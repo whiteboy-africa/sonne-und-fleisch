@@ -17,7 +17,7 @@ schrift_farbe: '#eee6d2'
 motiv: continuum
 hoehe: 1.9
 dicke: 0.078
-reihenfolge: 8
+reihenfolge: 12
 ---
 
 1800 im *Athenäum* erschienen, ein Jahr vor dem Tod des Autors. Die Hymnen

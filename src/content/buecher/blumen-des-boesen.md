@@ -18,7 +18,7 @@ schrift_farbe: '#f2e9db'
 motiv: lattice
 hoehe: 2.05
 dicke: 0.078
-reihenfolge: 7
+reihenfolge: 11
 ---
 
 Zweisprachige Ausgabe nach der Fassung von 1861, mit den verurteilten

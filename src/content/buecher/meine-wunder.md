@@ -16,7 +16,7 @@ schrift_farbe: '#f5e8da'
 motiv: wave
 hoehe: 1.98
 dicke: 0.078
-reihenfolge: 6
+reihenfolge: 10
 ---
 
 Die Sammlung erscheint bei Heinrich F. S. Bachmair in Heidelberg. Es ist der

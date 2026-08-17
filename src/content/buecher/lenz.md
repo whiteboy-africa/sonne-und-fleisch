@@ -16,7 +16,7 @@ schrift_farbe: '#f0e9d6'
 motiv: branches
 hoehe: 1.92
 dicke: 0.078
-reihenfolge: 3
+reihenfolge: 8
 ---
 
 Büchner arbeitet mit den Aufzeichnungen des Pfarrers Oberlin und schreibt

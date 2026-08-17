@@ -18,7 +18,7 @@ schrift_farbe: '#eee3cd'
 motiv: fracture
 hoehe: 2.05
 dicke: 0.078
-reihenfolge: 4
+reihenfolge: 9
 ---
 
 Isidore Ducasse veröffentlicht 1869 unter Pseudonym; der Verleger traut sich

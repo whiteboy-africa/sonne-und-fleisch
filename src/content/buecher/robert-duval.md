@@ -18,7 +18,7 @@ schrift_farbe: '#efe2c4'
 motiv: schematic
 hoehe: 2.0
 dicke: 0.078
-reihenfolge: 5
+reihenfolge: 2
 ---
 
 Platzhalter für die lange Beschreibung.

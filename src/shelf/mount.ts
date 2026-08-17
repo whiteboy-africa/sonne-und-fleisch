@@ -41,10 +41,6 @@ export function regalStarten(wurzel: HTMLElement) {
     panelVerfuegbarkeit: pflicht(wurzel, '[data-panel-verfuegbarkeit]'),
     panelLink: pflicht<HTMLAnchorElement>(wurzel, '[data-panel-link]'),
     panelLinkText: pflicht(wurzel, '[data-panel-link-text]'),
-    ansichtZuruecksetzen: pflicht<HTMLButtonElement>(
-      wurzel,
-      '[data-ansicht-zuruecksetzen]',
-    ),
     zurRegal: pflicht<HTMLButtonElement>(wurzel, '[data-zum-regal]'),
     wenden: pflicht<HTMLButtonElement>(wurzel, '[data-wenden]'),
     wendenText: pflicht(wurzel, '[data-wenden-text]'),
@@ -173,9 +169,6 @@ export function regalStarten(wurzel: HTMLElement) {
     });
   });
   el.zurRegal.addEventListener('click', () => engine?.returnToShelf());
-  el.ansichtZuruecksetzen.addEventListener('click', () =>
-    engine?.resetFocusView(),
-  );
   el.wenden.addEventListener('click', () => engine?.flipBook());
 
   wurzel.querySelectorAll('[data-gesamt]').forEach((element) => {

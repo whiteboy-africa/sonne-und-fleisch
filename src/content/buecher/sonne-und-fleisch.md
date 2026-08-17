@@ -19,7 +19,7 @@ motiv: orbit
 hoehe: 2.0
 dicke: 0.078
 lebendig: true
-reihenfolge: 2
+reihenfolge: 7
 # Doppelcover: hinten fängt das zweite Gedicht an, kopfüber gedruckt.
 rueckseite:
   titel: Das trunkene Schiff
