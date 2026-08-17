@@ -117,9 +117,10 @@ export function regalStarten(wurzel: HTMLElement) {
           : `Band zurück wenden zu ${buch.title}`
         : `${buch.title} umdrehen`,
     );
+    // Einheitlich kurz: „Seite A" oder „Seite B", bei jedem Doppelband
+    // gleich und immer in der Giftfarbe.
     if (doppelband) {
-      el.seitenmarke.textContent =
-        seite === 'vorn' ? 'Seite A von zwei' : 'Seite B von zwei';
+      el.seitenmarke.textContent = seite === 'vorn' ? 'Seite A' : 'Seite B';
     }
     el.panelFormat.textContent = buch.format;
     el.panelVerfuegbarkeit.textContent = buch.availability;
@@ -215,6 +216,42 @@ export function regalStarten(wurzel: HTMLElement) {
         blaetternAnsichtSetzen();
         panelSetzen();
         vorleseSetzen();
+      },
+      // Der Text fährt mit dem Band mit: erst hinaus, dann kommt der neue
+      // von der anderen Seite herein. Die ganze Detailseite wechselt, als
+      // stünden alle Bände nebeneinander auf einer Linie.
+      onSwap: (index, richtung) => {
+        const strecke = 56 * richtung;
+        const hinaus = el.panelInhalt.animate(
+          [
+            { transform: 'translateX(0)', opacity: 1 },
+            { transform: `translateX(${-strecke}px)`, opacity: 0 },
+          ],
+          { duration: 210, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' },
+        );
+
+        const umschalten = () => {
+          gewaehlterIndex = index;
+          aktiverIndex = index;
+          seite = 'vorn';
+          panelSetzen();
+          blaetternAnsichtSetzen();
+          vorleseSetzen();
+          // Erst die alte Bewegung loeschen, dann die neue starten. Sonst
+          // bliebe der Text bei „durchsichtig und verschoben" stehen, falls
+          // die Eintrittsbewegung nicht durchkommt — die Endlage von
+          // `fill: forwards` haelt sich sonst ewig.
+          hinaus.cancel();
+          el.panelInhalt.animate(
+            [
+              { transform: `translateX(${strecke}px)`, opacity: 0 },
+              { transform: 'translateX(0)', opacity: 1 },
+            ],
+            { duration: 280, easing: 'cubic-bezier(0, 0, 0.2, 1)' },
+          );
+        };
+
+        hinaus.finished.then(umschalten).catch(umschalten);
       },
       onSide: (naechsteSeite) => {
         seite = naechsteSeite;

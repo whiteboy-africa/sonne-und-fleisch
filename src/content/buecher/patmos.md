@@ -10,9 +10,9 @@ zitat_von: Verlagsnotiz
 format: Broschur
 verfuegbarkeit: In Vorbereitung
 cover_bild: /buecher/patmos/cover.webp
-cover_farbe: '#6d5b3f'
-akzent_farbe: '#b8863f'
-schrift_farbe: '#efe4cc'
+cover_farbe: '#08070b'
+akzent_farbe: '#bb9a79'
+schrift_farbe: '#d4b99f'
 motiv: continuum
 hoehe: 2.0
 dicke: 0.078

@@ -15,9 +15,9 @@ cover_bild: /buecher/yellow-fever/cover.webp
 # Dieser Band behaelt seinen gedruckten Ruecken aus dem Bogen.
 ruecken_bild: /buecher/yellow-fever/ruecken.webp
 # Farben für Rücken, Kanten und Blockrand — aus dem Umschlag genommen.
-cover_farbe: '#8a7a4a'
-akzent_farbe: '#c8352a'
-schrift_farbe: '#f2e7c8'
+cover_farbe: '#32352d'
+akzent_farbe: '#b64c36'
+schrift_farbe: '#ccbd99'
 motiv: fracture
 hoehe: 2.0
 dicke: 0.078

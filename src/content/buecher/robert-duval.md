@@ -12,9 +12,9 @@ format: Broschur
 verfuegbarkeit: In Vorbereitung
 cover_bild: /buecher/robert-duval/cover.webp
 # Farben für Rücken, Kanten und Blockrand — aus dem Umschlag genommen.
-cover_farbe: '#243a52'
-akzent_farbe: '#b8342a'
-schrift_farbe: '#efe2c4'
+cover_farbe: '#383429'
+akzent_farbe: '#cba970'
+schrift_farbe: '#bea378'
 motiv: schematic
 hoehe: 2.0
 dicke: 0.078

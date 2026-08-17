@@ -10,9 +10,9 @@ zitat_von: Verlagsnotiz
 format: Broschur
 verfuegbarkeit: In Vorbereitung
 cover_bild: /buecher/dolly/cover.webp
-cover_farbe: '#7f86b4'
-akzent_farbe: '#c9a7c8'
-schrift_farbe: '#efe9f4'
+cover_farbe: '#426763'
+akzent_farbe: '#a7d6f8'
+schrift_farbe: '#e0e7f7'
 motiv: branches
 hoehe: 2.0
 dicke: 0.078

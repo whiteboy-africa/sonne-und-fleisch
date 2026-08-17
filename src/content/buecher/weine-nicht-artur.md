@@ -14,9 +14,9 @@ verfuegbarkeit: In Vorbereitung
 cover_bild: /buecher/weine-nicht-artur/cover.webp
 # Farben für Rücken, Rückseite und Kanten — aus dem Umschlag genommen:
 # das Nachtblau des Himmels, das Gold der Schrift.
-cover_farbe: '#1e3c68'
-akzent_farbe: '#d8b25a'
-schrift_farbe: '#f4ecd8'
+cover_farbe: '#2e240e'
+akzent_farbe: '#e5b261'
+schrift_farbe: '#c0b292'
 motiv: orbit
 hoehe: 2.0
 dicke: 0.078

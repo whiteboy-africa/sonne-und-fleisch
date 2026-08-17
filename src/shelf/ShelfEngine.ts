@@ -35,6 +35,11 @@ type ShelfCallbacks = {
   onMode: (mode: ShelfMode, selectedIndex: number | null) => void;
   /** Welche der beiden Vorderseiten gerade oben ist. */
   onSide: (side: BookSide) => void;
+  /**
+   * Ein Seitwaertswechsel beginnt: der Text soll mitfahren. Richtung 1
+   * heisst nach links hinaus, -1 nach rechts.
+   */
+  onSwap: (index: number, richtung: 1 | -1) => void;
   onStatus: (message: string) => void;
   onReady: () => void;
 };
@@ -171,6 +176,18 @@ const introTempo = 0.45;
  * dieselbe Drehung bedeutet.
  */
 const drehschwelle = 0.2;
+
+/**
+ * Beim Wechsel in der Betrachtung fahren die Baende seitlich durchs Bild,
+ * als staenden alle auf einer endlosen Linie nebeneinander. So weit fahren
+ * sie dabei, und so lange dauert es.
+ */
+/** Grenzen des Zooms im Regal: naeher als 0,55 und weiter als 1,7 nicht. */
+const zoomNah = 0.55;
+const zoomFern = 1.7;
+
+const wipeWeg = 4.6;
+const wipeDauer = 0.52;
 
 const inspectDefaultYaw = 0.44;
 const inspectDefaultPitch = -0.07;
@@ -310,6 +327,9 @@ export class ShelfEngine {
   private elevationBeimGreifen = 0;
   /** Aufgelaufene Wischstrecke auf dem Telefon. */
   private wischWeg = 0;
+  /** Zoom im Regal: 1 ist der Normalabstand, kleiner heisst naeher dran. */
+  private zoom = 1;
+  private zielZoom = 1;
   private browseElevation = introElevation;
   private zielElevation = 0;
   /** Laeuft das anfaengliche Sinken noch? */
@@ -329,6 +349,11 @@ export class ShelfEngine {
    * Regal zurueck und wieder heran — genau der Umweg, den niemand will.
    */
   private swapZu: number | null = null;
+  /** Laufender Seitwaertswechsel in der Betrachtung. */
+  private wipeVon: number | null = null;
+  private wipeNach: number | null = null;
+  private wipeFortschritt = 0;
+  private wipeRichtung: 1 | -1 = 1;
   /** Schwanken des aufgestellten Bandes, aus der Blaettergeschwindigkeit. */
   private schwanken = 0;
   private pendingFocusIndex: number | null = null;
@@ -428,6 +453,7 @@ export class ShelfEngine {
           focus: (index: number) => void;
           browse: (index: number) => void;
           returnToShelf: () => void;
+          aufschlagen: (index: number) => void;
           intro: () => void;
         };
       }
@@ -436,6 +462,33 @@ export class ShelfEngine {
       focus: (index) => this.focusBook(index),
       browse: (index) => this.browseTo(index),
       returnToShelf: () => this.returnToShelf(),
+      // Schlaegt einen Band ohne Bewegung sofort auf. Nur zum Pruefen und
+      // Einstellen — so laesst sich die Betrachtung ansehen, ohne auf die
+      // Bewegung zu warten.
+      aufschlagen: (index: number) => {
+        const ziel = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
+        if (this.presentedIndex !== null && this.presentedIndex !== ziel) {
+          this.returnToPile(this.presentedIndex);
+        }
+        this.takeFromPile(ziel);
+        this.atRest = false;
+        this.layDownPending = false;
+        this.wipeVon = null;
+        this.wipeNach = null;
+        this.browseMotionPhase = "idle";
+        this.presentedIndex = ziel;
+        this.selectedIndex = ziel;
+        this.activeIndex = ziel;
+        this.scrollIndex = ziel;
+        this.targetScrollIndex = ziel;
+        this.focusProgress = 1;
+        this.mode = "inspect";
+        this.controls.enabled = true;
+        this.side = "vorn";
+        this.callbacks.onActiveIndex(ziel);
+        this.callbacks.onSide(this.side);
+        this.callbacks.onMode(this.mode, ziel);
+      },
       // Spielt den Ankunftsblick noch einmal ab — zum Einstellen von
       // Haltezeit, Hoehe und Tempo, ohne die Seite neu zu laden.
       intro: () => {
@@ -831,6 +884,19 @@ export class ShelfEngine {
 
   private handleWheel = (event: WheelEvent) => {
     if (this.mode !== "browse") return;
+
+    // Zwei Finger auseinander auf dem Trackpad (und Strg mit dem Mausrad
+    // unter Windows) kommt als Rad-Ereignis mit gedrueckter Strg-Taste an.
+    // Das ist Zoomen, kein Blaettern.
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      this.zielZoom = clamp(
+        this.zielZoom * (1 + event.deltaY * 0.0022),
+        zoomNah,
+        zoomFern,
+      );
+      return;
+    }
     event.preventDefault();
     this.pendingFocusIndex = null;
     const dominant =
@@ -1379,8 +1445,11 @@ export class ShelfEngine {
       }
     }
 
+    // Der aktive Band ist das Ziel, nicht der Zwischenstand des Gleitens.
+    // Sonst wandert die Auswahl beim Sprung von 002 nach 005 durch alle
+    // Baende dazwischen — und jeder kaeme kurz heraus.
     const nextActive = clamp(
-      Math.round(this.scrollIndex),
+      Math.round(this.targetScrollIndex),
       0,
       this.runtimeBooks.length - 1,
     );
@@ -1393,6 +1462,7 @@ export class ShelfEngine {
     if (this.mode === "browse") {
       this.updateBrowseMotion(delta);
     }
+    this.updateWipe(delta);
   }
 
   /**
@@ -1432,8 +1502,10 @@ export class ShelfEngine {
       delta,
     );
 
+    this.zoom = damp(this.zoom, this.zielZoom, this.reducedMotion ? 20 : 9, delta);
+
     const grund = this.responsiveBrowseCamera;
-    const abstand = grund.distanceTo(browseTarget);
+    const abstand = grund.distanceTo(browseTarget) * this.zoom;
     const flach = Math.hypot(grund.x - browseTarget.x, grund.z - browseTarget.z);
     const grundAzimut = Math.atan2(grund.x - browseTarget.x, grund.z - browseTarget.z);
     const grundHoehe = Math.atan2(grund.y - browseTarget.y, flach);
@@ -1451,7 +1523,7 @@ export class ShelfEngine {
 
   // Hilfsgroessen fuer den gehaltenen Ankunftsblick.
   private introAbstand() {
-    return this.responsiveBrowseCamera.distanceTo(browseTarget);
+    return this.responsiveBrowseCamera.distanceTo(browseTarget) * this.zoom;
   }
 
   private introHoehe() {
@@ -1489,6 +1561,51 @@ export class ShelfEngine {
     const drehTempo = this.reducedMotion ? 24 : 11;
     this.inspectYaw = damp(this.inspectYaw, this.zielYaw, drehTempo, delta);
     this.inspectPitch = damp(this.inspectPitch, this.zielPitch, drehTempo, delta);
+
+    // Waehrend eines Seitwaertswechsels stehen zwei Baende nebeneinander:
+    // der bisherige faehrt hinaus, der naechste kommt herein.
+    if (this.wipeVon !== null && this.wipeNach !== null) {
+      const t = easeOutCubic(this.wipeFortschritt);
+      const hinaus = this.runtimeBooks[this.wipeVon];
+      const herein = this.runtimeBooks[this.wipeNach];
+      // Der Bezugspunkt der Reihe steht noch beim alten Band; der neue
+      // muss den Abstand seiner Stapel dazurechnen, um an dieselbe Stelle
+      // zu kommen.
+      const versatz = hinaus.x - herein.x;
+      const weg = wipeWeg * this.wipeRichtung;
+
+      for (const [band, x, sichtbar] of [
+        [hinaus, focusX - weg * t, true],
+        [herein, focusX + versatz + weg * (1 - t), true],
+      ] as const) {
+        const pose = focusedBookPose(
+          1,
+          band.place,
+          this.motionLayout,
+          x,
+          focusZ,
+          focusScale,
+        );
+        this.commitBookPose(
+          band,
+          {
+            ...pose,
+            yaw: pose.yaw + inspectDefaultYaw,
+            pitch: pose.pitch + inspectDefaultPitch,
+          },
+          false,
+        );
+        band.content.rotation.z = inspectDefaultRoll;
+        band.content.visible = sichtbar;
+      }
+      this.runtimeBooks.forEach((band) => {
+        if (band.index !== this.wipeVon && band.index !== this.wipeNach) {
+          band.content.visible = false;
+        }
+      });
+      this.shelfFurniture.visible = false;
+      return;
+    }
 
     if (this.selectedIndex !== null) {
       const selected = this.runtimeBooks[this.selectedIndex];
@@ -1834,23 +1951,64 @@ export class ShelfEngine {
       return;
     }
     if (this.mode !== "inspect" && this.mode !== "focusing") return;
+    if (this.selectedIndex === null) return;
     if (ziel === this.selectedIndex) return;
+    // Ein laufender Wechsel wird erst zu Ende gefahren.
+    if (this.wipeVon !== null) return;
 
-    // Der aufgeschlagene Band geht zurueck, der naechste kommt heraus und
-    // wird gleich wieder aufgeschlagen. Die Beschreibung bleibt offen.
-    this.swapZu = ziel;
-    this.selectedIndex = null;
-    this.mode = "browse";
+    // Die Baende stehen fuer diesen Augenblick nebeneinander auf einer
+    // Linie: der aufgeschlagene faehrt zur Seite hinaus, der naechste kommt
+    // von der anderen Seite herein. Kein Rueckweg ueber den Stapel.
+    this.wipeVon = this.selectedIndex;
+    this.wipeNach = ziel;
+    this.wipeRichtung = ziel > this.selectedIndex ? 1 : -1;
+    this.wipeFortschritt = 0;
+
+    // Die Stapelbuchhaltung mitfuehren, damit das Regal stimmt, wenn man
+    // spaeter zurueckgeht.
+    this.returnToPile(this.wipeVon);
+    this.takeFromPile(this.wipeNach);
+
     this.controls.enabled = false;
     this.zielYaw = inspectDefaultYaw;
     this.zielPitch = inspectDefaultPitch;
-    this.inspectYaw = inspectDefaultYaw;
-    this.inspectPitch = inspectDefaultPitch;
-    this.atRest = false;
-    this.targetScrollIndex = ziel;
-    this.pendingFocusIndex = ziel;
-    this.lastInputTime = performance.now() - 1000;
-    this.callbacks.onMode("focusing", ziel);
+    this.side = "vorn";
+    this.callbacks.onSide(this.side);
+    this.callbacks.onSwap(ziel, this.wipeRichtung);
+    this.callbacks.onStatus(
+      `${this.runtimeBooks[ziel].data.shortTitle} kommt herein`,
+    );
+  }
+
+  /** Fuehrt den Seitwaertswechsel weiter; true, solange er laeuft. */
+  private updateWipe(delta: number) {
+    if (this.wipeVon === null || this.wipeNach === null) return false;
+    this.wipeFortschritt = clamp(
+      this.wipeFortschritt + delta / (this.reducedMotion ? 0.12 : wipeDauer),
+      0,
+      1,
+    );
+    if (this.wipeFortschritt < 1) return true;
+
+    // Angekommen: der neue Band ist der betrachtete. Der Bezugspunkt der
+    // Reihe wandert mit, die Weltposition bleibt dabei gleich.
+    const nach = this.wipeNach;
+    this.selectedIndex = nach;
+    this.activeIndex = nach;
+    this.scrollIndex = nach;
+    this.targetScrollIndex = nach;
+    this.presentedIndex = nach;
+    this.wipeVon = null;
+    this.wipeNach = null;
+    this.wipeFortschritt = 0;
+    this.mode = "inspect";
+    this.controls.enabled = true;
+    this.callbacks.onActiveIndex(nach);
+    this.callbacks.onMode(this.mode, nach);
+    this.callbacks.onStatus(
+      `${this.runtimeBooks[nach].data.shortTitle} liegt vorn`,
+    );
+    return false;
   }
 
   presentBook(index: number) {

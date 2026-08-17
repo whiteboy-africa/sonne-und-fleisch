@@ -10,9 +10,9 @@ zitat_von: Verlagsnotiz
 format: Broschur
 verfuegbarkeit: In Vorbereitung
 cover_bild: /buecher/gnadenthal-suspiria/cover.webp
-cover_farbe: '#e8e4da'
-akzent_farbe: '#8a8578'
-schrift_farbe: '#2a2823'
+cover_farbe: '#a5a5a5'
+akzent_farbe: '#5c5c5c'
+schrift_farbe: '#ffffff'
 motiv: lattice
 hoehe: 2.0
 dicke: 0.078
