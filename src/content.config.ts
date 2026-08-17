@@ -44,7 +44,16 @@ const buecher = defineCollection({
     // liegt bei 0,07, ein 384-Seiter bei 0,24. Die Breite rechnet das Regal
     // aus der Hoehe (Taschenbuchformat), sie steht nicht hier.
     hoehe: z.number().min(1.4).max(2.4).default(2.0),
-    dicke: z.number().min(0.03).max(0.4).default(0.08),
+    dicke: z.number().min(0.02).max(0.4).default(0.08),
+    // Breite geteilt durch Hoehe. Vorgabe ist A5 (0,705), und dabei bleibt
+    // es vorerst fuer alle Baende.
+    //
+    // Wer das echte Format eines Buches eintragen will, rechnet es aus dem
+    // Druckfile: Breite eines Deckels geteilt durch die Bogenhoehe. Dann
+    // wird das Umschlagbild nicht mehr ins A5-Format gequetscht. Die Dicke
+    // folgt genauso aus der Breite des Ruecken-Streifens, geteilt durch die
+    // Bogenhoehe und mal der Buchhoehe.
+    breite_verhaeltnis: z.number().min(0.4).max(1.2).default(148 / 210),
     // Eigenes Cover-Bild fuer die Vorderseite, etwa
     // "/buecher/mein-buch/cover.webp". Hochformat, moeglichst 2:3.
     // Ersetzt nur die Vorderseite; Ruecken, Rueckseite und Kanten

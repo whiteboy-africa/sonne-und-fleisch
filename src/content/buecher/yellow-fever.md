@@ -12,25 +12,24 @@ zitat_von: Verlagsnotiz
 format: Broschur
 verfuegbarkeit: In Vorbereitung
 cover_bild: /buecher/yellow-fever/cover.webp
-ruecken_bild: /buecher/yellow-fever/ruecken.webp
 # Farben für Rücken, Kanten und Blockrand — aus dem Umschlag genommen.
 cover_farbe: '#8a7a4a'
 akzent_farbe: '#c8352a'
 schrift_farbe: '#f2e7c8'
 motiv: fracture
 hoehe: 2.0
-dicke: 0.14
+dicke: 0.078
 reihenfolge: 1
 # Doppelcover: die zweite Vorderseite liegt im Druckbogen kopfüber links.
 # Hier ist sie aufrecht abgelegt — das Regal dreht sie beim Drucken selbst.
 rueckseite:
-  titel: Zweite Geschichte
-  kurztitel: Zweite Geschichte
+  titel: Götveren
+  kurztitel: Götveren
   autor: C. T. Selters
   klappentext: >-
-    Platzhalter: die Einführung in die andere Geschichte. Der echte Titel der
-    zweiten Seite steht noch nicht hier.
-  zitat: Platzhalter für die zweite Seite.
+    Platzhalter: die Einführung in Götveren, die zweite Geschichte des
+    Bandes. Sie erscheint, sobald man das Buch wendet.
+  zitat: Platzhalter für einen Satz aus Götveren.
   zitat_von: Verlagsnotiz
   cover_bild: /buecher/yellow-fever/rueckseite.webp
   cover_farbe: '#c9b98a'

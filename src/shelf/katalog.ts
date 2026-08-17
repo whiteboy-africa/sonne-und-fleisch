@@ -29,6 +29,8 @@ export type BookMotif = (typeof MOTIVE)[number];
 
 export type CatalogBook = {
   id: string;
+  /** Releasenummer, dreistellig — steht auf dem Buchruecken. */
+  release: string;
   title: string;
   shortTitle: string;
   author: string;
@@ -44,6 +46,8 @@ export type CatalogBook = {
   motif: BookMotif;
   height: number;
   thickness: number;
+  /** Breite geteilt durch Hoehe. Kommt aus dem Umschlagbild. */
+  widthRatio: number;
   /**
    * Optionales eigenes Cover-Bild fuer die Vorderseite. Dateien liegen unter
    * `public/buecher/<id>/` und werden als `/buecher/<id>/cover.webp`

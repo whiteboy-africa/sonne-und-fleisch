@@ -82,13 +82,6 @@ const browseTarget = new THREE.Vector3(0, 0.8, 0.5);
 const roomColor = "#000000";
 /** Der Schnitt der Buchbloecke — billiges Werkdruckpapier, leicht vergilbt. */
 const pageColor = new THREE.Color("#cbc3b0");
-/**
- * Breite zu Hoehe eines Taschenbuchs (A5: 148 zu 210). Die Breite wird aus
- * der Hoehe gerechnet, damit jeder Band dasselbe Format hat, egal wie hoch
- * er gesetzt ist.
- */
-const paperbackRatio = 148 / 210;
-
 /** So viele Baende vor und hinter dem aktiven bekommen ihr Cover-Bild. */
 const coverPreloadRange = 2;
 
@@ -138,10 +131,26 @@ const compactDetailWidthRatio = 0.48;
 const desktopDetailMaxWidth = 620;
 const compactDetailMaxWidth = 570;
 const desktopFocusX = -0.58;
-const desktopFocusZ = 2.95;
-const desktopFocusScale = 1.08;
-const mobileFocusZ = 2.62;
-const mobileFocusScale = 0.92;
+const desktopFocusZ = 3.2;
+const desktopFocusScale = 1.2;
+const mobileFocusZ = 2.9;
+const mobileFocusScale = 1.02;
+/**
+ * So steht der Band da, wenn man ihn ansieht: leicht angedreht, damit der
+ * Ruecken mitspricht und das Cover nicht wie ein flaches Bild klebt.
+ */
+/**
+ * Ab dieser Drehung der Ansicht legt sich der aufgestellte Band hin: gut
+ * elf Grad, auf einem breiten Fenster etwa fuenfzig Pixel Ziehen. Darunter
+ * darf man die Ansicht zurechtruecken, ohne dass der Band verschwindet.
+ * In Bogenmass statt in Pixeln, damit die Schwelle auf jedem Bildschirm
+ * dieselbe Drehung bedeutet.
+ */
+const drehschwelle = 0.2;
+
+const inspectDefaultYaw = 0.27;
+const inspectDefaultPitch = -0.05;
+
 const inspectionIdleLift = 0.014;
 const inspectionIdlePitch = THREE.MathUtils.degToRad(0.28);
 const inspectionIdleYaw = THREE.MathUtils.degToRad(0.48);
@@ -258,9 +267,17 @@ export class ShelfEngine {
    * losgehen.
    */
   private atRest = true;
+  /**
+   * Der aufgestellte Band soll sich hinlegen, ohne dass ein anderer
+   * herauskommt. Wird gesetzt, sobald jemand die Ansicht dreht: dann schaut
+   * man die Stapel an, nicht einen einzelnen Band.
+   */
+  private layDownPending = false;
   /** Blickwinkel um die Stapel herum, vom Ziehen gesetzt. */
   private browseAzimuth = 0;
   private zielAzimuth = 0;
+  /** Blickwinkel beim Aufsetzen des Zeigers — Bezugspunkt fuers Hinlegen. */
+  private azimuthBeimGreifen = 0;
   private browseElevation = 0;
   private zielElevation = 0;
   private pendingFocusIndex: number | null = null;
@@ -278,11 +295,11 @@ export class ShelfEngine {
   /** Welche Vorderseite oben ist. Nur bei Doppelbaenden veraenderbar. */
   private side: BookSide = "vorn";
   /** Freie Drehung des betrachteten Bandes, in Bogenmass. */
-  private inspectYaw = 0;
-  private inspectPitch = 0;
+  private inspectYaw = inspectDefaultYaw;
+  private inspectPitch = inspectDefaultPitch;
   /** Wohin gedreht werden soll — der Knopf setzt das Ziel, das Ziehen beides. */
-  private zielYaw = 0;
-  private zielPitch = 0;
+  private zielYaw = inspectDefaultYaw;
+  private zielPitch = inspectDefaultPitch;
   private lastInputTime = 0;
   private pointerDown = false;
   private pointerId: number | null = null;
@@ -416,8 +433,11 @@ export class ShelfEngine {
       const runtime = this.createBook(book, index, pile * pileSpacing, pile);
       this.runtimeBooks.push(runtime);
       this.shelfGroup.add(runtime.slot);
+      // Vorn im Katalog heisst oben im Stapel: die Reihenfolge wird beim
+      // Stapeln umgedreht, damit 001 obenauf liegt und nicht darunter
+      // verschwindet.
       if (!this.pileOrder[pile]) this.pileOrder[pile] = [];
-      this.pileOrder[pile].push(index);
+      this.pileOrder[pile].unshift(index);
     });
 
     this.motionLayout = createMotionLayout(
@@ -484,9 +504,10 @@ export class ShelfEngine {
     x: number,
     pile: number,
   ): RuntimeBook {
-    // Taschenbuch: die Breite folgt der Hoehe. Ein Hauch Abweichung, damit
-    // die Stapelkanten nicht wie geschnitten aussehen.
-    const width = book.height * paperbackRatio * (1 + ((index % 5) - 2) * 0.004);
+    // Die Breite folgt der Hoehe und dem Format des Buches. Kein
+    // Zufallsversatz mehr: wer ein Umschlagbild hinterlegt, bekommt genau
+    // dessen Verhaeltnis, sonst wird sein Cover verzerrt.
+    const width = book.height * book.widthRatio;
     const depth = book.thickness;
     const slot = new THREE.Group();
     slot.name = `bookSlot:${book.id}`;
@@ -752,6 +773,7 @@ export class ShelfEngine {
     this.pointerLastX = event.clientX;
     this.pointerLastY = event.clientY;
     this.pointerTravel = 0;
+    this.azimuthBeimGreifen = this.zielAzimuth;
     this.canvas.setPointerCapture(event.pointerId);
   };
 
@@ -781,6 +803,12 @@ export class ShelfEngine {
       this.pointerLastX = event.clientX;
       this.pointerLastY = event.clientY;
       this.pointerTravel += Math.abs(dx) + Math.abs(dy);
+      // Wer die Ansicht wirklich dreht, schaut die Stapel an — dann legt
+      // sich der aufgestellte Band wieder oben auf seinen Stapel. Ein
+      // kurzes Antippen oder ein Zurechtruecken reicht dafuer nicht.
+      if (Math.abs(this.zielAzimuth - this.azimuthBeimGreifen) > drehschwelle) {
+        this.layDown();
+      }
       const proPixel = Math.PI / Math.max(420, this.canvas.clientWidth * 0.6);
       this.zielAzimuth -= dx * proPixel;
       this.zielElevation = clamp(
@@ -835,6 +863,15 @@ export class ShelfEngine {
   };
 
   private handleKeyDown = (event: KeyboardEvent) => {
+    // F wendet den betrachteten Band.
+    if (
+      (event.key === "f" || event.key === "F") &&
+      (this.mode === "inspect" || this.mode === "focusing")
+    ) {
+      event.preventDefault();
+      this.flipBook();
+      return;
+    }
     if (this.mode === "browse") this.atRest = false;
     if (event.key === "Escape") {
       this.returnToShelf();
@@ -970,26 +1007,46 @@ export class ShelfEngine {
     );
   }
 
-  private updateBrowseMotion(delta: number) {
-    if (this.atRest) return;
-    if (this.browseMotionPhase === "idle") {
-      if (this.presentedIndex === this.activeIndex) {
-        if (this.pendingFocusIndex === this.activeIndex) {
-          this.beginFocus(this.activeIndex);
-        }
-        return;
-      }
+  /** Legt den aufgestellten Band zurueck, ohne einen neuen zu holen. */
+  private layDown() {
+    if (this.mode !== "browse") return;
+    if (this.presentedIndex === null || this.layDownPending) return;
+    this.layDownPending = true;
+    this.pendingFocusIndex = null;
+  }
 
-      this.motionBookIndex = this.presentedIndex;
-      this.browseMotionPhase =
-        this.motionBookIndex === null ? "extract-next" : "retreat-current";
-      if (this.motionBookIndex === null) {
-        this.motionBookIndex = this.activeIndex;
-      } else {
-        // Der aufgestellte Band gehoert wieder in seinen Stapel — obendrauf.
+  private updateBrowseMotion(delta: number) {
+    // Hinlegen geht auch aus der Ruhe heraus.
+    if (this.atRest && !this.layDownPending) return;
+    if (this.browseMotionPhase === "idle") {
+      if (this.layDownPending) {
+        if (this.presentedIndex === null) {
+          this.layDownPending = false;
+          return;
+        }
+        this.motionBookIndex = this.presentedIndex;
         this.returnToPile(this.motionBookIndex);
+        this.browseMotionPhase = "retreat-current";
+        this.browseMotionProgress = 0;
+      } else {
+        if (this.presentedIndex === this.activeIndex) {
+          if (this.pendingFocusIndex === this.activeIndex) {
+            this.beginFocus(this.activeIndex);
+          }
+          return;
+        }
+
+        this.motionBookIndex = this.presentedIndex;
+        this.browseMotionPhase =
+          this.motionBookIndex === null ? "extract-next" : "retreat-current";
+        if (this.motionBookIndex === null) {
+          this.motionBookIndex = this.activeIndex;
+        } else {
+          // Der aufgestellte Band gehoert wieder in seinen Stapel — obendrauf.
+          this.returnToPile(this.motionBookIndex);
+        }
+        this.browseMotionProgress = 0;
       }
-      this.browseMotionProgress = 0;
     }
 
     const phase = this.browseMotionPhase;
@@ -1030,6 +1087,15 @@ export class ShelfEngine {
         break;
       case "shelve-current":
         this.presentedIndex = null;
+        if (this.layDownPending) {
+          // Nur hinlegen, keinen neuen holen.
+          this.layDownPending = false;
+          this.motionBookIndex = null;
+          this.browseMotionPhase = "idle";
+          this.atRest = true;
+          this.callbacks.onStatus(`${this.booksData.length} Bände im Regal`);
+          break;
+        }
         this.motionBookIndex = this.activeIndex;
         this.browseMotionPhase = "extract-next";
         break;
@@ -1153,10 +1219,10 @@ export class ShelfEngine {
         }
         this.selectedIndex = null;
         this.mode = "browse";
-        this.zielYaw = 0;
-        this.zielPitch = 0;
-        this.inspectYaw = 0;
-        this.inspectPitch = 0;
+        this.zielYaw = inspectDefaultYaw;
+        this.zielPitch = inspectDefaultPitch;
+        this.inspectYaw = inspectDefaultYaw;
+        this.inspectPitch = inspectDefaultPitch;
         if (this.side !== "vorn") {
           this.side = "vorn";
           this.callbacks.onSide(this.side);
@@ -1589,8 +1655,8 @@ export class ShelfEngine {
 
   resetFocusView() {
     if (this.mode !== "inspect" || this.selectedIndex === null) return;
-    this.zielYaw = 0;
-    this.zielPitch = 0;
+    this.zielYaw = inspectDefaultYaw;
+    this.zielPitch = inspectDefaultPitch;
     const selected = this.runtimeBooks[this.selectedIndex];
     const worldPosition = new THREE.Vector3();
     selected.content.getWorldPosition(worldPosition);

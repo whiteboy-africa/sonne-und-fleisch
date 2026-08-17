@@ -18,12 +18,12 @@ import {
 } from '../src/shelf/book-motion.ts';
 
 // Dieselben Werte wie in ShelfEngine.ts.
-const paperbackRatio = 148 / 210;
+const paperbackRatio = 148 / 210;  // Vorgabe, wenn ein Buch nichts eigenes sagt
 const booksPerPile = 6;
 const pileSpacing = 2.3;
 const desktopFocusX = -0.58;
-const desktopFocusZ = 2.95;
-const desktopFocusScale = 1.08;
+const desktopFocusZ = 3.2;
+const desktopFocusScale = 1.2;
 
 // Das aktuelle Programm, so wie es im Regal steht.
 const buecher = [
@@ -64,7 +64,7 @@ const baende = buecher.map((b, index) => ({
   index,
   pile: pileOfIndex[index],
   x: pileOfIndex[index] * pileSpacing,
-  width: b.height * paperbackRatio * (1 + ((index % 5) - 2) * 0.004),
+  width: b.height * (b.ratio ?? paperbackRatio),
   place: {
     stackY: 0,
     ...stackJitter(index),
@@ -78,7 +78,7 @@ const baende = buecher.map((b, index) => ({
  * herausgezogen wird aus der Mitte, zurueckgelegt wird obenauf.
  */
 const stapel = [];
-baende.forEach((b) => (stapel[b.pile] ??= []).push(b.index));
+baende.forEach((b) => (stapel[b.pile] ??= []).unshift(b.index));
 
 function hoehenFortschreiben() {
   stapel.forEach((reihe) => {

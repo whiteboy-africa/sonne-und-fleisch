@@ -19,7 +19,7 @@ akzent_farbe: '#d8b25a'
 schrift_farbe: '#f4ecd8'
 motiv: orbit
 hoehe: 2.0
-dicke: 0.12
+dicke: 0.078
 reihenfolge: 0
 ---
 

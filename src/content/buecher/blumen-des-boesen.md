@@ -17,7 +17,7 @@ akzent_farbe: '#c0553c'
 schrift_farbe: '#f2e9db'
 motiv: lattice
 hoehe: 2.05
-dicke: 0.235
+dicke: 0.078
 reihenfolge: 7
 ---
 

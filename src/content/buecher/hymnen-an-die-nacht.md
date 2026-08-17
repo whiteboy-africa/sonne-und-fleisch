@@ -16,7 +16,7 @@ akzent_farbe: '#d9c07a'
 schrift_farbe: '#eee6d2'
 motiv: continuum
 hoehe: 1.9
-dicke: 0.055
+dicke: 0.078
 reihenfolge: 8
 ---
 

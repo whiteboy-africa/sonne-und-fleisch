@@ -17,8 +17,8 @@ akzent_farbe: '#b8342a'
 schrift_farbe: '#efe2c4'
 motiv: schematic
 hoehe: 2.0
-dicke: 0.19
-reihenfolge: 2
+dicke: 0.078
+reihenfolge: 5
 ---
 
 Platzhalter für die lange Beschreibung.

@@ -5,8 +5,8 @@
  * die sind gemalt und leuchten aus dem Schwarz heraus. Die Bedienung bleibt
  * hell auf Schwarz, mit einer Giftfarbe fuer aktive Zustaende.
  *
- * Schrift: eine einzige Groteske, gemischt gesetzt. Keine Versalien-Ketten,
- * keine gesperrten Kapitaelchen, keine Serifen mit Strichstaerkenkontrast.
+ * Schrift: ein technischer Mono, klein gesetzt. Katalognummern mit drei
+ * Stellen. Das Laute sind die Umschlaege, nicht die Typografie.
  */
 
 :root {
@@ -22,11 +22,11 @@
   /* Das Gold der Umschlaege, fuer stille Zweitakzente. */
   --gold: #d8b25a;
   /*
-   * Eine ruhige Groteske fuer alles. Sie soll nicht auffallen — die
-   * gemalten Umschlaege sind das Laute an dieser Seite.
+   * Ein technischer Mono. Feste Zeichenbreite, kalte Ziffern, keine
+   * Designschul-Groteske. Alles Kleine bleibt klein — gross ist nur das
+   * Buch selbst.
    */
-  --schrift: 'Inter Variable', Inter, -apple-system, 'Helvetica Neue',
-    Helvetica, Arial, sans-serif;
+  --schrift: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 }
 
 *,

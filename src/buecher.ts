@@ -34,10 +34,11 @@ export function buchPfad(buch: Buch): string {
  * deutschen Feldnamen der Inhalte auf die englischen der uebernommenen
  * Engine treffen.
  */
-export function alsKatalogBuch(buch: Buch): CatalogBook {
+export function alsKatalogBuch(buch: Buch, position = 0): CatalogBook {
   const d = buch.data;
   return {
     id: buch.id,
+    release: releasenummer(position),
     title: d.titel,
     shortTitle: d.kurztitel ?? d.titel,
     author: d.autor,
@@ -54,6 +55,7 @@ export function alsKatalogBuch(buch: Buch): CatalogBook {
     motif: d.motiv,
     height: d.hoehe,
     thickness: d.dicke,
+    widthRatio: d.breite_verhaeltnis,
     ...(d.cover_bild ? { coverImage: d.cover_bild } : {}),
     ...(d.ruecken_bild ? { spineImage: d.ruecken_bild } : {}),
     ...(d.lebendig ? { living: true } : {}),
@@ -85,7 +87,14 @@ export function istDoppelband(buch: Buch): boolean {
   return buch.data.rueckseite !== undefined;
 }
 
+/** Dreistellige Releasenummer, wie sie auf dem Buchruecken steht. */
+export function releasenummer(position: number): string {
+  return String(position + 1).padStart(3, '0');
+}
+
 /** Der ganze Katalog, fertig fuer die Engine. */
 export async function katalogFuerRegal(): Promise<CatalogBook[]> {
-  return (await alleBuecher()).map(alsKatalogBuch);
+  return (await alleBuecher()).map((buch, position) =>
+    alsKatalogBuch(buch, position),
+  );
 }

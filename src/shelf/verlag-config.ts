@@ -16,6 +16,11 @@ export const siteConfig = {
   // Kuerzel unten auf dem Buchruecken.
   spineMark: 'SF',
   bookLinkLabel: 'Zum Buch',
+  /**
+   * Steht unten rechts im Regal, wo sonst die Bedienhinweise staenden.
+   * Eine Zeile, Versalien.
+   */
+  slogan: 'PERMANENTE DETERRITORIALIZATION',
   socialImageAlt:
     'Ein Regal mit den Bänden des Verlags Sonne und Fleisch, ein Band nach vorn gezogen.',
   independentNote: 'Sonne und Fleisch — unabhängiger Verlag.',

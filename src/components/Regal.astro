@@ -10,9 +10,10 @@ interface Props {
 }
 
 const { katalog } = Astro.props;
-const zweistellig = (zahl: number) => String(zahl).padStart(2, '0');
+// Katalognummern: drei Stellen, fuehrende Nullen. 001, 002, 003.
+const katalognummer = (zahl: number) => String(zahl).padStart(3, '0');
 const erstes = katalog[0];
-const gesamt = zweistellig(katalog.length);
+const gesamt = katalognummer(katalog.length);
 ---
 
 <main class="press-experience is-browsing" data-regal>
@@ -51,7 +52,7 @@ const gesamt = zweistellig(katalog.length);
 
   <section class="browse-caption" data-browse-caption>
     <p class="eyebrow">
-      <span data-blaettern-zahl>{zweistellig(1)}</span>
+      <span data-blaettern-zahl>{katalognummer(1)}</span>
       <span class="eyebrow__line"></span>
       <span data-gesamt>{gesamt}</span>
     </p>
@@ -98,17 +99,15 @@ const gesamt = zweistellig(katalog.length);
             aria-current={index === 0 ? 'true' : undefined}
           >
             <span></span>
+            <b>{katalognummer(index + 1)}</b>
           </button>
         ))
       }
     </div>
-    <div class="input-hint" aria-hidden="true">
-      <span>Ziehen dreht die Ansicht</span>
-      <i></i>
-      <span>Scrollen blättert</span>
-      <i></i>
-      <span>Pfeiltasten</span>
-    </div>
+    {/* Kein Bedienhinweis: Pfeile und Leiste zeigen das Blättern von
+        selbst, und die Beschriftung der Fläche sagt es Vorlesegeräten.
+        Hier steht stattdessen die Parole. */}
+    <p class="slogan">{siteConfig.slogan}</p>
   </nav>
 
   <aside class="book-details" data-panel aria-hidden="true" aria-label="Angaben zum Band">
@@ -152,7 +151,8 @@ const gesamt = zweistellig(katalog.length);
             wechselt damit auch die Beschreibung auf die andere Geschichte. */}
         <button type="button" class="wenden-knopf" data-wenden>
           <span aria-hidden="true">⟳</span>
-          <span data-wenden-text>Umdrehen</span>
+          <span data-wenden-text>Flip book</span>
+          <kbd aria-hidden="true">F</kbd>
         </button>
 
         <a class="official-link" data-panel-link href="/programm">
@@ -161,9 +161,8 @@ const gesamt = zweistellig(katalog.length);
         </a>
       </div>
 
+      {/* Kein Bedienhinweis — Ziehen und Zoomen findet jeder selbst. */}
       <div class="focus-controls" aria-label="Ansicht">
-        <span>Ziehen dreht den Band in jede Richtung</span>
-        <span>Scrollen zoomt</span>
         <button type="button" data-ansicht-zuruecksetzen>Ansicht zurücksetzen</button>
       </div>
     </div>

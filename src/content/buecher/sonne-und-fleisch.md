@@ -17,9 +17,9 @@ akzent_farbe: '#e8c26a'
 schrift_farbe: '#f6ecd8'
 motiv: orbit
 hoehe: 2.0
-dicke: 0.05
+dicke: 0.078
 lebendig: true
-reihenfolge: 3
+reihenfolge: 2
 # Doppelcover: hinten fängt das zweite Gedicht an, kopfüber gedruckt.
 rueckseite:
   titel: Das trunkene Schiff

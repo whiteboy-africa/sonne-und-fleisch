@@ -6,7 +6,8 @@ import { ShelfEngine, type BookSide, type ShelfMode } from './ShelfEngine';
 import type { CatalogBook } from './katalog';
 import { siteConfig } from './verlag-config';
 
-const zweistellig = (zahl: number) => String(zahl).padStart(2, '0');
+// Katalognummern: drei Stellen, fuehrende Nullen. 001, 002, 003.
+const katalognummer = (zahl: number) => String(zahl).padStart(3, '0');
 
 function pflicht<T extends Element>(wurzel: ParentNode, wahl: string): T {
   const element = wurzel.querySelector<T>(wahl);
@@ -58,12 +59,12 @@ export function regalStarten(wurzel: HTMLElement) {
   let modus: ShelfMode = 'browse';
   let seite: BookSide = 'vorn';
 
-  const gesamt = zweistellig(katalog.length);
+  const gesamt = katalognummer(katalog.length);
 
   function blaetternAnsichtSetzen() {
     const buch = katalog[aktiverIndex];
     const imFokus = modus !== 'browse';
-    el.blaetternZahl.textContent = zweistellig(aktiverIndex + 1);
+    el.blaetternZahl.textContent = katalognummer(aktiverIndex + 1);
     el.blaetternTitel.textContent = buch.shortTitle;
     el.blaetternAutor.textContent = buch.author;
     el.ansehen.disabled = imFokus;
@@ -96,7 +97,7 @@ export function regalStarten(wurzel: HTMLElement) {
     const gezeigt = seite === 'hinten' && buch.back ? buch.back : buch;
 
     el.panel.setAttribute('aria-label', `Angaben zu ${gezeigt.title}`);
-    el.panelZahl.textContent = zweistellig(gewaehlterIndex + 1);
+    el.panelZahl.textContent = katalognummer(gewaehlterIndex + 1);
     el.panelTitel.textContent = gezeigt.title;
     el.panelAutor.textContent = gezeigt.author;
     el.panelKlappentext.textContent = gezeigt.description;
@@ -108,9 +109,9 @@ export function regalStarten(wurzel: HTMLElement) {
     el.seitenmarke.hidden = !doppelband;
     el.wendenText.textContent = doppelband
       ? seite === 'vorn'
-        ? `Umdrehen zu „${buch.back?.shortTitle ?? ''}“`
-        : `Zurück zu „${buch.shortTitle}“`
-      : 'Umdrehen';
+        ? `Flip zu „${buch.back?.shortTitle ?? ''}“`
+        : `Flip zu „${buch.shortTitle}“`
+      : 'Flip book';
     el.wenden.setAttribute(
       'aria-label',
       doppelband

@@ -1,7 +1,15 @@
 import type { CatalogBook } from "./katalog";
 import { siteConfig } from "./verlag-config";
 
-const serif = '"Newsreader Variable", "Iowan Old Style", Georgia, serif';
+const serif = '"Iowan Old Style", "Hoefler Text", Georgia, serif';
+
+/**
+ * Der Ruecken ist bei allen Baenden gleich: cremefarbenes Papier, dunkle
+ * Nummer. Die Farbe stammt vom gedruckten Umschlag des Bandes 002.
+ */
+const spinePaper = '#fcf1db';
+const spineInk = '#20201c';
+const spineSerif = '"Iowan Old Style", "Hoefler Text", Georgia, serif';
 const sans = '"Inter Variable", Inter, Arial, sans-serif';
 
 function seeded(seed: string) {
@@ -566,6 +574,12 @@ export function createTitleDecal(book: CatalogBook) {
   return canvas;
 }
 
+/**
+ * Der Buchruecken. Alle Baende bekommen denselben: cremefarbenes Papier und
+ * die Releasenummer, sonst nichts. Die Farbe ist vom gedruckten Ruecken des
+ * Bandes 002 abgenommen, die Schrift ist eine Systemserife — so wie eine
+ * Nummer auf einem Buchruecken eben gedruckt aussieht.
+ */
 export function createSpineCover(book: CatalogBook) {
   const logicalWidth = 256;
   const logicalHeight = 2048;
@@ -576,30 +590,22 @@ export function createSpineCover(book: CatalogBook) {
   if (!ctx) return canvas;
   ctx.scale(0.5, 0.5);
 
-  ctx.fillStyle = book.cover;
+  ctx.fillStyle = spinePaper;
   ctx.fillRect(0, 0, logicalWidth, logicalHeight);
   addPaperGrain(ctx, logicalWidth, logicalHeight, `${book.id}-spine`);
 
+  // Die Nummer laeuft laengs, wie auf einem stehenden Buch zu lesen.
   ctx.save();
-  ctx.fillStyle = book.accent;
-  ctx.fillRect(20, 24, 8, logicalHeight - 48);
-  ctx.fillStyle = book.ink;
-  ctx.translate(logicalWidth / 2 + 24, logicalHeight - 130);
+  ctx.fillStyle = spineInk;
+  ctx.translate(logicalWidth / 2, logicalHeight / 2);
   ctx.rotate(-Math.PI / 2);
-  const size = book.shortTitle.length > 24 ? 68 : 82;
-  ctx.font = `560 ${size}px ${serif}`;
   ctx.textBaseline = "middle";
-  ctx.fillText(book.shortTitle, 0, 0, 1660);
-  ctx.font = `520 35px ${sans}`;
-  ctx.fillText(book.author.replace(/^(Herausgegeben von|Hrsg\. von|Edited by) /, ""), 0, 72, 1450);
+  ctx.textAlign = "center";
+  ctx.letterSpacing = "14px";
+  ctx.font = `500 116px ${spineSerif}`;
+  ctx.fillText(book.release, 0, 4);
   ctx.restore();
 
-  ctx.save();
-  ctx.fillStyle = book.ink;
-  ctx.font = `700 26px ${sans}`;
-  ctx.textAlign = "center";
-  ctx.fillText(siteConfig.spineMark, logicalWidth / 2 + 10, logicalHeight - 42);
-  ctx.restore();
   return canvas;
 }
 
