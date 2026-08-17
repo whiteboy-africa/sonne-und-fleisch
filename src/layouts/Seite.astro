@@ -1,0 +1,65 @@
+---
+// Layout der ruhigen Seiten: Kopfzeile, Satzspiegel, Fusszeile.
+import { getCollection } from 'astro:content';
+import Basis from './Basis.astro';
+import { siteConfig } from '../shelf/verlag-config';
+import '../styles/seite.css';
+
+interface Props {
+  titel: string;
+  beschreibung?: string;
+  augenbraue?: string;
+  untertitel?: string;
+  /** Breiterer Satzspiegel, etwa fuer das Programm. */
+  weit?: boolean;
+}
+
+const { titel, beschreibung, augenbraue, untertitel, weit = false } = Astro.props;
+
+const pfad = Astro.url.pathname.replace(/\/$/, '') || '/';
+const istHier = (ziel: string) => pfad === ziel || pfad.startsWith(`${ziel}/`);
+
+const seiten = (await getCollection('seiten', ({ data }) => !data.versteckt)).sort(
+  (a, b) => a.data.reihenfolge - b.data.reihenfolge,
+);
+---
+
+<Basis titel={titel} beschreibung={beschreibung}>
+  <div class="seite">
+    <header class="kopf">
+      <a class="kopf__marke" href="/">
+        <span>{siteConfig.wordmark}</span>
+        <span class="kopf__strich"></span>
+        <span>{siteConfig.collectionName}</span>
+      </a>
+      <nav class="kopf__nav" aria-label="Hauptbereiche">
+        <a href="/" aria-current={pfad === '/' ? 'page' : undefined}>Regal</a>
+        <a href="/programm" aria-current={istHier('/programm') ? 'page' : undefined}>
+          Programm
+        </a>
+        <a href="/verlag" aria-current={istHier('/verlag') ? 'page' : undefined}>
+          Verlag
+        </a>
+        <a href="/kontakt" aria-current={istHier('/kontakt') ? 'page' : undefined}>
+          Kontakt
+        </a>
+      </nav>
+    </header>
+
+    <main class={weit ? 'inhalt inhalt--weit' : 'inhalt'}>
+      <div class="seitenkopf">
+        {augenbraue && <p class="augenbraue">{augenbraue}</p>}
+        <h1>{titel}</h1>
+        {untertitel && <p class="seitenkopf__untertitel">{untertitel}</p>}
+      </div>
+      <slot />
+    </main>
+
+    <footer class="fuss">
+      <span>{siteConfig.independentNote}</span>
+      <nav aria-label="Rechtliches und weitere Seiten">
+        {seiten.map((seite) => <a href={`/${seite.id}`}>{seite.data.titel}</a>)}
+      </nav>
+    </footer>
+  </div>
+</Basis>

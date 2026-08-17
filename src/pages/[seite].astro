@@ -1,0 +1,27 @@
+---
+// Die Verlagsseiten (Verlag, Kontakt, Impressum, Datenschutz). Jede ist eine
+// Datei in src/content/seiten/; der Dateiname ist die Adresse.
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Seite from '../layouts/Seite.astro';
+
+export async function getStaticPaths() {
+  const seiten = await getCollection('seiten');
+  return seiten.map((eintrag) => ({
+    params: { seite: eintrag.id },
+    props: { eintrag },
+  }));
+}
+
+interface Props {
+  eintrag: CollectionEntry<'seiten'>;
+}
+
+const { eintrag } = Astro.props;
+const { Content } = await render(eintrag);
+---
+
+<Seite titel={eintrag.data.titel} untertitel={eintrag.data.untertitel}>
+  <div class="fliesstext">
+    <Content />
+  </div>
+</Seite>

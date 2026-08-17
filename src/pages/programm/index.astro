@@ -1,0 +1,63 @@
+---
+// Das Programm als Liste — die Textfassung des Regals, auch ohne WebGL
+// lesbar und von Suchmaschinen erfassbar.
+import Seite from '../../layouts/Seite.astro';
+import { alleBuecher, buchPfad } from '../../buecher';
+
+const buecher = await alleBuecher();
+---
+
+<Seite
+  titel="Programm"
+  augenbraue={`${buecher.length} ${buecher.length === 1 ? 'Band' : 'Bände'}`}
+  untertitel="Alles, was der Verlag bisher gemacht hat, und was als nächstes kommt."
+  beschreibung="Das vollständige Programm des Verlags Sonne und Fleisch."
+  weit
+>
+  {
+    buecher.length === 0 ? (
+      <p class="fliesstext">Das Programm wird gerade gesetzt.</p>
+    ) : (
+      <div class="programm">
+        {buecher.map((buch) => (
+          <a class="band" href={buchPfad(buch)}>
+            <span
+              class="band__ruecken"
+              aria-hidden="true"
+              style={`background: ${buch.data.cover_farbe}; border-right: 3px solid ${buch.data.akzent_farbe};`}
+            >
+              {
+                buch.data.cover_bild && (
+                  <img src={buch.data.cover_bild} alt="" loading="lazy" decoding="async" />
+                )
+              }
+            </span>
+            <span class="band__text">
+              <h2>{buch.data.titel}</h2>
+              <p class="band__autor">{buch.data.autor}</p>
+              <p class="band__klappentext">{buch.data.klappentext}</p>
+              {
+                buch.data.rueckseite && (
+                  <p class="band__doppel">
+                    Doppelcover — auf der Rückseite: {buch.data.rueckseite.titel}
+                  </p>
+                )
+              }
+            </span>
+            <span class="band__marge">
+              {buch.data.verfuegbarkeit}
+              <br />
+              {buch.data.format}
+              {buch.data.preis && (
+                <>
+                  <br />
+                  {buch.data.preis}
+                </>
+              )}
+            </span>
+          </a>
+        ))}
+      </div>
+    )
+  }
+</Seite>

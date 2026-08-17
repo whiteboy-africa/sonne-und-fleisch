@@ -1,0 +1,51 @@
+---
+// Huelle aller Seiten: Kopfdaten, Schriften, Fundament-CSS.
+import '@fontsource/anton';
+import '@fontsource/courier-prime/400.css';
+import '@fontsource/courier-prime/400-italic.css';
+import '@fontsource/courier-prime/700.css';
+import '../styles/basis.css';
+import { siteConfig } from '../shelf/verlag-config';
+
+interface Props {
+  titel?: string;
+  beschreibung?: string;
+  /** Dunkle Statusleiste und kein Scrollen — nur fuer das Regal. */
+  regal?: boolean;
+}
+
+const { titel, beschreibung, regal = false } = Astro.props;
+
+const seitenTitel = titel
+  ? `${titel} — ${siteConfig.applicationName}`
+  : siteConfig.title;
+const seitenBeschreibung = beschreibung ?? siteConfig.description;
+const kanonisch = new URL(Astro.url.pathname, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{seitenTitel}</title>
+    <meta name="description" content={seitenBeschreibung} />
+    <link rel="canonical" href={kanonisch} />
+    <meta name="theme-color" content="#000000" />
+    <meta name="color-scheme" content="dark" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteConfig.applicationName} />
+    <meta property="og:title" content={seitenTitel} />
+    <meta property="og:description" content={seitenBeschreibung} />
+    <meta property="og:url" content={kanonisch} />
+    <meta property="og:locale" content="de_DE" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+  </head>
+  <body data-regalseite={regal ? 'ja' : undefined}>
+    <slot />
+  </body>
+</html>

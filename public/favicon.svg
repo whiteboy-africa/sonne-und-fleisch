@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Sonne: Scheibe mit acht Strahlen, in Ocker auf Papier. -->
+  <rect width="32" height="32" fill="#eee8db" />
+  <circle cx="16" cy="16" r="6.4" fill="#b04a37" />
+  <g stroke="#d99a3f" stroke-width="2" stroke-linecap="round">
+    <path d="M16 2.6v4" />
+    <path d="M16 25.4v4" />
+    <path d="M2.6 16h4" />
+    <path d="M25.4 16h4" />
+    <path d="M6.6 6.6l2.8 2.8" />
+    <path d="M22.6 22.6l2.8 2.8" />
+    <path d="M25.4 6.6l-2.8 2.8" />
+    <path d="M9.4 22.6l-2.8 2.8" />
+  </g>
+</svg>

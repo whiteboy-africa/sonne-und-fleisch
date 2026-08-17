@@ -1,0 +1,20 @@
+# Build
+dist/
+.astro/
+
+# Abhaengigkeiten
+node_modules/
+
+# Umgebung
+.env
+.env.production
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# Wird bei der Installation aus node_modules gelegt (scripts/cms-kopieren.mjs).
+public/admin/sveltia-cms.js

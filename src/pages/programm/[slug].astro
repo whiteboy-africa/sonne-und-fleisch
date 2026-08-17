@@ -1,0 +1,76 @@
+---
+// Einzelseite eines Bandes. Der Text der Datei (unter dem Frontmatter) wird
+// hier als Fliesstext gesetzt — dort steht die lange Beschreibung, eine
+// Leseprobe oder die Angaben zur Autorin.
+import { render } from 'astro:content';
+import Seite from '../../layouts/Seite.astro';
+import { alleBuecher, type Buch } from '../../buecher';
+
+export async function getStaticPaths() {
+  const buecher = await alleBuecher();
+  return buecher.map((buch) => ({
+    params: { slug: buch.id },
+    props: { buch },
+  }));
+}
+
+interface Props {
+  buch: Buch;
+}
+
+const { buch } = Astro.props;
+const d = buch.data;
+const { Content } = await render(buch);
+
+const datum = d.erscheinungsdatum
+  ? new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(
+      d.erscheinungsdatum,
+    )
+  : undefined;
+
+const angaben: Array<[string, string]> = [
+  ['Format', d.format],
+  ['Verfügbarkeit', d.verfuegbarkeit],
+  ...(d.preis ? ([['Preis', d.preis]] as Array<[string, string]>) : []),
+  ...(d.isbn ? ([['ISBN', d.isbn]] as Array<[string, string]>) : []),
+  ...(datum ? ([['Erscheint', datum]] as Array<[string, string]>) : []),
+  ...(d.uebersetzung_aus
+    ? ([['Übersetzt aus', d.uebersetzung_aus]] as Array<[string, string]>)
+    : []),
+  ...(d.reihe ? ([['Reihe', d.reihe]] as Array<[string, string]>) : []),
+];
+---
+
+<Seite titel={d.titel} beschreibung={d.klappentext} augenbraue="Aus dem Programm">
+  <div class="buchkopf">
+    <div>
+      <p class="buchkopf__autor">{d.autor}</p>
+      <p class="fliesstext">{d.klappentext}</p>
+      <blockquote class="buchkopf__zitat">
+        „{d.zitat}“
+        <cite>{d.zitat_von}</cite>
+      </blockquote>
+    </div>
+    <div
+      class="buchkopf__cover"
+      style={`background: ${d.cover_farbe}; border-right: 4px solid ${d.akzent_farbe};`}
+    >
+      {d.cover_bild && <img src={d.cover_bild} alt={`Umschlag von ${d.titel}`} />}
+    </div>
+  </div>
+
+  <dl class="angaben">
+    {
+      angaben.map(([bezeichnung, wert]) => (
+        <div>
+          <dt>{bezeichnung}</dt>
+          <dd>{wert}</dd>
+        </div>
+      ))
+    }
+  </dl>
+
+  <div class="fliesstext">
+    <Content />
+  </div>
+</Seite>

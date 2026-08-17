@@ -1,0 +1,223 @@
+// Bedienoberfläche des Regals. Ersetzt die React-Komponente des
+// Ursprungs-Templates: derselbe Zustand (aktiver Band, Modus, Status),
+// nur direkt am DOM statt über einen Framework-Umweg.
+
+import { ShelfEngine, type BookSide, type ShelfMode } from './ShelfEngine';
+import type { CatalogBook } from './katalog';
+import { siteConfig } from './verlag-config';
+
+const zweistellig = (zahl: number) => String(zahl).padStart(2, '0');
+
+function pflicht<T extends Element>(wurzel: ParentNode, wahl: string): T {
+  const element = wurzel.querySelector<T>(wahl);
+  if (!element) throw new Error(`Regal: Element fehlt — ${wahl}`);
+  return element;
+}
+
+export function regalStarten(wurzel: HTMLElement) {
+  const datenScript = pflicht<HTMLScriptElement>(wurzel, '[data-regal-daten]');
+  const katalog = JSON.parse(datenScript.textContent ?? '[]') as CatalogBook[];
+  if (katalog.length === 0) return;
+
+  const canvas = pflicht<HTMLCanvasElement>(wurzel, '[data-regal-canvas]');
+  const el = {
+    blaetternZahl: pflicht(wurzel, '[data-blaettern-zahl]'),
+    blaetternTitel: pflicht(wurzel, '[data-blaettern-titel]'),
+    blaetternAutor: pflicht(wurzel, '[data-blaettern-autor]'),
+    ansehen: pflicht<HTMLButtonElement>(wurzel, '[data-ansehen]'),
+    zurueck: pflicht<HTMLButtonElement>(wurzel, '[data-zurueck]'),
+    vor: pflicht<HTMLButtonElement>(wurzel, '[data-vor]'),
+    ticks: Array.from(wurzel.querySelectorAll<HTMLButtonElement>('[data-tick]')),
+    panel: pflicht(wurzel, '[data-panel]'),
+    panelInhalt: pflicht<HTMLElement>(wurzel, '[data-panel-inhalt]'),
+    panelZahl: pflicht(wurzel, '[data-panel-zahl]'),
+    panelTitel: pflicht(wurzel, '[data-panel-titel]'),
+    panelAutor: pflicht(wurzel, '[data-panel-autor]'),
+    panelKlappentext: pflicht(wurzel, '[data-panel-klappentext]'),
+    panelZitat: pflicht(wurzel, '[data-panel-zitat]'),
+    panelZitatVon: pflicht(wurzel, '[data-panel-zitat-von]'),
+    panelFormat: pflicht(wurzel, '[data-panel-format]'),
+    panelVerfuegbarkeit: pflicht(wurzel, '[data-panel-verfuegbarkeit]'),
+    panelLink: pflicht<HTMLAnchorElement>(wurzel, '[data-panel-link]'),
+    panelLinkText: pflicht(wurzel, '[data-panel-link-text]'),
+    ansichtZuruecksetzen: pflicht<HTMLButtonElement>(
+      wurzel,
+      '[data-ansicht-zuruecksetzen]',
+    ),
+    zurRegal: pflicht<HTMLButtonElement>(wurzel, '[data-zum-regal]'),
+    wenden: pflicht<HTMLButtonElement>(wurzel, '[data-wenden]'),
+    wendenText: pflicht(wurzel, '[data-wenden-text]'),
+    seitenmarke: pflicht<HTMLElement>(wurzel, '[data-seitenmarke]'),
+    status: pflicht(wurzel, '[data-status-text]'),
+    vorlese: pflicht(wurzel, '[data-vorlese]'),
+  };
+
+  let engine: ShelfEngine | null = null;
+  let aktiverIndex = 0;
+  let gewaehlterIndex: number | null = null;
+  let modus: ShelfMode = 'browse';
+  let seite: BookSide = 'vorn';
+
+  const gesamt = zweistellig(katalog.length);
+
+  function blaetternAnsichtSetzen() {
+    const buch = katalog[aktiverIndex];
+    const imFokus = modus !== 'browse';
+    el.blaetternZahl.textContent = zweistellig(aktiverIndex + 1);
+    el.blaetternTitel.textContent = buch.shortTitle;
+    el.blaetternAutor.textContent = buch.author;
+    el.ansehen.disabled = imFokus;
+    el.ansehen.setAttribute('aria-label', `${buch.title} ansehen`);
+    el.zurueck.disabled = imFokus || aktiverIndex === 0;
+    el.vor.disabled = imFokus || aktiverIndex === katalog.length - 1;
+    el.ticks.forEach((tick, index) => {
+      const ist = index === aktiverIndex;
+      tick.classList.toggle('is-active', ist);
+      tick.disabled = imFokus;
+      if (ist) tick.setAttribute('aria-current', 'true');
+      else tick.removeAttribute('aria-current');
+    });
+  }
+
+  function panelSetzen() {
+    const imFokus = modus !== 'browse';
+    const buch = gewaehlterIndex === null ? null : katalog[gewaehlterIndex];
+    wurzel.classList.toggle('is-focused', imFokus);
+    wurzel.classList.toggle('is-browsing', !imFokus);
+    el.panel.setAttribute('aria-hidden', String(!imFokus));
+    el.panelInhalt.hidden = buch === null;
+    if (!buch || gewaehlterIndex === null) {
+      el.panel.setAttribute('aria-label', 'Angaben zum Band');
+      return;
+    }
+    // Bei einem Doppelband gehoert zu jeder Seite eine eigene Geschichte.
+    // Das Panel folgt dem Band: was oben liegt, steht hier.
+    const doppelband = buch.back !== undefined;
+    const gezeigt = seite === 'hinten' && buch.back ? buch.back : buch;
+
+    el.panel.setAttribute('aria-label', `Angaben zu ${gezeigt.title}`);
+    el.panelZahl.textContent = zweistellig(gewaehlterIndex + 1);
+    el.panelTitel.textContent = gezeigt.title;
+    el.panelAutor.textContent = gezeigt.author;
+    el.panelKlappentext.textContent = gezeigt.description;
+    el.panelZitat.textContent = `„${gezeigt.quote}“`;
+    el.panelZitatVon.textContent = gezeigt.quoteBy;
+
+    el.wenden.hidden = !doppelband;
+    el.seitenmarke.hidden = !doppelband;
+    if (doppelband) {
+      el.wendenText.textContent =
+        seite === 'vorn' ? 'Andere Seite' : 'Zurück zur ersten Seite';
+      el.wenden.setAttribute(
+        'aria-label',
+        seite === 'vorn'
+          ? `Band wenden zu ${buch.back?.title ?? ''}`
+          : `Band zurück wenden zu ${buch.title}`,
+      );
+      el.seitenmarke.textContent =
+        seite === 'vorn' ? 'Seite A von zwei' : 'Seite B von zwei';
+    }
+    el.panelFormat.textContent = buch.format;
+    el.panelVerfuegbarkeit.textContent = buch.availability;
+    el.panelLink.href = buch.url;
+    el.panelLinkText.textContent = buch.linkLabel ?? siteConfig.bookLinkLabel;
+  }
+
+  function vorleseSetzen() {
+    if (modus !== 'browse' && gewaehlterIndex !== null) {
+      const buch = katalog[gewaehlterIndex];
+      const gezeigt = seite === 'hinten' && buch.back ? buch.back : buch;
+      const zusatz = buch.back
+        ? seite === 'vorn'
+          ? ' Erste von zwei Seiten.'
+          : ' Zweite von zwei Seiten.'
+        : '';
+      el.vorlese.textContent = `${gezeigt.title} von ${gezeigt.author} liegt vorn.${zusatz}`;
+      return;
+    }
+    const buch = katalog[aktiverIndex];
+    el.vorlese.textContent = `${buch.title} von ${buch.author} ausgewählt.`;
+  }
+
+  el.ansehen.addEventListener('click', () => engine?.focusBook(aktiverIndex));
+  el.zurueck.addEventListener('click', () => engine?.browseBy(-1));
+  el.vor.addEventListener('click', () => engine?.browseBy(1));
+  el.ticks.forEach((tick, index) => {
+    tick.addEventListener('click', () => engine?.browseTo(index));
+  });
+  el.zurRegal.addEventListener('click', () => engine?.returnToShelf());
+  el.ansichtZuruecksetzen.addEventListener('click', () =>
+    engine?.resetFocusView(),
+  );
+  el.wenden.addEventListener('click', () => engine?.flipBook());
+
+  wurzel.querySelectorAll('[data-gesamt]').forEach((element) => {
+    element.textContent = gesamt;
+  });
+
+  canvas.setAttribute(
+    'aria-label',
+    `Regal mit ${katalog.length} Bänden. Ziehen oder Pfeiltasten zum Blättern, Eingabetaste holt den Band nach vorn.`,
+  );
+
+  blaetternAnsichtSetzen();
+  panelSetzen();
+  vorleseSetzen();
+
+  let abgebrochen = false;
+
+  function aufgeben(grund: unknown) {
+    // Kein WebGL, kein Speicher, abgeschossener Grafiktreiber: ohne diesen
+    // Ausweg bliebe der Ladeschirm fuer immer stehen und die Seite waere
+    // eine graue Flaeche. Stattdessen zeigen wir den Weg ins Programm.
+    console.warn('Regal: 3D-Ansicht nicht moeglich.', grund);
+    wurzel.classList.add('is-ready', 'ohne-3d');
+    wurzel.querySelector('[data-ladeschirm]')?.setAttribute('aria-hidden', 'true');
+    el.status.textContent = 'Das Regal laesst sich hier nicht aufbauen';
+    const ausweg = wurzel.querySelector<HTMLElement>('[data-ausweg]');
+    if (ausweg) ausweg.hidden = false;
+  }
+
+  async function starten() {
+    // Die Cover werden auf Canvas gezeichnet; ohne fertige Schriften
+    // stehen sie in der Ersatzschrift.
+    await document.fonts.ready;
+    if (abgebrochen) return;
+    engine = new ShelfEngine(canvas, katalog, {
+      onActiveIndex: (index) => {
+        aktiverIndex = index;
+        blaetternAnsichtSetzen();
+        vorleseSetzen();
+      },
+      onMode: (naechsterModus, index) => {
+        modus = naechsterModus;
+        gewaehlterIndex = index;
+        blaetternAnsichtSetzen();
+        panelSetzen();
+        vorleseSetzen();
+      },
+      onSide: (naechsteSeite) => {
+        seite = naechsteSeite;
+        panelSetzen();
+        vorleseSetzen();
+      },
+      onStatus: (meldung) => {
+        el.status.textContent = meldung;
+      },
+      onReady: () => {
+        wurzel.classList.add('is-ready');
+        wurzel.querySelector('[data-ladeschirm]')?.setAttribute('aria-hidden', 'true');
+      },
+    });
+  }
+
+  void starten().catch(aufgeben);
+
+  // Astro laedt Seiten im Browser neu ein; ein zurueckgelassener
+  // WebGL-Kontext waere ein Leck.
+  window.addEventListener('beforeunload', () => {
+    abgebrochen = true;
+    engine?.dispose();
+    engine = null;
+  });
+}

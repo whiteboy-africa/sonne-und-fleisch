@@ -1,0 +1,107 @@
+/*
+ * Fundament aller Seiten: Farben, Schriften, ein knapper Reset.
+ *
+ * Der Grund ist schwarz. Alles Farbige kommt von den Umschlaegen selbst —
+ * die sind gemalt und leuchten aus dem Schwarz heraus. Die Bedienung bleibt
+ * hell auf Schwarz, mit einer Giftfarbe fuer aktive Zustaende.
+ *
+ * Schriften: Anton fuer alles Grosse (Plakat, Flyer, Aufkleber) und Courier
+ * Prime fuer alles Kleine (Schreibmaschine, Fotokopie). Keine Serifen mit
+ * Strichstaerkenkontrast, kein gesperrtes Editorial-Kapitaelchen.
+ */
+
+:root {
+  /* Schwarz und Off-White, sonst nichts. Kein Grauton. */
+  --paper: #000000;
+  --paper-deep: #000000;
+  --paper-light: #f3f0ea;
+  --ink: #f3f0ea;
+  --ink-soft: rgba(243, 240, 234, 0.58);
+  --hairline: rgba(243, 240, 234, 0.2);
+  /* Die Giftfarbe. Auf Schwarz braucht sie kaum Flaeche. */
+  --accent: #b6f000;
+  /* Das Gold der Umschlaege, fuer stille Zweitakzente. */
+  --gold: #d8b25a;
+  --plakat: 'Anton', 'Haettenschweiler', 'Impact', sans-serif;
+  --maschine: 'Courier Prime', 'Courier New', ui-monospace, monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/*
+ * Das hidden-Attribut muss jede Layout-Regel schlagen. Ohne diese Zeile
+ * gewinnt jedes `display: grid` oder `display: flex` einer Klasse gegen das
+ * `display: none` des Browsers — versteckte Elemente stehen dann sichtbar da.
+ */
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--paper);
+}
+
+body {
+  color: var(--ink);
+  font-family: var(--maschine);
+  -webkit-font-smoothing: antialiased;
+}
+
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+}
+
+button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+canvas:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: var(--ink);
+  background: var(--accent);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

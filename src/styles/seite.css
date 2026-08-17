@@ -1,0 +1,411 @@
+/*
+ * Die ruhigen Seiten: Programm, Buchseiten, Verlag, Kontakt, Rechtliches.
+ * Ein schmaler Satzspiegel auf demselben Papier wie das Regal.
+ */
+
+.seite {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* Kopf */
+
+.kopf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 32px;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 26px clamp(20px, 5vw, 64px) 22px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.kopf__marke {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--maschine);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.kopf__marke span:last-child {
+  color: var(--ink-soft);
+}
+
+.kopf__strich {
+  width: 26px;
+  height: 1px;
+  background: var(--ink);
+  opacity: 0.42;
+}
+
+.kopf__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  font-family: var(--maschine);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.kopf__nav a {
+  padding-bottom: 3px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.kopf__nav a:hover,
+.kopf__nav a[aria-current='page'] {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+
+/* Satzspiegel */
+
+.inhalt {
+  flex: 1;
+  width: 100%;
+  max-width: 74ch;
+  padding: clamp(44px, 8vw, 96px) clamp(20px, 5vw, 64px) 96px;
+  margin: 0 auto;
+}
+
+.inhalt--weit {
+  max-width: 1080px;
+}
+
+.seitenkopf {
+  padding-bottom: 26px;
+  margin-bottom: 44px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.seitenkopf .augenbraue {
+  margin: 0 0 16px;
+  font-family: var(--maschine);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+.seitenkopf h1 {
+  margin: 0;
+  font-family: var(--plakat);
+  font-size: clamp(36px, 7vw, 68px);
+  font-weight: 400;
+  line-height: 0.94;
+  letter-spacing: 0.004em;
+  text-transform: uppercase;
+}
+
+.seitenkopf__untertitel {
+  max-width: 52ch;
+  margin: 18px 0 0;
+  font-family: var(--maschine);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* Fliesstext */
+
+.fliesstext {
+  font-family: var(--maschine);
+  font-size: 15px;
+  line-height: 1.72;
+}
+
+.fliesstext > * + * {
+  margin-top: 1.1em;
+}
+
+.fliesstext h2 {
+  margin-top: 2.3em;
+  font-family: var(--plakat);
+  font-size: 23px;
+  font-weight: 400;
+  letter-spacing: 0.004em;
+  text-transform: uppercase;
+}
+
+.fliesstext h3 {
+  margin-top: 2em;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.fliesstext a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent);
+}
+
+.fliesstext a:hover {
+  color: var(--accent);
+}
+
+.fliesstext blockquote {
+  padding-left: 22px;
+  margin-left: 0;
+  font-style: italic;
+  border-left: 1px solid var(--accent);
+}
+
+.fliesstext ul,
+.fliesstext ol {
+  padding-left: 1.3em;
+}
+
+.fliesstext li + li {
+  margin-top: 0.5em;
+}
+
+.fliesstext hr {
+  height: 1px;
+  margin: 2.6em 0;
+  background: var(--hairline);
+  border: 0;
+}
+
+/* Programm: Liste der Baende */
+
+.programm {
+  display: grid;
+  gap: 1px;
+  background: var(--hairline);
+  border-block: 1px solid var(--hairline);
+}
+
+.band {
+  display: grid;
+  grid-template-columns: 88px 1fr auto;
+  gap: 8px 28px;
+  align-items: start;
+  padding: 26px 4px;
+  text-decoration: none;
+  background: var(--paper);
+  color: inherit;
+  transition: background 0.2s ease;
+}
+
+.band:hover {
+  background: rgba(232, 229, 222, 0.07);
+}
+
+.band__ruecken {
+  display: block;
+  /* Taschenbuchformat, damit vom Umschlag fast alles zu sehen ist. Mit
+     einem quadratischeren Kasten schneidet object-fit den Titel weg und
+     uebrig bleibt eine Farbflaeche. */
+  width: 100%;
+  aspect-ratio: 148 / 210;
+  overflow: hidden;
+  box-shadow: inset -6px 0 12px rgba(0, 0, 0, 0.22),
+    2px 3px 14px rgba(0, 0, 0, 0.55);
+}
+
+/* Liegt ein Umschlag vor, steht er hier statt der Farbflaeche. */
+.band__ruecken img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Marke fuer Doppelbaende. */
+.band__doppel {
+  display: inline-block;
+  margin: 12px 0 0;
+  padding: 3px 7px 2px;
+  background: var(--accent);
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.band__text h2 {
+  margin: 0;
+  font-family: var(--plakat);
+  font-size: 27px;
+  font-weight: 400;
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+
+.band__autor {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
+.band__klappentext {
+  max-width: 56ch;
+  margin: 14px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.band__marge {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  text-align: right;
+  text-transform: uppercase;
+}
+
+/* Buchseite */
+
+.buchkopf {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  gap: 48px;
+  padding-bottom: 40px;
+  margin-bottom: 46px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.buchkopf__autor {
+  margin: 0 0 22px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
+.buchkopf__zitat {
+  max-width: 44ch;
+  margin: 30px 0 0;
+  padding-left: 20px;
+  border-left: 3px solid var(--accent);
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.55;
+}
+
+.buchkopf__zitat cite {
+  display: block;
+  margin-top: 12px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+.buchkopf__cover {
+  aspect-ratio: 2 / 3;
+  border-radius: 2px 5px 5px 2px;
+  box-shadow: inset -10px 0 22px rgba(0, 0, 0, 0.2),
+    4px 6px 26px rgba(0, 0, 0, 0.6);
+}
+
+.buchkopf__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.angaben {
+  margin: 0 0 46px;
+  font-size: 13px;
+}
+
+.angaben div {
+  display: grid;
+  grid-template-columns: 168px 1fr;
+  gap: 16px;
+  padding: 11px 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.angaben div:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.angaben dt {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+.angaben dd {
+  margin: 0;
+}
+
+/* Fuss */
+
+.fuss {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  justify-content: space-between;
+  padding: 24px clamp(20px, 5vw, 64px);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  border-top: 2px solid var(--ink);
+}
+
+.fuss nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+}
+
+.fuss a {
+  text-decoration: none;
+}
+
+.fuss a:hover {
+  color: var(--ink);
+}
+
+@media (max-width: 720px) {
+  .band {
+    grid-template-columns: 62px 1fr;
+  }
+
+  .band__marge {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .buchkopf {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .buchkopf__cover {
+    max-width: 210px;
+  }
+
+  .angaben div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}

@@ -1,0 +1,64 @@
+---
+// Startseite: das Regal. Wer kein WebGL hat, sieht die Kopfzeile mit dem
+// Weg ins Programm — die Liste dort ist die Textfassung desselben Katalogs.
+import Basis from '../layouts/Basis.astro';
+import Regal from '../components/Regal.astro';
+import { katalogFuerRegal } from '../buecher';
+import { siteConfig } from '../shelf/verlag-config';
+import '../styles/regal.css';
+
+const katalog = await katalogFuerRegal();
+---
+
+<Basis regal>
+  {
+    katalog.length > 0 ? (
+      <Regal katalog={katalog} />
+    ) : (
+      <main class="regal-leer">
+        <p class="augenbraue">{siteConfig.wordmark}</p>
+        <h1>Das Regal ist noch leer</h1>
+        <p>
+          Sobald das erste Buch unter <code>src/content/buecher/</code> liegt —
+          oder im CMS unter <a href="/admin/">/admin</a> angelegt ist — steht es
+          hier.
+        </p>
+      </main>
+    )
+  }
+</Basis>
+
+<style>
+  .regal-leer {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    justify-content: center;
+    max-width: 46ch;
+    min-height: 100dvh;
+    padding: 0 clamp(20px, 6vw, 80px);
+  }
+
+  .augenbraue {
+    margin: 0;
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    color: var(--ink-soft);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: var(--plakat);
+    font-size: clamp(32px, 6.5vw, 56px);
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+
+  p:last-child {
+    margin: 0;
+    font-family: var(--maschine);
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+</style>

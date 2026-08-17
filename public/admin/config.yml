@@ -1,0 +1,239 @@
+# Redaktionsoberfläche (Sveltia CMS) unter /admin/
+#
+# Die Felder hier müssen zum Schema in src/content.config.ts passen. Wird dort
+# ein Feld ergänzt, gehört es auch hierher — sonst löscht das CMS es beim
+# Speichern still weg.
+#
+# Vor dem ersten Anmelden über GitHub sind zwei Dinge nötig (siehe README):
+# eine GitHub-OAuth-App und ein kleiner Auth-Dienst. Ohne das lässt sich die
+# Oberfläche lokal trotzdem benutzen: `npm run dev`, dann /admin/ in Chrome
+# öffnen und „Work with Local Repository" wählen.
+
+backend:
+  name: github
+  repo: whiteboy-africa/sonne-und-fleisch
+  branch: main
+
+# Lokales Arbeiten ohne Anmeldung (Chrome/Edge).
+local_backend: true
+
+# Sprache der Oberfläche.
+locale: de
+
+media_folder: public/buecher
+public_folder: /buecher
+
+collections:
+  - name: buecher
+    label: Bücher
+    label_singular: Buch
+    folder: src/content/buecher
+    create: true
+    extension: md
+    format: frontmatter
+    slug: '{{fields.titel | slugify}}'
+    summary: '{{titel}} — {{autor}}'
+    sortable_fields: [reihenfolge, titel, autor]
+    fields:
+      - { name: titel, label: Titel, widget: string }
+      - name: kurztitel
+        label: Kurztitel
+        widget: string
+        required: false
+        hint: Steht im Regal unter dem Band und auf dem Buchrücken. Kurz halten.
+      - { name: autor, label: Autor oder Autorin, widget: string }
+      - name: klappentext
+        label: Klappentext
+        widget: text
+        hint: Zwei bis vier Sätze. Erscheint im Regal, wenn der Band herausgezogen ist.
+      - { name: zitat, label: Zitat, widget: string }
+      - { name: zitat_von, label: Zitat von, widget: string, default: Verlagsnotiz }
+      - name: format
+        label: Format
+        widget: string
+        default: Broschur
+        hint: 'Freitext, etwa „Broschur · 224 Seiten".'
+      - name: verfuegbarkeit
+        label: Verfügbarkeit
+        widget: string
+        default: In Vorbereitung
+        hint: 'Freitext, etwa „Lieferbar" oder „Erscheint im Frühjahr 2027".'
+
+      - { name: isbn, label: ISBN, widget: string, required: false }
+      - { name: preis, label: Preis, widget: string, required: false }
+      - name: erscheinungsdatum
+        label: Erscheinungsdatum
+        widget: datetime
+        required: false
+        date_format: DD.MM.YYYY
+        time_format: false
+      - name: uebersetzung_aus
+        label: Übersetzt aus
+        widget: string
+        required: false
+        hint: 'Etwa „dem Französischen". Leer lassen, wenn es keine Übersetzung ist.'
+      - { name: reihe, label: Reihe, widget: string, required: false }
+
+      - name: cover_bild
+        label: Umschlag (Vorderseite)
+        widget: image
+        required: false
+        media_folder: '{{media_folder}}/{{slug}}'
+        public_folder: '{{public_folder}}/{{slug}}'
+        hint: >-
+          Hochformat, etwa 900 Pixel breit als WebP. Größere Dateien kosten auf
+          dem Handy Ladezeit und Speicher. Ohne Bild zeichnet das Regal ein
+          Cover aus den Farben unten.
+      - name: cover_farbe
+        label: Farbe des Einbands
+        widget: color
+        default: '#2b2622'
+        hint: 'Auch mit Umschlagbild: Rücken, Kanten und Rückseite nehmen diese Farbe.'
+      - { name: akzent_farbe, label: Akzentfarbe, widget: color, default: '#d99a3f' }
+      - { name: schrift_farbe, label: Schriftfarbe, widget: color, default: '#f2e9db' }
+      - name: motiv
+        label: Muster des gezeichneten Covers
+        widget: select
+        default: lattice
+        hint: Wird nur benutzt, wenn kein Umschlagbild hochgeladen ist.
+        options:
+          - { label: Gitter, value: lattice }
+          - { label: Korrosion, value: corrosion }
+          - { label: Effizienz, value: efficiency }
+          - { label: Netz, value: network }
+          - { label: Explosion, value: boom }
+          - { label: Ordnung, value: organization }
+          - { label: Schema, value: schematic }
+          - { label: Flug, value: flight }
+          - { label: Schaltung, value: circuit }
+          - { label: Umlauf, value: orbit }
+          - { label: Zweige, value: branches }
+          - { label: Welle, value: wave }
+          - { label: Läufer, value: runner }
+          - { label: Sammlung, value: gather }
+          - { label: Labyrinth, value: maze }
+          - { label: Bruch, value: fracture }
+          - { label: Kontinuum, value: continuum }
+          - { label: Fenster, value: windows }
+          - { label: Stufen, value: steps }
+      - name: hoehe
+        label: Höhe
+        widget: number
+        value_type: float
+        default: 2
+        min: 1.4
+        max: 2.4
+        step: 0.01
+        hint: 'Szeneneinheiten: 2,0 ist A5 hoch. Die Breite rechnet das Regal selbst.'
+      - name: dicke
+        label: Dicke
+        widget: number
+        value_type: float
+        default: 0.08
+        min: 0.03
+        max: 0.4
+        step: 0.005
+        hint: 'Nach Umfang: 96 Seiten sind etwa 0,07, 384 Seiten etwa 0,24.'
+      - name: lebendig
+        label: Wandernder Glanz auf dem Einband
+        widget: boolean
+        default: false
+        required: false
+
+      - name: rueckseite
+        label: Doppelcover (zweite Vorderseite)
+        widget: object
+        required: false
+        collapsed: true
+        hint: >-
+          Nur für tête-bêche-Bände. Die zweite Geschichte wird kopfüber auf die
+          Rückseite gedruckt; das Regal dreht das Bild selbst, hier also ein
+          aufrechtes Bild hochladen. Leer lassen für ein normales Buch.
+        fields:
+          - { name: titel, label: Titel, widget: string }
+          - { name: kurztitel, label: Kurztitel, widget: string, required: false }
+          - name: autor
+            label: Autor oder Autorin
+            widget: string
+            required: false
+            hint: Leer lassen, wenn es dieselbe Person wie vorn ist.
+          - { name: klappentext, label: Einführung, widget: text }
+          - { name: zitat, label: Zitat, widget: string, required: false }
+          - { name: zitat_von, label: Zitat von, widget: string, required: false }
+          - name: cover_bild
+            label: Umschlag (zweite Vorderseite)
+            widget: image
+            required: false
+            media_folder: '{{media_folder}}/{{slug}}'
+            public_folder: '{{public_folder}}/{{slug}}'
+          - { name: cover_farbe, label: Farbe des Einbands, widget: color, required: false }
+          - { name: akzent_farbe, label: Akzentfarbe, widget: color, required: false }
+          - { name: schrift_farbe, label: Schriftfarbe, widget: color, required: false }
+          - name: motiv
+            label: Muster
+            widget: select
+            required: false
+            options:
+              - lattice
+              - corrosion
+              - efficiency
+              - network
+              - boom
+              - organization
+              - schematic
+              - flight
+              - circuit
+              - orbit
+              - branches
+              - wave
+              - runner
+              - gather
+              - maze
+              - fracture
+              - continuum
+              - windows
+              - steps
+
+      - name: reihenfolge
+        label: Platz im Regal
+        widget: number
+        value_type: int
+        required: false
+        hint: >-
+          Kleinere Zahl steht weiter vorn. Jede Zahl nur einmal verwenden,
+          sonst ist die Reihenfolge zufällig. Ohne Angabe sortiert das Regal
+          von hoch nach niedrig.
+      - name: entwurf
+        label: Entwurf (nicht veröffentlichen)
+        widget: boolean
+        default: false
+      - name: body
+        label: Langer Text
+        widget: markdown
+        required: false
+        hint: Steht auf der Buchseite unter den Angaben. Leseprobe, Vita, Pressestimmen.
+
+  - name: seiten
+    label: Verlagsseiten
+    label_singular: Seite
+    folder: src/content/seiten
+    create: true
+    extension: md
+    format: frontmatter
+    slug: '{{fields.titel | slugify}}'
+    summary: '{{titel}}'
+    fields:
+      - { name: titel, label: Titel, widget: string }
+      - { name: untertitel, label: Untertitel, widget: string, required: false }
+      - name: reihenfolge
+        label: Platz in der Fußzeile
+        widget: number
+        value_type: int
+        default: 100
+        hint: Kleinere Zahl steht weiter links.
+      - name: versteckt
+        label: Nicht in der Fußzeile zeigen
+        widget: boolean
+        default: false
+        hint: Die Seite bleibt über ihre Adresse erreichbar.
+      - { name: body, label: Text, widget: markdown }

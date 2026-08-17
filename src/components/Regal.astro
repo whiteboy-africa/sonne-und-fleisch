@@ -1,0 +1,202 @@
+---
+// Das begehbare Regal. Das Markup steht vollstaendig im HTML, damit die
+// Seite auch ohne WebGL lesbar bleibt; das Skript haengt nur die Bedienung
+// und die 3D-Szene daran.
+import type { CatalogBook } from '../shelf/katalog';
+import { siteConfig } from '../shelf/verlag-config';
+
+interface Props {
+  katalog: CatalogBook[];
+}
+
+const { katalog } = Astro.props;
+const zweistellig = (zahl: number) => String(zahl).padStart(2, '0');
+const erstes = katalog[0];
+const gesamt = zweistellig(katalog.length);
+---
+
+<main class="press-experience is-browsing" data-regal>
+  <script type="application/json" data-regal-daten set:html={JSON.stringify(katalog)} is:inline />
+
+  <canvas
+    class="shelf-canvas"
+    data-regal-canvas
+    role="application"
+    tabindex="0"
+    aria-label={`Regal mit ${katalog.length} Bänden. Ziehen oder Pfeiltasten zum Blättern, Eingabetaste holt den Band nach vorn.`}
+  ></canvas>
+
+  <header class="site-header">
+    <a
+      class="wordmark"
+      href="/"
+      aria-label={`${siteConfig.wordmark}, ${siteConfig.collectionName}`}
+    >
+      <span>{siteConfig.wordmark}</span>
+      <span class="wordmark__divider"></span>
+      <span>{siteConfig.collectionName}</span>
+    </a>
+    <div class="header-actions">
+      <nav class="regal-nav" aria-label="Verlag">
+        <a href="/programm">Programm</a>
+        <a href="/verlag">Verlag</a>
+        <a href="/kontakt">Kontakt</a>
+      </nav>
+      <div class="edition-mark">
+        <span>{katalog.length} {katalog.length === 1 ? 'BAND' : 'BÄNDE'}</span>
+        <span>01 DURCHGEHENDES REGAL</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="browse-caption" data-browse-caption>
+    <p class="eyebrow">
+      <span data-blaettern-zahl>{zweistellig(1)}</span>
+      <span class="eyebrow__line"></span>
+      <span data-gesamt>{gesamt}</span>
+    </p>
+    <h1 data-blaettern-titel>{erstes.shortTitle}</h1>
+    <p class="browse-caption__author" data-blaettern-autor>{erstes.author}</p>
+    <button
+      type="button"
+      class="inspect-button"
+      data-ansehen
+      aria-label={`${erstes.title} ansehen`}
+    >
+      <span>Band herausziehen</span>
+      <span aria-hidden="true">↗</span>
+    </button>
+  </section>
+
+  <button
+    type="button"
+    class="shelf-arrow shelf-arrow--left"
+    data-zurueck
+    aria-label="Vorheriger Band"
+    disabled
+  >
+    <span aria-hidden="true" class="arrow-icon arrow-icon--left"><span></span></span>
+  </button>
+  <button
+    type="button"
+    class="shelf-arrow shelf-arrow--right"
+    data-vor
+    aria-label="Nächster Band"
+  >
+    <span aria-hidden="true" class="arrow-icon arrow-icon--right"><span></span></span>
+  </button>
+
+  <nav class="shelf-index" aria-label="Platz im Regal">
+    <div class="shelf-index__ticks">
+      {
+        katalog.map((buch, index) => (
+          <button
+            type="button"
+            data-tick
+            class={index === 0 ? 'is-active' : ''}
+            aria-label={`Zu ${buch.title} blättern`}
+            aria-current={index === 0 ? 'true' : undefined}
+          >
+            <span></span>
+          </button>
+        ))
+      }
+    </div>
+    <div class="input-hint" aria-hidden="true">
+      <span>ZIEHEN</span>
+      <i></i>
+      <span>SCROLLEN</span>
+      <i></i>
+      <span>PFEILTASTEN</span>
+    </div>
+  </nav>
+
+  <aside class="book-details" data-panel aria-hidden="true" aria-label="Angaben zum Band">
+    <div class="book-details__inner" data-panel-inhalt hidden>
+      <button type="button" class="back-button" data-zum-regal>
+        <span aria-hidden="true" class="arrow-icon arrow-icon--left"><span></span></span>
+        <span>Zurück ins Regal</span>
+      </button>
+
+      <div class="book-details__position">
+        <span data-panel-zahl>01</span>
+        <span data-gesamt>{gesamt}</span>
+      </div>
+
+      <div class="book-details__copy">
+        <p class="eyebrow">
+          {siteConfig.editionEyebrow}
+          <span class="seitenmarke" data-seitenmarke hidden>Seite A von zwei</span>
+        </p>
+        <h2 data-panel-titel></h2>
+        <p class="book-details__author" data-panel-autor></p>
+        <p class="book-details__description" data-panel-klappentext></p>
+
+        <blockquote>
+          <p data-panel-zitat></p>
+          <cite data-panel-zitat-von></cite>
+        </blockquote>
+
+        <dl>
+          <div>
+            <dt>Format</dt>
+            <dd data-panel-format></dd>
+          </div>
+          <div>
+            <dt>Verfügbarkeit</dt>
+            <dd data-panel-verfuegbarkeit></dd>
+          </div>
+        </dl>
+
+        <a class="official-link" data-panel-link href="/programm">
+          <span data-panel-link-text>{siteConfig.bookLinkLabel}</span>
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+
+      <div class="focus-controls" aria-label="Ansicht">
+        <span>Ziehen dreht den Band</span>
+        <span>Scrollen zoomt</span>
+        {/* Nur bei Doppelbänden: wendet den Band um und auf den Kopf,
+            damit die zweite Vorderseite richtig herum steht. */}
+        <button type="button" class="wenden-knopf" data-wenden hidden>
+          <span aria-hidden="true">⟳</span>
+          <span data-wenden-text>Andere Seite</span>
+        </button>
+        <button type="button" data-ansicht-zuruecksetzen>Ansicht zurücksetzen</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="experience-status" role="status" aria-live="polite">
+    <span class="experience-status__dot"></span>
+    <span data-status-text>Das Regal wird aufgebaut</span>
+  </div>
+
+  <div class="loading-screen" data-ladeschirm aria-hidden="false">
+    <div class="loading-screen__mark">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <p>{katalog.length} {katalog.length === 1 ? 'Band' : 'Bände'} werden gestellt</p>
+  </div>
+
+  {/* Ausweg, wenn kein WebGL zur Verfügung steht oder die Szene abstürzt.
+      Ohne ihn bliebe hier eine schwarze Fläche stehen. */}
+  <div class="ohne-3d-ausweg" data-ausweg hidden>
+    <p>Dieses Gerät kann das Regal nicht aufbauen.</p>
+    <a href="/programm">Zum Programm als Liste</a>
+  </div>
+
+  <p class="independent-note">{siteConfig.independentNote}</p>
+
+  <div class="sr-only" aria-live="polite" data-vorlese></div>
+</main>
+
+<script>
+  import { regalStarten } from '../shelf/mount';
+
+  const wurzel = document.querySelector<HTMLElement>('[data-regal]');
+  if (wurzel) regalStarten(wurzel);
+</script>
