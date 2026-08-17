@@ -130,13 +130,14 @@ const desktopDetailWidthRatio = 0.41;
 const compactDetailWidthRatio = 0.48;
 const desktopDetailMaxWidth = 620;
 const compactDetailMaxWidth = 570;
-// Der Band steht links, das Textfeld rechts. Weiter nach links oder groesser
-// und er laeuft aus dem Bild und ueber die Wortmarke.
-const desktopFocusX = -0.4;
-const desktopFocusZ = 3.05;
-const desktopFocusScale = 1.06;
-const mobileFocusZ = 2.9;
-const mobileFocusScale = 1.02;
+// Der Band steht links, das Textfeld rechts. Er soll das Bild nicht
+// ausfuellen — mit Luft drumherum wirkt er wie ein Gegenstand, nicht wie
+// ein Bildschirmfoto eines Covers.
+const desktopFocusX = -0.42;
+const desktopFocusZ = 2.72;
+const desktopFocusScale = 0.9;
+const mobileFocusZ = 2.5;
+const mobileFocusScale = 0.86;
 /**
  * So steht der Band da, wenn man ihn ansieht: leicht angedreht, damit der
  * Ruecken mitspricht und das Cover nicht wie ein flaches Bild klebt.
@@ -158,8 +159,8 @@ const introTempo = 1.35;
  */
 const drehschwelle = 0.2;
 
-const inspectDefaultYaw = 0.27;
-const inspectDefaultPitch = -0.05;
+const inspectDefaultYaw = 0.44;
+const inspectDefaultPitch = -0.07;
 
 const inspectionIdleLift = 0.014;
 const inspectionIdlePitch = THREE.MathUtils.degToRad(0.28);

@@ -21,9 +21,9 @@ import {
 const paperbackRatio = 148 / 210;  // Vorgabe, wenn ein Buch nichts eigenes sagt
 const booksPerPile = 6;
 const pileSpacing = 2.3;
-const desktopFocusX = -0.4;
-const desktopFocusZ = 3.05;
-const desktopFocusScale = 1.06;
+const desktopFocusX = -0.42;
+const desktopFocusZ = 2.72;
+const desktopFocusScale = 0.9;
 
 // Das aktuelle Programm, so wie es im Regal steht.
 const buecher = [
