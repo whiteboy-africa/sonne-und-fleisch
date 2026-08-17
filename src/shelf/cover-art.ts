@@ -581,11 +581,19 @@ export function createTitleDecal(book: CatalogBook) {
  * Nummer auf einem Buchruecken eben gedruckt aussieht.
  */
 export function createSpineCover(book: CatalogBook) {
-  const logicalWidth = 256;
+  // Die Zeichenflaeche muss dasselbe Seitenverhaeltnis haben wie der Ruecken
+  // am Buch — sonst zieht die Textur die Ziffern in die Laenge. Der Ruecken
+  // ist so breit wie das Buch dick ist (abzueglich der Kanten).
+  const spineWidth = Math.max(0.02, book.thickness - 0.006);
+  const spineHeight = book.height - 0.014;
   const logicalHeight = 2048;
+  const logicalWidth = Math.max(
+    28,
+    Math.round(logicalHeight * (spineWidth / spineHeight)),
+  );
   const canvas = document.createElement("canvas");
-  canvas.width = 128;
-  canvas.height = 1024;
+  canvas.width = Math.round(logicalWidth / 2);
+  canvas.height = logicalHeight / 2;
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
   ctx.scale(0.5, 0.5);
@@ -601,9 +609,11 @@ export function createSpineCover(book: CatalogBook) {
   ctx.rotate(-Math.PI / 2);
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
-  ctx.letterSpacing = "14px";
-  ctx.font = `500 116px ${spineSerif}`;
-  ctx.fillText(book.release, 0, 4);
+  // Die Ziffern stehen quer, ihre Hoehe ist also die Breite des Ruecken.
+  const ziffernGroesse = Math.round(logicalWidth * 0.62);
+  ctx.letterSpacing = `${Math.round(ziffernGroesse * 0.1)}px`;
+  ctx.font = `500 ${ziffernGroesse}px ${spineSerif}`;
+  ctx.fillText(book.release, 0, ziffernGroesse * 0.03);
   ctx.restore();
 
   return canvas;

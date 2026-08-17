@@ -278,6 +278,7 @@ export class ShelfEngine {
   private zielAzimuth = 0;
   /** Blickwinkel beim Aufsetzen des Zeigers — Bezugspunkt fuers Hinlegen. */
   private azimuthBeimGreifen = 0;
+  private elevationBeimGreifen = 0;
   private browseElevation = 0;
   private zielElevation = 0;
   private pendingFocusIndex: number | null = null;
@@ -394,8 +395,15 @@ export class ShelfEngine {
     this.scene.fog = new THREE.Fog(roomColor, 8, 19);
 
     // Wenig Grundlicht: die Schatten sollen schwarz werden, nicht grau.
-    const hemisphere = new THREE.HemisphereLight("#cfd4d8", "#000000", 0.28);
+    const hemisphere = new THREE.HemisphereLight("#cfd4d8", "#000000", 0.42);
     this.scene.add(hemisphere);
+
+    // Aufheller von vorn. Ohne Boden und Wand faellt kein Licht zurueck auf
+    // die Stapel, und die Umschlaege saufen im Schwarz ab. Trifft nur die
+    // Buecher — der Hintergrund bleibt schwarz, weil er kein Objekt ist.
+    const fill = new THREE.DirectionalLight("#ffffff", 1.15);
+    fill.position.set(1.6, 2.2, 7);
+    this.scene.add(fill);
 
     // Ein hartes, kaltes Licht von vorn oben — Blitz, nicht Fensterlicht.
     const key = new THREE.DirectionalLight("#ffffff", 4.2);
@@ -740,7 +748,6 @@ export class ShelfEngine {
   }
 
   private handleWheel = (event: WheelEvent) => {
-    if (this.mode === "browse") this.atRest = false;
     if (this.mode !== "browse") return;
     event.preventDefault();
     this.pendingFocusIndex = null;
@@ -774,6 +781,7 @@ export class ShelfEngine {
     this.pointerLastY = event.clientY;
     this.pointerTravel = 0;
     this.azimuthBeimGreifen = this.zielAzimuth;
+    this.elevationBeimGreifen = this.zielElevation;
     this.canvas.setPointerCapture(event.pointerId);
   };
 
@@ -806,9 +814,10 @@ export class ShelfEngine {
       // Wer die Ansicht wirklich dreht, schaut die Stapel an — dann legt
       // sich der aufgestellte Band wieder oben auf seinen Stapel. Ein
       // kurzes Antippen oder ein Zurechtruecken reicht dafuer nicht.
-      if (Math.abs(this.zielAzimuth - this.azimuthBeimGreifen) > drehschwelle) {
-        this.layDown();
-      }
+      const gedreht =
+        Math.abs(this.zielAzimuth - this.azimuthBeimGreifen) +
+        Math.abs(this.zielElevation - this.elevationBeimGreifen);
+      if (gedreht > drehschwelle) this.layDown();
       const proPixel = Math.PI / Math.max(420, this.canvas.clientWidth * 0.6);
       this.zielAzimuth -= dx * proPixel;
       this.zielElevation = clamp(
@@ -872,7 +881,6 @@ export class ShelfEngine {
       this.flipBook();
       return;
     }
-    if (this.mode === "browse") this.atRest = false;
     if (event.key === "Escape") {
       this.returnToShelf();
       return;
@@ -1592,9 +1600,13 @@ export class ShelfEngine {
     this.browseTo(Math.round(this.targetScrollIndex) + direction);
   }
 
+  /**
+   * Waehlt einen Band aus, ohne ihn herauszuziehen. Liegt gerade alles im
+   * Stapel, bleibt das so — herausgezogen wird nur auf Klick (`focusBook`).
+   * Steht dagegen schon ein Band vorn, wechselt er.
+   */
   browseTo(index: number) {
     if (this.mode !== "browse") return;
-    this.atRest = false;
     const next = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
     this.pendingFocusIndex = null;
     this.targetScrollIndex = next;

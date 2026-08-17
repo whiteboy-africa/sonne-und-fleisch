@@ -149,8 +149,10 @@ export function regalStarten(wurzel: HTMLElement) {
   el.ansehen.addEventListener('click', () => engine?.focusBook(aktiverIndex));
   el.zurueck.addEventListener('click', () => engine?.browseBy(-1));
   el.vor.addEventListener('click', () => engine?.browseBy(1));
+  // Ein Klick auf die Nummer zieht den Band heraus — Blättern allein tut
+  // das nicht mehr.
   el.ticks.forEach((tick, index) => {
-    tick.addEventListener('click', () => engine?.browseTo(index));
+    tick.addEventListener('click', () => engine?.focusBook(index));
   });
   el.zurRegal.addEventListener('click', () => engine?.returnToShelf());
   el.ansichtZuruecksetzen.addEventListener('click', () =>
