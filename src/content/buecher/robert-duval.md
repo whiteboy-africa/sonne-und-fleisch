@@ -19,6 +19,18 @@ motiv: schematic
 hoehe: 2.0
 dicke: 0.078
 reihenfolge: 2
+# Doppelcover: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
+rueckseite:
+  titel: Mountains of Sadness
+  kurztitel: Mountains of Sadness
+  autor: Autor eintragen
+  klappentext: >-
+    Platzhalter: die Einführung in die zweite Geschichte des Bandes.
+  cover_bild: /buecher/robert-duval/rueckseite.webp
+  cover_farbe: '#303620'
+  akzent_farbe: '#da791a'
+  schrift_farbe: '#b9a159'
+  motiv: wave
 ---
 
 Platzhalter für die lange Beschreibung.

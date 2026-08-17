@@ -21,6 +21,18 @@ motiv: orbit
 hoehe: 2.0
 dicke: 0.078
 reihenfolge: 0
+# Doppelcover: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
+rueckseite:
+  titel: The Rise of Damascus Goat
+  kurztitel: Damascus Goat
+  autor: A. Dwoku
+  klappentext: >-
+    Platzhalter: die Einführung in die zweite Geschichte des Bandes.
+  cover_bild: /buecher/weine-nicht-artur/rueckseite.webp
+  cover_farbe: '#2e2d16'
+  akzent_farbe: '#d68f00'
+  schrift_farbe: '#8a978b'
+  motiv: branches
 ---
 
 Platzhalter für die lange Beschreibung. Hier ist Platz für Inhalt, Leseprobe
