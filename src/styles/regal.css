@@ -259,19 +259,27 @@ body {
   transform: none;
 }
 
-.shelf-arrow:disabled {
-  cursor: default;
-  opacity: 0.25;
+/*
+ * Die Pfeile gehoeren zum aufgeschlagenen Band, nicht ins Regal. Dort
+ * blaettert man mit der Nummernleiste, dem Rad oder den Pfeiltasten.
+ */
+.shelf-arrow {
+  opacity: 0;
+  pointer-events: none;
 }
 
-/* Die Pfeile bleiben beim aufgeschlagenen Band stehen — sie blaettern dort
-   direkt weiter. */
 .is-focused .shelf-arrow {
   opacity: 0.62;
+  pointer-events: auto;
 }
 
 .is-focused .shelf-arrow:hover:not(:disabled) {
   opacity: 1;
+}
+
+.is-focused .shelf-arrow:disabled {
+  cursor: default;
+  opacity: 0.2;
 }
 
 .shelf-arrow--left {

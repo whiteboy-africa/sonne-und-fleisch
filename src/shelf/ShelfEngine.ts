@@ -891,7 +891,7 @@ export class ShelfEngine {
     if (event.ctrlKey || event.metaKey) {
       event.preventDefault();
       this.zielZoom = clamp(
-        this.zielZoom * (1 + event.deltaY * 0.0022),
+        this.zielZoom * (1 + event.deltaY * 0.0027),
         zoomNah,
         zoomFern,
       );
@@ -1502,7 +1502,7 @@ export class ShelfEngine {
       delta,
     );
 
-    this.zoom = damp(this.zoom, this.zielZoom, this.reducedMotion ? 20 : 9, delta);
+    this.zoom = damp(this.zoom, this.zielZoom, this.reducedMotion ? 22 : 11, delta);
 
     const grund = this.responsiveBrowseCamera;
     const abstand = grund.distanceTo(browseTarget) * this.zoom;
@@ -1590,8 +1590,8 @@ export class ShelfEngine {
           band,
           {
             ...pose,
-            yaw: pose.yaw + inspectDefaultYaw,
-            pitch: pose.pitch + inspectDefaultPitch,
+            yaw: pose.yaw + this.inspectYaw,
+            pitch: pose.pitch + this.inspectPitch,
           },
           false,
         );
@@ -1969,11 +1969,25 @@ export class ShelfEngine {
     this.returnToPile(this.wipeVon);
     this.takeFromPile(this.wipeNach);
 
+    // Wer auf Seite B blaettert, will die zweite Geschichte des naechsten
+    // Bandes sehen — nicht wieder bei A anfangen. Hat der naechste Band
+    // keine zweite Seite, bleibt nur A uebrig.
+    const zielHatZweiteSeite =
+      this.runtimeBooks[ziel].data.back !== undefined;
+    const zeigeHinten = this.side === "hinten" && zielHatZweiteSeite;
+    const naechsteSeite: BookSide = zeigeHinten ? "hinten" : "vorn";
+
     this.controls.enabled = false;
     this.zielYaw = inspectDefaultYaw;
-    this.zielPitch = inspectDefaultPitch;
-    this.side = "vorn";
-    this.callbacks.onSide(this.side);
+    this.zielPitch = inspectDefaultPitch + (zeigeHinten ? Math.PI : 0);
+    // Sofort setzen: waehrend des Wechsels soll nichts nachlaufen.
+    this.inspectYaw = this.zielYaw;
+    this.inspectPitch = this.zielPitch;
+
+    if (naechsteSeite !== this.side) {
+      this.side = naechsteSeite;
+      this.callbacks.onSide(this.side);
+    }
     this.callbacks.onSwap(ziel, this.wipeRichtung);
     this.callbacks.onStatus(
       `${this.runtimeBooks[ziel].data.shortTitle} kommt herein`,

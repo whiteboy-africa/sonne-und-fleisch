@@ -233,7 +233,8 @@ export function regalStarten(wurzel: HTMLElement) {
         const umschalten = () => {
           gewaehlterIndex = index;
           aktiverIndex = index;
-          seite = 'vorn';
+          // Die Seite wird nicht zurueckgesetzt: sie kommt aus der Engine,
+          // die beim Blaettern A bei A und B bei B laesst.
           panelSetzen();
           blaetternAnsichtSetzen();
           vorleseSetzen();
