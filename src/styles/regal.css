@@ -73,13 +73,12 @@ body {
   gap: 13px;
   align-items: center;
   color: inherit;
-  font-family: var(--maschine);
+  font-family: var(--schrift);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   line-height: 1;
   text-decoration: none;
-  text-transform: uppercase;
   /* Die Kopfzeile laesst Klicks aufs Regal durch; was anklickbar ist,
      muss die Zeiger wieder annehmen. */
   pointer-events: auto;
@@ -98,12 +97,11 @@ body {
   gap: 18px;
   align-items: center;
   color: var(--ink-soft);
-  font-family: var(--maschine);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-family: var(--schrift);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   line-height: 1;
-  text-transform: uppercase;
 }
 
 .regal-nav a {
@@ -123,10 +121,10 @@ body {
   gap: 5px;
   justify-items: end;
   color: var(--ink-soft);
-  font-family: var(--maschine);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-family: var(--schrift);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   line-height: 1;
 }
 
@@ -161,10 +159,10 @@ body {
   gap: 10px;
   align-items: center;
   margin: 0 0 12px;
-  font-family: var(--maschine);
+  font-family: var(--schrift);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   line-height: 1;
 }
 
@@ -177,25 +175,21 @@ body {
 
 .browse-caption h1 {
   margin: 0;
-  font-family: var(--plakat);
+  font-family: var(--schrift);
   font-size: clamp(30px, 3.4vw, 54px);
-  font-weight: 400;
-  letter-spacing: 0.004em;
-  /* Anton hat lange Oberlaengen: unter 0,9 laeuft die erste Zeile in die
-     Augenbraue darueber. */
-  line-height: 0.92;
-  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: -0.021em;
+  line-height: 1.0;
   text-wrap: balance;
 }
 
 .browse-caption__author {
   margin: 14px 0 0;
   color: var(--ink);
-  font-family: var(--maschine);
+  font-family: var(--schrift);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.2;
-  text-transform: uppercase;
 }
 
 .inspect-button {
@@ -209,11 +203,10 @@ body {
   color: var(--ink);
   cursor: pointer;
   pointer-events: auto;
-  font-family: var(--maschine);
+  font-family: var(--schrift);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   transition: background 140ms steps(2), color 140ms steps(2);
 }
 
@@ -229,7 +222,7 @@ body {
 
 .inspect-button span:last-child {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
   transition: transform 220ms ease;
 }
 
@@ -417,10 +410,10 @@ body {
   padding-bottom: 1px;
   color: var(--ink-soft);
   white-space: nowrap;
-  font-family: var(--maschine);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-family: var(--schrift);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .input-hint i {
@@ -477,12 +470,11 @@ body {
   padding: 0;
   background: transparent;
   cursor: pointer;
-  font-family: var(--maschine);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-family: var(--schrift);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   line-height: 1;
-  text-transform: uppercase;
 }
 
 .back-button .arrow-icon {
@@ -495,10 +487,10 @@ body {
   align-items: center;
   justify-self: end;
   margin-top: -9px;
-  font-family: var(--maschine);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-family: var(--schrift);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .book-details__position span:first-child::after {
@@ -529,27 +521,25 @@ body {
   max-width: 500px;
   margin: 0;
   text-wrap: balance;
-  font-family: var(--plakat);
+  font-family: var(--schrift);
   font-size: clamp(36px, 3.8vw, 58px);
-  font-weight: 400;
-  letter-spacing: 0.004em;
-  line-height: 0.86;
-  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: -0.021em;
+  line-height: 1.02;
 }
 
 .book-details__author {
   margin: 18px 0 0;
   color: var(--ink);
-  font-family: var(--maschine);
+  font-family: var(--schrift);
   font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 500;
 }
 
 .book-details__description {
   max-width: 520px;
   margin: 34px 0 0;
-  font-family: var(--maschine);
+  font-family: var(--schrift);
   font-size: clamp(13px, 1.05vw, 15px);
   font-weight: 400;
   line-height: 1.5;
@@ -565,7 +555,7 @@ body {
 
 .book-details blockquote p {
   margin: 0;
-  font-family: var(--maschine);
+  font-family: var(--schrift);
   font-size: 14px;
   font-style: italic;
   line-height: 1.45;
@@ -575,12 +565,11 @@ body {
   display: block;
   margin-top: 10px;
   color: var(--ink-soft);
-  font-family: var(--maschine);
-  font-size: 10px;
+  font-family: var(--schrift);
+  font-size: 12px;
   font-style: normal;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .book-details dl {
@@ -600,16 +589,15 @@ body {
 .book-details dt {
   margin-bottom: 5px;
   color: var(--ink-soft);
-  font-family: var(--maschine);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  font-family: var(--schrift);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .book-details dd {
   margin: 0;
-  font-family: var(--maschine);
+  font-family: var(--schrift);
   font-size: 13px;
   line-height: 1.3;
 }
@@ -627,11 +615,10 @@ body {
   border-top: 1px solid currentColor;
   border-bottom: 1px solid currentColor;
   text-decoration: none;
-  font-family: var(--maschine);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  font-family: var(--schrift);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .official-link span:last-child {
@@ -655,7 +642,6 @@ body {
   font-size: 8px;
   font-weight: 590;
   letter-spacing: 0.11em;
-  text-transform: uppercase;
 }
 
 .focus-controls span + span::before {
@@ -674,11 +660,10 @@ body {
   background: transparent;
   cursor: pointer;
   color: var(--ink);
-  font-family: var(--maschine);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  font-family: var(--schrift);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .experience-status {
@@ -690,11 +675,10 @@ body {
   gap: 8px;
   align-items: center;
   color: var(--ink-soft);
-  font-family: var(--maschine);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  font-family: var(--schrift);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   transition: opacity 300ms ease;
 }
 
@@ -757,11 +741,10 @@ body {
 
 .loading-screen p {
   margin: 19px 0 0;
-  font-family: var(--maschine);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  font-family: var(--schrift);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 @keyframes assemble {
@@ -784,8 +767,8 @@ body {
   margin: 0;
   color: rgba(19, 18, 16, 0.46);
   text-align: right;
-  font-family: var(--maschine);
-  font-size: 9px;
+  font-family: var(--schrift);
+  font-size: 11px;
   line-height: 1.3;
   transition: opacity 280ms ease;
 }
@@ -1102,11 +1085,10 @@ body {
   border: 2px solid var(--accent);
   color: var(--ink);
   cursor: pointer;
-  font-family: var(--maschine);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  font-family: var(--schrift);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   transition: background 140ms steps(2), color 140ms steps(2);
 }
 
@@ -1136,7 +1118,7 @@ body {
 
 .ohne-3d-ausweg p {
   margin: 0;
-  font-family: var(--maschine);
+  font-family: var(--schrift);
   font-size: 14px;
 }
 
@@ -1144,11 +1126,10 @@ body {
   padding: 10px 14px 9px;
   border: 2px solid var(--accent);
   color: var(--ink);
-  font-family: var(--maschine);
+  font-family: var(--schrift);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
   text-decoration: none;
-  text-transform: uppercase;
 }
 
 .ohne-3d-ausweg a:hover {

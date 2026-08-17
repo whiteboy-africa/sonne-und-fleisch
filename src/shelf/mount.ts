@@ -103,17 +103,23 @@ export function regalStarten(wurzel: HTMLElement) {
     el.panelZitat.textContent = `„${gezeigt.quote}“`;
     el.panelZitatVon.textContent = gezeigt.quoteBy;
 
-    el.wenden.hidden = !doppelband;
+    // Umdrehen kann man jeden Band. Nur beim Doppelcover steht auf der
+    // anderen Seite eine zweite Geschichte — dann sagt der Knopf das auch.
     el.seitenmarke.hidden = !doppelband;
-    if (doppelband) {
-      el.wendenText.textContent =
-        seite === 'vorn' ? 'Andere Seite' : 'Zurück zur ersten Seite';
-      el.wenden.setAttribute(
-        'aria-label',
-        seite === 'vorn'
+    el.wendenText.textContent = doppelband
+      ? seite === 'vorn'
+        ? `Umdrehen zu „${buch.back?.shortTitle ?? ''}“`
+        : `Zurück zu „${buch.shortTitle}“`
+      : 'Umdrehen';
+    el.wenden.setAttribute(
+      'aria-label',
+      doppelband
+        ? seite === 'vorn'
           ? `Band wenden zu ${buch.back?.title ?? ''}`
-          : `Band zurück wenden zu ${buch.title}`,
-      );
+          : `Band zurück wenden zu ${buch.title}`
+        : `${buch.title} umdrehen`,
+    );
+    if (doppelband) {
       el.seitenmarke.textContent =
         seite === 'vorn' ? 'Seite A von zwei' : 'Seite B von zwei';
     }
@@ -157,7 +163,7 @@ export function regalStarten(wurzel: HTMLElement) {
 
   canvas.setAttribute(
     'aria-label',
-    `Regal mit ${katalog.length} Bänden. Ziehen oder Pfeiltasten zum Blättern, Eingabetaste holt den Band nach vorn.`,
+    `Regal mit ${katalog.length} Bänden. Pfeiltasten blättern, Ziehen dreht die Ansicht, Eingabetaste holt den Band nach vorn.`,
   );
 
   blaetternAnsichtSetzen();

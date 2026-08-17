@@ -55,6 +55,7 @@ export function alsKatalogBuch(buch: Buch): CatalogBook {
     height: d.hoehe,
     thickness: d.dicke,
     ...(d.cover_bild ? { coverImage: d.cover_bild } : {}),
+    ...(d.ruecken_bild ? { spineImage: d.ruecken_bild } : {}),
     ...(d.lebendig ? { living: true } : {}),
     ...(d.rueckseite
       ? {

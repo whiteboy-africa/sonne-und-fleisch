@@ -5,9 +5,8 @@
  * die sind gemalt und leuchten aus dem Schwarz heraus. Die Bedienung bleibt
  * hell auf Schwarz, mit einer Giftfarbe fuer aktive Zustaende.
  *
- * Schriften: Anton fuer alles Grosse (Plakat, Flyer, Aufkleber) und Courier
- * Prime fuer alles Kleine (Schreibmaschine, Fotokopie). Keine Serifen mit
- * Strichstaerkenkontrast, kein gesperrtes Editorial-Kapitaelchen.
+ * Schrift: eine einzige Groteske, gemischt gesetzt. Keine Versalien-Ketten,
+ * keine gesperrten Kapitaelchen, keine Serifen mit Strichstaerkenkontrast.
  */
 
 :root {
@@ -22,8 +21,12 @@
   --accent: #b6f000;
   /* Das Gold der Umschlaege, fuer stille Zweitakzente. */
   --gold: #d8b25a;
-  --plakat: 'Anton', 'Haettenschweiler', 'Impact', sans-serif;
-  --maschine: 'Courier Prime', 'Courier New', ui-monospace, monospace;
+  /*
+   * Eine ruhige Groteske fuer alles. Sie soll nicht auffallen — die
+   * gemalten Umschlaege sind das Laute an dieser Seite.
+   */
+  --schrift: 'Inter Variable', Inter, -apple-system, 'Helvetica Neue',
+    Helvetica, Arial, sans-serif;
 }
 
 *,
@@ -49,7 +52,7 @@ body {
 
 body {
   color: var(--ink);
-  font-family: var(--maschine);
+  font-family: var(--schrift);
   -webkit-font-smoothing: antialiased;
 }
 

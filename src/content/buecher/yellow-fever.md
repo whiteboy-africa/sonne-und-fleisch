@@ -12,6 +12,7 @@ zitat_von: Verlagsnotiz
 format: Broschur
 verfuegbarkeit: In Vorbereitung
 cover_bild: /buecher/yellow-fever/cover.webp
+ruecken_bild: /buecher/yellow-fever/ruecken.webp
 # Farben für Rücken, Kanten und Blockrand — aus dem Umschlag genommen.
 cover_farbe: '#8a7a4a'
 akzent_farbe: '#c8352a'

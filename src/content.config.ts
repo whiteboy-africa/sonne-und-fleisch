@@ -50,6 +50,10 @@ const buecher = defineCollection({
     // Ersetzt nur die Vorderseite; Ruecken, Rueckseite und Kanten
     // behalten die Farben von oben.
     cover_bild: z.string().optional(),
+    // Bild fuer den Buchruecken, etwa "/buecher/mein-buch/ruecken.webp".
+    // Hochkant, schmal — beim Druckbogen der Streifen zwischen den beiden
+    // Deckeln. Ohne Angabe wird der Ruecken aus den Farben gezeichnet.
+    ruecken_bild: z.string().optional(),
     // Leichter wandernder Glanz auf dem Einband. Sparsam einsetzen.
     lebendig: z.boolean().default(false),
 

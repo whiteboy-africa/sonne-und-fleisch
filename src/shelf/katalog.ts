@@ -51,6 +51,8 @@ export type CatalogBook = {
    * gezeichnete Cover sichtbar.
    */
   coverImage?: string;
+  /** Eigenes Bild fuer den Buchruecken. */
+  spineImage?: string;
   linkLabel?: string;
   living?: boolean;
   /**

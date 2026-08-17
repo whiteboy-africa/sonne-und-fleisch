@@ -58,6 +58,7 @@ type RuntimeBook = {
   >;
   /** Die Rueckseite — bei Doppelbaenden die zweite Vorderseite. */
   backSurface: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial>;
+  spineSurface: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshPhysicalMaterial>;
   pickProxy: THREE.Mesh;
   livingMaterial?: THREE.ShaderMaterial;
   x: number;
@@ -116,8 +117,12 @@ function pilePerIndex(count: number) {
   }
   return zuordnung;
 }
-/** Abstand der Stapel voneinander, entlang der Reihe. */
-const pileSpacing = 1.95;
+/**
+ * Abstand der Stapel voneinander. Muss groesser sein als der seitliche
+ * Versatz des herausgezogenen Bandes plus eine Buchbreite plus Rand — sonst
+ * streift er beim Herausfahren den Nachbarstapel und die Bewegung haengt.
+ */
+const pileSpacing = 2.3;
 const clamp = THREE.MathUtils.clamp;
 /**
  * Haengt eine Bewegung so lange an der Kollisionspruefung, wird sie
@@ -126,8 +131,8 @@ const clamp = THREE.MathUtils.clamp;
  * gibt es zwangslaeufig Augenblicke, in denen sich zwei Baende ueberlagern.
  */
 const motionStallLimit = 0.25;
-const focusInDuration = 0.46;
-const focusOutDuration = 0.34;
+const focusInDuration = 0.58;
+const focusOutDuration = 0.42;
 const desktopDetailWidthRatio = 0.41;
 const compactDetailWidthRatio = 0.48;
 const desktopDetailMaxWidth = 620;
@@ -246,7 +251,18 @@ export class ShelfEngine {
   private mode: ShelfMode = "browse";
   private selectedIndex: number | null = null;
   private activeIndex = 0;
-  private presentedIndex: number | null = 0;
+  private presentedIndex: number | null = null;
+  /**
+   * Beim Ankommen liegt alles im Stapel. Erst eine Eingabe holt den ersten
+   * Band heraus — ohne diesen Zustand wuerde die Bewegung sofort von selbst
+   * losgehen.
+   */
+  private atRest = true;
+  /** Blickwinkel um die Stapel herum, vom Ziehen gesetzt. */
+  private browseAzimuth = 0;
+  private zielAzimuth = 0;
+  private browseElevation = 0;
+  private zielElevation = 0;
   private pendingFocusIndex: number | null = null;
   private browseMotionPhase: BrowseMotionPhase | "idle" = "idle";
   private browseMotionProgress = 0;
@@ -261,18 +277,25 @@ export class ShelfEngine {
   private focusProgress = 0;
   /** Welche Vorderseite oben ist. Nur bei Doppelbaenden veraenderbar. */
   private side: BookSide = "vorn";
-  /** Fortschritt der Wende-Bewegung: 0 ist vorn, 1 ist gewendet. */
-  private flipAmount = 0;
+  /** Freie Drehung des betrachteten Bandes, in Bogenmass. */
+  private inspectYaw = 0;
+  private inspectPitch = 0;
+  /** Wohin gedreht werden soll — der Knopf setzt das Ziel, das Ziehen beides. */
+  private zielYaw = 0;
+  private zielPitch = 0;
   private lastInputTime = 0;
   private pointerDown = false;
   private pointerId: number | null = null;
   private pointerStartX = 0;
   private pointerLastX = 0;
+  private pointerLastY = 0;
   private pointerTravel = 0;
   private reducedMotion = false;
   private focusCameraPosition = new THREE.Vector3();
   private focusCameraTarget = new THREE.Vector3();
   private responsiveBrowseCamera = browseCamera.clone();
+  /** Wiederverwendeter Rechenplatz, damit nicht jedes Bild einen Vektor anlegt. */
+  private blickZiel = new THREE.Vector3();
   private lastTimestamp = 0;
   private lastDiagnosticsAt = 0;
   private isDisposed = false;
@@ -313,10 +336,12 @@ export class ShelfEngine {
     this.controls.enablePan = true;
     this.controls.screenSpacePanning = true;
     this.controls.enableZoom = true;
-    this.controls.minDistance = 2.7;
+    this.controls.minDistance = 2.4;
     this.controls.maxDistance = 7.2;
-    this.controls.minPolarAngle = Math.PI * 0.22;
-    this.controls.maxPolarAngle = Math.PI * 0.78;
+    // Die Kamera dreht sich nicht mehr um das Buch — das Buch dreht sich in
+    // der Hand. Nur so laesst es sich umdrehen und auf den Kopf stellen;
+    // eine kreisende Kamera behaelt immer ihr Oben.
+    this.controls.enableRotate = false;
 
     this.resizeObserver = new ResizeObserver(this.handleResize);
     this.setupScene();
@@ -403,16 +428,13 @@ export class ShelfEngine {
       })),
     );
 
-    // Der erste Band steht von Anfang an aufgestellt vor seinem Stapel und
-    // liegt deshalb nicht darin.
-    this.takeFromPile(0);
+    this.updateStackTargets();
     this.loadCoversNear(0);
-    this.runtimeBooks.forEach((book, index) => {
+    // Alle Baende liegen. Aufgestellt wird erst auf Verlangen.
+    this.runtimeBooks.forEach((book) => {
       this.commitBookPose(
         book,
-        index === 0
-          ? presentedBookPose(book.place, this.motionLayout)
-          : stackedBookPose(book.place, this.motionLayout),
+        stackedBookPose(book.place, this.motionLayout),
         false,
       );
     });
@@ -619,7 +641,10 @@ export class ShelfEngine {
     backSurface.rotation.y = Math.PI;
     physical.add(backSurface);
 
-    const spineSurface = new THREE.Mesh(
+    const spineSurface = new THREE.Mesh<
+      THREE.PlaneGeometry,
+      THREE.MeshPhysicalMaterial
+    >(
       new THREE.PlaneGeometry(Math.max(0.02, depth - 0.006), book.height - 0.014),
       new THREE.MeshPhysicalMaterial({
         map: spineTexture,
@@ -669,6 +694,7 @@ export class ShelfEngine {
       physical,
       frontSurface,
       backSurface,
+      spineSurface,
       pickProxy,
       livingMaterial,
       x,
@@ -693,6 +719,7 @@ export class ShelfEngine {
   }
 
   private handleWheel = (event: WheelEvent) => {
+    if (this.mode === "browse") this.atRest = false;
     if (this.mode !== "browse") return;
     event.preventDefault();
     this.pendingFocusIndex = null;
@@ -709,28 +736,57 @@ export class ShelfEngine {
   };
 
   private handlePointerDown = (event: PointerEvent) => {
+    if (this.mode === "inspect") {
+      this.pointerDown = true;
+      this.pointerId = event.pointerId;
+      this.pointerLastX = event.clientX;
+      this.pointerLastY = event.clientY;
+      this.canvas.setPointerCapture(event.pointerId);
+      this.canvas.classList.add("is-dragging");
+      return;
+    }
     if (this.mode !== "browse") return;
     this.pointerDown = true;
     this.pointerId = event.pointerId;
     this.pointerStartX = event.clientX;
     this.pointerLastX = event.clientX;
+    this.pointerLastY = event.clientY;
     this.pointerTravel = 0;
     this.canvas.setPointerCapture(event.pointerId);
   };
 
   private handlePointerMove = (event: PointerEvent) => {
     this.updatePointer(event);
+
+    // Im Betrachten dreht das Ziehen den Band: waagerecht um die Hochachse,
+    // senkrecht um die Querachse. Ohne Anschlag — man soll ihn umdrehen und
+    // auf den Kopf stellen koennen.
+    if (this.mode === "inspect") {
+      if (!this.pointerDown || event.pointerId !== this.pointerId) return;
+      const proPixel = Math.PI / Math.max(320, this.canvas.clientWidth * 0.42);
+      this.zielYaw += (event.clientX - this.pointerLastX) * proPixel;
+      this.zielPitch += (event.clientY - this.pointerLastY) * proPixel;
+      this.pointerLastX = event.clientX;
+      this.pointerLastY = event.clientY;
+      return;
+    }
+
     if (this.mode !== "browse") return;
 
     if (this.pointerDown && event.pointerId === this.pointerId) {
-      this.pendingFocusIndex = null;
-      const delta = event.clientX - this.pointerLastX;
+      // Ziehen dreht die Ansicht um die Stapel. Geblaettert wird mit dem
+      // Rad, den Pfeilen, der Leiste unten oder den Pfeiltasten.
+      const dx = event.clientX - this.pointerLastX;
+      const dy = event.clientY - this.pointerLastY;
       this.pointerLastX = event.clientX;
-      this.pointerTravel += Math.abs(delta);
-      this.targetScrollIndex = clamp(
-        this.targetScrollIndex - delta / Math.max(105, this.canvas.clientWidth * 0.11),
-        0,
-        this.runtimeBooks.length - 1,
+      this.pointerLastY = event.clientY;
+      this.pointerTravel += Math.abs(dx) + Math.abs(dy);
+      const proPixel = Math.PI / Math.max(420, this.canvas.clientWidth * 0.6);
+      this.zielAzimuth -= dx * proPixel;
+      this.zielElevation = clamp(
+        this.zielElevation + dy * proPixel,
+        -0.34,
+        0.72,
       );
       this.lastInputTime = performance.now();
       this.canvas.classList.add("is-dragging");
@@ -779,6 +835,7 @@ export class ShelfEngine {
   };
 
   private handleKeyDown = (event: KeyboardEvent) => {
+    if (this.mode === "browse") this.atRest = false;
     if (event.key === "Escape") {
       this.returnToShelf();
       return;
@@ -914,6 +971,7 @@ export class ShelfEngine {
   }
 
   private updateBrowseMotion(delta: number) {
+    if (this.atRest) return;
     if (this.browseMotionPhase === "idle") {
       if (this.presentedIndex === this.activeIndex) {
         if (this.pendingFocusIndex === this.activeIndex) {
@@ -1045,7 +1103,7 @@ export class ShelfEngine {
       );
       this.focusProgress = damp(this.focusProgress, 0, 10, delta);
       this.camera.position.lerp(
-        this.responsiveBrowseCamera,
+        this.blickpunkt(delta),
         1 - Math.exp(-(this.reducedMotion ? 18 : 7) * delta),
       );
       this.camera.lookAt(browseTarget);
@@ -1078,7 +1136,7 @@ export class ShelfEngine {
       );
       this.applyFocusViewOffset(easeOutCubic(this.focusProgress));
       this.camera.position.lerp(
-        this.responsiveBrowseCamera,
+        this.blickpunkt(delta),
         1 - Math.exp(-(this.reducedMotion ? 24 : 14) * delta),
       );
       this.camera.lookAt(browseTarget);
@@ -1095,6 +1153,10 @@ export class ShelfEngine {
         }
         this.selectedIndex = null;
         this.mode = "browse";
+        this.zielYaw = 0;
+        this.zielPitch = 0;
+        this.inspectYaw = 0;
+        this.inspectPitch = 0;
         if (this.side !== "vorn") {
           this.side = "vorn";
           this.callbacks.onSide(this.side);
@@ -1121,6 +1183,37 @@ export class ShelfEngine {
     }
   }
 
+  /**
+   * Wo die Kamera stehen soll: auf einer Kugel um die Stapel, deren Radius
+   * aus der Fenstergroesse kommt und deren Winkel das Ziehen setzt.
+   */
+  private blickpunkt(delta: number) {
+    const tempo = this.reducedMotion ? 20 : 8;
+    this.browseAzimuth = damp(this.browseAzimuth, this.zielAzimuth, tempo, delta);
+    this.browseElevation = damp(
+      this.browseElevation,
+      this.zielElevation,
+      tempo,
+      delta,
+    );
+
+    const grund = this.responsiveBrowseCamera;
+    const abstand = grund.distanceTo(browseTarget);
+    const flach = Math.hypot(grund.x - browseTarget.x, grund.z - browseTarget.z);
+    const grundAzimut = Math.atan2(grund.x - browseTarget.x, grund.z - browseTarget.z);
+    const grundHoehe = Math.atan2(grund.y - browseTarget.y, flach);
+
+    const azimut = grundAzimut + this.browseAzimuth;
+    // Nicht unter den Boden und nicht senkrecht von oben.
+    const hoehe = clamp(grundHoehe + this.browseElevation, 0.02, 1.24);
+
+    return this.blickZiel.set(
+      browseTarget.x + abstand * Math.cos(hoehe) * Math.sin(azimut),
+      browseTarget.y + abstand * Math.sin(hoehe),
+      browseTarget.z + abstand * Math.cos(hoehe) * Math.cos(azimut),
+    );
+  }
+
   private updateBooks(delta: number, elapsed: number) {
     const motionFocus =
       this.mode === "returning"
@@ -1134,13 +1227,10 @@ export class ShelfEngine {
     const focusScale =
       window.innerWidth < 760 ? mobileFocusScale : desktopFocusScale;
 
-    // Die Wende laeuft weich, damit man sieht, was passiert.
-    this.flipAmount = damp(
-      this.flipAmount,
-      this.side === "hinten" ? 1 : 0,
-      this.reducedMotion ? 22 : 7,
-      delta,
-    );
+    // Die freie Drehung laeuft der Hand weich hinterher.
+    const drehTempo = this.reducedMotion ? 24 : 11;
+    this.inspectYaw = damp(this.inspectYaw, this.zielYaw, drehTempo, delta);
+    this.inspectPitch = damp(this.inspectPitch, this.zielPitch, drehTempo, delta);
 
     if (this.selectedIndex !== null) {
       const selected = this.runtimeBooks[this.selectedIndex];
@@ -1152,10 +1242,19 @@ export class ShelfEngine {
         focusZ,
         focusScale,
       );
-      this.commitBookPose(selected, {
-        ...pose,
-        pitch: pose.pitch + this.flipAmount * Math.PI,
-      });
+      // Ohne Kollisionspruefung: beim Betrachten ist der Rest des Regals
+      // ausgeblendet, es gibt nichts zu treffen — eine Pruefung koennte die
+      // Drehung nur blockieren.
+      this.commitBookPose(
+        selected,
+        {
+          ...pose,
+          yaw: pose.yaw + this.inspectYaw * motionFocus,
+          pitch: pose.pitch + this.inspectPitch * motionFocus,
+        },
+        false,
+      );
+      this.seiteAblesen(selected);
     }
 
     this.runtimeBooks.forEach((book) => {
@@ -1172,7 +1271,7 @@ export class ShelfEngine {
       const isOutOfPile =
         isSelected || book.index === this.presentedIndex;
       if (!isMoving && !isOutOfPile && book.pose.y !== book.place.stackY) {
-        const settled = damp(book.pose.y, book.place.stackY, 9, delta);
+        const settled = damp(book.pose.y, book.place.stackY, 6.5, delta);
         book.pose.y = settled;
         book.content.position.y = settled;
       }
@@ -1212,6 +1311,34 @@ export class ShelfEngine {
         );
       }
     });
+  }
+
+  /**
+   * Liest aus der Lage des Bandes ab, welche seiner beiden Seiten zur Kamera
+   * zeigt, und meldet einen Wechsel. So stimmt die Beschreibung daneben
+   * immer mit dem ueberein, was man sieht — egal ob gedreht oder geknoepft.
+   */
+  private seiteAblesen(selected: RuntimeBook) {
+    if (!selected.data.back) return;
+    if (this.mode !== "inspect") return;
+
+    const deckelNormale = new THREE.Vector3(0, 0, 1).applyQuaternion(
+      selected.content.getWorldQuaternion(new THREE.Quaternion()),
+    );
+    const zurKamera = new THREE.Vector3()
+      .subVectors(this.camera.position, selected.content.getWorldPosition(new THREE.Vector3()))
+      .normalize();
+    const naechste: BookSide =
+      deckelNormale.dot(zurKamera) >= 0 ? "vorn" : "hinten";
+    if (naechste === this.side) return;
+
+    this.side = naechste;
+    this.callbacks.onSide(this.side);
+    this.callbacks.onStatus(
+      this.side === "hinten"
+        ? "Die andere Seite liegt vorn"
+        : "Die erste Seite liegt vorn",
+    );
   }
 
   private updateFocusCamera(delta: number) {
@@ -1301,7 +1428,7 @@ export class ShelfEngine {
     this.camera.updateProjectionMatrix();
     if (this.mode === "browse" && this.focusProgress < 0.01) {
       this.camera.clearViewOffset();
-      this.camera.position.copy(this.responsiveBrowseCamera);
+      this.camera.position.copy(this.blickpunkt(1));
       this.camera.lookAt(browseTarget);
     } else if (this.mode === "inspect" && this.selectedIndex !== null) {
       const worldPosition = new THREE.Vector3();
@@ -1329,11 +1456,15 @@ export class ShelfEngine {
       const runtime = this.runtimeBooks[i];
       if (!runtime || runtime.coverRequested) continue;
       const bild = runtime.data.coverImage;
-      if (!bild && !runtime.data.back?.coverImage) continue;
+      if (!bild && !runtime.data.back?.coverImage && !runtime.data.spineImage) {
+        continue;
+      }
       runtime.coverRequested = true;
       if (bild) void this.loadCustomFace(runtime, bild, "front");
       const hinten = runtime.data.back?.coverImage;
       if (hinten) void this.loadCustomFace(runtime, hinten, "back");
+      const ruecken = runtime.data.spineImage;
+      if (ruecken) void this.loadCustomFace(runtime, ruecken, "spine");
     }
   }
 
@@ -1348,7 +1479,7 @@ export class ShelfEngine {
   private async loadCustomFace(
     runtime: RuntimeBook,
     coverImage: string,
-    seite: "front" | "back",
+    seite: "front" | "back" | "spine",
   ) {
     try {
       const texture = await new THREE.TextureLoader().loadAsync(coverImage);
@@ -1371,7 +1502,9 @@ export class ShelfEngine {
       const material =
         seite === "front"
           ? runtime.frontSurface.material
-          : runtime.backSurface.material;
+          : seite === "spine"
+            ? runtime.spineSurface.material
+            : runtime.backSurface.material;
       const proceduralTexture = material.map;
       material.map = texture;
       material.needsUpdate = true;
@@ -1395,6 +1528,7 @@ export class ShelfEngine {
 
   browseTo(index: number) {
     if (this.mode !== "browse") return;
+    this.atRest = false;
     const next = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
     this.pendingFocusIndex = null;
     this.targetScrollIndex = next;
@@ -1402,6 +1536,7 @@ export class ShelfEngine {
   }
 
   focusBook(index = this.activeIndex) {
+    this.atRest = false;
     if (this.mode !== "browse") return;
     const next = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
     this.targetScrollIndex = next;
@@ -1438,25 +1573,24 @@ export class ShelfEngine {
    * ihn um *und* stellt ihn auf den Kopf — genau so kommt die zweite,
    * kopfueber gedruckte Vorderseite richtig herum zu stehen.
    */
+  /**
+   * Wendet den betrachteten Band: eine halbe Drehung um die Querachse dreht
+   * ihn um *und* stellt ihn auf den Kopf. Genau so kommt bei einem
+   * Doppelband die zweite, kopfueber gedruckte Vorderseite richtig herum zu
+   * stehen. Welche Seite dann vorn liegt, liest die Engine aus der Lage des
+   * Bandes ab — es macht keinen Unterschied, ob man den Knopf drueckt oder
+   * mit der Hand dreht.
+   */
   flipBook() {
     if (this.selectedIndex === null) return;
     if (this.mode !== "inspect" && this.mode !== "focusing") return;
-    if (!this.runtimeBooks[this.selectedIndex].data.back) return;
-    this.side = this.side === "vorn" ? "hinten" : "vorn";
-    this.callbacks.onSide(this.side);
-    this.callbacks.onStatus(
-      this.side === "hinten"
-        ? "Die andere Seite liegt oben"
-        : "Die erste Seite liegt oben",
-    );
+    this.zielPitch += Math.PI;
   }
 
   resetFocusView() {
     if (this.mode !== "inspect" || this.selectedIndex === null) return;
-    if (this.side !== "vorn") {
-      this.side = "vorn";
-      this.callbacks.onSide(this.side);
-    }
+    this.zielYaw = 0;
+    this.zielPitch = 0;
     const selected = this.runtimeBooks[this.selectedIndex];
     const worldPosition = new THREE.Vector3();
     selected.content.getWorldPosition(worldPosition);

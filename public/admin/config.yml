@@ -84,6 +84,15 @@ collections:
           Hochformat, etwa 900 Pixel breit als WebP. Größere Dateien kosten auf
           dem Handy Ladezeit und Speicher. Ohne Bild zeichnet das Regal ein
           Cover aus den Farben unten.
+      - name: ruecken_bild
+        label: Buchrücken
+        widget: image
+        required: false
+        media_folder: '{{media_folder}}/{{slug}}'
+        public_folder: '{{public_folder}}/{{slug}}'
+        hint: >-
+          Schmaler Hochkant-Streifen. Beim Druckbogen der Teil zwischen den
+          beiden Deckeln. Ohne Bild wird der Rücken aus den Farben gezeichnet.
       - name: cover_farbe
         label: Farbe des Einbands
         widget: color

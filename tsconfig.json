@@ -1,7 +1,9 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"],
+  // public/admin traegt die fertig gebaute Redaktionsoberflaeche — fremder
+  // Code, der nicht geprueft werden soll.
+  "exclude": ["dist", "public/admin"],
   "compilerOptions": {
     "types": ["astro/client", "three"]
   }

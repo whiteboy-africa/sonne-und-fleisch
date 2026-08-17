@@ -23,7 +23,7 @@ const gesamt = zweistellig(katalog.length);
     data-regal-canvas
     role="application"
     tabindex="0"
-    aria-label={`Regal mit ${katalog.length} Bänden. Ziehen oder Pfeiltasten zum Blättern, Eingabetaste holt den Band nach vorn.`}
+    aria-label={`Regal mit ${katalog.length} Bänden. Pfeiltasten blättern, Ziehen dreht die Ansicht, Eingabetaste holt den Band nach vorn.`}
   ></canvas>
 
   <header class="site-header">
@@ -43,8 +43,8 @@ const gesamt = zweistellig(katalog.length);
         <a href="/kontakt">Kontakt</a>
       </nav>
       <div class="edition-mark">
-        <span>{katalog.length} {katalog.length === 1 ? 'BAND' : 'BÄNDE'}</span>
-        <span>01 DURCHGEHENDES REGAL</span>
+        <span>{katalog.length} {katalog.length === 1 ? 'Band' : 'Bände'}</span>
+        <span>Ein Stapel Programm</span>
       </div>
     </div>
   </header>
@@ -103,11 +103,11 @@ const gesamt = zweistellig(katalog.length);
       }
     </div>
     <div class="input-hint" aria-hidden="true">
-      <span>ZIEHEN</span>
+      <span>Ziehen dreht die Ansicht</span>
       <i></i>
-      <span>SCROLLEN</span>
+      <span>Scrollen blättert</span>
       <i></i>
-      <span>PFEILTASTEN</span>
+      <span>Pfeiltasten</span>
     </div>
   </nav>
 
@@ -148,6 +148,13 @@ const gesamt = zweistellig(katalog.length);
           </div>
         </dl>
 
+        {/* Wenden: dreht den Band um und auf den Kopf. Bei Doppelbänden
+            wechselt damit auch die Beschreibung auf die andere Geschichte. */}
+        <button type="button" class="wenden-knopf" data-wenden>
+          <span aria-hidden="true">⟳</span>
+          <span data-wenden-text>Umdrehen</span>
+        </button>
+
         <a class="official-link" data-panel-link href="/programm">
           <span data-panel-link-text>{siteConfig.bookLinkLabel}</span>
           <span aria-hidden="true">↗</span>
@@ -155,14 +162,8 @@ const gesamt = zweistellig(katalog.length);
       </div>
 
       <div class="focus-controls" aria-label="Ansicht">
-        <span>Ziehen dreht den Band</span>
+        <span>Ziehen dreht den Band in jede Richtung</span>
         <span>Scrollen zoomt</span>
-        {/* Nur bei Doppelbänden: wendet den Band um und auf den Kopf,
-            damit die zweite Vorderseite richtig herum steht. */}
-        <button type="button" class="wenden-knopf" data-wenden hidden>
-          <span aria-hidden="true">⟳</span>
-          <span data-wenden-text>Andere Seite</span>
-        </button>
         <button type="button" data-ansicht-zuruecksetzen>Ansicht zurücksetzen</button>
       </div>
     </div>

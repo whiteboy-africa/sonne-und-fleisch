@@ -83,13 +83,18 @@ export type BrowseMotionPhase =
   | 'turn-next'
   | 'settle-next';
 
+/**
+ * Dauer der einzelnen Phasen in Sekunden. Buecher haben Gewicht: das
+ * Herausziehen und das Aufrichten duerfen ruhig etwas dauern, das Setzen im
+ * Stapel ist kurz. Zusammen etwas ueber eine Sekunde.
+ */
 export const browsePhaseDuration: Record<BrowseMotionPhase, number> = {
-  'retreat-current': 0.13,
-  'turn-current': 0.12,
-  'shelve-current': 0.1,
-  'extract-next': 0.12,
-  'turn-next': 0.15,
-  'settle-next': 0.1,
+  'retreat-current': 0.24,
+  'turn-current': 0.2,
+  'shelve-current': 0.12,
+  'extract-next': 0.26,
+  'turn-next': 0.28,
+  'settle-next': 0.14,
 };
 
 function clamp01(value: number) {
@@ -133,20 +138,25 @@ export function createMotionLayout(books: MotionBookSize[]): MotionLayout {
   );
 
   // Der zurueckgelehnte Band ist tiefer als er dick ist: die Neigung legt
-  // einen Teil seiner Hoehe in die Tiefe. Ohne diesen Anteil steht er der
-  // Kollisionspruefung nach im Stapel, und keine Bewegung kaeme durch.
+  // einen Teil seiner Hoehe in die Tiefe.
   const leanedDepth =
     Math.abs(Math.cos(leanBack)) * maxThickness +
     Math.abs(Math.sin(leanBack)) * maxHeight;
 
+  // Entscheidend ist aber der Augenblick, in dem der Band flach vor dem
+  // Stapel liegt: dann ist er eine ganze Buchlaenge tief. Steht er dabei
+  // nicht weit genug vorn, steckt sein hinteres Ende noch im Stapel — und
+  // genau das hat die Kollisionspruefung in jeder zweiten Phase blockiert,
+  // was die Bewegung sekundenlang anhalten liess.
+  const flachAusgezogen =
+    maxHeight * 0.5 + // halbe Tiefe des Stapels
+    maxHeight * 0.5; // halbe Laenge des liegenden Bandes
+  const aufgestellt = maxHeight * 0.5 + leanedDepth * 0.5 * maximumFocusScale;
+
   return {
     floorTop: 0,
-    // Der liegende Stapel ist so tief wie das hoechste Buch lang ist. Davor
-    // muss der aufgestellte Band Platz haben, ohne ihn zu schneiden — plus
-    // Luft fuer die Schieflage der gestapelten Baende.
     pulledZ:
-      maxHeight * 0.5 +
-      leanedDepth * 0.5 * maximumFocusScale +
+      Math.max(flachAusgezogen, aufgestellt) +
       maxStackJitter +
       collisionMargin +
       pulledClearance,
