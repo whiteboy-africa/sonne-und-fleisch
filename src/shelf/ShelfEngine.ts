@@ -143,10 +143,12 @@ const mobileFocusScale = 0.79;
  * Ruecken mitspricht und das Cover nicht wie ein flaches Bild klebt.
  */
 /**
- * Der Blick beim Ankommen: von oben auf die Stapel. Von dort sinkt die
- * Kamera gedaempft in die normale Hoehe — einmal, beim Aufbau.
+ * Der Blick beim Ankommen: steil von oben auf die Stapel und leicht
+ * herumgedreht. Von dort sinkt die Kamera gedaempft in die normale Hoehe
+ * und richtet sich gerade — einmal, beim Aufbau.
  */
-const introElevation = 0.42;
+const introElevation = 0.74;
+const introAzimuth = 0.3;
 /** Wie traege dieses Sinken ist. Klein heisst langsam. */
 const introTempo = 1.35;
 
@@ -290,7 +292,7 @@ export class ShelfEngine {
    */
   private layDownPending = false;
   /** Blickwinkel um die Stapel herum, vom Ziehen gesetzt. */
-  private browseAzimuth = 0;
+  private browseAzimuth = introAzimuth;
   private zielAzimuth = 0;
   /** Blickwinkel beim Aufsetzen des Zeigers — Bezugspunkt fuers Hinlegen. */
   private azimuthBeimGreifen = 0;
@@ -1298,7 +1300,11 @@ export class ShelfEngine {
   private blickpunkt(delta: number) {
     // Beim Ankommen faellt der Blick langsam aus der Vogelperspektive in die
     // Normalhoehe. Danach folgt er dem Ziehen im gewohnten Tempo.
-    if (this.introLaeuft && Math.abs(this.browseElevation - this.zielElevation) < 0.012) {
+    if (
+      this.introLaeuft &&
+      Math.abs(this.browseElevation - this.zielElevation) < 0.012 &&
+      Math.abs(this.browseAzimuth - this.zielAzimuth) < 0.012
+    ) {
       this.introLaeuft = false;
     }
     const tempo = this.reducedMotion
