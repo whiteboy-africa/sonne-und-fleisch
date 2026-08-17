@@ -264,9 +264,14 @@ body {
   opacity: 0.25;
 }
 
+/* Die Pfeile bleiben beim aufgeschlagenen Band stehen — sie blaettern dort
+   direkt weiter. */
 .is-focused .shelf-arrow {
-  opacity: 0;
-  pointer-events: none;
+  opacity: 0.62;
+}
+
+.is-focused .shelf-arrow:hover:not(:disabled) {
+  opacity: 1;
 }
 
 .shelf-arrow--left {
@@ -344,10 +349,14 @@ body {
     transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Die Leiste bleibt auch beim Aufgeschlagenen stehen: von dort geht es
+   direkt zum naechsten Band. Nur etwas zurueckgenommen. */
 .is-focused .shelf-index {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(12px);
+  opacity: 0.72;
+}
+
+.is-focused .shelf-index:hover {
+  opacity: 1;
 }
 
 .shelf-index__ticks {

@@ -69,12 +69,13 @@ export function regalStarten(wurzel: HTMLElement) {
     el.blaetternAutor.textContent = buch.author;
     el.ansehen.disabled = imFokus;
     el.ansehen.setAttribute('aria-label', `${buch.title} ansehen`);
-    el.zurueck.disabled = imFokus || aktiverIndex === 0;
-    el.vor.disabled = imFokus || aktiverIndex === katalog.length - 1;
+    el.zurueck.disabled = aktiverIndex === 0;
+    el.vor.disabled = aktiverIndex === katalog.length - 1;
     el.ticks.forEach((tick, index) => {
       const ist = index === aktiverIndex;
       tick.classList.toggle('is-active', ist);
-      tick.disabled = imFokus;
+      // Die Leiste bleibt auch im Fokus bedienbar.
+      tick.disabled = false;
       if (ist) tick.setAttribute('aria-current', 'true');
       else tick.removeAttribute('aria-current');
     });
@@ -146,13 +147,30 @@ export function regalStarten(wurzel: HTMLElement) {
     el.vorlese.textContent = `${buch.title} von ${buch.author} ausgewählt.`;
   }
 
-  el.ansehen.addEventListener('click', () => engine?.focusBook(aktiverIndex));
-  el.zurueck.addEventListener('click', () => engine?.browseBy(-1));
-  el.vor.addEventListener('click', () => engine?.browseBy(1));
-  // Ein Klick auf die Nummer zieht den Band heraus — Blättern allein tut
-  // das nicht mehr.
+  // „Band herausziehen" tut genau das. Aufgeschlagen wird mit einem Klick
+  // auf den Band.
+  el.ansehen.addEventListener('click', () => engine?.presentBook(aktiverIndex));
+  // Die Pfeile tun dasselbe wie die Nummern: einen Band weiter. Im Regal
+  // holen sie ihn heraus, beim aufgeschlagenen Band blättern sie weiter.
+  function nachbar(richtung: -1 | 1) {
+    const ziel = Math.min(
+      katalog.length - 1,
+      Math.max(0, aktiverIndex + richtung),
+    );
+    if (modus === 'browse') engine?.presentBook(ziel);
+    else engine?.inspectOther(ziel);
+  }
+  el.zurueck.addEventListener('click', () => nachbar(-1));
+  el.vor.addEventListener('click', () => nachbar(1));
+  // Ein Klick auf die Nummer holt den Band heraus und stellt ihn auf. Die
+  // Beschreibung kommt erst, wenn man dann auf den Band selbst klickt.
   el.ticks.forEach((tick, index) => {
-    tick.addEventListener('click', () => engine?.focusBook(index));
+    tick.addEventListener('click', () => {
+      // Im Regal: nur herausholen. Beim aufgeschlagenen Band: direkt zum
+      // naechsten weiterblättern, ohne Umweg über das Regal.
+      if (modus === 'browse') engine?.presentBook(index);
+      else engine?.inspectOther(index);
+    });
   });
   el.zurRegal.addEventListener('click', () => engine?.returnToShelf());
   el.ansichtZuruecksetzen.addEventListener('click', () =>

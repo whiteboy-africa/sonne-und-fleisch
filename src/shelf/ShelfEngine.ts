@@ -147,10 +147,21 @@ const mobileFocusScale = 0.79;
  * herumgedreht. Von dort sinkt die Kamera gedaempft in die normale Hoehe
  * und richtet sich gerade — einmal, beim Aufbau.
  */
-const introElevation = 0.74;
-const introAzimuth = 0.3;
-/** Wie traege dieses Sinken ist. Klein heisst langsam. */
-const introTempo = 1.35;
+const introElevation = 0.82;
+/**
+ * Die Drehung beim Ankommen. Sie kippt die Reihe der Stapel gegeneinander:
+ * je mehr gedreht, desto hoeher steht der linke Stapel im Bild. Klein
+ * halten, sonst wirkt die Ansicht schief.
+ */
+const introAzimuth = 0.15;
+/**
+ * So lange bleibt der Blick oben stehen, bevor er zu sinken beginnt. Ohne
+ * dieses Halten ist die steile Ansicht nach einer halben Sekunde vorbei und
+ * niemand sieht sie.
+ */
+const introHalten = 2.5;
+/** Wie traege das Sinken danach ist. Klein heisst langsam. */
+const introTempo = 0.45;
 
 /**
  * Ab dieser Drehung der Ansicht legt sich der aufgestellte Band hin: gut
@@ -297,10 +308,29 @@ export class ShelfEngine {
   /** Blickwinkel beim Aufsetzen des Zeigers — Bezugspunkt fuers Hinlegen. */
   private azimuthBeimGreifen = 0;
   private elevationBeimGreifen = 0;
+  /** Aufgelaufene Wischstrecke auf dem Telefon. */
+  private wischWeg = 0;
   private browseElevation = introElevation;
   private zielElevation = 0;
   /** Laeuft das anfaengliche Sinken noch? */
   private introLaeuft = true;
+  /** Wie lange der Blick schon oben steht. */
+  private introGehalten = 0;
+  /**
+   * Band, der nach dem Zurueckgehen aufgeschlagen werden soll. So kommt man
+   * aus der Betrachtung heraus direkt zum naechsten, ohne Umweg ueber das
+   * Regal.
+   */
+  /**
+   * Laeuft gerade ein Wechsel aus der Betrachtung heraus zum naechsten
+   * Band? Dann bleibt die Kamera stehen, wo sie ist: der aufgestellte Platz
+   * liegt in Weltkoordinaten immer an derselben Stelle, weil die Stapel
+   * unter der Kamera durchrutschen. Ohne das faehrt die Kamera erst zum
+   * Regal zurueck und wieder heran — genau der Umweg, den niemand will.
+   */
+  private swapZu: number | null = null;
+  /** Schwanken des aufgestellten Bandes, aus der Blaettergeschwindigkeit. */
+  private schwanken = 0;
   private pendingFocusIndex: number | null = null;
   private browseMotionPhase: BrowseMotionPhase | "idle" = "idle";
   private browseMotionProgress = 0;
@@ -398,6 +428,7 @@ export class ShelfEngine {
           focus: (index: number) => void;
           browse: (index: number) => void;
           returnToShelf: () => void;
+          intro: () => void;
         };
       }
     ).__PRESS_LIBRARY__ = {
@@ -405,6 +436,16 @@ export class ShelfEngine {
       focus: (index) => this.focusBook(index),
       browse: (index) => this.browseTo(index),
       returnToShelf: () => this.returnToShelf(),
+      // Spielt den Ankunftsblick noch einmal ab — zum Einstellen von
+      // Haltezeit, Hoehe und Tempo, ohne die Seite neu zu laden.
+      intro: () => {
+        this.browseElevation = introElevation;
+        this.browseAzimuth = introAzimuth;
+        this.zielElevation = 0;
+        this.zielAzimuth = 0;
+        this.introGehalten = 0;
+        this.introLaeuft = true;
+      },
     };
   }
 
@@ -494,6 +535,8 @@ export class ShelfEngine {
    * ein Band (weil es vorn aufgestellt ist), rutschen die darueber nach.
    */
   private updateStackTargets() {
+    // Nach dem Umschichten liegt oben womoeglich ein anderer Band.
+    queueMicrotask(() => this.loadCoversNear(this.activeIndex));
     this.pileOrder.forEach((order) => {
       let cursor = this.motionLayout.floorTop;
       order.forEach((index) => {
@@ -634,23 +677,37 @@ export class ShelfEngine {
     physical.add(spine);
 
 
-    const frontTexture = toTexture(createFrontCover(book), this.renderer);
-    const spineTexture = toTexture(createSpineCover(book), this.renderer, 4);
+    // Wo ein eigener Umschlag nachgeladen wird, zeichnen wir keinen Ersatz:
+    // sonst steht dort erst ein fremdes Cover mit fremdem Titel und wird
+    // beim Eintreffen des Bildes ausgetauscht — das sieht nach Fehler aus.
+    // Bis das Bild da ist, bleibt die Flaeche in der Einbandfarbe.
+    const frontTexture = book.coverImage
+      ? null
+      : toTexture(createFrontCover(book), this.renderer);
+    const spineTexture = book.spineImage
+      ? null
+      : toTexture(createSpineCover(book), this.renderer, 4);
 
     // Doppelcover: hinten steht keine Klappentext-Rueckseite, sondern eine
     // zweite Vorderseite — und zwar kopfueber. Genau so ist ein
     // tête-bêche-Band gedruckt: umdrehen genuegt nicht, man muss ihn auch
     // auf den Kopf stellen.
     const zweiteSeite = backFaceAsBook(book);
-    const backTexture = toTexture(
-      zweiteSeite ? createFrontCover(zweiteSeite) : createBackCover(book),
-      this.renderer,
-    );
-    if (zweiteSeite) {
+    const backTexture = zweiteSeite?.coverImage
+      ? null
+      : toTexture(
+          zweiteSeite ? createFrontCover(zweiteSeite) : createBackCover(book),
+          this.renderer,
+        );
+    if (zweiteSeite && backTexture) {
       backTexture.center.set(0.5, 0.5);
       backTexture.rotation = Math.PI;
     }
-    const textures = [frontTexture, spineTexture, backTexture];
+    const textures: THREE.Texture[] = [
+      frontTexture,
+      spineTexture,
+      backTexture,
+    ].filter((texture) => texture !== null);
 
     const frontSurface = new THREE.Mesh<
       THREE.PlaneGeometry,
@@ -659,6 +716,7 @@ export class ShelfEngine {
       new THREE.PlaneGeometry(width - 0.012, book.height - 0.012),
       new THREE.MeshPhysicalMaterial({
         map: frontTexture,
+        color: frontTexture ? 0xffffff : new THREE.Color(book.cover),
         roughness: 0.66,
         metalness: 0.02,
         clearcoat: book.motif === "gather" ? 0.18 : 0.05,
@@ -677,6 +735,7 @@ export class ShelfEngine {
       new THREE.PlaneGeometry(width - 0.012, book.height - 0.012),
       new THREE.MeshStandardMaterial({
         map: backTexture,
+        color: backTexture ? 0xffffff : new THREE.Color(book.cover),
         roughness: 0.72,
       }),
     );
@@ -697,6 +756,7 @@ export class ShelfEngine {
       new THREE.PlaneGeometry(Math.max(0.02, depth - 0.006), book.height - 0.014),
       new THREE.MeshPhysicalMaterial({
         map: spineTexture,
+        color: spineTexture ? 0xffffff : new THREE.Color(book.cover),
         roughness: 0.68,
         metalness: 0.015,
       }),
@@ -804,6 +864,7 @@ export class ShelfEngine {
     this.pointerTravel = 0;
     this.azimuthBeimGreifen = this.zielAzimuth;
     this.elevationBeimGreifen = this.zielElevation;
+    this.wischWeg = 0;
     this.canvas.setPointerCapture(event.pointerId);
   };
 
@@ -833,6 +894,24 @@ export class ShelfEngine {
       this.pointerLastX = event.clientX;
       this.pointerLastY = event.clientY;
       this.pointerTravel += Math.abs(dx) + Math.abs(dy);
+
+      // Auf dem Telefon blaettert eine waagerechte Wischbewegung, statt die
+      // Ansicht zu drehen — Drehen bleibt der senkrechten vorbehalten.
+      if (event.pointerType === "touch") {
+        this.wischWeg += dx;
+        if (Math.abs(this.wischWeg) > 56) {
+          this.browseBy(this.wischWeg > 0 ? -1 : 1);
+          this.wischWeg = 0;
+        }
+        this.zielElevation = clamp(
+          this.zielElevation + dy * (Math.PI / Math.max(420, this.canvas.clientWidth * 0.6)),
+          -0.34,
+          0.72,
+        );
+        this.pointerLastX = event.clientX;
+        this.pointerLastY = event.clientY;
+        return;
+      }
       // Wer die Ansicht wirklich dreht, schaut die Stapel an — dann legt
       // sich der aufgestellte Band wieder oben auf seinen Stapel. Ein
       // kurzes Antippen oder ein Zurechtruecken reicht dafuer nicht.
@@ -841,8 +920,9 @@ export class ShelfEngine {
         Math.abs(this.zielElevation - this.elevationBeimGreifen);
       if (gedreht > drehschwelle) this.layDown();
       const proPixel = Math.PI / Math.max(420, this.canvas.clientWidth * 0.6);
-      // Wer selbst dreht, uebernimmt — das Sinken hoert dann auf.
+      // Wer selbst dreht, uebernimmt — Halten und Sinken hoeren auf.
       this.introLaeuft = false;
+      this.introGehalten = introHalten;
       this.zielAzimuth -= dx * proPixel;
       this.zielElevation = clamp(
         this.zielElevation + dy * proPixel,
@@ -1038,6 +1118,7 @@ export class ShelfEngine {
       return;
     }
     this.pendingFocusIndex = null;
+    this.swapZu = null;
     this.selectedIndex = index;
     this.focusProgress = 0;
     this.mode = "focusing";
@@ -1211,11 +1292,13 @@ export class ShelfEngine {
         delta,
       );
       this.focusProgress = damp(this.focusProgress, 0, 10, delta);
-      this.camera.position.lerp(
-        this.blickpunkt(delta),
-        1 - Math.exp(-(this.reducedMotion ? 18 : 7) * delta),
-      );
-      this.camera.lookAt(browseTarget);
+      if (this.swapZu === null) {
+        this.camera.position.lerp(
+          this.blickpunkt(delta),
+          1 - Math.exp(-(this.reducedMotion ? 18 : 7) * delta),
+        );
+        this.camera.lookAt(browseTarget);
+      }
     } else if (this.mode === "focusing") {
       this.focusProgress = clamp(
         this.focusProgress +
@@ -1300,12 +1383,22 @@ export class ShelfEngine {
   private blickpunkt(delta: number) {
     // Beim Ankommen faellt der Blick langsam aus der Vogelperspektive in die
     // Normalhoehe. Danach folgt er dem Ziehen im gewohnten Tempo.
-    if (
-      this.introLaeuft &&
-      Math.abs(this.browseElevation - this.zielElevation) < 0.012 &&
-      Math.abs(this.browseAzimuth - this.zielAzimuth) < 0.012
-    ) {
-      this.introLaeuft = false;
+    if (this.introLaeuft) {
+      // Erst halten, dann fallen.
+      if (this.introGehalten < introHalten) {
+        this.introGehalten += delta;
+        return this.blickZiel.set(
+          browseTarget.x + this.introAbstand() * Math.cos(this.introHoehe()) * Math.sin(this.introSeite()),
+          browseTarget.y + this.introAbstand() * Math.sin(this.introHoehe()),
+          browseTarget.z + this.introAbstand() * Math.cos(this.introHoehe()) * Math.cos(this.introSeite()),
+        );
+      }
+      if (
+        Math.abs(this.browseElevation - this.zielElevation) < 0.012 &&
+        Math.abs(this.browseAzimuth - this.zielAzimuth) < 0.012
+      ) {
+        this.introLaeuft = false;
+      }
     }
     const tempo = this.reducedMotion
       ? 20
@@ -1334,6 +1427,29 @@ export class ShelfEngine {
       browseTarget.x + abstand * Math.cos(hoehe) * Math.sin(azimut),
       browseTarget.y + abstand * Math.sin(hoehe),
       browseTarget.z + abstand * Math.cos(hoehe) * Math.cos(azimut),
+    );
+  }
+
+  // Hilfsgroessen fuer den gehaltenen Ankunftsblick.
+  private introAbstand() {
+    return this.responsiveBrowseCamera.distanceTo(browseTarget);
+  }
+
+  private introHoehe() {
+    const grund = this.responsiveBrowseCamera;
+    const flach = Math.hypot(grund.x - browseTarget.x, grund.z - browseTarget.z);
+    return clamp(
+      Math.atan2(grund.y - browseTarget.y, flach) + this.browseElevation,
+      0.02,
+      1.24,
+    );
+  }
+
+  private introSeite() {
+    const grund = this.responsiveBrowseCamera;
+    return (
+      Math.atan2(grund.x - browseTarget.x, grund.z - browseTarget.z) +
+      this.browseAzimuth
     );
   }
 
@@ -1555,7 +1671,11 @@ export class ShelfEngine {
     this.camera.updateProjectionMatrix();
     if (this.mode === "browse" && this.focusProgress < 0.01) {
       this.camera.clearViewOffset();
-      this.camera.position.copy(this.blickpunkt(1));
+      // Delta null: die Fenstergroesse soll den Blick neu berechnen, aber
+      // die Bewegung nicht vorspulen. Mit delta = 1 sprang das Sinken beim
+      // Aufbau sofort um drei Viertel nach unten — der Ankunftsblick kam
+      // nie zustande.
+      this.camera.position.copy(this.blickpunkt(0));
       this.camera.lookAt(browseTarget);
     } else if (this.mode === "inspect" && this.selectedIndex !== null) {
       const worldPosition = new THREE.Vector3();
@@ -1575,24 +1695,33 @@ export class ShelfEngine {
    * gewachsenen Programm reicht das, um ein Telefon abzuschiessen.
    */
   private loadCoversNear(index: number) {
+    // Was obenauf liegt, sieht man — diese Umschlaege immer laden.
+    this.pileOrder.forEach((reihe) => {
+      const oben = reihe[reihe.length - 1];
+      if (oben !== undefined) this.loadCover(oben);
+    });
+
     for (
       let i = Math.max(0, index - coverPreloadRange);
       i <= Math.min(this.runtimeBooks.length - 1, index + coverPreloadRange);
       i += 1
     ) {
-      const runtime = this.runtimeBooks[i];
-      if (!runtime || runtime.coverRequested) continue;
-      const bild = runtime.data.coverImage;
-      if (!bild && !runtime.data.back?.coverImage && !runtime.data.spineImage) {
-        continue;
-      }
-      runtime.coverRequested = true;
-      if (bild) void this.loadCustomFace(runtime, bild, "front");
-      const hinten = runtime.data.back?.coverImage;
-      if (hinten) void this.loadCustomFace(runtime, hinten, "back");
-      const ruecken = runtime.data.spineImage;
-      if (ruecken) void this.loadCustomFace(runtime, ruecken, "spine");
+      this.loadCover(i);
     }
+  }
+
+  /** Laedt die Umschlagbilder eines Bandes, einmalig. */
+  private loadCover(index: number) {
+    const runtime = this.runtimeBooks[index];
+    if (!runtime || runtime.coverRequested) return;
+    const bild = runtime.data.coverImage;
+    const hinten = runtime.data.back?.coverImage;
+    const ruecken = runtime.data.spineImage;
+    if (!bild && !hinten && !ruecken) return;
+    runtime.coverRequested = true;
+    if (bild) void this.loadCustomFace(runtime, bild, "front");
+    if (hinten) void this.loadCustomFace(runtime, hinten, "back");
+    if (ruecken) void this.loadCustomFace(runtime, ruecken, "spine");
   }
 
   /**
@@ -1634,6 +1763,10 @@ export class ShelfEngine {
             : runtime.backSurface.material;
       const proceduralTexture = material.map;
       material.map = texture;
+      // Die Einbandfarbe stand nur als Platzhalter auf der Flaeche. Bliebe
+      // sie stehen, wuerde sie sich mit dem Bild multiplizieren und das
+      // Cover verdunkeln.
+      material.color.set(0xffffff);
       material.needsUpdate = true;
       runtime.textures.push(texture);
 
@@ -1663,6 +1796,54 @@ export class ShelfEngine {
     const next = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
     this.pendingFocusIndex = null;
     this.targetScrollIndex = next;
+    this.lastInputTime = performance.now() - 1000;
+  }
+
+  /**
+   * Holt einen Band aus dem Stapel und stellt ihn auf — ohne die
+   * Beschreibung zu oeffnen. Das ist der erste von zwei Schritten: erst
+   * herausholen, dann (mit einem Klick auf den Band) aufschlagen.
+   */
+  /**
+   * Waehlt einen Band aus der Betrachtung heraus: der aufgeschlagene geht
+   * zurueck, der neue kommt heraus und wird gleich aufgeschlagen.
+   */
+  inspectOther(index: number) {
+    const ziel = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
+    if (this.mode === "browse") {
+      this.focusBook(ziel);
+      return;
+    }
+    if (this.mode !== "inspect" && this.mode !== "focusing") return;
+    if (ziel === this.selectedIndex) return;
+
+    // Der aufgeschlagene Band geht zurueck, der naechste kommt heraus und
+    // wird gleich wieder aufgeschlagen. Die Beschreibung bleibt offen.
+    this.swapZu = ziel;
+    this.selectedIndex = null;
+    this.mode = "browse";
+    this.controls.enabled = false;
+    this.zielYaw = inspectDefaultYaw;
+    this.zielPitch = inspectDefaultPitch;
+    this.inspectYaw = inspectDefaultYaw;
+    this.inspectPitch = inspectDefaultPitch;
+    this.atRest = false;
+    this.targetScrollIndex = ziel;
+    this.pendingFocusIndex = ziel;
+    this.lastInputTime = performance.now() - 1000;
+    this.callbacks.onMode("focusing", ziel);
+  }
+
+  presentBook(index: number) {
+    if (this.mode !== "browse") return;
+    this.atRest = false;
+    this.layDownPending = false;
+    this.pendingFocusIndex = null;
+    this.targetScrollIndex = clamp(
+      Math.round(index),
+      0,
+      this.runtimeBooks.length - 1,
+    );
     this.lastInputTime = performance.now() - 1000;
   }
 
@@ -1759,6 +1940,22 @@ export class ShelfEngine {
     return {
       mode: this.mode,
       side: this.side,
+      // Blickwinkel in Grad ueber der Waagerechten — damit sich der
+      // Ankunftsblick messen laesst statt schaetzen.
+      introLaeuft: this.introLaeuft,
+      introGehalten: Number(this.introGehalten.toFixed(2)),
+      browseElevation: Number(this.browseElevation.toFixed(3)),
+      blickhoeheGrad: Math.round(
+        (Math.atan2(
+          this.camera.position.y - browseTarget.y,
+          Math.hypot(
+            this.camera.position.x - browseTarget.x,
+            this.camera.position.z - browseTarget.z,
+          ),
+        ) *
+          180) /
+          Math.PI,
+      ),
       activeIndex: this.activeIndex,
       selectedIndex: this.selectedIndex,
       books: this.runtimeBooks.length,

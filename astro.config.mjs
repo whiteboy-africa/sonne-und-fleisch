@@ -14,6 +14,8 @@ export default defineConfig({
       filter: (seite) => !seite.includes('/admin'),
     }),
   ],
+  // Die Entwicklerleiste unten im Bild stoert beim Beurteilen der Szene.
+  devToolbar: { enabled: false },
   // Saubere URLs ohne .html, wie beim Gnadenthal-Magazin.
   build: {
     format: 'directory',
