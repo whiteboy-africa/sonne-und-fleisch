@@ -949,7 +949,12 @@ export class ShelfEngine {
     if (this.mode === "browse" && wasClick) {
       this.updatePointer(event);
       const hit = this.raycastBook();
-      if (hit !== null) this.focusBook(hit);
+      if (hit !== null) {
+        // Zwei Schritte: ein liegender Band kommt erst heraus. Erst ein
+        // Klick auf den bereits aufgestellten schlaegt ihn auf.
+        if (hit === this.presentedIndex) this.focusBook(hit);
+        else this.presentBook(hit);
+      }
     }
   };
 
@@ -1004,14 +1009,28 @@ export class ShelfEngine {
       this.resetFocusView();
       return;
     }
+
+    // Beim aufgeschlagenen Band blaettern die Pfeiltasten zum naechsten
+    // Band weiter, ohne den Umweg ueber das Regal.
+    if (this.mode === "inspect" || this.mode === "focusing") {
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        this.inspectOther(this.activeIndex + 1);
+      } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        this.inspectOther(this.activeIndex - 1);
+      }
+      return;
+    }
     if (this.mode !== "browse") return;
 
     if (event.key === "ArrowRight") {
       event.preventDefault();
-      this.browseBy(1);
+      // Im Regal holen die Pfeile den Band gleich heraus, wie die Nummern.
+      this.presentBook(this.activeIndex + 1);
     } else if (event.key === "ArrowLeft") {
       event.preventDefault();
-      this.browseBy(-1);
+      this.presentBook(this.activeIndex - 1);
     } else if (event.key === "Home") {
       event.preventDefault();
       this.browseTo(0);
