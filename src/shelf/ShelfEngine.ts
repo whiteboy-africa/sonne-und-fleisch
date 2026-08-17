@@ -142,6 +142,14 @@ const mobileFocusScale = 1.02;
  * Ruecken mitspricht und das Cover nicht wie ein flaches Bild klebt.
  */
 /**
+ * Der Blick beim Ankommen: von oben auf die Stapel. Von dort sinkt die
+ * Kamera gedaempft in die normale Hoehe — einmal, beim Aufbau.
+ */
+const introElevation = 0.42;
+/** Wie traege dieses Sinken ist. Klein heisst langsam. */
+const introTempo = 1.35;
+
+/**
  * Ab dieser Drehung der Ansicht legt sich der aufgestellte Band hin: gut
  * elf Grad, auf einem breiten Fenster etwa fuenfzig Pixel Ziehen. Darunter
  * darf man die Ansicht zurechtruecken, ohne dass der Band verschwindet.
@@ -281,8 +289,10 @@ export class ShelfEngine {
   /** Blickwinkel beim Aufsetzen des Zeigers — Bezugspunkt fuers Hinlegen. */
   private azimuthBeimGreifen = 0;
   private elevationBeimGreifen = 0;
-  private browseElevation = 0;
+  private browseElevation = introElevation;
   private zielElevation = 0;
+  /** Laeuft das anfaengliche Sinken noch? */
+  private introLaeuft = true;
   private pendingFocusIndex: number | null = null;
   private browseMotionPhase: BrowseMotionPhase | "idle" = "idle";
   private browseMotionProgress = 0;
@@ -823,6 +833,8 @@ export class ShelfEngine {
         Math.abs(this.zielElevation - this.elevationBeimGreifen);
       if (gedreht > drehschwelle) this.layDown();
       const proPixel = Math.PI / Math.max(420, this.canvas.clientWidth * 0.6);
+      // Wer selbst dreht, uebernimmt — das Sinken hoert dann auf.
+      this.introLaeuft = false;
       this.zielAzimuth -= dx * proPixel;
       this.zielElevation = clamp(
         this.zielElevation + dy * proPixel,
@@ -1277,7 +1289,16 @@ export class ShelfEngine {
    * aus der Fenstergroesse kommt und deren Winkel das Ziehen setzt.
    */
   private blickpunkt(delta: number) {
-    const tempo = this.reducedMotion ? 20 : 8;
+    // Beim Ankommen faellt der Blick langsam aus der Vogelperspektive in die
+    // Normalhoehe. Danach folgt er dem Ziehen im gewohnten Tempo.
+    if (this.introLaeuft && Math.abs(this.browseElevation - this.zielElevation) < 0.012) {
+      this.introLaeuft = false;
+    }
+    const tempo = this.reducedMotion
+      ? 20
+      : this.introLaeuft
+        ? introTempo
+        : 8;
     this.browseAzimuth = damp(this.browseAzimuth, this.zielAzimuth, tempo, delta);
     this.browseElevation = damp(
       this.browseElevation,
