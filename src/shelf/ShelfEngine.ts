@@ -134,10 +134,10 @@ const compactDetailMaxWidth = 570;
 // ausfuellen — mit Luft drumherum wirkt er wie ein Gegenstand, nicht wie
 // ein Bildschirmfoto eines Covers.
 const desktopFocusX = -0.42;
-const desktopFocusZ = 2.72;
-const desktopFocusScale = 0.9;
-const mobileFocusZ = 2.5;
-const mobileFocusScale = 0.86;
+const desktopFocusZ = 2.55;
+const desktopFocusScale = 0.82;
+const mobileFocusZ = 2.36;
+const mobileFocusScale = 0.79;
 /**
  * So steht der Band da, wenn man ihn ansieht: leicht angedreht, damit der
  * Ruecken mitspricht und das Cover nicht wie ein flaches Bild klebt.
@@ -161,6 +161,11 @@ const drehschwelle = 0.2;
 
 const inspectDefaultYaw = 0.44;
 const inspectDefaultPitch = -0.07;
+/**
+ * Eine Handbreit Schraeglage: der Buchruecken wandert unten nach rechts,
+ * der Band steht nicht wie an der Wand ausgerichtet.
+ */
+const inspectDefaultRoll = 0.075;
 
 const inspectionIdleLift = 0.014;
 const inspectionIdlePitch = THREE.MathUtils.degToRad(0.28);
@@ -1253,6 +1258,7 @@ export class ShelfEngine {
           );
           this.presentedIndex = this.selectedIndex;
         }
+        this.runtimeBooks[this.selectedIndex ?? 0].content.rotation.z = 0;
         this.selectedIndex = null;
         this.mode = "browse";
         this.zielYaw = inspectDefaultYaw;
@@ -1365,6 +1371,10 @@ export class ShelfEngine {
         },
         false,
       );
+      // Die Schraeglage liegt auf der Z-Achse. Sie gehoert nicht in die
+      // Pose: nur der betrachtete Band hat sie, und die Kollisionspruefung
+      // interessiert sie nicht.
+      selected.content.rotation.z = inspectDefaultRoll * motionFocus;
       this.seiteAblesen(selected);
     }
 
