@@ -43,6 +43,23 @@ siehe `LICENSE-mint-playground`) und in drei Punkten umgebaut:
 
 Der Adapter für ein fremdes Asset-Archiv wurde entfernt.
 
+### Bedienung
+
+Eine Regel trägt das Ganze: **herausgezogen wird nur, was man anklickt** —
+das Buch selbst, seine Nummer in der Leiste oder der Knopf. Rad, Pfeile und
+Tasten wählen bloß aus, sie holen nichts heraus.
+
+- Beim Ankommen liegt alles im Stapel (`atRest`).
+- Ziehen dreht die Ansicht um die Stapel. Wer wirklich dreht (über
+  `drehschwelle`, gut elf Grad), legt den aufgestellten Band zurück — oben
+  auf seinen Stapel.
+- In der Betrachtung dreht Ziehen den Band selbst, ohne Anschlag. Die
+  Kamera kreist dort nicht (`enableRotate = false`), sonst ließe sich der
+  Band nie auf den Kopf stellen.
+- Welche Seite eines Doppelbandes vorn liegt, liest `seiteAblesen` aus der
+  Lage des Bandes ab — nicht aus dem Knopfdruck. Deshalb stimmt die
+  Beschreibung auch, wenn von Hand gedreht wird.
+
 ### Regeln, die man beim Anfassen kennen muss
 
 - **Drehreihenfolge.** Die `content`-Gruppe eines Bandes steht auf
@@ -54,6 +71,9 @@ Der Adapter für ein fremdes Asset-Archiv wurde entfernt.
 - **Der Stapel rutscht erst nach, wenn der Band draußen ist** (am Ende von
   `extract-next`). Umgekehrt fällt das Buch von oben in den herausfahrenden
   Band.
+- **Die Zeichenfläche einer Textur braucht das Seitenverhältnis der Fläche
+  am Buch.** Sonst zieht die Textur den Aufdruck in die Länge — beim
+  Buchrücken war er zeitweise um das Dreifache gestaucht.
 - **Cover-Bilder werden nur um den aktiven Band herum geladen**
   (`coverPreloadRange`). Alle auf einmal zu laden kostet bei einem gewachsenen
   Programm mehrere hundert Megabyte Grafikspeicher — das killt Telefone.
@@ -71,10 +91,16 @@ Umschlag als fertiger Druckbogen (Rückseite kopfüber | Rücken | Vorderseite),
 muss die linke Hälfte also erst um 180 Grad gedreht werden — siehe
 `public/buecher/yellow-fever/`.
 
-Beim Betrachten wendet der Knopf „Andere Seite" den Band um die Querachse:
+Beim Betrachten wendet der Knopf „Flip book" (oder die Taste F) den Band um die Querachse:
 das dreht ihn um *und* stellt ihn auf den Kopf, genau wie in der Hand.
 
 ## Bilder
+
+Beim Zerlegen eines Druckbogens: **erst schneiden, dann drehen — in zwei
+getrennten Durchgängen.** Hängt man `.rotate()` in derselben Kette an
+`.extract()`, dreht das Bildwerkzeug zuerst den ganzen Bogen, und der Schnitt
+trifft die falsche Hälfte. Genau so ist einmal die Vorderseite als Rückseite
+gelandet.
 
 - Umschläge als **WebP, etwa 900 px breit**. Größer bringt am Bildschirm
   nichts und kostet auf dem Handy Ladezeit und Grafikspeicher.
@@ -84,12 +110,17 @@ das dreht ihn um *und* stellt ihn auf den Kopf, genau wie in der Hand.
 ## Farben und Schriften
 
 Schwarz und Off-White, dazu eine Giftfarbe (`--accent`) für aktive Zustände.
-Sonst nichts: alles Farbige kommt von den Umschlägen. Schriften sind Anton
-(alles Große) und Courier Prime (alles Kleine). Keine Editorial-Serifen, keine
-gesperrten Kapitälchen.
+Sonst nichts: alles Farbige kommt von den Umschlägen. Eine einzige Schrift,
+ein technischer Mono (IBM Plex Mono), klein gesetzt; groß ist nur das Buch
+selbst. Keine Editorial-Serifen, keine Designschul-Groteske, keine großen
+Plakattitel.
+
+Nummeriert wird dreistellig — 001, 002, 003 — wie Katalognummern eines
+Labels. Diese Nummer steht auch auf dem Buchrücken.
 
 Die Werte stehen in `src/styles/basis.css` und gelten überall — auch die
-3D-Szene (`ShelfEngine.ts`, `roomColor`) muss dazu passen.
+3D-Szene (`ShelfEngine.ts`, `roomColor`) muss dazu passen. Die Parole unten
+rechts steht in `src/shelf/verlag-config.ts`.
 
 ## Deutsch
 

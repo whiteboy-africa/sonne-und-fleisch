@@ -130,9 +130,11 @@ const desktopDetailWidthRatio = 0.41;
 const compactDetailWidthRatio = 0.48;
 const desktopDetailMaxWidth = 620;
 const compactDetailMaxWidth = 570;
-const desktopFocusX = -0.58;
-const desktopFocusZ = 3.2;
-const desktopFocusScale = 1.2;
+// Der Band steht links, das Textfeld rechts. Weiter nach links oder groesser
+// und er laeuft aus dem Bild und ueber die Wortmarke.
+const desktopFocusX = -0.4;
+const desktopFocusZ = 3.05;
+const desktopFocusScale = 1.06;
 const mobileFocusZ = 2.9;
 const mobileFocusScale = 1.02;
 /**
@@ -743,7 +745,9 @@ export class ShelfEngine {
     this.canvas.addEventListener("pointerup", this.handlePointerUp);
     this.canvas.addEventListener("pointercancel", this.handlePointerCancel);
     this.canvas.addEventListener("pointerleave", this.handlePointerLeave);
-    this.canvas.addEventListener("keydown", this.handleKeyDown);
+    // Am Fenster, nicht am Canvas: wer ueber einen Knopf herausgezogen hat,
+    // haelt den Tastenfokus dort — am Canvas kaeme nichts mehr an.
+    window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("blur", this.handleWindowBlur);
   }
 
@@ -872,6 +876,17 @@ export class ShelfEngine {
   };
 
   private handleKeyDown = (event: KeyboardEvent) => {
+    // Wer gerade in ein Feld schreibt, meint nicht das Regal.
+    const ziel = event.target as HTMLElement | null;
+    if (
+      ziel?.isContentEditable ||
+      ziel instanceof HTMLInputElement ||
+      ziel instanceof HTMLTextAreaElement ||
+      ziel instanceof HTMLSelectElement
+    ) {
+      return;
+    }
+
     // F wendet den betrachteten Band.
     if (
       (event.key === "f" || event.key === "F") &&
@@ -1738,7 +1753,7 @@ export class ShelfEngine {
     this.canvas.removeEventListener("pointerup", this.handlePointerUp);
     this.canvas.removeEventListener("pointercancel", this.handlePointerCancel);
     this.canvas.removeEventListener("pointerleave", this.handlePointerLeave);
-    this.canvas.removeEventListener("keydown", this.handleKeyDown);
+    window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("blur", this.handleWindowBlur);
 
     this.scene.traverse((object) => {

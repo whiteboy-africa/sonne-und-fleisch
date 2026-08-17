@@ -10,7 +10,7 @@ const serif = '"Iowan Old Style", "Hoefler Text", Georgia, serif';
 const spinePaper = '#fcf1db';
 const spineInk = '#20201c';
 const spineSerif = '"Iowan Old Style", "Hoefler Text", Georgia, serif';
-const sans = '"Inter Variable", Inter, Arial, sans-serif';
+const sans = '"IBM Plex Mono", ui-monospace, Menlo, monospace';
 
 function seeded(seed: string) {
   let state = 2166136261;

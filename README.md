@@ -2,9 +2,14 @@
 
 Die Seite des Verlags. Statisch gebaut mit Astro, deutsch, ohne Datenbank.
 
-Die Startseite ist ein Regal: die Bände liegen als Stapel auf schwarzem Grund,
-man blättert durch und zieht einen heraus. Dasselbe Programm steht als Liste
-unter `/programm` — die ist auch ohne 3D lesbar und für Suchmaschinen da.
+Die Startseite ist ein Regal: die Bände liegen als Stapel auf schwarzem Grund.
+Ziehen dreht die Ansicht um die Stapel, das Mausrad und die Pfeile blättern
+durch den Katalog, und ein Klick zieht einen Band heraus. Liegt er vorn, lässt
+er sich frei drehen — auch umdrehen und auf den Kopf stellen, was bei
+Doppelbänden die zweite Geschichte nach vorn holt.
+
+Dasselbe Programm steht als Liste unter `/programm` — die ist auch ohne 3D
+lesbar und für Suchmaschinen da.
 
 ## Loslegen
 
