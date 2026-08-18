@@ -41,13 +41,16 @@ type ShelfCallbacks = {
    * Millisekunden, die der Band dafuer braucht — der Text muss dieselbe
    * nehmen, sonst zerfaellt der Wechsel in zwei Haelften.
    */
-  onSwap: (
-    index: number,
-    richtung: 1 | -1,
-    dauer: number,
-    /** Wie weit der Band dabei ueber den Schirm faehrt, in Pixeln. */
-    strecke: number,
-  ) => void;
+  onSwap: (index: number, richtung: 1 | -1) => void;
+  /**
+   * Bild fuer Bild waehrend des Wechsels: wo die beiden Baende gerade
+   * stehen, gemessen in Pixeln neben ihrem Platz. Der Text nimmt genau
+   * diese Werte — dann fahren Bild und Text als ein Stueck, statt jeder
+   * seine eigene Strecke in derselben Zeit zurueckzulegen.
+   */
+  onWipeFrame: (alt: number, neu: number) => void;
+  /** Der Wechsel ist durch: der Text kann seine Kopie wegraeumen. */
+  onWipeEnde: () => void;
   onStatus: (message: string) => void;
   onReady: () => void;
 };
@@ -1781,6 +1784,16 @@ export class ShelfEngine {
       const versatz = hinaus.x - herein.x;
       const weg = wipeWeg * this.wipeRichtung;
 
+      // Dieselben Wege, die gleich die Baende nehmen, gehen an den Text.
+      // Ohne `versatz`: der gleicht nur den Stapelabstand des neuen Bandes
+      // aus, damit er am selben Fleck ankommt — auf dem Schirm ist er
+      // nicht zu sehen.
+      const proEinheit = this.pixelProWelteinheit();
+      this.callbacks.onWipeFrame(
+        -weg * t * proEinheit,
+        weg * (1 - t) * proEinheit,
+      );
+
       for (const [band, x, sichtbar] of [
         [hinaus, focusX - weg * t, true],
         [herein, focusX + versatz + weg * (1 - t), true],
@@ -2238,29 +2251,21 @@ export class ShelfEngine {
       this.side = naechsteSeite;
       this.callbacks.onSide(this.side);
     }
-    this.callbacks.onSwap(
-      ziel,
-      this.wipeRichtung,
-      (this.reducedMotion ? 0.12 : wipeDauer) * 1000,
-      this.wipeWegInPixeln(),
-    );
+    this.callbacks.onSwap(ziel, this.wipeRichtung);
     this.callbacks.onStatus(
       `${this.runtimeBooks[ziel].data.shortTitle} kommt herein`,
     );
   }
 
   /**
-   * Der Weg des Bandes beim Seitwaertswechsel, umgerechnet auf den Schirm.
-   * Der Text daneben faehrt dieselbe Strecke — bei ungleichen Strecken
-   * laufen die beiden Haelften verschieden schnell, und der Wechsel
-   * zerfaellt genau in die zwei Haelften, die er nicht sein soll.
+   * Wie viele Pixel eine Welteinheit auf Hoehe des betrachteten Bandes
+   * misst. Damit rechnet der Wechsel seinen Weg fuer den Text um.
    */
-  private wipeWegInPixeln() {
-    const abstand = this.canvas.clientWidth < 760 ? 7.4 : 5.4;
+  private pixelProWelteinheit() {
     const halbeHoehe =
-      Math.tan(THREE.MathUtils.degToRad(this.camera.fov * 0.5)) * abstand;
-    const proEinheit = Math.max(1, this.canvas.clientHeight) / (2 * halbeHoehe);
-    return wipeWeg * proEinheit;
+      Math.tan(THREE.MathUtils.degToRad(this.camera.fov * 0.5)) *
+      this.grundAbstand();
+    return Math.max(1, this.canvas.clientHeight) / (2 * halbeHoehe);
   }
 
   /** Fuehrt den Seitwaertswechsel weiter; true, solange er laeuft. */
@@ -2286,6 +2291,7 @@ export class ShelfEngine {
     this.wipeFortschritt = 0;
     this.mode = "inspect";
     this.controls.enabled = true;
+    this.callbacks.onWipeEnde();
     this.callbacks.onActiveIndex(nach);
     this.callbacks.onMode(this.mode, nach);
     this.callbacks.onStatus(

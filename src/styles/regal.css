@@ -176,6 +176,12 @@ body {
   opacity: 0.35;
 }
 
+/* Steht allein ueber dem Titel, darf also etwas groesser sein. */
+.eyebrow--nummer {
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
 .browse-caption h1 {
   margin: 0;
   font-family: var(--schrift);
@@ -462,12 +468,16 @@ body {
 /* Die Parole unten rechts, wo sonst Bedienhinweise staenden. */
 .slogan {
   margin: 0;
-  padding-bottom: 1px;
+  padding-bottom: 0;
   color: var(--ink-soft);
   white-space: nowrap;
-  /* Groesser als der Rest der Leiste, aber die Parole steht in einer Zeile
-     und darf auf dem Handy nicht ueber den Rand laufen. */
-  font-size: clamp(10px, 1.05vw, 13px);
+  /* Die Linie der Nummernleiste liegt 22 Pixel ueber der Unterkante
+     (18 Pixel Abstand plus 4 Pixel im Strichfeld). Die Parole rueckt so
+     weit hoch, dass genau diese Linie durch ihre Mitte laeuft. */
+  transform: translateY(calc(50% - 22px));
+  /* Groesser als der Rest der Leiste, aber sie steht in einer Zeile und
+     darf auf dem Handy nicht ueber den Rand laufen. */
+  font-size: clamp(11px, 1.25vw, 16px);
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1009,6 +1019,10 @@ body {
      Linie weiter laufen, bevor sie sich verliert. */
   .shelf-index__weiter::before {
     right: -120px;
+  }
+
+  .slogan {
+    transform: none;
   }
 
   .shelf-index__ticks button span {

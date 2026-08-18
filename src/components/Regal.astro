@@ -47,10 +47,10 @@ const gesamt = katalognummer(katalog.length);
   </header>
 
   <section class="browse-caption" data-browse-caption>
-    <p class="eyebrow">
+    {/* Nur die Nummer des Bandes, der gerade vorn liegt — wie weit das
+        Programm reicht, sagt die Leiste unten. */}
+    <p class="eyebrow eyebrow--nummer">
       <span data-blaettern-zahl>{katalognummer(1)}</span>
-      <span class="eyebrow__line"></span>
-      <span data-gesamt>{gesamt}</span>
     </p>
     <h1 data-blaettern-titel>{erstes.shortTitle}</h1>
     <p class="browse-caption__author" data-blaettern-autor>{erstes.author}</p>

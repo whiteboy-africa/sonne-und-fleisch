@@ -53,6 +53,19 @@ export function regalStarten(wurzel: HTMLElement) {
   };
 
   let engine: ShelfEngine | null = null;
+  /** Der alte Text, solange ein Seitwaertswechsel laeuft. */
+  let wipeKopie: HTMLElement | null = null;
+
+  /**
+   * Kopie weg, Verschiebung weg. Wird am Ende des Wechsels gerufen — und
+   * sicherheitshalber auch, wenn die Betrachtung vorher verlassen wird:
+   * sonst bliebe die Kopie liegen und der Text stuende verschoben da.
+   */
+  function wipeAufraeumen() {
+    wipeKopie?.remove();
+    wipeKopie = null;
+    el.panelText.style.transform = '';
+  }
   let aktiverIndex = 0;
   let gewaehlterIndex: number | null = null;
   let modus: ShelfMode = 'browse';
@@ -268,27 +281,25 @@ export function regalStarten(wurzel: HTMLElement) {
         panelSetzen();
         vorleseSetzen();
         if (modus === 'inspect' && vorher !== 'inspect') wischHinweisZeigen();
-        if (modus === 'browse') wischHinweisVerstecken();
+        if (modus === 'browse' || modus === 'returning') {
+          wischHinweisVerstecken();
+          wipeAufraeumen();
+        }
       },
-      // Der Text fährt mit dem Band mit — gleiche Richtung, gleiche Dauer,
-      // gleiche Kurve, und beide Texte bewegen sich gleichzeitig: der alte
-      // hinaus, der neue herein. Nacheinander sah es aus, als wische die
-      // Seite in zwei Hälften. Kopf- und Fußzeile bleiben stehen; bewegt
-      // wird nur der Block, der zum Band gehört.
-      onSwap: (index, richtung, dauer, weg) => {
+      // Der Text fährt mit dem Band mit — und zwar wörtlich: die Engine
+      // meldet Bild für Bild, wo die beiden Bände stehen, und genau diese
+      // Pixel bekommt der Text. Vorher rechnete jede Seite ihre eigene
+      // Strecke aus, und weil die Wege verschieden lang waren, liefen
+      // Bild und Tafel verschieden schnell — daher die zwei Hälften.
+      onSwap: (index) => {
         wischHinweisVerstecken();
         const text = el.panelText;
-        // Genau der Weg des Bandes, in Pixeln. Vorher fuhr der Text nur
-        // seine eigene Tafelbreite — ein Drittel der Strecke in derselben
-        // Zeit, und darum sah es aus wie zwei getrennte Hälften.
-        const strecke = weg * richtung;
-        // easeOutCubic, dieselbe Kurve, mit der die Engine den Band schiebt.
-        const kurve = 'cubic-bezier(0.215, 0.61, 0.355, 1)';
 
-        // Der alte Text bleibt als Kopie stehen und faehrt hinaus, waehrend
+        // Der alte Text bleibt als Kopie stehen und fährt hinaus, während
         // das Original schon den neuen Band zeigt und hereinkommt.
         const masse = text.getBoundingClientRect();
         const rahmen = wurzel.getBoundingClientRect();
+        wipeKopie?.remove();
         const kopie = text.cloneNode(true) as HTMLElement;
         kopie.setAttribute('aria-hidden', 'true');
         kopie.setAttribute('inert', '');
@@ -300,23 +311,10 @@ export function regalStarten(wurzel: HTMLElement) {
           height: `${masse.height}px`,
         });
         kopie.scrollTop = text.scrollTop;
-        // In die ganze Flaeche gehaengt, nicht in die Tafel: so faehrt der
-        // Text neben dem Band ueber den Schirm und verschwindet erst am
-        // Bildrand. Die Tafel ist ohnehin schwarz wie der Rest.
+        // In der ganzen Fläche, nicht in der Tafel: so fährt der Text neben
+        // dem Band über den Schirm und verschwindet erst am Bildrand.
         wurzel.appendChild(kopie);
-
-        const bewegung: KeyframeAnimationOptions = {
-          duration: dauer,
-          easing: kurve,
-          fill: 'forwards',
-        };
-        const hinaus = kopie.animate(
-          [
-            { transform: 'translateX(0)' },
-            { transform: `translateX(${-strecke}px)` },
-          ],
-          bewegung,
-        );
+        wipeKopie = kopie;
 
         gewaehlterIndex = index;
         aktiverIndex = index;
@@ -326,26 +324,12 @@ export function regalStarten(wurzel: HTMLElement) {
         blaetternAnsichtSetzen();
         vorleseSetzen();
         text.scrollTop = 0;
-
-        const herein = text.animate(
-          [
-            { transform: `translateX(${strecke}px)` },
-            { transform: 'translateX(0)' },
-          ],
-          { duration: dauer, easing: kurve },
-        );
-
-        // Aufraeumen in jedem Fall: bricht eine Bewegung ab, bliebe die
-        // Kopie sonst fuer immer ueber der Tafel liegen.
-        const aufraeumen = () => {
-          hinaus.cancel();
-          kopie.remove();
-        };
-        Promise.allSettled([hinaus.finished, herein.finished]).then(
-          aufraeumen,
-          aufraeumen,
-        );
       },
+      onWipeFrame: (alt, neu) => {
+        if (wipeKopie) wipeKopie.style.transform = `translateX(${alt}px)`;
+        el.panelText.style.transform = `translateX(${neu}px)`;
+      },
+      onWipeEnde: wipeAufraeumen,
       onSide: (naechsteSeite) => {
         seite = naechsteSeite;
         panelSetzen();
