@@ -412,6 +412,12 @@ export class ShelfEngine {
   private stehendGedreht = false;
   /** Seine Ausgangslage, damit das Wenden wieder zurueckfindet. */
   private stehendBasisPitch: number | null = null;
+  /**
+   * Beim Wenden dreht sich der Band zusaetzlich einmal ganz um die
+   * Hochachse — das gibt dem Kippen Schwung. Eine volle Umdrehung aendert
+   * die Endlage nicht, sie landet wieder genau vorn.
+   */
+  private stehendYawZiel = 0;
   private pointerStartX = 0;
   private pointerLastX = 0;
   private pointerLastY = 0;
@@ -1416,8 +1422,11 @@ export class ShelfEngine {
     const band = this.runtimeBooks[this.presentedIndex];
     if (this.stehendBasisPitch === null) {
       this.stehendBasisPitch = band.content.rotation.x;
+      this.stehendYawZiel = band.content.rotation.y;
     }
     this.stehendGedreht = !this.stehendGedreht;
+    // Hin herum, zurueck andersherum — dann wickelt sich nichts auf.
+    this.stehendYawZiel += this.stehendGedreht ? Math.PI * 2 : -Math.PI * 2;
     this.callbacks.onStatus(
       this.stehendGedreht
         ? `${band.data.back?.shortTitle ?? band.data.shortTitle} liegt vorn`
@@ -1859,10 +1868,17 @@ export class ShelfEngine {
     ) {
       const stehend = this.runtimeBooks[this.presentedIndex];
       const ziel = this.stehendBasisPitch + (this.stehendGedreht ? Math.PI : 0);
+      const tempo = this.reducedMotion ? 20 : 6.5;
       stehend.content.rotation.x = damp(
         stehend.content.rotation.x,
         ziel,
-        this.reducedMotion ? 20 : 9,
+        tempo,
+        delta,
+      );
+      stehend.content.rotation.y = damp(
+        stehend.content.rotation.y,
+        this.stehendYawZiel,
+        tempo,
         delta,
       );
     }
@@ -2316,6 +2332,7 @@ export class ShelfEngine {
     if (this.mode !== "browse") return;
     this.stehendGedreht = false;
     this.stehendBasisPitch = null;
+    this.stehendYawZiel = 0;
     this.atRest = false;
     this.layDownPending = false;
     this.pendingFocusIndex = null;
