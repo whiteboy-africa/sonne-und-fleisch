@@ -966,7 +966,9 @@ body {
     top: auto;
     bottom: 0;
     width: 100%;
-    height: min(49dvh, 500px);
+    /* Etwas hoeher als frueher: sonst lag der Wenden-Knopf — der einzige
+       Weg zur zweiten Geschichte — unter der Kante. */
+    height: min(56dvh, 540px);
     opacity: 0;
     transform: translateY(100%);
   }
@@ -1019,8 +1021,12 @@ body {
   }
 
   .book-details h2 {
-    max-width: 90%;
-    font-size: clamp(35px, 10vw, 48px);
+    max-width: 100%;
+    /* „Mathieu Lovats Selbstkreuzigung" lief bei 10vw rechts aus dem Bild:
+       eine Schreibmaschinenschrift trennt nicht, ein langes Wort steht wie
+       es ist. Kleiner gesetzt, und im Notfall bricht es mitten im Wort. */
+    font-size: clamp(20px, 6.2vw, 27px);
+    overflow-wrap: anywhere;
   }
 
   .book-details__author {
@@ -1029,20 +1035,20 @@ body {
   }
 
   .book-details__description {
-    margin-top: 20px;
-    font-size: 16px;
+    margin-top: 14px;
+    font-size: 15px;
   }
 
   .book-details blockquote {
-    margin-top: 21px;
+    margin-top: 16px;
   }
 
   .book-details dl {
-    margin-top: 23px;
+    margin-top: 16px;
   }
 
   .official-link {
-    margin-top: 22px;
+    margin-top: 16px;
   }
 
 

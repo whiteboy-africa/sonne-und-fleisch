@@ -41,7 +41,13 @@ type ShelfCallbacks = {
    * Millisekunden, die der Band dafuer braucht — der Text muss dieselbe
    * nehmen, sonst zerfaellt der Wechsel in zwei Haelften.
    */
-  onSwap: (index: number, richtung: 1 | -1, dauer: number) => void;
+  onSwap: (
+    index: number,
+    richtung: 1 | -1,
+    dauer: number,
+    /** Wie weit der Band dabei ueber den Schirm faehrt, in Pixeln. */
+    strecke: number,
+  ) => void;
   onStatus: (message: string) => void;
   onReady: () => void;
 };
@@ -2005,10 +2011,25 @@ export class ShelfEngine {
       ziel,
       this.wipeRichtung,
       (this.reducedMotion ? 0.12 : wipeDauer) * 1000,
+      this.wipeWegInPixeln(),
     );
     this.callbacks.onStatus(
       `${this.runtimeBooks[ziel].data.shortTitle} kommt herein`,
     );
+  }
+
+  /**
+   * Der Weg des Bandes beim Seitwaertswechsel, umgerechnet auf den Schirm.
+   * Der Text daneben faehrt dieselbe Strecke — bei ungleichen Strecken
+   * laufen die beiden Haelften verschieden schnell, und der Wechsel
+   * zerfaellt genau in die zwei Haelften, die er nicht sein soll.
+   */
+  private wipeWegInPixeln() {
+    const abstand = this.canvas.clientWidth < 760 ? 5.8 : 5.4;
+    const halbeHoehe =
+      Math.tan(THREE.MathUtils.degToRad(this.camera.fov * 0.5)) * abstand;
+    const proEinheit = Math.max(1, this.canvas.clientHeight) / (2 * halbeHoehe);
+    return wipeWeg * proEinheit;
   }
 
   /** Fuehrt den Seitwaertswechsel weiter; true, solange er laeuft. */

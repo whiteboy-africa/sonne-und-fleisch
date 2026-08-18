@@ -223,11 +223,13 @@ export function regalStarten(wurzel: HTMLElement) {
       // hinaus, der neue herein. Nacheinander sah es aus, als wische die
       // Seite in zwei Hälften. Kopf- und Fußzeile bleiben stehen; bewegt
       // wird nur der Block, der zum Band gehört.
-      onSwap: (index, richtung, dauer) => {
+      onSwap: (index, richtung, dauer, weg) => {
         const bereich = el.panel as HTMLElement;
         const text = el.panelText;
-        // So weit wie der Band: aus der Tafel hinaus, nicht bloß ein Stück.
-        const strecke = bereich.getBoundingClientRect().width * richtung;
+        // Genau der Weg des Bandes, in Pixeln. Vorher fuhr der Text nur
+        // seine eigene Tafelbreite — ein Drittel der Strecke in derselben
+        // Zeit, und darum sah es aus wie zwei getrennte Hälften.
+        const strecke = weg * richtung;
         // easeOutCubic, dieselbe Kurve, mit der die Engine den Band schiebt.
         const kurve = 'cubic-bezier(0.215, 0.61, 0.355, 1)';
 
