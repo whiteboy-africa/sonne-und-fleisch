@@ -391,7 +391,7 @@ body {
   font-size: 10px;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
-  opacity: 0.42;
+  opacity: 0.55;
   text-align: center;
 }
 
@@ -595,6 +595,15 @@ body {
 .slogan:hover,
 .slogan:focus-visible {
   color: var(--ink);
+}
+
+/* Im aufgeschlagenen Band bleibt die Parole weg. Sonst lag sie hinter dem
+   Grund der Tafel und blitzte genau dann auf, wenn der beim Wechsel
+   durchsichtig wird. */
+.is-focused .slogan {
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
 }
 
 /* Steht im Baum, aber nicht im Bild — fuer Vorlesegeraete. */
