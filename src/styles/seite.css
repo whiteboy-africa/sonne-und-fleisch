@@ -415,23 +415,70 @@
 }
 
 /* Der Weg zurueck: wer ueber die freie Stelle hinter dem letzten Band
-   hierher kam, kommt so wieder zu ihm. */
-.zurueck-zeile {
-  margin: 52px 0 0;
+   hierher kam, kommt so wieder zu ihm. Er liegt am linken Bildrand, genau
+   wie die Nachbarzeile im aufgeschlagenen Band. */
+.rand-zurueck {
+  position: fixed;
+  z-index: 24;
+  top: 50%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  color: #55554f;
+  text-decoration: none;
+  transform: translateY(-50%);
+  transition: color 150ms ease;
+}
+
+.rand-zurueck:hover,
+.rand-zurueck:focus-visible {
+  color: var(--ink);
+}
+
+.rand-zurueck__zeile {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
   font-family: var(--schrift);
   font-size: 12px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
   letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.rand-zurueck__titel {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
   text-transform: uppercase;
+  transition:
+    max-width 150ms ease,
+    opacity 150ms ease;
 }
 
-.zurueck-zeile a {
-  color: var(--ink-soft);
-  text-decoration: none;
+.rand-zurueck:hover .rand-zurueck__titel,
+.rand-zurueck:focus-visible .rand-zurueck__titel {
+  max-width: 24ch;
+  opacity: 1;
 }
 
-.zurueck-zeile a:hover {
-  color: var(--ink);
+/* Auf dem Handy steht er als Zeile unter dem Text: am Rand waere er dort
+   im Weg, und gewischt wird auf einer Textseite ohnehin nicht. */
+@media (max-width: 720px) {
+  .rand-zurueck {
+    position: static;
+    display: inline-flex;
+    margin-top: 44px;
+    padding: 0;
+    transform: none;
+  }
+
+  .rand-zurueck__titel {
+    max-width: 24ch;
+    opacity: 1;
+  }
 }
 
 /* Bestellen ist eine Zeile, kein Knopf. */

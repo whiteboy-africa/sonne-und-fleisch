@@ -32,13 +32,22 @@ const neuesteNummer = releasenummer(buecher.length - 1);
   </div>
 
   {
+    /* Liegt am linken Bildrand wie die Nachbarzeile im aufgeschlagenen
+       Band: Nummer sichtbar, Titel beim Darueberfahren. */
     eintrag.data.zurueck_zum_neuesten && neuester && (
-      <p class="zurueck-zeile">
-        <a href={buchPfad(neuester)}>
-          <span aria-hidden="true">‹</span> {neuesteNummer} —{' '}
-          {neuester.data.kurztitel ?? neuester.data.titel}
-        </a>
-      </p>
+      <a
+        class="rand-zurueck"
+        href={buchPfad(neuester)}
+        aria-label={`Zurück zum neuesten Band — ${neuester.data.titel}`}
+      >
+        <span class="rand-zurueck__zeile">
+          <span aria-hidden="true">‹</span>
+          <span>{neuesteNummer}</span>
+          <span class="rand-zurueck__titel">
+            — {neuester.data.kurztitel ?? neuester.data.titel}
+          </span>
+        </span>
+      </a>
     )
   }
 </Seite>
