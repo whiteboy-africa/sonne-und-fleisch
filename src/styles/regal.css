@@ -633,8 +633,17 @@ body {
 }
 
 .book-details__copy .eyebrow {
+  align-items: baseline;
   margin-bottom: 20px;
   color: var(--ink-soft);
+}
+
+/* Die Nummer traegt die Zeile: anderthalbfache Groesse, weiss, und sie
+   sitzt mit der Marke auf derselben Grundlinie. */
+.book-details__copy .eyebrow [data-panel-augenbraue] {
+  color: var(--ink);
+  font-size: 1.5em;
+  line-height: 1;
 }
 
 .book-details h2 {

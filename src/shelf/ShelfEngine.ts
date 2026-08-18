@@ -2046,6 +2046,10 @@ export class ShelfEngine {
     const width = Math.max(1, this.canvas.clientWidth);
     const height = Math.max(1, this.canvas.clientHeight);
     const dprCap = width < 760 ? 1.5 : 1.75;
+    // Auf dem Handy wird nicht verschoben: der Band bleibt, wo er ist, und
+    // laesst sich nur drehen und heranholen. Mit zwei Fingern wandert er
+    // sonst aus dem Bild.
+    this.controls.enablePan = width >= 760;
     // Schmales Fenster: ganz auf den aufgestellten Band zielen, der Stapel
     // steht dann links dahinter. Breites Fenster: dazwischen, dann sind
     // beide im Bild.
