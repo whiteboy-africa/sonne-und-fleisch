@@ -90,6 +90,14 @@ const gesamt = katalognummer(katalog.length);
           </button>
         ))
       }
+      {/* Die Linie hoert nicht am letzten Band auf: sie laeuft weiter und
+          wird vom Bildrand angeschnitten. Darauf sitzt eine gedimmte
+          Marke fuer den naechsten Band — eine Linie, die am Rand endet
+          statt am letzten Eintrag, verspricht von selbst Fortsetzung. */}
+      <span class="shelf-index__weiter" aria-hidden="true">
+        <span></span>
+        <b>{katalognummer(katalog.length + 1)}</b>
+      </span>
     </div>
     {/* Kein Bedienhinweis: Pfeile und Leiste zeigen das Blättern von
         selbst, und die Beschriftung der Fläche sagt es Vorlesegeräten.
