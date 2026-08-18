@@ -195,7 +195,7 @@ const zoomFern = 1.7;
 const abblendAb = 0.15;
 /** Im Schwarz wird kurz gehalten — ohne diese Pause wirkt es hektisch. */
 const abblendHalten = 0.15;
-const abblendAuf = 0.35;
+const abblendAuf = 0.32;
 const wipeDauer = abblendAb + abblendHalten + abblendAuf;
 
 /** Belichtung der Szene, wenn der Blick normal nah steht. */
