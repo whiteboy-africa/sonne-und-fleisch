@@ -117,6 +117,9 @@ const seiten = defineCollection({
     // Nicht in der Fusszeile zeigen (Seite bleibt ueber ihre Adresse
     // erreichbar).
     versteckt: z.boolean().default(false),
+    // Fliesstext in der Buchserife statt im Mono — fuer Texte, die aus
+    // einem Buch heraus sprechen (Traktat, Leseprobe).
+    buchtext: z.boolean().default(false),
   }),
 });
 

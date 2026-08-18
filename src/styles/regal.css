@@ -184,7 +184,8 @@ body {
 
 .browse-caption h1 {
   margin: 0;
-  font-family: var(--schrift);
+  font-family: var(--schrift-plakat);
+  letter-spacing: 0.01em;
   font-size: clamp(19px, 1.7vw, 26px);
   font-weight: 500;
   letter-spacing: -0.005em;
@@ -681,7 +682,7 @@ body {
   max-width: 500px;
   margin: 0;
   text-wrap: balance;
-  font-family: var(--schrift);
+  font-family: var(--schrift-plakat);
   font-size: clamp(21px, 1.9vw, 30px);
   font-weight: 500;
   letter-spacing: -0.005em;
@@ -722,12 +723,14 @@ body {
   border-left: 1px solid currentColor;
 }
 
+/* Das Zitat kommt aus dem Buch, also spricht hier die Buchserife —
+   aufrecht, nie kursiv. Der Mono ringsum ist die Bedienung. */
 .book-details blockquote p {
   margin: 0;
-  font-family: var(--schrift);
-  font-size: 14px;
-  font-style: italic;
-  line-height: 1.45;
+  font-family: var(--schrift-buch);
+  font-size: 17px;
+  font-style: normal;
+  line-height: 1.4;
 }
 
 .book-details blockquote cite {

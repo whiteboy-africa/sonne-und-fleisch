@@ -21,7 +21,7 @@ const { Content } = await render(eintrag);
 ---
 
 <Seite titel={eintrag.data.titel} untertitel={eintrag.data.untertitel}>
-  <div class="fliesstext">
+  <div class:list={['fliesstext', eintrag.data.buchtext && 'buchtext']}>
     <Content />
   </div>
 </Seite>

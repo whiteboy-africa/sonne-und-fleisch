@@ -27,6 +27,14 @@
    * Buch selbst.
    */
   --schrift: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  /*
+   * Drei Rollen, sonst keine. Mono ist die Bedienung: Marken, Ziffern,
+   * Angaben, Klappentexte. Die Plakatschrift traegt alle Titel in
+   * Schaugroesse. Die Serife spricht aus dem Buch heraus — Zitate,
+   * Leseproben, der Traktat. Nirgends sonst wird eine Schrift benannt.
+   */
+  --schrift-plakat: 'Anton', var(--schrift);
+  --schrift-buch: 'Source Serif 4', Georgia, 'Times New Roman', serif;
 }
 
 *,
