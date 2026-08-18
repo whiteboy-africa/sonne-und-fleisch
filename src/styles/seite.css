@@ -414,6 +414,26 @@
   content: "";
 }
 
+/* Der Weg zurueck: wer ueber die freie Stelle hinter dem letzten Band
+   hierher kam, kommt so wieder zu ihm. */
+.zurueck-zeile {
+  margin: 52px 0 0;
+  font-family: var(--schrift);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.zurueck-zeile a {
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.zurueck-zeile a:hover {
+  color: var(--ink);
+}
+
 /* Bestellen ist eine Zeile, kein Knopf. */
 .bestellzeile {
   margin: 34px 0 0;

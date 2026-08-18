@@ -57,18 +57,13 @@ export function regalStarten(wurzel: HTMLElement) {
   };
 
   let engine: ShelfEngine | null = null;
-  /** Der alte Text, solange ein Seitwaertswechsel laeuft. */
-  let wipeKopie: HTMLElement | null = null;
-
   /**
    * Kopie weg, Verschiebung weg. Wird am Ende des Wechsels gerufen — und
    * sicherheitshalber auch, wenn die Betrachtung vorher verlassen wird:
    * sonst bliebe die Kopie liegen und der Text stuende verschoben da.
    */
   function wipeAufraeumen() {
-    wipeKopie?.remove();
-    wipeKopie = null;
-    el.panelText.style.transform = '';
+    el.panelText.style.opacity = '';
     el.panel.classList.remove('is-wischend');
   }
   let aktiverIndex = 0;
@@ -174,9 +169,9 @@ export function regalStarten(wurzel: HTMLElement) {
     });
     el.wendenText.textContent = doppelband
       ? seite === 'vorn'
-        ? `Flip zu „${buch.back?.shortTitle ?? ''}“`
-        : `Flip zu „${buch.shortTitle}“`
-      : 'Flip book';
+        ? `Wenden zu „${buch.back?.shortTitle ?? ''}“`
+        : `Wenden zu „${buch.shortTitle}“`
+      : 'Band wenden';
     el.wenden.setAttribute(
       'aria-label',
       doppelband
@@ -352,38 +347,11 @@ export function regalStarten(wurzel: HTMLElement) {
           wipeAufraeumen();
         }
       },
-      // Der Text fährt mit dem Band mit — und zwar wörtlich: die Engine
-      // meldet Bild für Bild, wo die beiden Bände stehen, und genau diese
-      // Pixel bekommt der Text. Vorher rechnete jede Seite ihre eigene
-      // Strecke aus, und weil die Wege verschieden lang waren, liefen
-      // Bild und Tafel verschieden schnell — daher die zwei Hälften.
+      // Der Wechsel ist ein Abblender: das Licht geht aus, im Dunkeln
+      // wechselt der Text, dann kommt das Licht zurueck. Nichts faehrt
+      // seitwaerts — die Engine sagt Bild fuer Bild, wie viel Licht da ist.
       onSwap: (index) => {
         wischHinweisVerstecken();
-        const text = el.panelText;
-
-        // Der alte Text bleibt als Kopie stehen und fährt hinaus, während
-        // das Original schon den neuen Band zeigt und hereinkommt.
-        const masse = text.getBoundingClientRect();
-        const rahmen = wurzel.getBoundingClientRect();
-        wipeKopie?.remove();
-        const kopie = text.cloneNode(true) as HTMLElement;
-        kopie.setAttribute('aria-hidden', 'true');
-        kopie.setAttribute('inert', '');
-        kopie.classList.add('book-details__copy--kopie');
-        Object.assign(kopie.style, {
-          left: `${masse.left - rahmen.left}px`,
-          top: `${masse.top - rahmen.top}px`,
-          width: `${masse.width}px`,
-          height: `${masse.height}px`,
-        });
-        kopie.scrollTop = text.scrollTop;
-        // In der ganzen Fläche, nicht in der Tafel: so fährt der Text neben
-        // dem Band über den Schirm und verschwindet erst am Bildrand.
-        wurzel.appendChild(kopie);
-        wipeKopie = kopie;
-        // Grund der Tafel weg, sonst verschwindet der Band hinter ihr.
-        el.panel.classList.add('is-wischend');
-
         gewaehlterIndex = index;
         aktiverIndex = index;
         // Die Seite wird nicht zurueckgesetzt: sie kommt aus der Engine,
@@ -391,11 +359,10 @@ export function regalStarten(wurzel: HTMLElement) {
         panelSetzen();
         blaetternAnsichtSetzen();
         vorleseSetzen();
-        text.scrollTop = 0;
+        el.panelText.scrollTop = 0;
       },
-      onWipeFrame: (alt, neu) => {
-        if (wipeKopie) wipeKopie.style.transform = `translateX(${alt}px)`;
-        el.panelText.style.transform = `translateX(${neu}px)`;
+      onWipeFrame: (licht) => {
+        el.panelText.style.opacity = String(licht);
       },
       onWipeEnde: wipeAufraeumen,
       onSide: (naechsteSeite) => {

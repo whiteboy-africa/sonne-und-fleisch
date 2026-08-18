@@ -3,6 +3,7 @@ titel: Kontakt
 untertitel: Wer erreichbar ist, und wie.
 reihenfolge: 20
 versteckt: true
+zurueck_zum_neuesten: true
 ---
 
 <!-- Platzhalter: echte Adresse und Anschrift eintragen. -->

@@ -3,6 +3,7 @@
 // Datei in src/content/seiten/; der Dateiname ist die Adresse.
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Seite from '../layouts/Seite.astro';
+import { alleBuecher, buchPfad, releasenummer } from '../buecher';
 
 export async function getStaticPaths() {
   const seiten = await getCollection('seiten');
@@ -18,10 +19,26 @@ interface Props {
 
 const { eintrag } = Astro.props;
 const { Content } = await render(eintrag);
+
+// Der neueste Band steht am Ende der Regalordnung.
+const buecher = await alleBuecher();
+const neuester = buecher.at(-1);
+const neuesteNummer = releasenummer(buecher.length - 1);
 ---
 
 <Seite titel={eintrag.data.titel} untertitel={eintrag.data.untertitel}>
   <div class:list={['fliesstext', eintrag.data.buchtext && 'buchtext']}>
     <Content />
   </div>
+
+  {
+    eintrag.data.zurueck_zum_neuesten && neuester && (
+      <p class="zurueck-zeile">
+        <a href={buchPfad(neuester)}>
+          <span aria-hidden="true">‹</span> {neuesteNummer} —{' '}
+          {neuester.data.kurztitel ?? neuester.data.titel}
+        </a>
+      </p>
+    )
+  }
 </Seite>

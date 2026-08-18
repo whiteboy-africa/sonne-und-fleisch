@@ -43,12 +43,11 @@ type ShelfCallbacks = {
    */
   onSwap: (index: number, richtung: 1 | -1) => void;
   /**
-   * Bild fuer Bild waehrend des Wechsels: wo die beiden Baende gerade
-   * stehen, gemessen in Pixeln neben ihrem Platz. Der Text nimmt genau
-   * diese Werte — dann fahren Bild und Text als ein Stueck, statt jeder
-   * seine eigene Strecke in derselben Zeit zurueckzulegen.
+   * Bild fuer Bild waehrend des Wechsels: wie viel Licht gerade da ist.
+   * 1 ist volle Helligkeit, 0 ist Schwarz. Der Text daneben nimmt denselben
+   * Wert, damit die Tafel mit der Szene abblendet.
    */
-  onWipeFrame: (alt: number, neu: number) => void;
+  onWipeFrame: (licht: number) => void;
   /** Der Wechsel ist durch: der Text kann seine Kopie wegraeumen. */
   onWipeEnde: () => void;
   onStatus: (message: string) => void;
@@ -188,8 +187,14 @@ const introTempo = 0.45;
 const zoomNah = 0.55;
 const zoomFern = 1.7;
 
-const wipeWeg = 4.6;
-const wipeDauer = 0.52;
+/**
+ * Der Wechsel ist ein Abblender, keine Fahrt: das Licht geht in 180 ms
+ * aus, im Dunkeln wird der Band getauscht, in 220 ms kommt es wieder.
+ * Nichts bewegt sich dabei seitwaerts.
+ */
+const abblendAb = 0.18;
+const abblendAuf = 0.22;
+const wipeDauer = abblendAb + abblendAuf;
 
 /** Belichtung der Szene, wenn der Blick normal nah steht. */
 const grundBelichtung = 0.94;
@@ -357,6 +362,10 @@ export class ShelfEngine {
   private wipeNach: number | null = null;
   private wipeFortschritt = 0;
   private wipeRichtung: 1 | -1 = 1;
+  /** Ist im Dunkeln schon auf den neuen Band umgeschaltet? */
+  private dipGetauscht = false;
+  /** Licht des Abblenders: 1 volle Helligkeit, 0 Schwarz. */
+  private dipLicht = 1;
   /** Schwanken des aufgestellten Bandes, aus der Blaettergeschwindigkeit. */
   private schwanken = 0;
   private pendingFocusIndex: number | null = null;
@@ -1548,7 +1557,7 @@ export class ShelfEngine {
     const handy =
       this.mode === "browse" && this.canvas.clientWidth < 760 ? 0.13 : 0;
     this.renderer.toneMappingExposure =
-      grundBelichtung * (1 + weit * 0.34 + handy);
+      grundBelichtung * (1 + weit * 0.34 + handy) * this.dipLicht;
 
     if (this.controls.enabled) this.controls.update();
     this.renderer.render(this.scene, this.camera);
@@ -1775,28 +1784,33 @@ export class ShelfEngine {
     // Waehrend eines Seitwaertswechsels stehen zwei Baende nebeneinander:
     // der bisherige faehrt hinaus, der naechste kommt herein.
     if (this.wipeVon !== null && this.wipeNach !== null) {
-      const t = easeOutCubic(this.wipeFortschritt);
       const hinaus = this.runtimeBooks[this.wipeVon];
       const herein = this.runtimeBooks[this.wipeNach];
       // Der Bezugspunkt der Reihe steht noch beim alten Band; der neue
       // muss den Abstand seiner Stapel dazurechnen, um an dieselbe Stelle
       // zu kommen.
       const versatz = hinaus.x - herein.x;
-      const weg = wipeWeg * this.wipeRichtung;
 
-      // Dieselben Wege, die gleich die Baende nehmen, gehen an den Text.
-      // Ohne `versatz`: der gleicht nur den Stapelabstand des neuen Bandes
-      // aus, damit er am selben Fleck ankommt — auf dem Schirm ist er
-      // nicht zu sehen.
-      const proEinheit = this.pixelProWelteinheit();
-      this.callbacks.onWipeFrame(
-        -weg * t * proEinheit,
-        weg * (1 - t) * proEinheit,
+      // Abblender: erst hinunter, dann herauf. Nichts faehrt seitwaerts.
+      const anteilAb = abblendAb / wipeDauer;
+      const p = this.wipeFortschritt;
+      this.dipLicht = clamp(
+        p < anteilAb ? 1 - p / anteilAb : (p - anteilAb) / (1 - anteilAb),
+        0,
+        1,
       );
+      this.callbacks.onWipeFrame(this.dipLicht);
 
+      // Getauscht wird im Dunkeln, nicht vor aller Augen.
+      if (!this.dipGetauscht && p >= anteilAb) {
+        this.dipGetauscht = true;
+        this.callbacks.onSwap(this.wipeNach, this.wipeRichtung);
+      }
+
+      const zeigen = this.dipGetauscht ? herein : hinaus;
       for (const [band, x, sichtbar] of [
-        [hinaus, focusX - weg * t, true],
-        [herein, focusX + versatz + weg * (1 - t), true],
+        [hinaus, focusX, zeigen === hinaus],
+        [herein, focusX + versatz, zeigen === herein],
       ] as const) {
         const pose = focusedBookPose(
           1,
@@ -2257,7 +2271,7 @@ export class ShelfEngine {
       this.side = naechsteSeite;
       this.callbacks.onSide(this.side);
     }
-    this.callbacks.onSwap(ziel, this.wipeRichtung);
+    this.dipGetauscht = false;
     this.callbacks.onStatus(
       `${this.runtimeBooks[ziel].data.shortTitle} kommt herein`,
     );
@@ -2303,6 +2317,9 @@ export class ShelfEngine {
     this.wipeFortschritt = 0;
     this.mode = "inspect";
     this.controls.enabled = true;
+    this.dipLicht = 1;
+    this.dipGetauscht = false;
+    this.callbacks.onWipeFrame(1);
     this.callbacks.onWipeEnde();
     this.callbacks.onActiveIndex(nach);
     this.callbacks.onMode(this.mode, nach);

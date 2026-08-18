@@ -120,6 +120,10 @@ const seiten = defineCollection({
     // Fliesstext in der Buchserife statt im Mono — fuer Texte, die aus
     // einem Buch heraus sprechen (Traktat, Leseprobe).
     buchtext: z.boolean().default(false),
+    // Zeigt unten einen Weg zurueck zum neuesten Band. Fuer die Seite mit
+    // den Einsendungen: dorthin kommt man ueber die freie Stelle hinter
+    // dem letzten Band, und von dort muss man auch wieder zurueck.
+    zurueck_zum_neuesten: z.boolean().default(false),
   }),
 });
 
