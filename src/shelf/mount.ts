@@ -45,7 +45,9 @@ export function regalStarten(wurzel: HTMLElement) {
     zurRegal: pflicht<HTMLButtonElement>(wurzel, '[data-zum-regal]'),
     wenden: pflicht<HTMLButtonElement>(wurzel, '[data-wenden]'),
     wendenText: pflicht(wurzel, '[data-wenden-text]'),
-    seitenmarke: pflicht<HTMLElement>(wurzel, '[data-seitenmarke]'),
+    seitenmarken: Array.from(
+      wurzel.querySelectorAll<HTMLElement>('[data-seitenmarke]'),
+    ),
     status: pflicht(wurzel, '[data-status-text]'),
     vorlese: pflicht(wurzel, '[data-vorlese]'),
   };
@@ -102,7 +104,9 @@ export function regalStarten(wurzel: HTMLElement) {
 
     // Umdrehen kann man jeden Band. Nur beim Doppelcover steht auf der
     // anderen Seite eine zweite Geschichte — dann sagt der Knopf das auch.
-    el.seitenmarke.hidden = !doppelband;
+    el.seitenmarken.forEach((marke) => {
+      marke.hidden = !doppelband;
+    });
     el.wendenText.textContent = doppelband
       ? seite === 'vorn'
         ? `Flip zu „${buch.back?.shortTitle ?? ''}“`
@@ -119,7 +123,9 @@ export function regalStarten(wurzel: HTMLElement) {
     // Einheitlich kurz: „Seite A" oder „Seite B", bei jedem Doppelband
     // gleich und immer in der Giftfarbe.
     if (doppelband) {
-      el.seitenmarke.textContent = seite === 'vorn' ? 'Seite A' : 'Seite B';
+      el.seitenmarken.forEach((marke) => {
+        marke.textContent = seite === 'vorn' ? 'Seite A' : 'Seite B';
+      });
     }
     el.panelFormat.textContent = buch.format;
     el.panelVerfuegbarkeit.textContent = buch.availability;

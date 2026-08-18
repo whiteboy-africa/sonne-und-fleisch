@@ -654,6 +654,10 @@ body {
   text-transform: uppercase;
 }
 
+.seitenmarke--autor:not([hidden]) {
+  display: none;
+}
+
 .book-details__author {
   display: flex;
   gap: 10px;
@@ -1073,9 +1077,13 @@ body {
   }
 
   /* „Aus dem Programm" ist auf dem Handy nur Zeilenfresser — die Marke
-     „Seite A/B" steht neben dem Autor. */
+     „Seite A/B" wandert deshalb neben den Autor. */
   .book-details__copy .eyebrow {
     display: none;
+  }
+
+  .seitenmarke--autor:not([hidden]) {
+    display: inline-block;
   }
 
   /* Der Weg zurueck steht oben links ueber dem Band. */

@@ -125,11 +125,14 @@ const gesamt = katalognummer(katalog.length);
       </div>
 
       <div class="book-details__copy" data-panel-text>
-        <p class="eyebrow">{siteConfig.editionEyebrow}</p>
+        <p class="eyebrow">
+          {siteConfig.editionEyebrow}
+          <span class="seitenmarke seitenmarke--kopf" data-seitenmarke hidden>Seite A</span>
+        </p>
         <h2 data-panel-titel></h2>
         <p class="book-details__author">
           <span data-panel-autor></span>
-          <span class="seitenmarke" data-seitenmarke hidden>Seite A</span>
+          <span class="seitenmarke seitenmarke--autor" data-seitenmarke hidden>Seite A</span>
         </p>
         <p class="book-details__description" data-panel-klappentext></p>
 

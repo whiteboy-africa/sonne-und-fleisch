@@ -1123,9 +1123,9 @@ export class ShelfEngine {
       this.neigungBasis = { beta: event.beta, gamma: event.gamma };
     }
     // Hoechstens etwa acht Grad — es soll mitgehen, nicht herumfuchteln.
-    this.neigungYaw = clamp(event.gamma - this.neigungBasis.gamma, -28, 28) * 0.005;
+    this.neigungYaw = clamp(event.gamma - this.neigungBasis.gamma, -28, 28) * 0.0055;
     this.neigungPitch =
-      -clamp(event.beta - this.neigungBasis.beta, -28, 28) * 0.0032;
+      -clamp(event.beta - this.neigungBasis.beta, -28, 28) * 0.0035;
   };
 
   /**
