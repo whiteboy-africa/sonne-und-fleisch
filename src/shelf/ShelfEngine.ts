@@ -397,11 +397,6 @@ export class ShelfEngine {
   private neigungPitch = 0;
   private neigungGefragt = false;
   /**
-   * Selbst gewaehlter Abstand in der Betrachtung, als Vielfaches des
-   * Vorgabeabstands. Bleibt ueber einen Seitwaertswechsel hinweg stehen.
-   */
-  private inspectAbstandFaktor = 1;
-  /**
    * Schraeglage des betrachteten Bandes. Kommt man ueber die Rueckseite
    * herein, steht der Band um seine Querachse gedreht — dann kippt die
    * Lage andersherum, und man muss sie spiegeln, damit Seite B genauso
@@ -410,16 +405,17 @@ export class ShelfEngine {
   private rollVorzeichen = 1;
   /** Die Schraeglage laeuft der gewendeten Lage weich hinterher. */
   private rollAktuell = inspectDefaultRoll;
-  /** Steht der aufgestellte Band mit der Rueckseite nach vorn? */
-  private stehendGedreht = false;
-  /** Seine Ausgangslage, damit das Wenden wieder zurueckfindet. */
-  private stehendBasisPitch: number | null = null;
   /**
-   * Beim Wenden dreht sich der Band zusaetzlich einmal ganz um die
-   * Hochachse — das gibt dem Kippen Schwung. Eine volle Umdrehung aendert
-   * die Endlage nicht, sie landet wieder genau vorn.
+   * Wenden im Regal in vier Schritten, wie man ein Buch in der Hand dreht:
+   * 1. um die Hochachse — die Rueckseite kommt nach vorn, kopfueber, denn
+   *    so ist die zweite Geschichte gedruckt;
+   * 2. auf den Kopf stellen — jetzt steht Seite B richtig;
+   * 3. wieder um die Hochachse — Seite A ist vorn, kopfueber;
+   * 4. wieder aufrichten — alles steht wie am Anfang.
    */
-  private stehendYawZiel = 0;
+  private stehendSchritt = 0;
+  private stehendYawZiel: number | null = null;
+  private stehendRollZiel = 0;
   private pointerStartX = 0;
   private pointerLastX = 0;
   private pointerLastY = 0;
@@ -1366,7 +1362,6 @@ export class ShelfEngine {
     this.neigungBasis = null;
     this.neigungYaw = 0;
     this.neigungPitch = 0;
-    this.inspectAbstandFaktor = 1;
 
     // Wer die Rueckseite des stehenden Bandes anschaut und ihn aufschlaegt,
     // will die zweite Geschichte sehen — nicht wieder Seite A.
@@ -1422,17 +1417,22 @@ export class ShelfEngine {
   flipStehenden() {
     if (this.mode !== "browse" || this.presentedIndex === null) return;
     const band = this.runtimeBooks[this.presentedIndex];
-    if (this.stehendBasisPitch === null) {
-      this.stehendBasisPitch = band.content.rotation.x;
+    if (this.stehendYawZiel === null) {
       this.stehendYawZiel = band.content.rotation.y;
+      this.stehendRollZiel = band.content.rotation.z;
     }
-    this.stehendGedreht = !this.stehendGedreht;
-    // Hin herum, zurueck andersherum — dann wickelt sich nichts auf.
-    this.stehendYawZiel += this.stehendGedreht ? Math.PI * 2 : -Math.PI * 2;
+    this.stehendSchritt = (this.stehendSchritt + 1) % 4;
+    // Ungerade Schritte drehen um die Hochachse, gerade stellen den Band
+    // wieder auf die Fuesse. Nach vier Griffen steht alles wie zuvor.
+    if (this.stehendSchritt % 2 === 1) this.stehendYawZiel += Math.PI;
+    else this.stehendRollZiel += Math.PI;
+
+    const zweite = band.data.back?.shortTitle ?? band.data.shortTitle;
+    const seiteB = this.stehendSchritt === 1 || this.stehendSchritt === 2;
     this.callbacks.onStatus(
-      this.stehendGedreht
-        ? `${band.data.back?.shortTitle ?? band.data.shortTitle} liegt vorn`
-        : `${band.data.shortTitle} liegt vorn`,
+      this.stehendSchritt % 2 === 1
+        ? `${seiteB ? zweite : band.data.shortTitle} liegt vorn, kopfüber`
+        : `${seiteB ? zweite : band.data.shortTitle} liegt vorn`,
     );
   }
 
@@ -1871,20 +1871,19 @@ export class ShelfEngine {
     if (
       this.mode === "browse" &&
       this.presentedIndex !== null &&
-      this.stehendBasisPitch !== null
+      this.stehendYawZiel !== null
     ) {
       const stehend = this.runtimeBooks[this.presentedIndex];
-      const ziel = this.stehendBasisPitch + (this.stehendGedreht ? Math.PI : 0);
-      const tempo = this.reducedMotion ? 20 : 6.5;
-      stehend.content.rotation.x = damp(
-        stehend.content.rotation.x,
-        ziel,
-        tempo,
-        delta,
-      );
+      const tempo = this.reducedMotion ? 20 : 7.5;
       stehend.content.rotation.y = damp(
         stehend.content.rotation.y,
         this.stehendYawZiel,
+        tempo,
+        delta,
+      );
+      stehend.content.rotation.z = damp(
+        stehend.content.rotation.z,
+        this.stehendRollZiel,
         tempo,
         delta,
       );
@@ -2032,22 +2031,12 @@ export class ShelfEngine {
     return this.canvas.clientWidth < 760 ? 6.7 : 5.4;
   }
 
-  /** Wie weit die Kamera gerade steht, gemessen am Vorgabeabstand. */
-  private abstandFaktorJetzt() {
-    if (this.selectedIndex === null) return 1;
-    const band = this.runtimeBooks[this.selectedIndex];
-    const abstand = this.camera.position.distanceTo(
-      band.content.getWorldPosition(new THREE.Vector3()),
-    );
-    return clamp(abstand / this.grundAbstand(), 0.45, 2.4);
-  }
-
   private frameFocusedBook(
     worldPosition: THREE.Vector3,
     compositionProgress = 1,
   ) {
     const isMobile = this.canvas.clientWidth < 760;
-    const focusDistance = this.grundAbstand() * this.inspectAbstandFaktor;
+    const focusDistance = this.grundAbstand();
     this.applyFocusViewOffset(compositionProgress);
 
     this.focusCameraTarget.copy(worldPosition);
@@ -2263,18 +2252,16 @@ export class ShelfEngine {
     const naechsteSeite: BookSide = zeigeHinten ? "hinten" : "vorn";
 
     this.controls.enabled = false;
-    // Winkel und Zoom bleiben, wie man sie eingestellt hat — der naechste
-    // Band kommt in derselben Haltung herein. Nur wenn die Seite wechselt,
-    // dreht sich der Band um seine Querachse mit.
-    if (naechsteSeite !== this.side) {
-      this.zielPitch += Math.PI;
-    }
+    // Jeder Band kommt in der Vorgabehaltung herein. Winkel und Zoom mit
+    // hinueberzunehmen wurde versucht und wieder verworfen: die Baende
+    // starteten in der Vorgabelage und drehten sich sekundenlang nach.
+    this.zielYaw = inspectDefaultYaw;
+    this.zielPitch = inspectDefaultPitch + (zeigeHinten ? Math.PI : 0);
+    this.rollVorzeichen = zeigeHinten ? -1 : 1;
     // Sofort setzen: waehrend des Wechsels soll nichts nachlaufen.
     this.inspectYaw = this.zielYaw;
     this.inspectPitch = this.zielPitch;
-    // Den selbst gewaehlten Abstand merken, damit die Kamera ihn nach dem
-    // Wechsel wieder einnimmt statt auf den Vorgabeabstand zu springen.
-    this.inspectAbstandFaktor = this.abstandFaktorJetzt();
+    this.rollAktuell = inspectDefaultRoll * this.rollVorzeichen;
 
     if (naechsteSeite !== this.side) {
       this.side = naechsteSeite;
@@ -2338,9 +2325,9 @@ export class ShelfEngine {
 
   presentBook(index: number) {
     if (this.mode !== "browse") return;
-    this.stehendGedreht = false;
-    this.stehendBasisPitch = null;
-    this.stehendYawZiel = 0;
+    this.stehendSchritt = 0;
+    this.stehendYawZiel = null;
+    this.stehendRollZiel = 0;
     this.atRest = false;
     this.layDownPending = false;
     this.pendingFocusIndex = null;
