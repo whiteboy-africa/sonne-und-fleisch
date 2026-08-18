@@ -20,7 +20,7 @@ export const siteConfig = {
    * Steht unten rechts im Regal, wo sonst die Bedienhinweise staenden.
    * Eine Zeile, Versalien.
    */
-  slogan: 'PERMANENTE DETERRITORIALIZATION',
+  slogan: 'PERMANENT DETERRITORIALIZATION',
   socialImageAlt:
     'Ein Regal mit den Bänden des Verlags Sonne und Fleisch, ein Band nach vorn gezogen.',
   independentNote: 'Sonne und Fleisch — unabhängiger Verlag.',

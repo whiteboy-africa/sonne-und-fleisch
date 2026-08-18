@@ -20,31 +20,28 @@ const eintraege = await programmListe();
       <p class="fliesstext">Das Programm wird gerade gesetzt.</p>
     ) : (
       <div class="programm">
-        {eintraege.map(({ buch, nummer }) => (
+        {eintraege.map(({ buch, nummer, titel, autor, seiten }) => (
           <a class="band" href={buchPfad(buch)}>
-            <span
-              class="band__ruecken"
-              aria-hidden="true"
-              style={`background: ${buch.data.cover_farbe}; border-right: 3px solid ${buch.data.akzent_farbe};`}
-            >
-              {
-                buch.data.cover_bild && (
-                  <img src={buch.data.cover_bild} alt="" loading="lazy" decoding="async" />
-                )
-              }
+            <span class="band__umschlaege" aria-hidden="true">
+              {seiten.map((seite) => (
+                <span
+                  class="band__ruecken"
+                  style={`background: ${seite.cover_farbe}; border-right: 3px solid ${seite.akzent_farbe};`}
+                >
+                  {
+                    seite.cover_bild && (
+                      <img src={seite.cover_bild} alt="" loading="lazy" decoding="async" />
+                    )
+                  }
+                </span>
+              ))}
             </span>
             <span class="band__text">
               <span class="band__nummer">{nummer}</span>
-              <h2>{buch.data.titel}</h2>
-              <p class="band__autor">{buch.data.autor}</p>
+              <h2>{titel}</h2>
+              <p class="band__autor">{autor}</p>
               <p class="band__klappentext">{buch.data.klappentext}</p>
-              {
-                buch.data.rueckseite && (
-                  <p class="band__doppel">
-                    Doppelcover — auf der Rückseite: {buch.data.rueckseite.titel}
-                  </p>
-                )
-              }
+              {buch.data.rueckseite && <p class="band__doppel">Doppelcover</p>}
             </span>
             <span class="band__marge">
               <span

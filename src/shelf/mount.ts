@@ -31,6 +31,7 @@ export function regalStarten(wurzel: HTMLElement) {
     ticks: Array.from(wurzel.querySelectorAll<HTMLButtonElement>('[data-tick]')),
     panel: pflicht(wurzel, '[data-panel]'),
     panelInhalt: pflicht<HTMLElement>(wurzel, '[data-panel-inhalt]'),
+    panelText: pflicht<HTMLElement>(wurzel, '[data-panel-text]'),
     panelZahl: pflicht(wurzel, '[data-panel-zahl]'),
     panelTitel: pflicht(wurzel, '[data-panel-titel]'),
     panelAutor: pflicht(wurzel, '[data-panel-autor]'),
@@ -217,42 +218,80 @@ export function regalStarten(wurzel: HTMLElement) {
         panelSetzen();
         vorleseSetzen();
       },
-      // Der Text fährt mit dem Band mit: erst hinaus, dann kommt der neue
-      // von der anderen Seite herein. Die ganze Detailseite wechselt, als
-      // stünden alle Bände nebeneinander auf einer Linie.
-      onSwap: (index, richtung) => {
-        const strecke = 56 * richtung;
-        const hinaus = el.panelInhalt.animate(
+      // Der Text fährt mit dem Band mit — gleiche Richtung, gleiche Dauer,
+      // gleiche Kurve, und beide Texte bewegen sich gleichzeitig: der alte
+      // hinaus, der neue herein. Nacheinander sah es aus, als wische die
+      // Seite in zwei Hälften. Kopf- und Fußzeile bleiben stehen; bewegt
+      // wird nur der Block, der zum Band gehört.
+      onSwap: (index, richtung, dauer) => {
+        const bereich = el.panel as HTMLElement;
+        const text = el.panelText;
+        // So weit wie der Band: aus der Tafel hinaus, nicht bloß ein Stück.
+        const strecke = bereich.getBoundingClientRect().width * richtung;
+        // easeOutCubic, dieselbe Kurve, mit der die Engine den Band schiebt.
+        const kurve = 'cubic-bezier(0.215, 0.61, 0.355, 1)';
+
+        // Der alte Text bleibt als Kopie stehen und faehrt hinaus, waehrend
+        // das Original schon den neuen Band zeigt und hereinkommt.
+        const masse = text.getBoundingClientRect();
+        const rahmen = bereich.getBoundingClientRect();
+        const kopie = text.cloneNode(true) as HTMLElement;
+        kopie.setAttribute('aria-hidden', 'true');
+        kopie.setAttribute('inert', '');
+        kopie.classList.add('book-details__copy--kopie');
+        Object.assign(kopie.style, {
+          left: `${masse.left - rahmen.left}px`,
+          top: `${masse.top - rahmen.top}px`,
+          width: `${masse.width}px`,
+          height: `${masse.height}px`,
+        });
+        kopie.scrollTop = text.scrollTop;
+        // Waehrend des Wechsels wird an den Raendern der Tafel beschnitten,
+        // damit der hinausfahrende Text nicht ueber den Band wandert.
+        bereich.classList.add('is-wischend');
+        bereich.appendChild(kopie);
+
+        const bewegung: KeyframeAnimationOptions = {
+          duration: dauer,
+          easing: kurve,
+          fill: 'forwards',
+        };
+        const hinaus = kopie.animate(
           [
-            { transform: 'translateX(0)', opacity: 1 },
-            { transform: `translateX(${-strecke}px)`, opacity: 0 },
+            { transform: 'translateX(0)' },
+            { transform: `translateX(${-strecke}px)` },
           ],
-          { duration: 210, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' },
+          bewegung,
         );
 
-        const umschalten = () => {
-          gewaehlterIndex = index;
-          aktiverIndex = index;
-          // Die Seite wird nicht zurueckgesetzt: sie kommt aus der Engine,
-          // die beim Blaettern A bei A und B bei B laesst.
-          panelSetzen();
-          blaetternAnsichtSetzen();
-          vorleseSetzen();
-          // Erst die alte Bewegung loeschen, dann die neue starten. Sonst
-          // bliebe der Text bei „durchsichtig und verschoben" stehen, falls
-          // die Eintrittsbewegung nicht durchkommt — die Endlage von
-          // `fill: forwards` haelt sich sonst ewig.
-          hinaus.cancel();
-          el.panelInhalt.animate(
-            [
-              { transform: `translateX(${strecke}px)`, opacity: 0 },
-              { transform: 'translateX(0)', opacity: 1 },
-            ],
-            { duration: 280, easing: 'cubic-bezier(0, 0, 0.2, 1)' },
-          );
-        };
+        gewaehlterIndex = index;
+        aktiverIndex = index;
+        // Die Seite wird nicht zurueckgesetzt: sie kommt aus der Engine,
+        // die beim Blaettern A bei A und B bei B laesst.
+        panelSetzen();
+        blaetternAnsichtSetzen();
+        vorleseSetzen();
+        text.scrollTop = 0;
 
-        hinaus.finished.then(umschalten).catch(umschalten);
+        const herein = text.animate(
+          [
+            { transform: `translateX(${strecke}px)` },
+            { transform: 'translateX(0)' },
+          ],
+          { duration: dauer, easing: kurve },
+        );
+
+        // Aufraeumen in jedem Fall: bricht eine Bewegung ab, bliebe die
+        // Kopie sonst fuer immer ueber der Tafel liegen.
+        const aufraeumen = () => {
+          hinaus.cancel();
+          kopie.remove();
+          bereich.classList.remove('is-wischend');
+        };
+        Promise.allSettled([hinaus.finished, herein.finished]).then(
+          aufraeumen,
+          aufraeumen,
+        );
       },
       onSide: (naechsteSeite) => {
         seite = naechsteSeite;

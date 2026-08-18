@@ -23,6 +23,25 @@ export async function alleBuecher(): Promise<Buch[]> {
   });
 }
 
+/** Eine der beiden Vorderseiten, so wie sie in der Liste erscheint. */
+export type Umschlagseite = {
+  cover_bild?: string;
+  cover_farbe: string;
+  akzent_farbe: string;
+};
+
+export type ProgrammEintrag = {
+  buch: Buch;
+  nummer: string;
+  /** Bei Doppelbaenden beide Titel, mit Schraegstrich. */
+  titel: string;
+  /** Beide Namen, mit Schraegstrich — schreibt eine Person beide
+      Geschichten, steht sie nur einmal da. */
+  autor: string;
+  /** Ein Umschlag, bei Doppelbaenden zwei. */
+  seiten: Umschlagseite[];
+};
+
 /**
  * Das Programm als Liste: der neueste Band oben, der aelteste unten.
  *
@@ -30,12 +49,42 @@ export async function alleBuecher(): Promise<Buch[]> {
  * Regalordnung (001 ist der erste Band) und bleibt deshalb dieselbe, egal wie
  * herum die Liste sortiert ist.
  */
-export async function programmListe(): Promise<
-  Array<{ buch: Buch; nummer: string }>
-> {
+export async function programmListe(): Promise<ProgrammEintrag[]> {
   const buecher = await alleBuecher();
   return buecher
-    .map((buch, position) => ({ buch, nummer: releasenummer(position) }))
+    .map((buch, position) => {
+      const d = buch.data;
+      const hinten = d.rueckseite;
+      // Ohne eigene Angabe erbt die zweite Seite Autor und Farben von vorn.
+      const autorHinten = hinten?.autor ?? d.autor;
+      const namen =
+        hinten && autorHinten !== d.autor
+          ? `${d.autor} / ${autorHinten}`
+          : d.autor;
+
+      return {
+        buch,
+        nummer: releasenummer(position),
+        titel: hinten ? `${d.titel} / ${hinten.titel}` : d.titel,
+        autor: namen,
+        seiten: [
+          {
+            cover_farbe: d.cover_farbe,
+            akzent_farbe: d.akzent_farbe,
+            ...(d.cover_bild ? { cover_bild: d.cover_bild } : {}),
+          },
+          ...(hinten
+            ? [
+                {
+                  cover_farbe: hinten.cover_farbe ?? d.cover_farbe,
+                  akzent_farbe: hinten.akzent_farbe ?? d.akzent_farbe,
+                  ...(hinten.cover_bild ? { cover_bild: hinten.cover_bild } : {}),
+                },
+              ]
+            : []),
+        ],
+      };
+    })
     .reverse();
 }
 

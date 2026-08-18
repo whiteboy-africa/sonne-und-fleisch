@@ -454,7 +454,9 @@ body {
   padding-bottom: 1px;
   color: var(--ink-soft);
   white-space: nowrap;
-  font-size: 10px;
+  /* Groesser als der Rest der Leiste, aber die Parole steht in einer Zeile
+     und darf auf dem Handy nicht ueber den Rand laufen. */
+  font-size: clamp(10px, 1.05vw, 13px);
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -551,6 +553,23 @@ body {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--hairline) transparent;
+}
+
+/* Waehrend eines Seitwaertswechsels wird an den Raendern der Tafel
+   beschnitten: der hinausfahrende Text verschwindet an ihrer Kante, statt
+   ueber den Band zu wandern. */
+.book-details.is-wischend {
+  overflow: hidden;
+}
+
+/* Der alte Text als Kopie, waehrend das Original schon den neuen Band
+   zeigt. Liegt genau ueber der Stelle, an der er eben noch stand. */
+.book-details__copy--kopie {
+  position: absolute;
+  z-index: 1;
+  margin: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .book-details__copy .eyebrow {
@@ -885,8 +904,10 @@ body {
   }
 
   .browse-caption h1 {
-    max-width: 78vw;
-    font-size: clamp(39px, 12.5vw, 58px);
+    max-width: 100%;
+    /* Plakatgroesse ging auf dem Handy nicht auf: „Weine nicht, Artur!"
+       brauchte drei Zeilen und schob Knopf und Leiste aus dem Bild. */
+    font-size: clamp(23px, 6.8vw, 32px);
   }
 
   .browse-caption__author {
@@ -913,14 +934,17 @@ body {
   }
 
   .shelf-index {
-    right: 72px;
-    bottom: 68px;
-    left: 72px;
+    right: 20px;
+    bottom: 26px;
+    left: 20px;
     display: block;
   }
 
   .shelf-index__ticks {
     height: 13px;
+    /* Die Nummern haengen 17px unter den Strichen — ohne diesen Abstand
+       liegt die Parole mitten in ihnen. */
+    margin-bottom: 36px;
   }
 
   .shelf-index__ticks button {

@@ -184,7 +184,10 @@
 
 .band {
   display: grid;
-  grid-template-columns: 88px 1fr auto;
+  /* Platz fuer zwei Umschlaege: Doppelbaende zeigen beide Vorderseiten
+     nebeneinander, einfache Baende lassen die zweite Stelle leer. So
+     stehen alle Titel auf derselben Linie. */
+  grid-template-columns: 184px 1fr auto;
   gap: 8px 28px;
   align-items: start;
   padding: 26px 4px;
@@ -196,6 +199,13 @@
 
 .band:hover {
   background: rgba(232, 229, 222, 0.07);
+}
+
+.band__umschlaege {
+  display: grid;
+  grid-template-columns: repeat(2, 88px);
+  gap: 8px;
+  align-items: start;
 }
 
 .band__ruecken {
@@ -238,6 +248,10 @@
   font-weight: 500;
   letter-spacing: 0.16em;
   color: var(--ink-soft);
+}
+
+.band__text {
+  min-width: 0;
 }
 
 .band__text h2 {
@@ -402,7 +416,21 @@
 
 @media (max-width: 720px) {
   .band {
-    grid-template-columns: 62px 1fr;
+    /* Zwei Umschlaege plus Text auf 375 Pixeln: die Spalte fuer die Bilder
+       schrumpft, die Textspalte darf nicht mehr Platz fordern als da ist. */
+    grid-template-columns: 116px minmax(0, 1fr);
+    gap: 8px 16px;
+  }
+
+  .band__umschlaege {
+    grid-template-columns: repeat(2, 54px);
+    gap: 8px;
+  }
+
+  .band__text h2 {
+    font-size: 20px;
+    /* Notbremse fuer sehr lange Titelwoerter. */
+    overflow-wrap: anywhere;
   }
 
   .band__marge {

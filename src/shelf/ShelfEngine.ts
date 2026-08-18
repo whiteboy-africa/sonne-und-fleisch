@@ -37,9 +37,11 @@ type ShelfCallbacks = {
   onSide: (side: BookSide) => void;
   /**
    * Ein Seitwaertswechsel beginnt: der Text soll mitfahren. Richtung 1
-   * heisst nach links hinaus, -1 nach rechts.
+   * heisst nach links hinaus, -1 nach rechts. `dauer` ist die Zeit in
+   * Millisekunden, die der Band dafuer braucht — der Text muss dieselbe
+   * nehmen, sonst zerfaellt der Wechsel in zwei Haelften.
    */
-  onSwap: (index: number, richtung: 1 | -1) => void;
+  onSwap: (index: number, richtung: 1 | -1, dauer: number) => void;
   onStatus: (message: string) => void;
   onReady: () => void;
 };
@@ -1748,11 +1750,17 @@ export class ShelfEngine {
     const horizontalOffset = isMobile
       ? 0
       : detailWidth * 0.5 * clampedProgress;
-    const verticalOffset = isMobile
-      ? (0.28 / verticalHalfSpan) * height * 0.5 * clampedProgress
+    // Hochkant sitzt der Text im unteren Drittel. Schon im Regal wird das
+    // Bild deshalb ein Stueck angehoben, sonst klebt der Stapel ueber der
+    // Beschriftung und oben bleibt eine leere Flaeche stehen.
+    const grundVersatz = isMobile ? height * 0.05 : 0;
+    const fokusVersatz = isMobile
+      ? (0.28 / verticalHalfSpan) * height * 0.5
       : 0;
+    const verticalOffset =
+      grundVersatz + (fokusVersatz - grundVersatz) * clampedProgress;
 
-    if (clampedProgress <= 0.001) {
+    if (!isMobile && clampedProgress <= 0.001) {
       this.camera.clearViewOffset();
       return;
     }
@@ -1793,12 +1801,17 @@ export class ShelfEngine {
     // steht dann links dahinter. Breites Fenster: dazwischen, dann sind
     // beide im Bild.
     const schmal = width < 760;
-    const blickX = schmal ? pulledSideStep : pulledSideStep * 0.5;
+    const blickX = schmal ? pulledSideStep * 0.55 : pulledSideStep * 0.5;
     browseTarget.x = blickX;
+    // Hochkant sitzt der Text unten im Bild: der Blick geht etwas tiefer,
+    // damit der Stapel nach oben rueckt statt in der Bildmitte zu kleben.
+    browseTarget.y = schmal ? 0.35 : 0.8;
+    // Auf dem Handy steht die Kamera weiter hinten: das Bild ist schmal,
+    // und von naeher lief der Stapel links aus dem Bild.
     this.responsiveBrowseCamera.set(
       blickX,
-      schmal ? 2.6 : browseCamera.y,
-      schmal ? 9.4 : browseCamera.z,
+      schmal ? 2.8 : browseCamera.y,
+      schmal ? 10.6 : browseCamera.z,
     );
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, dprCap));
     this.renderer.setSize(width, height, false);
@@ -1806,7 +1819,7 @@ export class ShelfEngine {
     this.camera.fov = width < 600 ? 33 : width < 920 ? 30 : 27;
     this.camera.updateProjectionMatrix();
     if (this.mode === "browse" && this.focusProgress < 0.01) {
-      this.camera.clearViewOffset();
+      this.applyFocusViewOffset(0);
       // Delta null: die Fenstergroesse soll den Blick neu berechnen, aber
       // die Bewegung nicht vorspulen. Mit delta = 1 sprang das Sinken beim
       // Aufbau sofort um drei Viertel nach unten — der Ankunftsblick kam
@@ -1988,7 +2001,11 @@ export class ShelfEngine {
       this.side = naechsteSeite;
       this.callbacks.onSide(this.side);
     }
-    this.callbacks.onSwap(ziel, this.wipeRichtung);
+    this.callbacks.onSwap(
+      ziel,
+      this.wipeRichtung,
+      (this.reducedMotion ? 0.12 : wipeDauer) * 1000,
+    );
     this.callbacks.onStatus(
       `${this.runtimeBooks[ziel].data.shortTitle} kommt herein`,
     );
