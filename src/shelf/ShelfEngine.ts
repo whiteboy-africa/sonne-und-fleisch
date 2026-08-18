@@ -2262,9 +2262,15 @@ export class ShelfEngine {
    * misst. Damit rechnet der Wechsel seinen Weg fuer den Text um.
    */
   private pixelProWelteinheit() {
+    // Der wirkliche Abstand der Kamera zum Platz des Bandes, nicht der
+    // Vorgabeabstand: wer selbst herangezoomt hat, sieht den Band groesser
+    // — und dann muss auch der Text schneller fahren.
+    const abstand = Math.max(
+      1,
+      this.camera.position.distanceTo(this.focusCameraTarget),
+    );
     const halbeHoehe =
-      Math.tan(THREE.MathUtils.degToRad(this.camera.fov * 0.5)) *
-      this.grundAbstand();
+      Math.tan(THREE.MathUtils.degToRad(this.camera.fov * 0.5)) * abstand;
     return Math.max(1, this.canvas.clientHeight) / (2 * halbeHoehe);
   }
 

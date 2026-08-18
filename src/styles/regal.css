@@ -94,11 +94,11 @@ body {
 /* Ergaenzung zum Template: die Wege in den Textteil der Seite. */
 .regal-nav {
   display: flex;
-  gap: 18px;
+  gap: 20px;
   align-items: center;
   color: var(--ink-soft);
   font-family: var(--schrift);
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.06em;
   line-height: 1;
