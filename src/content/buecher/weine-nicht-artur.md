@@ -25,7 +25,9 @@ reihenfolge: 0
 # Farben aus dem Umschlag: das Olivgrün des Gewitterhimmels, das Gold der
 # Wabe, das Knochenweiß der Schrift.
 rueckseite:
-  titel: 'Lichas: The Agony and the Extasy'
+  # Nach dem Doppelpunkt stehen geschuetzte Leerzeichen (U+00A0): der
+  # Titel bricht nur hinter „Lichas:" um, nicht mitten in der Formel.
+  titel: "Lichas:\u00A0The\u00A0Agony\u00A0and\u00A0the\u00A0Extasy"
   kurztitel: Lichas
   autor: Aleksandar Vadim
   klappentext: >-
