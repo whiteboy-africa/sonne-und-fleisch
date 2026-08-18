@@ -2233,15 +2233,20 @@ export class ShelfEngine {
     const naechsteSeite: BookSide = zeigeHinten ? "hinten" : "vorn";
 
     this.controls.enabled = false;
-    // Jeder Band kommt in der Vorgabehaltung herein. Winkel und Zoom mit
-    // hinueberzunehmen wurde versucht und wieder verworfen: die Baende
-    // starteten in der Vorgabelage und drehten sich sekundenlang nach.
-    this.zielYaw = inspectDefaultYaw;
-    this.zielPitch = inspectDefaultPitch + (zeigeHinten ? Math.PI : 0);
-    this.rollVorzeichen = zeigeHinten ? -1 : 1;
-    // Sofort setzen: waehrend des Wechsels soll nichts nachlaufen.
+    // Winkel und Zoom bleiben, wie man sie eingestellt hat: der naechste
+    // Band kommt in derselben Haltung herein. Die Kamera wird dabei nicht
+    // angefasst, also bleibt auch der Abstand.
+    if (naechsteSeite !== this.side) {
+      // Die andere Seite kommt nach vorn — der Band kippt um die Querachse.
+      this.zielPitch += Math.PI;
+    }
+    // Alles sofort setzen, nichts darf nachlaufen. Besonders die
+    // Schraeglage: wurde sie erst beim Ablesen der Seite umgekehrt, kippte
+    // der Band eine Sekunde spaeter noch einmal nach — genau die komische
+    // Nachjustierung, die nur bei den B-Seiten auftrat.
     this.inspectYaw = this.zielYaw;
     this.inspectPitch = this.zielPitch;
+    this.rollVorzeichen = naechsteSeite === "hinten" ? -1 : 1;
     this.rollAktuell = inspectDefaultRoll * this.rollVorzeichen;
 
     if (naechsteSeite !== this.side) {
