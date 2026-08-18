@@ -419,7 +419,8 @@ body {
   /* Nur noch eine Zeile: der Text. Kopfzeile und Nummern sind heraus. */
   grid-template-rows: minmax(0, 1fr);
   height: 100%;
-  padding: 27px clamp(28px, 4vw, 68px) 30px clamp(52px, 6vw, 98px);
+  /* Rechts bleibt Platz fuer die Nachbarzeile am Bildrand. */
+  padding: 27px clamp(84px, 6vw, 104px) 30px clamp(52px, 6vw, 98px);
   border-left: 1px solid rgba(19, 18, 16, 0.08);
 }
 
@@ -524,10 +525,11 @@ body {
   right: 0;
   justify-content: flex-end;
   /* Schmaler als links: rechts liegt die Tafel, und ihre Knoepfe sollen
-     anklickbar bleiben. Der Streifen bleibt im Rand ihrer Innenkante. */
-  width: clamp(46px, 3.4vw, 62px);
+     anklickbar bleiben. Der Streifen sitzt am Bildrand, nicht in der
+     Textspalte — die haelt sich mit Abstand davon frei. */
+  width: clamp(62px, 4.4vw, 84px);
   min-width: 0;
-  padding: 0 14px 0 0;
+  padding: 0 20px 0 0;
 }
 
 .is-focused .nachbar {
@@ -656,7 +658,7 @@ body {
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
-  margin: 18px 0 0;
+  margin: 0.4em 0 0;
   color: var(--ink);
   font-family: var(--schrift);
   font-size: 13px;
@@ -665,7 +667,7 @@ body {
 
 .book-details__description {
   max-width: 520px;
-  margin: 34px 0 0;
+  margin: 1.15em 0 0;
   font-family: var(--schrift);
   font-size: clamp(13px, 1.05vw, 15px);
   font-weight: 400;
@@ -1227,7 +1229,13 @@ body {
 
 /* Ohne 3D verschwinden die Bedienelemente, die nichts mehr steuern. */
 .ohne-3d .browse-caption,
-.ohne-3d /* Der Tastenhinweis im Flip-Knopf. */
+.ohne-3d .nachbar,
+.ohne-3d .shelf-index {
+  display: none;
+}
+
+/* Der Tastenhinweis im Flip-Knopf: das einzige Kaestchen der Seite, und
+   zwar zu Recht — ohne Gehaeuse liest sich das F wie ein Tippfehler. */
 .wenden-knopf kbd {
   padding: 1px 5px;
   border: 1px solid currentColor;

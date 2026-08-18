@@ -25,16 +25,17 @@ wie ----
 ### III.
 
 Diese Reihe hat keinen Anfang, den man nachholen müsste, und kein Hauptwerk,
-auf das sie zuliefe. Steigt ein, wo ihr steht. Jeder Band ist eine eigene
-Hochebene, keine Stufe einer Treppe: keine Steigerung, nur Intensitäten
+auf das sie zuliefe. Steigt ein, wo ihr steht. Jeder Band ist ein eigenes
+Plateau, keine Stufe einer Treppe: keine Steigerung, nur Intensitäten
 nebeneinander.
 
 ### IV.
 
 Es gibt zwei Arten von Gelände: das vermessene — Parzelle, Zaun, Katasteramt —
-und das offene, das niemandem gehört und das man nur durchqueren kann.
-Verwaltet werden Bücher auf dem vermessenen Gelände. Geschrieben, gelesen und
-verkauft werden unsere auf dem offenen.
+und das offene, das niemandem gehört und das man nur durchqueren kann. Auf dem
+vermessenen wird Literatur verwaltet, Sparte für Sparte, Regalmeter für
+Regalmeter. Unsere Bücher werden auf dem offenen geschrieben, gelesen und
+verkauft.
 
 ### V.
 
@@ -56,9 +57,10 @@ recherchiert, holt nach, was er nicht lebt.
 
 ### VIII.
 
-Wir haben keine Mitte, kein Gesicht und stellen keine Anträge. Gelesen wird in
-Räumen ohne Adresse, verkauft von Hand zu Hand. Kappt man uns an einer Stelle,
-treiben wir an einer anderen aus.
+Wir haben keine Mitte, kein Gesicht und stellen keine Anträge. Kein Baum: kein
+Stamm, den ein einziger Schnitt fällt. Eher Quecke — unterirdisch, seitwärts,
+überall zugleich. Gelesen wird in Räumen ohne Adresse, verkauft von Hand zu
+Hand. Kappt man uns an einer Stelle, treiben wir an einer anderen aus.
 
 ### IX.
 
