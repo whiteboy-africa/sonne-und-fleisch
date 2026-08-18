@@ -448,13 +448,34 @@ body {
   text-transform: uppercase;
 }
 
+/*
+ * Zwei Zonen: oben der wechselnde Inhalt, unten ein am Spaltenboden
+ * verankerter fester Block. Bedienung ortsfest, Inhalt wechselt — sonst
+ * springt der Wenden-Schalter beim Wenden unter dem Zeiger weg.
+ */
 .book-details__copy {
-  align-self: center;
-  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  height: 100%;
   padding: 34px 0;
+  overflow: hidden;
+}
+
+.book-details__oben {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  padding-right: 6px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--hairline) transparent;
+}
+
+.book-details__unten {
+  flex: none;
 }
 
 .is-focused .back-button {
@@ -692,9 +713,21 @@ body {
 }
 
 .book-details__copy .eyebrow {
-  align-items: baseline;
+  align-items: center;
   margin-bottom: 20px;
   color: var(--ink-soft);
+}
+
+/* Die Marke bekommt genau die Hoehe der Nummer und sitzt mittig auf ihr:
+   oben und unten buendig, damit beide als ein Block lesen. Ihre Schrift
+   bleibt kleiner — die Rangfolge Titel, Nummer, Marke steht weiter. */
+.book-details__copy .eyebrow .seitenmarke {
+  display: inline-flex;
+  align-items: center;
+  height: 1.5em;
+  padding: 0 7px;
+  font-size: 0.95em;
+  line-height: 1;
 }
 
 /* Die Nummer traegt die Zeile: anderthalbfache Groesse, weiss, und sie
@@ -777,7 +810,7 @@ body {
   grid-template-columns: 0.78fr 1.22fr;
   gap: 20px;
   max-width: 500px;
-  margin: 34px 0 0;
+  margin: 30px 0 0;
   padding: 16px 0 0;
   border-top: 1px solid var(--hairline);
 }
@@ -1116,8 +1149,12 @@ body {
   .book-details__copy {
     grid-column: 1;
     grid-row: 1;
-    align-self: auto;
+    align-self: stretch;
     padding: 25px 0 18px;
+  }
+
+  .book-details__oben {
+    justify-content: flex-start;
   }
 
   /* Die Augenbraue traegt nur noch die Nummer — die passt auch aufs

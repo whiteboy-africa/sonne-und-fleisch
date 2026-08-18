@@ -127,6 +127,8 @@ const gesamt = katalognummer(katalog.length);
   <aside class="book-details" data-panel aria-hidden="true" aria-label="Angaben zum Band">
     <div class="book-details__inner" data-panel-inhalt hidden>
       <div class="book-details__copy" data-panel-text>
+        {/* Oben der wechselnde Inhalt: er darf verschieden lang sein. */}
+        <div class="book-details__oben">
         {/* Statt „Aus dem Programm" steht hier die Nummer des Bandes. */}
         <p class="eyebrow">
           <span data-panel-augenbraue>{katalognummer(1)}</span>
@@ -144,6 +146,12 @@ const gesamt = katalognummer(katalog.length);
           <cite data-panel-zitat-von></cite>
         </blockquote>
 
+        </div>
+
+        {/* Unten der feste Block: er steht bei jedem Band und auf beiden
+            Seiten an derselben Stelle. Sonst springt der Wenden-Schalter
+            beim Wenden unter dem Zeiger weg. */}
+        <div class="book-details__unten">
         <dl>
           <div>
             <dt>Format</dt>
@@ -167,6 +175,7 @@ const gesamt = katalognummer(katalog.length);
           <span data-panel-link-text>{siteConfig.bookLinkLabel}</span>
           <span aria-hidden="true">↗</span>
         </a>
+        </div>
       </div>
 
 

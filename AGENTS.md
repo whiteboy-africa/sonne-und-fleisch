@@ -80,6 +80,45 @@ Tasten wählen bloß aus, sie holen nichts heraus.
 - **Ohne WebGL zeigt die Seite einen Ausweg** auf `/programm`. Ohne den bliebe
   eine schwarze Fläche stehen.
 
+## Schriften
+
+Drei Rollen, benannt ausschliesslich in `src/styles/basis.css`:
+
+- `--schrift` (IBM Plex Mono) ist die **Bedienung**: Navigation, Marken,
+  Ziffern, Nummernleiste, Angaben, Klappentexte.
+- `--schrift-plakat` (Anton) traegt **alle Titel in Schaugroesse**.
+- `--schrift-buch` (Source Serif) spricht **aus dem Buch heraus**: Zitate
+  (aufrecht, nie kursiv) und der Traktat unter `/deterritorialization`.
+
+Das ist ein Versuch und widerspricht der frueheren Regel „eine einzige
+Schrift". Rueckbau: `git revert 28451c5`.
+
+## Wechsel zwischen Baenden: der Abblender
+
+Beim Seitwaertswechsel faehrt nichts. Das Licht geht in 150 ms aus, im
+Dunkeln (150 ms) werden Band und Text getauscht, in 320 ms kommt es wieder.
+Die Engine meldet Bild fuer Bild, wie viel Licht da ist
+(`onWipeFrame(licht)`); Szenenbelichtung und Deckkraft der Tafel haengen an
+diesem einen Wert. Die Zeiten stehen als `abblendAb`, `abblendHalten` und
+`abblendAuf` in `ShelfEngine.ts`.
+
+Davor gab es eine seitliche Fahrt („Wipe"). Sie zerfiel optisch in zwei
+Haelften, weil der Grund der Tafel den Band rechts verdeckte. Zurueckholen:
+`git revert 448adbe`.
+
+## Nachbarschaft am Bildrand
+
+Statt gerahmter Pfeile stehen links und rechts gedimmte Zeilen mit der
+Nummer des Nachbarbandes; beim Darueberfahren waechst sein Titel heraus.
+`randVariante` in `verlag-config.ts` schaltet zwischen `buchruecken`
+(senkrecht, wie ein Buchruecken) und `waagerecht`; `randRichtung` dreht die
+Leserichtung. Kein Umlauf: auf Band 001 faellt die linke Zeile weg, auf dem
+letzten steht rechts „Vakant" und fuehrt zu den Einsendungen. Auf
+Fingergeraeten wird die Nachbarschaft gar nicht gebaut — dort wischt man
+unten auf der Tafel.
+
+`/?band=008` schlaegt einen Band direkt auf.
+
 ## Doppelcover (tête-bêche)
 
 Manche Bände haben zwei Vorderseiten: die zweite Geschichte steht kopfüber auf
