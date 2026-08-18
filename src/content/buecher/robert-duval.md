@@ -2,7 +2,7 @@
 # Angelegt aus dem Beispielcover. Nur Titel und Umschlag stehen fest.
 titel: The Life and Times of Robert Duval
 kurztitel: Robert Duval
-autor: Autor eintragen
+autor: Aleksandar Vadim
 klappentext: >-
   Platzhalter: zwei bis vier Sätze, die im Regal erscheinen, wenn der Band
   herausgezogen ist.

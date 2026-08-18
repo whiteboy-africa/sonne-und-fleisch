@@ -177,15 +177,6 @@ const introHalten = 2.5;
 const introTempo = 0.45;
 
 /**
- * Ab dieser Drehung der Ansicht legt sich der aufgestellte Band hin: gut
- * elf Grad, auf einem breiten Fenster etwa fuenfzig Pixel Ziehen. Darunter
- * darf man die Ansicht zurechtruecken, ohne dass der Band verschwindet.
- * In Bogenmass statt in Pixeln, damit die Schwelle auf jedem Bildschirm
- * dieselbe Drehung bedeutet.
- */
-const drehschwelle = 0.2;
-
-/**
  * Beim Wechsel in der Betrachtung fahren die Baende seitlich durchs Bild,
  * als staenden alle auf einer endlosen Linie nebeneinander. So weit fahren
  * sie dabei, und so lange dauert es.
@@ -331,8 +322,6 @@ export class ShelfEngine {
   private browseAzimuth = introAzimuth;
   private zielAzimuth = 0;
   /** Blickwinkel beim Aufsetzen des Zeigers — Bezugspunkt fuers Hinlegen. */
-  private azimuthBeimGreifen = 0;
-  private elevationBeimGreifen = 0;
   /** Aufgelaufene Wischstrecke auf dem Telefon. */
   private wischWeg = 0;
   /** Zoom im Regal: 1 ist der Normalabstand, kleiner heisst naeher dran. */
@@ -936,8 +925,6 @@ export class ShelfEngine {
     this.pointerLastX = event.clientX;
     this.pointerLastY = event.clientY;
     this.pointerTravel = 0;
-    this.azimuthBeimGreifen = this.zielAzimuth;
-    this.elevationBeimGreifen = this.zielElevation;
     this.wischWeg = 0;
     this.canvas.setPointerCapture(event.pointerId);
   };
@@ -986,13 +973,9 @@ export class ShelfEngine {
         this.pointerLastY = event.clientY;
         return;
       }
-      // Wer die Ansicht wirklich dreht, schaut die Stapel an — dann legt
-      // sich der aufgestellte Band wieder oben auf seinen Stapel. Ein
-      // kurzes Antippen oder ein Zurechtruecken reicht dafuer nicht.
-      const gedreht =
-        Math.abs(this.zielAzimuth - this.azimuthBeimGreifen) +
-        Math.abs(this.zielElevation - this.elevationBeimGreifen);
-      if (gedreht > drehschwelle) this.layDown();
+      // Der aufgestellte Band bleibt beim Drehen stehen. Frueher legte er
+      // sich ab einer gewissen Drehung wieder hin — damit kam man nie um
+      // ihn herum, und seine Rueckseite bekam man nie zu sehen.
       const proPixel = Math.PI / Math.max(420, this.canvas.clientWidth * 0.6);
       // Wer selbst dreht, uebernimmt — Halten und Sinken hoeren auf.
       this.introLaeuft = false;
@@ -1224,7 +1207,12 @@ export class ShelfEngine {
     );
   }
 
-  /** Legt den aufgestellten Band zurueck, ohne einen neuen zu holen. */
+  /**
+   * Legt den aufgestellten Band zurueck, ohne einen neuen zu holen.
+   * Ruft im Augenblick niemand auf: das Drehen der Ansicht laesst den Band
+   * stehen, damit man ihn von allen Seiten ansehen kann. Der Weg zurueck
+   * in den Stapel bleibt hier stehen, falls ihn wieder etwas braucht.
+   */
   private layDown() {
     if (this.mode !== "browse") return;
     if (this.presentedIndex === null || this.layDownPending) return;

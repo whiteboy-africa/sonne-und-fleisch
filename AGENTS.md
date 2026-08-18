@@ -50,9 +50,9 @@ das Buch selbst, seine Nummer in der Leiste oder der Knopf. Rad, Pfeile und
 Tasten wählen bloß aus, sie holen nichts heraus.
 
 - Beim Ankommen liegt alles im Stapel (`atRest`).
-- Ziehen dreht die Ansicht um die Stapel. Wer wirklich dreht (über
-  `drehschwelle`, gut elf Grad), legt den aufgestellten Band zurück — oben
-  auf seinen Stapel.
+- Ziehen dreht die Ansicht um die Stapel. Der aufgestellte Band bleibt
+  dabei stehen — man kann um ihn herumgehen und seine Rückseite ansehen.
+  (Früher legte er sich ab einer Schwelle wieder hin; das ist raus.)
 - In der Betrachtung dreht Ziehen den Band selbst, ohne Anschlag. Die
   Kamera kreist dort nicht (`enableRotate = false`), sonst ließe sich der
   Band nie auf den Kopf stellen.

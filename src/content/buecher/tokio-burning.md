@@ -21,7 +21,7 @@ reihenfolge: 7
 rueckseite:
   titel: The Melancholy of Quidam
   kurztitel: Melancholy of Quidam
-  autor: Farranggore
+  autor: Aleksandar Vadim
   klappentext: >-
     Platzhalter: die Einführung in die zweite Geschichte des Bandes.
   cover_bild: /buecher/tokio-burning/rueckseite.webp

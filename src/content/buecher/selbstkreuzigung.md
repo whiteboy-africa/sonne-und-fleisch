@@ -23,6 +23,7 @@ reihenfolge: 6
 rueckseite:
   titel: Corporal Curses
   kurztitel: Corporal Curses
+  autor: Marlies van Addak
   klappentext: >-
     Platzhalter: die Einführung in die zweite Geschichte des Bandes. Sie
     erscheint, sobald man das Buch wendet.
