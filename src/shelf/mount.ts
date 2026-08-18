@@ -77,6 +77,12 @@ export function regalStarten(wurzel: HTMLElement) {
   let seite: BookSide = 'vorn';
 
   const gesamt = katalognummer(katalog.length);
+  /**
+   * Wohin die freie Stelle nach dem letzten Band fuehrt. Vorerst die
+   * Kontaktseite; sobald dort der Abschnitt fuer Einsendungen steht, zeigt
+   * die Sprungmarke genau dorthin.
+   */
+  const einsendungen = '/kontakt#einsendungen';
 
   function blaetternAnsichtSetzen() {
     const buch = katalog[aktiverIndex];
@@ -84,10 +90,12 @@ export function regalStarten(wurzel: HTMLElement) {
     el.blaetternZahl.textContent = katalognummer(aktiverIndex + 1);
     el.blaetternTitel.textContent = buch.shortTitle;
     el.blaetternAutor.textContent = buch.author;
-    // Die Nachbarn stehen namentlich am Rand. Es geht rundherum: vor 001
-    // kommt der letzte Band, nach dem letzten wieder 001.
-    const davor = (aktiverIndex - 1 + katalog.length) % katalog.length;
-    const danach = (aktiverIndex + 1) % katalog.length;
+    // Die Nachbarn stehen namentlich am Rand. Kein Umlauf: vor dem ersten
+    // Band ist nichts, nach dem letzten die freie Stelle.
+    const davor = aktiverIndex - 1;
+    const danach = aktiverIndex + 1;
+    const amAnfang = davor < 0;
+    const amEnde = danach > katalog.length - 1;
     const gekuerzt = (titel: string) =>
       titel.length > 24 ? `${titel.slice(0, 23).trimEnd()}…` : titel;
     // Liegt Seite B vorn, bleibt sie es auch beim Blaettern — dann gehoert
@@ -97,15 +105,34 @@ export function regalStarten(wurzel: HTMLElement) {
       const zweite = seite === 'hinten' && buch.back ? buch.back : buch;
       return gekuerzt(zweite.shortTitle);
     };
-    el.nachbarZahlZurueck.textContent = katalognummer(davor + 1);
-    el.nachbarTitelZurueck.textContent = `— ${nachbarTitel(davor)}`;
-    el.nachbarZahlVor.textContent = katalognummer(danach + 1);
-    el.nachbarTitelVor.textContent = `${nachbarTitel(danach)} —`;
-    el.zurueck.setAttribute(
-      'aria-label',
-      `Vorheriger Band — ${katalog[davor].title}`,
-    );
-    el.vor.setAttribute('aria-label', `Nächster Band — ${katalog[danach].title}`);
+    // Vor dem ersten Band steht nichts — dann faellt die linke Zeile weg.
+    el.zurueck.hidden = amAnfang;
+    if (!amAnfang) {
+      el.nachbarZahlZurueck.textContent = katalognummer(davor + 1);
+      el.nachbarTitelZurueck.textContent = `— ${nachbarTitel(davor)}`;
+      el.zurueck.setAttribute(
+        'aria-label',
+        `Vorheriger Band — ${katalog[davor].title}`,
+      );
+    }
+
+    // Nach dem letzten Band kommt kein Umlauf, sondern die freie Stelle:
+    // die naechste Nummer, noch ohne Buch, und der Weg zu den Einsendungen.
+    if (amEnde) {
+      el.nachbarZahlVor.textContent = katalognummer(katalog.length + 1);
+      el.nachbarTitelVor.textContent = 'Vakant —';
+      el.vor.setAttribute(
+        'aria-label',
+        `${katalognummer(katalog.length + 1)} — vakant. Zu den Einsendungen`,
+      );
+    } else {
+      el.nachbarZahlVor.textContent = katalognummer(danach + 1);
+      el.nachbarTitelVor.textContent = `${nachbarTitel(danach)} —`;
+      el.vor.setAttribute(
+        'aria-label',
+        `Nächster Band — ${katalog[danach].title}`,
+      );
+    }
     el.ticks.forEach((tick, index) => {
       const ist = index === aktiverIndex;
       tick.classList.toggle('is-active', ist);
@@ -192,12 +219,27 @@ export function regalStarten(wurzel: HTMLElement) {
   // Die Pfeile tun dasselbe wie die Nummern: einen Band weiter. Im Regal
   // holen sie ihn heraus, beim aufgeschlagenen Band blättern sie weiter.
   function nachbar(richtung: -1 | 1) {
-    // Rundherum statt an den Enden anschlagen.
-    const ziel = (aktiverIndex + richtung + katalog.length) % katalog.length;
+    const ziel = aktiverIndex + richtung;
+    // Vor dem ersten Band ist nichts.
+    if (ziel < 0) return;
+    // Nach dem letzten die freie Stelle: dort geht es zu den Einsendungen.
+    if (ziel > katalog.length - 1) {
+      window.location.href = einsendungen;
+      return;
+    }
     if (modus === 'browse') engine?.presentBook(ziel);
-    // Richtung mitgeben: beim Umlauf springt die Nummer, die Hand nicht.
     else engine?.inspectOther(ziel, richtung);
   }
+  // Pfeiltaste rechts am letzten Band fuehrt ebenfalls zu den Einsendungen.
+  // Alles andere macht die Engine selbst; sie schlaegt an den Enden an.
+  window.addEventListener('keydown', (ereignis) => {
+    if (ereignis.key !== 'ArrowRight') return;
+    if (aktiverIndex !== katalog.length - 1) return;
+    const ziel = ereignis.target as HTMLElement | null;
+    if (ziel?.isContentEditable || ziel instanceof HTMLInputElement) return;
+    window.location.href = einsendungen;
+  });
+
   el.zurueck.addEventListener('click', () => nachbar(-1));
   el.vor.addEventListener('click', () => nachbar(1));
   // Ein Klick auf die Nummer holt den Band heraus und stellt ihn auf. Die
