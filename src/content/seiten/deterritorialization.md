@@ -60,9 +60,9 @@ treiben wir an einer anderen aus.
 
 ### IX.
 
-Alle zwei Monate ein Band. Geschwindigkeit ist kein Pfusch — sie ist die
-Waffe derer, die nicht warten, bis man einen Platz für sie gefunden hat. Bis
-die Einordnung eintrifft, sind wir zwei Bücher weiter.
+Alle zwei Monate ein Band. Geschwindigkeit ist keine Nachlässigkeit — sie ist
+die Waffe derer, die nicht warten, bis man einen Platz für sie gefunden hat.
+Bis die Einordnung eintrifft, sind wir zwei Bücher weiter.
 
 ### X.
 
