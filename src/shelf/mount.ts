@@ -91,8 +91,14 @@ export function regalStarten(wurzel: HTMLElement) {
     const danach = aktiverIndex + 1;
     const amAnfang = davor < 0;
     const amEnde = danach > katalog.length - 1;
+    // Am Buchruecken ist Platz; waagerecht im aufgeschlagenen Band nicht:
+    // dort wird frueher gekappt, damit nichts in die Textspalte laeuft.
+    const grenze =
+      siteConfig.randVariante === 'waagerecht' && modus !== 'browse' ? 14 : 24;
     const gekuerzt = (titel: string) =>
-      titel.length > 24 ? `${titel.slice(0, 23).trimEnd()}…` : titel;
+      titel.length > grenze
+        ? `${titel.slice(0, grenze - 1).trimEnd()}…`
+        : titel;
     // Liegt Seite B vorn, bleibt sie es auch beim Blaettern — dann gehoert
     // in die Nachbarzeile der Titel der zweiten Geschichte.
     const nachbarTitel = (index: number) => {

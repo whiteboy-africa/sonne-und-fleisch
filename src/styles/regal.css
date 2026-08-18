@@ -572,6 +572,57 @@ body {
   opacity: 1;
 }
 
+/*
+ * Fassung „Buchruecken": der Titel des Nachbarn steht senkrecht am Rand,
+ * wie auf dem Ruecken im Regal. Die Nummer bleibt waagerecht an ihrem
+ * Platz, der Titel waechst darueber heraus. Der ganze Streifen bleibt
+ * schmal genug, dass er der Textspalte nicht in die Quere kommt.
+ */
+[data-rand-variante='buchruecken'] .nachbar {
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 14px;
+}
+
+[data-rand-variante='buchruecken'] .nachbar__zeile {
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+[data-rand-variante='buchruecken'] .nachbar__titel {
+  max-width: none;
+  max-height: 0;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 0.16em;
+  transition:
+    max-height 150ms ease,
+    opacity 150ms ease;
+}
+
+[data-rand-variante='buchruecken'][data-rand-richtung='aufwaerts']
+  .nachbar__titel {
+  transform: rotate(180deg);
+}
+
+[data-rand-variante='buchruecken'] .nachbar:hover .nachbar__titel,
+[data-rand-variante='buchruecken'] .nachbar:focus-visible .nachbar__titel {
+  max-height: 60vh;
+  opacity: 1;
+}
+
+/* In dieser Fassung steht die Nummer unten, der Ruecken darueber. */
+[data-rand-variante='buchruecken'] .nachbar--links .nachbar__zeile,
+[data-rand-variante='buchruecken'] .nachbar--rechts .nachbar__zeile {
+  justify-content: center;
+}
+
+[data-rand-variante='buchruecken'] .nachbar--rechts {
+  width: clamp(48px, 3vw, 56px);
+  padding: 0 14px 0 0;
+}
+
 /* Auf Fingergeraeten gibt es das nicht: dort wird gewischt. */
 @media (pointer: coarse) {
   .nachbar {
