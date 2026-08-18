@@ -18,7 +18,8 @@ Wir schreiben in einer Sprache, die uns nicht gehört, und wir erzählen klein:
 ein Zimmer, ein Rausch, ein Hund im Hinterhof, ein Wort von der Straße. Im
 Kleinen hängt sofort alles mit allem zusammen; das Große erzählt sich von
 selbst, und es lügt dabei. Es gibt dafür einen Namen: *littérature mineure*.
-Mineur wie Moll — die Tonart, nicht die Größe.
+Mineur wie Moll, wie klein, wie der Mineur, der unter der Festung gräbt, wie
+der Minderjährige, dem man die Mündigkeit noch nicht zugesteht.
 
 ### III.
 
