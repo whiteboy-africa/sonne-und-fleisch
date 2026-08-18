@@ -36,7 +36,7 @@ export const siteConfig = {
    * „waagerecht": in einer Zeile, wie bisher.
    * Zurueckstellen auf „waagerecht" stellt das alte Verhalten wieder her.
    */
-  randVariante: 'buchruecken' as 'buchruecken' | 'waagerecht',
+  randVariante: 'waagerecht' as 'buchruecken' | 'waagerecht',
   /** Leserichtung des Buchruecken-Titels: abwaerts oder aufwaerts. */
   randRichtung: 'abwaerts' as 'abwaerts' | 'aufwaerts',
 } as const;
