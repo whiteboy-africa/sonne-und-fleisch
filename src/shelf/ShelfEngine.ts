@@ -406,16 +406,12 @@ export class ShelfEngine {
   /** Die Schraeglage laeuft der gewendeten Lage weich hinterher. */
   private rollAktuell = inspectDefaultRoll;
   /**
-   * Wenden im Regal in vier Schritten, wie man ein Buch in der Hand dreht:
-   * 1. um die Hochachse — die Rueckseite kommt nach vorn, kopfueber, denn
-   *    so ist die zweite Geschichte gedruckt;
-   * 2. auf den Kopf stellen — jetzt steht Seite B richtig;
-   * 3. wieder um die Hochachse — Seite A ist vorn, kopfueber;
-   * 4. wieder aufrichten — alles steht wie am Anfang.
+   * Wenden im Regal: der Band kippt um seine Querachse, wie man ein Buch
+   * in der Hand umdreht. Die zweite Geschichte steht kopfueber auf der
+   * Rueckseite und kommt dadurch richtig herum zum Stehen.
    */
-  private stehendSchritt = 0;
-  private stehendYawZiel: number | null = null;
-  private stehendRollZiel = 0;
+  private stehendGedreht = false;
+  private stehendBasisPitch: number | null = null;
   private pointerStartX = 0;
   private pointerLastX = 0;
   private pointerLastY = 0;
@@ -1417,22 +1413,14 @@ export class ShelfEngine {
   flipStehenden() {
     if (this.mode !== "browse" || this.presentedIndex === null) return;
     const band = this.runtimeBooks[this.presentedIndex];
-    if (this.stehendYawZiel === null) {
-      this.stehendYawZiel = band.content.rotation.y;
-      this.stehendRollZiel = band.content.rotation.z;
+    if (this.stehendBasisPitch === null) {
+      this.stehendBasisPitch = band.content.rotation.x;
     }
-    this.stehendSchritt = (this.stehendSchritt + 1) % 4;
-    // Ungerade Schritte drehen um die Hochachse, gerade stellen den Band
-    // wieder auf die Fuesse. Nach vier Griffen steht alles wie zuvor.
-    if (this.stehendSchritt % 2 === 1) this.stehendYawZiel += Math.PI;
-    else this.stehendRollZiel += Math.PI;
-
-    const zweite = band.data.back?.shortTitle ?? band.data.shortTitle;
-    const seiteB = this.stehendSchritt === 1 || this.stehendSchritt === 2;
+    this.stehendGedreht = !this.stehendGedreht;
     this.callbacks.onStatus(
-      this.stehendSchritt % 2 === 1
-        ? `${seiteB ? zweite : band.data.shortTitle} liegt vorn, kopfüber`
-        : `${seiteB ? zweite : band.data.shortTitle} liegt vorn`,
+      this.stehendGedreht
+        ? `${band.data.back?.shortTitle ?? band.data.shortTitle} liegt vorn`
+        : `${band.data.shortTitle} liegt vorn`,
     );
   }
 
@@ -1871,20 +1859,13 @@ export class ShelfEngine {
     if (
       this.mode === "browse" &&
       this.presentedIndex !== null &&
-      this.stehendYawZiel !== null
+      this.stehendBasisPitch !== null
     ) {
       const stehend = this.runtimeBooks[this.presentedIndex];
-      const tempo = this.reducedMotion ? 20 : 7.5;
-      stehend.content.rotation.y = damp(
-        stehend.content.rotation.y,
-        this.stehendYawZiel,
-        tempo,
-        delta,
-      );
-      stehend.content.rotation.z = damp(
-        stehend.content.rotation.z,
-        this.stehendRollZiel,
-        tempo,
+      stehend.content.rotation.x = damp(
+        stehend.content.rotation.x,
+        this.stehendBasisPitch + (this.stehendGedreht ? Math.PI : 0),
+        this.reducedMotion ? 20 : 8,
         delta,
       );
     }
@@ -2325,9 +2306,8 @@ export class ShelfEngine {
 
   presentBook(index: number) {
     if (this.mode !== "browse") return;
-    this.stehendSchritt = 0;
-    this.stehendYawZiel = null;
-    this.stehendRollZiel = 0;
+    this.stehendGedreht = false;
+    this.stehendBasisPitch = null;
     this.atRest = false;
     this.layDownPending = false;
     this.pendingFocusIndex = null;
