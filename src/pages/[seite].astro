@@ -3,7 +3,7 @@
 // Datei in src/content/seiten/; der Dateiname ist die Adresse.
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Seite from '../layouts/Seite.astro';
-import { alleBuecher, buchPfad, releasenummer } from '../buecher';
+import { alleBuecher, releasenummer } from '../buecher';
 
 export async function getStaticPaths() {
   const seiten = await getCollection('seiten');
@@ -37,7 +37,7 @@ const neuesteNummer = releasenummer(buecher.length - 1);
     eintrag.data.zurueck_zum_neuesten && neuester && (
       <a
         class="rand-zurueck"
-        href={buchPfad(neuester)}
+        href={`/?band=${neuesteNummer}`}
         aria-label={`Zurück zum neuesten Band — ${neuester.data.titel}`}
       >
         <span class="rand-zurueck__zeile">

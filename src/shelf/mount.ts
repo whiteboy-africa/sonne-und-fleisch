@@ -378,6 +378,14 @@ export function regalStarten(wurzel: HTMLElement) {
       onReady: () => {
         wurzel.classList.add('is-ready');
         wurzel.querySelector('[data-ladeschirm]')?.setAttribute('aria-hidden', 'true');
+        // Wer mit /?band=008 kommt, will genau diesen Band aufgeschlagen
+        // sehen — etwa auf dem Weg zurueck von den Einsendungen.
+        const gewuenscht = Number(
+          new URLSearchParams(window.location.search).get('band'),
+        );
+        if (Number.isInteger(gewuenscht) && gewuenscht >= 1 && gewuenscht <= katalog.length) {
+          engine?.focusBook(gewuenscht - 1);
+        }
       },
     });
   }

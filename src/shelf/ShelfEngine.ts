@@ -192,10 +192,10 @@ const zoomFern = 1.7;
  * aus, im Dunkeln wird der Band getauscht, in 220 ms kommt es wieder.
  * Nichts bewegt sich dabei seitwaerts.
  */
-const abblendAb = 0.18;
+const abblendAb = 0.15;
 /** Im Schwarz wird kurz gehalten — ohne diese Pause wirkt es hektisch. */
-const abblendHalten = 0.16;
-const abblendAuf = 0.24;
+const abblendHalten = 0.15;
+const abblendAuf = 0.3;
 const wipeDauer = abblendAb + abblendHalten + abblendAuf;
 
 /** Belichtung der Szene, wenn der Blick normal nah steht. */
