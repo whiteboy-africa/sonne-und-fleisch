@@ -1163,9 +1163,8 @@ body {
     margin-bottom: 8px;
   }
 
-  .seitenmarke--autor:not([hidden]) {
-    display: inline-block;
-  }
+  /* Die Marke steht auf dem Handy wieder oben in der Augenbraue — neben
+     dem Autor waere sie doppelt. */
 
   /* Der Weg zurueck steht oben links ueber dem Band. */
   .back-button {
