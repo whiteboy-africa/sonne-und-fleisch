@@ -467,9 +467,12 @@ body {
 
 /* Die Parole unten rechts, wo sonst Bedienhinweise staenden. */
 .slogan {
+  display: block;
   margin: 0;
   padding-bottom: 0;
   color: var(--ink-soft);
+  text-decoration: none;
+  transition: color 200ms ease;
   white-space: nowrap;
   /* Die Linie der Nummernleiste liegt 22 Pixel ueber der Unterkante
      (18 Pixel Abstand plus 4 Pixel im Strichfeld). Die Parole rueckt so
@@ -587,6 +590,11 @@ body {
 .is-focused .back-button {
   opacity: 1;
   pointer-events: auto;
+}
+
+.slogan:hover,
+.slogan:focus-visible {
+  color: var(--ink);
 }
 
 /* Steht im Baum, aber nicht im Bild — fuer Vorlesegeraete. */

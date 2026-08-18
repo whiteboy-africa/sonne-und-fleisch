@@ -1,5 +1,5 @@
 ---
-titel: Verlag
+titel: SONNE + FLEISCH
 untertitel: The Return of the Narrative
 reihenfolge: 10
 versteckt: true
