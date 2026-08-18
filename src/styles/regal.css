@@ -500,8 +500,10 @@ body {
   /* Ueber der Tafel: der rechte Streifen liegt sonst hinter ihr und
      laesst sich weder sehen noch treffen. */
   z-index: 24;
-  top: 92px;
-  bottom: 96px;
+  /* Oben und unten gleich viel ausgespart — dann sitzt die Beschriftung
+     wirklich auf halber Hoehe und nicht knapp daneben. */
+  top: 94px;
+  bottom: 94px;
   width: 8vw;
   min-width: 74px;
   display: flex;
@@ -579,23 +581,29 @@ body {
  * schmal genug, dass er der Textspalte nicht in die Quere kommt.
  */
 [data-rand-variante='buchruecken'] .nachbar {
-  flex-direction: column;
-  gap: 12px;
   padding: 0 14px;
 }
 
+/* Die Nummer steht genau in der Mitte und bleibt dort. Der Ruecken waechst
+   ueber ihr heraus, ohne sie zu verschieben — deshalb haengt er absolut
+   und nicht in der Reihe. */
 [data-rand-variante='buchruecken'] .nachbar__zeile {
+  position: relative;
   flex-direction: column;
-  gap: 10px;
+  gap: 0;
   align-items: center;
 }
 
 [data-rand-variante='buchruecken'] .nachbar__titel {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
   max-width: none;
   max-height: 0;
   writing-mode: vertical-rl;
   text-orientation: mixed;
   letter-spacing: 0.16em;
+  transform: translateX(-50%);
   transition:
     max-height 150ms ease,
     opacity 150ms ease;
@@ -603,7 +611,7 @@ body {
 
 [data-rand-variante='buchruecken'][data-rand-richtung='aufwaerts']
   .nachbar__titel {
-  transform: rotate(180deg);
+  transform: translateX(-50%) rotate(180deg);
 }
 
 [data-rand-variante='buchruecken'] .nachbar:hover .nachbar__titel,
