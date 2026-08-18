@@ -51,3 +51,23 @@ const neuesteNummer = releasenummer(buecher.length - 1);
     )
   }
 </Seite>
+
+{/* Wer von der freien Stelle mit der Pfeiltaste hierher kam, kommt mit der
+    Pfeiltaste nach links auch wieder zurueck. */}
+<script>
+  const zurueck = document.querySelector('.rand-zurueck');
+  if (zurueck instanceof HTMLAnchorElement) {
+    window.addEventListener('keydown', (ereignis) => {
+      if (ereignis.key !== 'ArrowLeft') return;
+      const ziel = ereignis.target as HTMLElement | null;
+      if (
+        ziel?.isContentEditable ||
+        ziel instanceof HTMLInputElement ||
+        ziel instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+      window.location.href = zurueck.href;
+    });
+  }
+</script>
