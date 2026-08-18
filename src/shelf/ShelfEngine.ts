@@ -408,6 +408,8 @@ export class ShelfEngine {
    * dasteht wie sonst Seite A.
    */
   private rollVorzeichen = 1;
+  /** Die Schraeglage laeuft der gewendeten Lage weich hinterher. */
+  private rollAktuell = inspectDefaultRoll;
   /** Steht der aufgestellte Band mit der Rueckseite nach vorn? */
   private stehendGedreht = false;
   /** Seine Ausgangslage, damit das Wenden wieder zurueckfindet. */
@@ -1372,14 +1374,14 @@ export class ShelfEngine {
     const zeigtRueckseite =
       band.data.back !== undefined && this.rueckseiteZurKamera(band);
     const seite: BookSide = zeigtRueckseite ? "hinten" : "vorn";
-    // Seite B soll dabei genauso dastehen wie sonst Seite A: um die
-    // Querachse gedreht kippen Neigung, Drehung und Schraeglage
-    // andersherum, also werden sie gespiegelt.
-    this.zielPitch = zeigtRueckseite
-      ? Math.PI - inspectDefaultPitch
-      : inspectDefaultPitch;
-    this.zielYaw = zeigtRueckseite ? -inspectDefaultYaw : inspectDefaultYaw;
+    // Seite B soll genauso dastehen wie sonst Seite A. Gedreht wird der
+    // Band um seine Querachse (Neigung plus pi) — die Drehung um die
+    // Hochachse bleibt dabei, wie sie ist, und nur die Schraeglage kippt
+    // andersherum. (Ry·Rx·Rz·Rx(pi) = Ry·Rx(p+pi)·Rz(-r).)
+    this.zielPitch = inspectDefaultPitch + (zeigtRueckseite ? Math.PI : 0);
+    this.zielYaw = inspectDefaultYaw;
     this.rollVorzeichen = zeigtRueckseite ? -1 : 1;
+    this.rollAktuell = inspectDefaultRoll * this.rollVorzeichen;
     this.inspectPitch = this.zielPitch;
     this.inspectYaw = this.zielYaw;
     if (seite !== this.side) {
@@ -1855,8 +1857,13 @@ export class ShelfEngine {
       // Die Schraeglage liegt auf der Z-Achse. Sie gehoert nicht in die
       // Pose: nur der betrachtete Band hat sie, und die Kollisionspruefung
       // interessiert sie nicht.
-      selected.content.rotation.z =
-        inspectDefaultRoll * this.rollVorzeichen * motionFocus;
+      this.rollAktuell = damp(
+        this.rollAktuell,
+        inspectDefaultRoll * this.rollVorzeichen,
+        this.reducedMotion ? 20 : 8,
+        delta,
+      );
+      selected.content.rotation.z = this.rollAktuell * motionFocus;
       this.seiteAblesen(selected);
     }
 
@@ -1959,6 +1966,7 @@ export class ShelfEngine {
     if (naechste === this.side) return;
 
     this.side = naechste;
+    this.rollVorzeichen = this.side === "hinten" ? -1 : 1;
     this.callbacks.onSide(this.side);
     this.callbacks.onStatus(
       this.side === "hinten"
