@@ -379,12 +379,27 @@ export function regalStarten(wurzel: HTMLElement) {
         wurzel.classList.add('is-ready');
         wurzel.querySelector('[data-ladeschirm]')?.setAttribute('aria-hidden', 'true');
         // Wer mit /?band=008 kommt, will genau diesen Band aufgeschlagen
-        // sehen — etwa auf dem Weg zurueck von den Einsendungen.
+        // sehen — etwa auf dem Weg zurueck von den Einsendungen. Ein
+        // einzelner Anstoss verpufft, solange der Band noch im Stapel
+        // liegt: das Regal holt ihn erst heraus. Also so lange nachfassen,
+        // bis er wirklich offen ist.
         const gewuenscht = Number(
           new URLSearchParams(window.location.search).get('band'),
         );
-        if (Number.isInteger(gewuenscht) && gewuenscht >= 1 && gewuenscht <= katalog.length) {
-          engine?.focusBook(gewuenscht - 1);
+        if (
+          Number.isInteger(gewuenscht) &&
+          gewuenscht >= 1 &&
+          gewuenscht <= katalog.length
+        ) {
+          const ziel = gewuenscht - 1;
+          let versuche = 0;
+          const aufschlagen = () => {
+            if (modus !== 'browse') return;
+            engine?.focusBook(ziel);
+            versuche += 1;
+            if (versuche < 16) window.setTimeout(aufschlagen, 260);
+          };
+          aufschlagen();
         }
       },
     });
