@@ -634,6 +634,14 @@ body {
   opacity: 1;
 }
 
+/* Waehrend des Wechsels verschwindet der Grund der Tafel. Er ist
+   undurchsichtig und deckt die rechten gut vierzig Prozent der Flaeche zu —
+   der Band faehrt zwar ueber den ganzen Schirm, war aber nur links davon zu
+   sehen. Genau daran sah es aus, als wische jede Haelfte fuer sich. */
+.book-details.is-wischend::before {
+  opacity: 0;
+}
+
 /* Der alte Text als Kopie, waehrend das Original schon den neuen Band
    zeigt. Sie haengt in der ganzen Flaeche, nicht in der Tafel: der Text
    soll neben dem Band ueber den Schirm fahren und erst am Bildrand

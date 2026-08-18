@@ -65,6 +65,7 @@ export function regalStarten(wurzel: HTMLElement) {
     wipeKopie?.remove();
     wipeKopie = null;
     el.panelText.style.transform = '';
+    el.panel.classList.remove('is-wischend');
   }
   let aktiverIndex = 0;
   let gewaehlterIndex: number | null = null;
@@ -315,6 +316,8 @@ export function regalStarten(wurzel: HTMLElement) {
         // dem Band über den Schirm und verschwindet erst am Bildrand.
         wurzel.appendChild(kopie);
         wipeKopie = kopie;
+        // Grund der Tafel weg, sonst verschwindet der Band hinter ihr.
+        el.panel.classList.add('is-wischend');
 
         gewaehlterIndex = index;
         aktiverIndex = index;

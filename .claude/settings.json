@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "permissions": {
+    "deny": [
+      "Read(~/Library/**)",
+      "Edit(~/Library/**)",
+      "Read(~/.ssh/**)",
+      "Edit(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Edit(~/.aws/**)",
+      "Read(~/.gnupg/**)",
+      "Edit(~/.gnupg/**)",
+      "Read(~/.config/**)",
+      "Edit(~/.config/**)",
+      "Read(~/.npmrc)",
+      "Read(~/.netrc)",
+      "Read(~/.zsh_history)",
+      "Read(~/.bash_history)",
+      "Edit(~/Downloads/**)",
+      "Edit(~/Desktop/**)",
+      "Edit(~/Pictures/**)"
+    ],
+    "allow": [
+      "Read(~/Documents/Projekte/sonne-und-fleisch/**)",
+      "Edit(~/Documents/Projekte/sonne-und-fleisch/**)",
+      "Read(~/Downloads/**)"
+    ]
+  }
+}
