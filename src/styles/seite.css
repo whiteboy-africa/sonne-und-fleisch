@@ -307,6 +307,98 @@
 
 /* Buchseite */
 
+/* Ein Block je Vorderseite. Seite A steht mit dem Text links, Seite B
+   spiegelbildlich — das ist das Wenden, in Satz uebersetzt. */
+.bandblock {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  gap: 48px;
+  align-items: start;
+}
+
+.bandblock--gewendet .bandblock__text {
+  order: 2;
+}
+
+.bandblock__marke {
+  margin: 0 0 14px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.bandblock h2 {
+  max-width: 22ch;
+  margin: 0;
+  font-size: clamp(23px, 2.4vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.bandblock__autor {
+  margin: 12px 0 22px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.bandblock__cover {
+  aspect-ratio: 2 / 3;
+  border-radius: 2px 5px 5px 2px;
+  box-shadow: inset -10px 0 22px rgba(0, 0, 0, 0.2),
+    4px 6px 26px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+.bandblock__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bandblock__nachwort {
+  margin-top: 46px;
+}
+
+/* Zwischen den beiden Geschichten: die Wendemarke auf einer Haarlinie. */
+.wende-trenner {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin: 46px 0;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+}
+
+.wende-trenner::before,
+.wende-trenner::after {
+  height: 1px;
+  flex: 1;
+  background: var(--hairline);
+  content: "";
+}
+
+/* Bestellen ist eine Zeile, kein Knopf. */
+.bestellzeile {
+  margin: 34px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.bestellzeile a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+}
+
 .buchkopf {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 250px;
@@ -436,6 +528,24 @@
   .band__marge {
     grid-column: 2;
     text-align: left;
+  }
+
+  .bandblock {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+
+  .bandblock__cover,
+  .bandblock--gewendet .bandblock__text {
+    order: 0;
+  }
+
+  .bandblock__cover {
+    max-width: 210px;
+  }
+
+  .wende-trenner {
+    margin: 34px 0;
   }
 
   .buchkopf {

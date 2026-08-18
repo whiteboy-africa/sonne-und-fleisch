@@ -28,6 +28,9 @@ const buecher = defineCollection({
     // Angaben nur fuer die Buchseite, nicht fuers Regal.
     isbn: z.string().optional(),
     preis: z.string().optional(),
+    // Wohin die Bestellzeile auf der Buchseite fuehrt. Ohne Angabe steht
+    // dort nur der Zustand als Text.
+    bestell_link: z.string().optional(),
     erscheinungsdatum: z.date().optional(),
     uebersetzung_aus: z.string().optional(),
     reihe: z.string().optional(),

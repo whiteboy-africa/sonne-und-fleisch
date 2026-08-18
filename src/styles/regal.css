@@ -351,12 +351,19 @@ body {
 
 .shelf-index__weiter::before {
   position: absolute;
-  right: -100vw;
+  /* Laeuft ueber die 009 hinaus und verliert sich dann — ein harter
+     Schnitt am Bildrand wirkte wie ein abgesaegtes Ende. */
+  right: -220px;
   bottom: 4px;
   left: 0;
   height: 1px;
   content: "";
-  background: var(--hairline);
+  background: linear-gradient(
+    90deg,
+    var(--hairline) 0%,
+    var(--hairline) 34%,
+    transparent 100%
+  );
 }
 
 .shelf-index__weiter span {
