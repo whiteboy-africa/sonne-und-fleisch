@@ -56,7 +56,4 @@ Ausstattung.
 
 Gelesen wird auch laut: in Räumen ohne Adresse, Wien und anderswo.
 
-Ganzer Text, keine Exposés. PDF an
-[salve@sonneundfleisch.com](mailto:salve@sonneundfleisch.com)
-
-Antwort kommt. Vielleicht.
+Ganzer Text, keine Exposés.
