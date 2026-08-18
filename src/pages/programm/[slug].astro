@@ -86,7 +86,10 @@ const bestellung =
   d.verfuegbarkeit === 'Vergriffen'
     ? { text: 'Vergriffen', link: undefined }
     : d.verfuegbarkeit === 'Vakant'
-      ? { text: 'Einsenden', link: 'mailto:salve@sonneundfleisch.com' }
+      ? {
+          text: 'PDF an salve@sonneundfleisch.com',
+          link: 'mailto:salve@sonneundfleisch.com',
+        }
       : d.verfuegbarkeit === 'Verfügbar'
         ? { text: 'Bestellen', link: d.bestell_link }
         : { text: 'Vormerken', link: d.bestell_link };
@@ -157,4 +160,8 @@ const bestellung =
       )
     }
   </p>
+
+  {d.verfuegbarkeit === 'Vakant' && (
+    <p class="bestellzeile__notiz">Antwort kommt. Vielleicht.</p>
+  )}
 </Seite>

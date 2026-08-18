@@ -7,8 +7,7 @@ titel: Vakant
 kurztitel: Vakant
 autor: D. U.
 klappentext: >-
-  Die Reihe hat eine offene Stelle. Immer. Wir drucken erzählende Prosa,
-  40.000 bis 50.000 Zeichen. Genre ist keine Sünde: Verbrechen, Fieber,
+  Wir drucken erzählende Prosa, 40.000 bis 50.000 Zeichen. Genre ist keine Sünde: Verbrechen, Fieber,
   Reise, Ekstase. Namen sind Werkzeuge, Pseudonym willkommen, niemand prüft
   nach. Manche Stellen werden geschwärzt — das ist keine Drohung, das ist
   die Ausstattung. Ganzer Text, keine Exposés.
