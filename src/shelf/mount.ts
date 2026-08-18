@@ -72,12 +72,6 @@ export function regalStarten(wurzel: HTMLElement) {
   let seite: BookSide = 'vorn';
 
   const gesamt = katalognummer(katalog.length);
-  /**
-   * Wohin die freie Stelle nach dem letzten Band fuehrt. Vorerst die
-   * Kontaktseite; sobald dort der Abschnitt fuer Einsendungen steht, zeigt
-   * die Sprungmarke genau dorthin.
-   */
-  const einsendungen = '/kontakt#einsendungen';
 
   function blaetternAnsichtSetzen() {
     const buch = katalog[aktiverIndex];
@@ -116,16 +110,10 @@ export function regalStarten(wurzel: HTMLElement) {
       );
     }
 
-    // Nach dem letzten Band kommt kein Umlauf, sondern die freie Stelle:
-    // die naechste Nummer, noch ohne Buch, und der Weg zu den Einsendungen.
-    if (amEnde) {
-      el.nachbarZahlVor.textContent = katalognummer(katalog.length + 1);
-      el.nachbarTitelVor.textContent = 'Vakant —';
-      el.vor.setAttribute(
-        'aria-label',
-        `${katalognummer(katalog.length + 1)} — vakant. Zu den Einsendungen`,
-      );
-    } else {
+    // Nach dem letzten Band ist Schluss — die offene Stelle steht als
+    // Blindband selbst in der Reihe.
+    el.vor.hidden = amEnde;
+    if (!amEnde) {
       el.nachbarZahlVor.textContent = katalognummer(danach + 1);
       el.nachbarTitelVor.textContent = `${nachbarTitel(danach)} —`;
       el.vor.setAttribute(
@@ -136,6 +124,7 @@ export function regalStarten(wurzel: HTMLElement) {
     el.ticks.forEach((tick, index) => {
       const ist = index === aktiverIndex;
       tick.classList.toggle('is-active', ist);
+      tick.classList.toggle('ist-blind', Boolean(katalog[index]?.blind));
       // Die Leiste bleibt auch im Fokus bedienbar.
       tick.disabled = false;
       if (ist) tick.setAttribute('aria-current', 'true');
@@ -172,11 +161,18 @@ export function regalStarten(wurzel: HTMLElement) {
     el.seitenmarken.forEach((marke) => {
       marke.hidden = !doppelband;
     });
-    el.wendenText.textContent = doppelband
-      ? seite === 'vorn'
-        ? `Wenden zu „${buch.back?.shortTitle ?? ''}“`
-        : `Wenden zu „${buch.shortTitle}“`
-      : 'Band wenden';
+    // Heissen beide Seiten gleich — wie beim Blindband —, waere der Titel
+    // im Knopf keine Auskunft. Dann sagt er schlicht, wohin es geht.
+    const gleicherTitel = buch.back?.shortTitle === buch.shortTitle;
+    el.wendenText.textContent = !doppelband
+      ? 'Band wenden'
+      : gleicherTitel
+        ? seite === 'vorn'
+          ? 'Wenden zu Seite B'
+          : 'Wenden zu Seite A'
+        : seite === 'vorn'
+          ? `Wenden zu „${buch.back?.shortTitle ?? ''}“`
+          : `Wenden zu „${buch.shortTitle}“`;
     el.wenden.setAttribute(
       'aria-label',
       doppelband
@@ -220,26 +216,11 @@ export function regalStarten(wurzel: HTMLElement) {
   // holen sie ihn heraus, beim aufgeschlagenen Band blättern sie weiter.
   function nachbar(richtung: -1 | 1) {
     const ziel = aktiverIndex + richtung;
-    // Vor dem ersten Band ist nichts.
-    if (ziel < 0) return;
-    // Nach dem letzten die freie Stelle: dort geht es zu den Einsendungen.
-    if (ziel > katalog.length - 1) {
-      window.location.href = einsendungen;
-      return;
-    }
+    // Vor dem ersten und nach dem letzten Band ist nichts.
+    if (ziel < 0 || ziel > katalog.length - 1) return;
     if (modus === 'browse') engine?.presentBook(ziel);
     else engine?.inspectOther(ziel, richtung);
   }
-  // Pfeiltaste rechts am letzten Band fuehrt ebenfalls zu den Einsendungen.
-  // Alles andere macht die Engine selbst; sie schlaegt an den Enden an.
-  window.addEventListener('keydown', (ereignis) => {
-    if (ereignis.key !== 'ArrowRight') return;
-    if (aktiverIndex !== katalog.length - 1) return;
-    const ziel = ereignis.target as HTMLElement | null;
-    if (ziel?.isContentEditable || ziel instanceof HTMLInputElement) return;
-    window.location.href = einsendungen;
-  });
-
   el.zurueck.addEventListener('click', () => nachbar(-1));
   el.vor.addEventListener('click', () => nachbar(1));
   // Ein Klick auf die Nummer holt den Band heraus und stellt ihn auf. Die

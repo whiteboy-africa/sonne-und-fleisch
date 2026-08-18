@@ -535,6 +535,34 @@ function drawCoverTypography(
   ctx.restore();
 }
 
+/**
+ * Der Blindband: cremefarbener Karton, Papierkorn, sonst nichts als das
+ * Verlagszeichen unten in der Mitte. Kein Bild, keine Schrift, kein Rahmen
+ * — er soll wie ein unbedruckter Rohling aussehen, nicht wie Gestaltung.
+ * Die Nummer traegt er wie alle anderen auf dem Ruecken.
+ */
+function drawBlindCover(
+  ctx: CanvasRenderingContext2D,
+  book: CatalogBook,
+  width: number,
+  height: number,
+  seed: string,
+) {
+  ctx.fillStyle = book.cover;
+  ctx.fillRect(0, 0, width, height);
+  addPaperGrain(ctx, width, height, seed);
+
+  ctx.save();
+  ctx.fillStyle = book.ink;
+  ctx.globalAlpha = 0.6;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.letterSpacing = "7px";
+  ctx.font = `500 24px ${sans}`;
+  ctx.fillText(siteConfig.coverImprint, width / 2, height - 104);
+  ctx.restore();
+}
+
 export function createFrontCover(book: CatalogBook) {
   const logicalWidth = 1024;
   const logicalHeight = 1536;
@@ -544,6 +572,11 @@ export function createFrontCover(book: CatalogBook) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
   ctx.scale(0.5, 0.5);
+
+  if (book.blind) {
+    drawBlindCover(ctx, book, logicalWidth, logicalHeight, book.id);
+    return canvas;
+  }
 
   ctx.fillStyle = book.cover;
   ctx.fillRect(0, 0, logicalWidth, logicalHeight);
@@ -570,7 +603,10 @@ export function createTitleDecal(book: CatalogBook) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
   ctx.scale(0.5, 0.5);
-  drawCoverTypography(ctx, book, logicalWidth, logicalHeight, true);
+  // Der Blindband traegt keine Schrift auf dem Deckel.
+  if (!book.blind) {
+    drawCoverTypography(ctx, book, logicalWidth, logicalHeight, true);
+  }
   return canvas;
 }
 
@@ -628,6 +664,11 @@ export function createBackCover(book: CatalogBook) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
   ctx.scale(0.5, 0.5);
+
+  if (book.blind) {
+    drawBlindCover(ctx, book, logicalWidth, logicalHeight, `${book.id}-back`);
+    return canvas;
+  }
 
   ctx.fillStyle = book.cover;
   ctx.fillRect(0, 0, logicalWidth, logicalHeight);

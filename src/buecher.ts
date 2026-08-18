@@ -85,7 +85,12 @@ export async function programmListe(): Promise<ProgrammEintrag[]> {
         ],
       };
     })
-    .reverse();
+    .reverse()
+    // Der Blindband schliesst die Liste ab, egal wie herum sortiert wird:
+    // er ist die offene Stelle, nicht der neueste Band.
+    .sort((links, rechts) =>
+      Number(links.buch.data.blind) - Number(rechts.buch.data.blind),
+    );
 }
 
 /** Adresse der Buchseite. */
@@ -124,6 +129,7 @@ export function alsKatalogBuch(buch: Buch, position = 0): CatalogBook {
     ...(d.cover_bild ? { coverImage: d.cover_bild } : {}),
     ...(d.ruecken_bild ? { spineImage: d.ruecken_bild } : {}),
     ...(d.lebendig ? { living: true } : {}),
+    ...(d.blind ? { blind: true } : {}),
     ...(d.rueckseite
       ? {
           back: {

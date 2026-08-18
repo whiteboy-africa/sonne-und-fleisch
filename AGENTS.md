@@ -118,6 +118,22 @@ unten auf der Tafel.
 
 `/?band=008` schlaegt einen Band direkt auf.
 
+## Der Blindband
+
+Am Ende der Reihe steht ein unbedruckter Rohling: `blind: true` im
+Frontmatter, `reihenfolge: 999`, damit echte Baende immer davor ruecken.
+Seine Nummer ergibt sich wie bei allen anderen aus der Position — heute
+009, nach dem naechsten echten Band 010. Sein Umschlag wird nicht bemalt
+(`drawBlindCover` in `cover-art.ts`): cremefarbener Karton, Papierkorn,
+das Verlagszeichen unten in der Mitte, die Nummer auf dem Ruecken.
+
+Er ist ein Band wie jeder andere: er wird gewendet, abgeblendet,
+angeklickt. Nur drei Stellen wissen von ihm — die Marke in der Leiste
+(`ist-blind`, nur Kontur), die Bestellzeile („Einsenden" ins Postfach) und
+das Programm, wo er als letzter Eintrag steht statt als neuester Band.
+Heissen beide Seiten gleich, sagt der Wenden-Knopf „Seite B" statt eines
+Titels.
+
 ## Doppelcover (tête-bêche)
 
 Manche Bände haben zwei Vorderseiten: die zweite Geschichte steht kopfüber auf

@@ -349,6 +349,18 @@ body {
 }
 
 .shelf-index__ticks button:hover span,
+/* Der Blindband traegt eine leere Marke: er steht in der Reihe, ist aber
+   noch kein Buch. Anklickbar bleibt er wie jeder andere. */
+.shelf-index__ticks button.ist-blind span {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--ink);
+  opacity: 0.5;
+}
+
+.shelf-index__ticks button.ist-blind b {
+  opacity: 0.6;
+}
+
 .shelf-index__ticks button.is-active span {
   width: 3px;
   height: 18px;

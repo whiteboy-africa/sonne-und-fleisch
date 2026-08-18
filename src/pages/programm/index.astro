@@ -41,7 +41,11 @@ const eintraege = await programmListe();
               <h2>{titel}</h2>
               <p class="band__autor">{autor}</p>
               <p class="band__klappentext">{buch.data.klappentext}</p>
-              {buch.data.rueckseite && <p class="band__doppel">Doppelcover</p>}
+              {buch.data.rueckseite && (
+                <p class="band__doppel">
+                  {buch.data.blind ? 'Wendeband' : 'Doppelcover'}
+                </p>
+              )}
             </span>
             <span class="band__marge">
               <span

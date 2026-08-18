@@ -85,9 +85,11 @@ const angaben: Array<[string, string]> = [
 const bestellung =
   d.verfuegbarkeit === 'Vergriffen'
     ? { text: 'Vergriffen', link: undefined }
-    : d.verfuegbarkeit === 'Verfügbar'
-      ? { text: 'Bestellen', link: d.bestell_link }
-      : { text: 'Vormerken', link: d.bestell_link };
+    : d.verfuegbarkeit === 'Vakant'
+      ? { text: 'Einsenden', link: 'mailto:salve@sonneundfleisch.com' }
+      : d.verfuegbarkeit === 'Verfügbar'
+        ? { text: 'Bestellen', link: d.bestell_link }
+        : { text: 'Vormerken', link: d.bestell_link };
 ---
 
 <Seite

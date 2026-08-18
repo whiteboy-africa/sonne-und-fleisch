@@ -68,6 +68,14 @@ const buecher = defineCollection({
     ruecken_bild: z.string().optional(),
     // Leichter wandernder Glanz auf dem Einband. Sparsam einsetzen.
     lebendig: z.boolean().default(false),
+    /**
+     * Blindband: der unbedruckte Rohling am Ende der Reihe. Sein Umschlag
+     * bleibt leer, im Programm steht er als letzter Eintrag, und die
+     * Bestellzeile lautet „Einsenden". Seine Nummer ergibt sich wie bei
+     * allen anderen aus der Reihenfolge — steht `reihenfolge` hoch genug,
+     * ruecken echte Baende automatisch davor.
+     */
+    blind: z.boolean().default(false),
 
     // Doppelcover (tête-bêche): das Buch hat zwei Vorderseiten. Die zweite
     // ist kopfüber auf die Rückseite gedruckt — man dreht den Band um und

@@ -36,6 +36,8 @@ export const VERFUEGBARKEITEN = [
   'Verfügbar',
   'In Vorbereitung',
   'Vergriffen',
+  // Der Blindband: die offene Stelle am Ende der Reihe.
+  'Vakant',
 ] as const;
 
 export type Verfuegbarkeit = (typeof VERFUEGBARKEITEN)[number];
@@ -70,6 +72,11 @@ export type CatalogBook = {
   coverImage?: string;
   /** Eigenes Bild fuer den Buchruecken. */
   spineImage?: string;
+  /**
+   * Blindband: ein unbedruckter Rohling am Ende der Reihe. Sein Umschlag
+   * traegt nur das Verlagszeichen, kein Bild und keinen Titel.
+   */
+  blind?: boolean;
   linkLabel?: string;
   living?: boolean;
   /**
