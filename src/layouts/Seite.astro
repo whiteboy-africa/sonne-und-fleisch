@@ -56,7 +56,6 @@ const seiten = (await getCollection('seiten', ({ data }) => !data.versteckt)).so
     </main>
 
     <footer class="fuss">
-      <span>{siteConfig.independentNote}</span>
       <nav aria-label="Rechtliches und weitere Seiten">
         {seiten.map((seite) => <a href={`/${seite.id}`}>{seite.data.titel}</a>)}
       </nav>

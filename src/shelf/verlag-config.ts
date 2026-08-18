@@ -23,7 +23,6 @@ export const siteConfig = {
   slogan: 'PERMANENT DETERRITORIALIZATION',
   socialImageAlt:
     'Ein Regal mit den Bänden des Verlags Sonne und Fleisch, ein Band nach vorn gezogen.',
-  independentNote: 'Sonne und Fleisch — unabhängiger Verlag.',
   /**
    * Solange das hier `false` ist, traegt jede Seite `noindex` und die Seite
    * taucht in keiner Suchmaschine auf. Der zweite Riegel liegt in

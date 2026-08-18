@@ -518,6 +518,51 @@ body {
   scrollbar-color: var(--hairline) transparent;
 }
 
+/* Steht im Baum, aber nicht im Bild — fuer Vorlesegeraete. */
+.nur-vorlesen {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Wisch-Hinweis im aufgeschlagenen Band: kommt kurz, geht von selbst. */
+.wisch-hinweis {
+  position: absolute;
+  z-index: 23;
+  right: 0;
+  bottom: calc(min(38dvh, 380px) + 16px);
+  left: 0;
+  display: none;
+  margin: 0;
+  padding: 0 20px;
+  color: var(--ink-soft);
+  font-family: var(--schrift);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease;
+}
+
+@media (pointer: coarse) {
+  .is-focused .wisch-hinweis {
+    display: block;
+  }
+}
+
+.wisch-hinweis.is-sichtbar {
+  opacity: 1;
+}
+
 /* Der alte Text als Kopie, waehrend das Original schon den neuen Band
    zeigt. Sie haengt in der ganzen Flaeche, nicht in der Tafel: der Text
    soll neben dem Band ueber den Schirm fahren und erst am Bildrand
@@ -549,6 +594,10 @@ body {
 }
 
 .book-details__author {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
   margin: 18px 0 0;
   color: var(--ink);
   font-family: var(--schrift);
@@ -755,25 +804,6 @@ body {
   }
 }
 
-.independent-note {
-  position: absolute;
-  z-index: 17;
-  right: clamp(24px, 3.4vw, 56px);
-  bottom: 72px;
-  max-width: 260px;
-  margin: 0;
-  color: rgba(19, 18, 16, 0.46);
-  text-align: right;
-  font-family: var(--schrift);
-  font-size: 11px;
-  line-height: 1.3;
-  transition: opacity 280ms ease;
-}
-
-.is-focused .independent-note {
-  opacity: 0;
-}
-
 .sr-only {
   position: absolute !important;
   width: 1px !important;
@@ -800,10 +830,6 @@ body {
     display: none;
   }
 
-  .independent-note {
-    display: none;
-  }
-
 }
 
 @media (max-width: 760px) {
@@ -812,9 +838,10 @@ body {
   }
 
   .wordmark {
-    gap: 8px;
-    font-size: 10px;
-    letter-spacing: 0.1em;
+    gap: 7px;
+    /* Eine Zeile, und daneben muss noch die Navigation Platz haben. */
+    font-size: 9px;
+    letter-spacing: 0.08em;
     white-space: nowrap;
   }
 
@@ -922,10 +949,10 @@ body {
     top: auto;
     bottom: 0;
     width: 100%;
-    /* Knapp unter der Haelfte: der Band soll darueber ganz zu sehen sein.
-       Sichtbar sind Kopfzeile, Titel und Autor; alles Weitere holt man
-       sich mit einer Wischbewegung in der Tafel herauf. */
-    height: min(45dvh, 440px);
+    /* Gut ein Drittel: der ganze Band steht darueber im Bild, der Text
+       faengt darunter an. Sichtbar sind Kopfzeile, Titel und Autor, alles
+       Weitere holt man sich in der Tafel herauf. */
+    height: min(38dvh, 380px);
     opacity: 0;
     transform: translateY(100%);
   }
@@ -973,8 +1000,24 @@ body {
     padding: 25px 0 18px;
   }
 
+  /* „Aus dem Programm" ist auf dem Handy nur Zeilenfresser — die Marke
+     „Seite A/B" steht neben dem Autor. */
   .book-details__copy .eyebrow {
-    margin-bottom: 11px;
+    display: none;
+  }
+
+  /* Der Weg zurueck steht oben ueber dem Band, nicht in der Tafel: dort
+     unten ist der Platz fuer den Text. */
+  .back-button {
+    position: fixed;
+    z-index: 24;
+    top: 56px;
+    left: 20px;
+  }
+
+  .book-details__position {
+    grid-column: 1 / -1;
+    justify-self: end;
   }
 
   .book-details h2 {
@@ -982,18 +1025,18 @@ body {
     /* „Mathieu Lovats Selbstkreuzigung" lief bei 10vw rechts aus dem Bild:
        eine Schreibmaschinenschrift trennt nicht, ein langes Wort steht wie
        es ist. Kleiner gesetzt, und im Notfall bricht es mitten im Wort. */
-    font-size: clamp(20px, 6.2vw, 27px);
+    font-size: clamp(17px, 5.2vw, 23px);
     overflow-wrap: anywhere;
   }
 
   .book-details__author {
-    margin-top: 10px;
-    font-size: 14px;
+    margin-top: 8px;
+    font-size: 13px;
   }
 
   .book-details__description {
-    margin-top: 14px;
-    font-size: 15px;
+    margin-top: 12px;
+    font-size: 14px;
   }
 
   .book-details blockquote {

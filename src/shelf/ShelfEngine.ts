@@ -188,6 +188,9 @@ const zoomFern = 1.7;
 const wipeWeg = 4.6;
 const wipeDauer = 0.52;
 
+/** Belichtung der Szene, wenn der Blick normal nah steht. */
+const grundBelichtung = 0.94;
+
 const inspectDefaultYaw = 0.44;
 const inspectDefaultPitch = -0.07;
 /**
@@ -397,15 +400,6 @@ export class ShelfEngine {
   private neigungPitch = 0;
   private neigungGefragt = false;
   /**
-   * Schraeglage des betrachteten Bandes. Kommt man ueber die Rueckseite
-   * herein, steht der Band um seine Querachse gedreht — dann kippt die
-   * Lage andersherum, und man muss sie spiegeln, damit Seite B genauso
-   * dasteht wie sonst Seite A.
-   */
-  private rollVorzeichen = 1;
-  /** Die Schraeglage laeuft der gewendeten Lage weich hinterher. */
-  private rollAktuell = inspectDefaultRoll;
-  /**
    * Wenden im Regal: der Band kippt um seine Querachse, wie man ein Buch
    * in der Hand umdreht. Die zweite Geschichte steht kopfueber auf der
    * Rueckseite und kommt dadurch richtig herum zum Stehen.
@@ -447,7 +441,7 @@ export class ShelfEngine {
     // Kein filmischer Rolloff: die Lichter sollen ausbrennen und die
     // Schatten zulaufen, wie auf einem Blitzfoto.
     this.renderer.toneMapping = THREE.LinearToneMapping;
-    this.renderer.toneMappingExposure = 0.94;
+    this.renderer.toneMappingExposure = grundBelichtung;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
@@ -463,7 +457,7 @@ export class ShelfEngine {
     this.controls.screenSpacePanning = true;
     this.controls.enableZoom = true;
     this.controls.minDistance = 2.4;
-    this.controls.maxDistance = 7.2;
+    this.controls.maxDistance = 9;
     // Die Kamera dreht sich nicht mehr um das Buch — das Buch dreht sich in
     // der Hand. Nur so laesst es sich umdrehen und auf den Kopf stellen;
     // eine kreisende Kamera behaelt immer ihr Oben.
@@ -1016,21 +1010,9 @@ export class ShelfEngine {
       const dx = event.clientX - this.pointerLastX;
       const dy = event.clientY - this.pointerLastY;
 
-      // Auf dem Telefon blaettert der Daumen: waagerecht wischen holt den
-      // naechsten Band herein, senkrecht dreht ihn weiter. Mit der Maus
-      // dreht beides, da gibt es Pfeile und Leiste zum Blaettern.
-      if (event.pointerType === "touch") {
-        this.wischWeg += dx;
-        this.zielPitch += dy * proPixel;
-        this.pointerLastX = event.clientX;
-        this.pointerLastY = event.clientY;
-        if (Math.abs(this.wischWeg) > 56 && this.selectedIndex !== null) {
-          this.inspectOther(this.selectedIndex + (this.wischWeg > 0 ? 1 : -1));
-          this.wischWeg = 0;
-        }
-        return;
-      }
-
+      // Auch mit dem Finger wird hier gedreht — geblaettert wird unten auf
+      // der Textflaeche. Ueber dem Band bleibt die Hand zum Drehen und
+      // Zoomen frei.
       this.zielYaw += dx * proPixel;
       this.zielPitch += dy * proPixel;
       this.pointerLastX = event.clientX;
@@ -1365,14 +1347,12 @@ export class ShelfEngine {
     const zeigtRueckseite =
       band.data.back !== undefined && this.rueckseiteZurKamera(band);
     const seite: BookSide = zeigtRueckseite ? "hinten" : "vorn";
-    // Seite B soll genauso dastehen wie sonst Seite A. Gedreht wird der
-    // Band um seine Querachse (Neigung plus pi) — die Drehung um die
-    // Hochachse bleibt dabei, wie sie ist, und nur die Schraeglage kippt
-    // andersherum. (Ry·Rx·Rz·Rx(pi) = Ry·Rx(p+pi)·Rz(-r).)
+    // Seite B steht in ihrer gewohnten Ansicht — dieselbe, die auch das
+    // Wenden mit F ergibt. Die Schraeglage mitzuspiegeln wurde versucht
+    // und wieder verworfen: sie wurde eine Sekunde spaeter nachgezogen und
+    // der Band kippte sichtbar nach.
     this.zielPitch = inspectDefaultPitch + (zeigtRueckseite ? Math.PI : 0);
     this.zielYaw = inspectDefaultYaw;
-    this.rollVorzeichen = zeigtRueckseite ? -1 : 1;
-    this.rollAktuell = inspectDefaultRoll * this.rollVorzeichen;
     this.inspectPitch = this.zielPitch;
     this.inspectYaw = this.zielYaw;
     if (seite !== this.side) {
@@ -1552,6 +1532,14 @@ export class ShelfEngine {
 
     this.updateState(delta, timestamp);
     this.updateBooks(delta, elapsed);
+
+    // Von weit weg wirken die Stapel auf dem Handy zu dunkel — die
+    // Umschlaege sind dort nur noch daumengross und verlieren gegen das
+    // Schwarz. Statt an den Lampen zu drehen wird die Belichtung ein Stueck
+    // angehoben, und nur solange der Blick weit weg steht. Nah heran und
+    // im aufgeschlagenen Band bleibt alles, wie es war.
+    const weit = this.mode === "browse" ? clamp(this.zoom - 1, 0, 0.45) : 0;
+    this.renderer.toneMappingExposure = grundBelichtung * (1 + weit * 0.34);
 
     if (this.controls.enabled) this.controls.update();
     this.renderer.render(this.scene, this.camera);
@@ -1845,13 +1833,7 @@ export class ShelfEngine {
       // Die Schraeglage liegt auf der Z-Achse. Sie gehoert nicht in die
       // Pose: nur der betrachtete Band hat sie, und die Kollisionspruefung
       // interessiert sie nicht.
-      this.rollAktuell = damp(
-        this.rollAktuell,
-        inspectDefaultRoll * this.rollVorzeichen,
-        this.reducedMotion ? 20 : 8,
-        delta,
-      );
-      selected.content.rotation.z = this.rollAktuell * motionFocus;
+      selected.content.rotation.z = inspectDefaultRoll * motionFocus;
       this.seiteAblesen(selected);
     }
 
@@ -1946,7 +1928,6 @@ export class ShelfEngine {
     if (naechste === this.side) return;
 
     this.side = naechste;
-    this.rollVorzeichen = this.side === "hinten" ? -1 : 1;
     this.callbacks.onSide(this.side);
     this.callbacks.onStatus(
       this.side === "hinten"
@@ -1986,7 +1967,7 @@ export class ShelfEngine {
     const grundVersatz = isMobile ? height * 0.05 : 0;
     // Hochkant liegt die Tafel unten im Bild. Der Band rueckt so weit nach
     // oben, dass er ganz in der freien Flaeche darueber steht.
-    const fokusVersatz = isMobile ? height * 0.2 : 0;
+    const fokusVersatz = isMobile ? height * 0.17 : 0;
     const verticalOffset =
       grundVersatz + (fokusVersatz - grundVersatz) * clampedProgress;
 
@@ -2009,7 +1990,7 @@ export class ShelfEngine {
 
   /** Vorgabeabstand der Betrachtung, ohne eigenes Zutun. */
   private grundAbstand() {
-    return this.canvas.clientWidth < 760 ? 6.7 : 5.4;
+    return this.canvas.clientWidth < 760 ? 7.4 : 5.4;
   }
 
   private frameFocusedBook(
@@ -2246,8 +2227,6 @@ export class ShelfEngine {
     // Nachjustierung, die nur bei den B-Seiten auftrat.
     this.inspectYaw = this.zielYaw;
     this.inspectPitch = this.zielPitch;
-    this.rollVorzeichen = naechsteSeite === "hinten" ? -1 : 1;
-    this.rollAktuell = inspectDefaultRoll * this.rollVorzeichen;
 
     if (naechsteSeite !== this.side) {
       this.side = naechsteSeite;
@@ -2271,7 +2250,7 @@ export class ShelfEngine {
    * zerfaellt genau in die zwei Haelften, die er nicht sein soll.
    */
   private wipeWegInPixeln() {
-    const abstand = this.canvas.clientWidth < 760 ? 6.7 : 5.4;
+    const abstand = this.canvas.clientWidth < 760 ? 7.4 : 5.4;
     const halbeHoehe =
       Math.tan(THREE.MathUtils.degToRad(this.camera.fov * 0.5)) * abstand;
     const proEinheit = Math.max(1, this.canvas.clientHeight) / (2 * halbeHoehe);

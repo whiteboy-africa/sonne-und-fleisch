@@ -28,9 +28,10 @@ export function regalStarten(wurzel: HTMLElement) {
     zurueck: pflicht<HTMLButtonElement>(wurzel, '[data-zurueck]'),
     vor: pflicht<HTMLButtonElement>(wurzel, '[data-vor]'),
     ticks: Array.from(wurzel.querySelectorAll<HTMLButtonElement>('[data-tick]')),
-    panel: pflicht(wurzel, '[data-panel]'),
+    panel: pflicht<HTMLElement>(wurzel, '[data-panel]'),
     panelInhalt: pflicht<HTMLElement>(wurzel, '[data-panel-inhalt]'),
     panelText: pflicht<HTMLElement>(wurzel, '[data-panel-text]'),
+    wischHinweis: pflicht<HTMLElement>(wurzel, '[data-wisch-hinweis]'),
     panelZahl: pflicht(wurzel, '[data-panel-zahl]'),
     panelTitel: pflicht(wurzel, '[data-panel-titel]'),
     panelAutor: pflicht(wurzel, '[data-panel-autor]'),
@@ -166,6 +167,52 @@ export function regalStarten(wurzel: HTMLElement) {
       else engine?.inspectOther(index);
     });
   });
+  // Kurzer Hinweis beim Aufschlagen: dass die Textfläche weiterblättert,
+  // sieht man ihr nicht an. Er geht von selbst wieder weg — und sofort,
+  // sobald wirklich gewischt wurde.
+  let hinweisUhr: number | undefined;
+  function wischHinweisZeigen() {
+    if (!matchMedia('(pointer: coarse)').matches) return;
+    if (gewaehlterIndex === null || katalog.length < 2) return;
+    const text =
+      gewaehlterIndex === 0
+        ? 'Unten nach rechts wischen → nächster Band'
+        : gewaehlterIndex === katalog.length - 1
+          ? '← Unten nach links wischen → vorheriger Band'
+          : 'Unten wischen blättert weiter';
+    el.wischHinweis.textContent = text;
+    el.wischHinweis.classList.add('is-sichtbar');
+    window.clearTimeout(hinweisUhr);
+    hinweisUhr = window.setTimeout(wischHinweisVerstecken, 2800);
+  }
+
+  function wischHinweisVerstecken() {
+    window.clearTimeout(hinweisUhr);
+    el.wischHinweis.classList.remove('is-sichtbar');
+  }
+
+  // Geblättert wird unten auf der Tafel. Über dem Band bleibt die Hand
+  // zum Drehen und Zoomen frei.
+  let wischStart: { x: number; y: number } | null = null;
+  el.panel.addEventListener('pointerdown', (ereignis) => {
+    if (ereignis.pointerType !== 'touch') return;
+    wischStart = { x: ereignis.clientX, y: ereignis.clientY };
+  });
+  el.panel.addEventListener('pointerup', (ereignis) => {
+    if (!wischStart || ereignis.pointerType !== 'touch') return;
+    const dx = ereignis.clientX - wischStart.x;
+    const dy = ereignis.clientY - wischStart.y;
+    wischStart = null;
+    // Senkrecht ist Lesen, waagerecht ist Blättern.
+    if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+    if (gewaehlterIndex === null) return;
+    wischHinweisVerstecken();
+    engine?.inspectOther(gewaehlterIndex + (dx > 0 ? 1 : -1));
+  });
+  el.panel.addEventListener('pointercancel', () => {
+    wischStart = null;
+  });
+
   el.zurRegal.addEventListener('click', () => engine?.returnToShelf());
   el.wenden.addEventListener('click', () => engine?.flipBook());
 
@@ -208,11 +255,14 @@ export function regalStarten(wurzel: HTMLElement) {
         vorleseSetzen();
       },
       onMode: (naechsterModus, index) => {
+        const vorher = modus;
         modus = naechsterModus;
         gewaehlterIndex = index;
         blaetternAnsichtSetzen();
         panelSetzen();
         vorleseSetzen();
+        if (modus === 'inspect' && vorher !== 'inspect') wischHinweisZeigen();
+        if (modus === 'browse') wischHinweisVerstecken();
       },
       // Der Text fährt mit dem Band mit — gleiche Richtung, gleiche Dauer,
       // gleiche Kurve, und beide Texte bewegen sich gleichzeitig: der alte
@@ -220,6 +270,7 @@ export function regalStarten(wurzel: HTMLElement) {
       // Seite in zwei Hälften. Kopf- und Fußzeile bleiben stehen; bewegt
       // wird nur der Block, der zum Band gehört.
       onSwap: (index, richtung, dauer, weg) => {
+        wischHinweisVerstecken();
         const text = el.panelText;
         // Genau der Weg des Bandes, in Pixeln. Vorher fuhr der Text nur
         // seine eigene Tafelbreite — ein Drittel der Strecke in derselben

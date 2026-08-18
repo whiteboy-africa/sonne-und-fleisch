@@ -43,10 +43,6 @@ const gesamt = katalognummer(katalog.length);
         <a href="/verlag">Verlag</a>
         <a href="/kontakt">Kontakt</a>
       </nav>
-      <div class="edition-mark">
-        <span>{katalog.length} {katalog.length === 1 ? 'Band' : 'Bände'}</span>
-        <span>Ein Stapel Programm</span>
-      </div>
     </div>
   </header>
 
@@ -101,6 +97,10 @@ const gesamt = katalognummer(katalog.length);
     <p class="slogan">{siteConfig.slogan}</p>
   </nav>
 
+  {/* Kurzer Hinweis beim Aufschlagen: dass man weiterwischen kann, sieht
+      man dem Bild sonst nicht an. Nur auf Geraeten mit Fingerbedienung. */}
+  <p class="wisch-hinweis" data-wisch-hinweis aria-hidden="true"></p>
+
   <aside class="book-details" data-panel aria-hidden="true" aria-label="Angaben zum Band">
     <div class="book-details__inner" data-panel-inhalt hidden>
       <button type="button" class="back-button" data-zum-regal>
@@ -114,12 +114,12 @@ const gesamt = katalognummer(katalog.length);
       </div>
 
       <div class="book-details__copy" data-panel-text>
-        <p class="eyebrow">
-          {siteConfig.editionEyebrow}
+        <p class="eyebrow">{siteConfig.editionEyebrow}</p>
+        <h2 data-panel-titel></h2>
+        <p class="book-details__author">
+          <span data-panel-autor></span>
           <span class="seitenmarke" data-seitenmarke hidden>Seite A</span>
         </p>
-        <h2 data-panel-titel></h2>
-        <p class="book-details__author" data-panel-autor></p>
         <p class="book-details__description" data-panel-klappentext></p>
 
         <blockquote>
@@ -156,8 +156,9 @@ const gesamt = katalognummer(katalog.length);
     </div>
   </aside>
 
-  <div class="experience-status" role="status" aria-live="polite">
-    <span class="experience-status__dot"></span>
+  {/* Nur noch fuer Vorlesegeraete: die Meldung sagt, was gerade passiert.
+      Im Bild stand sie bloss im Weg. */}
+  <div class="experience-status nur-vorlesen" role="status" aria-live="polite">
     <span data-status-text>Das Regal wird aufgebaut</span>
   </div>
 
@@ -176,8 +177,6 @@ const gesamt = katalognummer(katalog.length);
     <p>Dieses Gerät kann das Regal nicht aufbauen.</p>
     <a href="/programm">Zum Programm als Liste</a>
   </div>
-
-  <p class="independent-note">{siteConfig.independentNote}</p>
 
   <div class="sr-only" aria-live="polite" data-vorlese></div>
 </main>
