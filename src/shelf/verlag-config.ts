@@ -30,13 +30,4 @@ export const siteConfig = {
    * gilt — beide gehoeren umgestellt, wenn der Verlag oeffentlich wird.
    */
   suchmaschinen: false,
-  /**
-   * Wie die Nachbarschaft am Bildrand ihren Titel zeigt.
-   * „buchruecken": senkrecht am Rand, wie auf einem Buchruecken.
-   * „waagerecht": in einer Zeile, wie bisher.
-   * Zurueckstellen auf „waagerecht" stellt das alte Verhalten wieder her.
-   */
-  randVariante: 'waagerecht' as 'buchruecken' | 'waagerecht',
-  /** Leserichtung des Buchruecken-Titels: abwaerts oder aufwaerts. */
-  randRichtung: 'abwaerts' as 'abwaerts' | 'aufwaerts',
 } as const;

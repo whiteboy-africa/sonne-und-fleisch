@@ -109,10 +109,9 @@ Haelften, weil der Grund der Tafel den Band rechts verdeckte. Zurueckholen:
 ## Nachbarschaft am Bildrand
 
 Statt gerahmter Pfeile stehen links und rechts gedimmte Zeilen mit der
-Nummer des Nachbarbandes; beim Darueberfahren waechst sein Titel heraus.
-`randVariante` in `verlag-config.ts` schaltet zwischen `buchruecken`
-(senkrecht, wie ein Buchruecken) und `waagerecht`; `randRichtung` dreht die
-Leserichtung. Kein Umlauf: auf Band 001 faellt die linke Zeile weg, auf dem
+Nummer des Nachbarbandes; beim Darueberfahren waechst sein Titel heraus —
+im aufgeschlagenen Band nach 14 Zeichen gekappt, im Stapel nach 24. Kein
+Umlauf: auf Band 001 faellt die linke Zeile weg, auf dem
 letzten steht rechts „Vakant" und fuehrt zu den Einsendungen. Auf
 Fingergeraeten wird die Nachbarschaft gar nicht gebaut — dort wischt man
 unten auf der Tafel.

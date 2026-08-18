@@ -91,10 +91,9 @@ export function regalStarten(wurzel: HTMLElement) {
     const danach = aktiverIndex + 1;
     const amAnfang = davor < 0;
     const amEnde = danach > katalog.length - 1;
-    // Am Buchruecken ist Platz; waagerecht im aufgeschlagenen Band nicht:
-    // dort wird frueher gekappt, damit nichts in die Textspalte laeuft.
-    const grenze =
-      siteConfig.randVariante === 'waagerecht' && modus !== 'browse' ? 14 : 24;
+    // Im aufgeschlagenen Band ist wenig Platz: dort wird frueher gekappt,
+    // damit der Titel nicht in die Textspalte laeuft.
+    const grenze = modus === 'browse' ? 24 : 14;
     const gekuerzt = (titel: string) =>
       titel.length > grenze
         ? `${titel.slice(0, grenze - 1).trimEnd()}…`

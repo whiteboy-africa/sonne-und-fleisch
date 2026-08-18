@@ -16,12 +16,7 @@ const erstes = katalog[0];
 const gesamt = katalognummer(katalog.length);
 ---
 
-<main
-  class="press-experience is-browsing"
-  data-regal
-  data-rand-variante={siteConfig.randVariante}
-  data-rand-richtung={siteConfig.randRichtung}
->
+<main class="press-experience is-browsing" data-regal>
   <script type="application/json" data-regal-daten set:html={JSON.stringify(katalog)} is:inline />
 
   <canvas
