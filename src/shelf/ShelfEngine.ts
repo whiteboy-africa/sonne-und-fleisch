@@ -193,8 +193,10 @@ const zoomFern = 1.7;
  * Nichts bewegt sich dabei seitwaerts.
  */
 const abblendAb = 0.18;
-const abblendAuf = 0.22;
-const wipeDauer = abblendAb + abblendAuf;
+/** Im Schwarz wird kurz gehalten — ohne diese Pause wirkt es hektisch. */
+const abblendHalten = 0.16;
+const abblendAuf = 0.24;
+const wipeDauer = abblendAb + abblendHalten + abblendAuf;
 
 /** Belichtung der Szene, wenn der Blick normal nah steht. */
 const grundBelichtung = 0.94;
@@ -1791,11 +1793,16 @@ export class ShelfEngine {
       // zu kommen.
       const versatz = hinaus.x - herein.x;
 
-      // Abblender: erst hinunter, dann herauf. Nichts faehrt seitwaerts.
+      // Abblender: hinunter, kurz halten, herauf. Nichts faehrt seitwaerts.
       const anteilAb = abblendAb / wipeDauer;
+      const anteilDunkel = (abblendAb + abblendHalten) / wipeDauer;
       const p = this.wipeFortschritt;
       this.dipLicht = clamp(
-        p < anteilAb ? 1 - p / anteilAb : (p - anteilAb) / (1 - anteilAb),
+        p < anteilAb
+          ? 1 - p / anteilAb
+          : p < anteilDunkel
+            ? 0
+            : (p - anteilDunkel) / (1 - anteilDunkel),
         0,
         1,
       );
