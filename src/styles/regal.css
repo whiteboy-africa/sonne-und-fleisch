@@ -57,7 +57,9 @@ body {
 
 .site-header {
   position: absolute;
-  z-index: 20;
+  /* Ueber der Tafel: sonst verschwinden Programm, Verlag und Kontakt im
+     aufgeschlagenen Band hinter ihrem Grund. */
+  z-index: 25;
   top: 0;
   right: 0;
   left: 0;
@@ -204,11 +206,7 @@ body {
 }
 
 
-/*
- * Die Pfeile gehoeren zum aufgeschlagenen Band, nicht ins Regal. Dort
- * blaettert man mit der Nummernleiste, dem Rad oder den Pfeiltasten.
- */
-.is-focused .is-focused .is-focused .shelf-index {
+.shelf-index {
   position: absolute;
   z-index: 19;
   right: clamp(24px, 5vw, 82px);
@@ -448,30 +446,7 @@ body {
   text-transform: uppercase;
 }
 
-.back-button .book-details__position {
-  font-variant-numeric: tabular-nums;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-self: end;
-  margin-top: -9px;
-  font-family: var(--schrift);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-}
-
-.book-details__position span:first-child::after {
-  display: inline-block;
-  width: 34px;
-  height: 1px;
-  margin: 0 9px 3px 13px;
-  content: "";
-  background: currentColor;
-  opacity: 0.28;
-}
-
-.book-details__copy {
+.back-button .book-details__copy {
   align-self: center;
   max-height: 100%;
   padding: 34px 0;
@@ -520,7 +495,9 @@ body {
  */
 .nachbar {
   position: absolute;
-  z-index: 17;
+  /* Ueber der Tafel: der rechte Streifen liegt sonst hinter ihr und
+     laesst sich weder sehen noch treffen. */
+  z-index: 24;
   top: 92px;
   bottom: 96px;
   width: 8vw;
@@ -545,6 +522,11 @@ body {
 .nachbar--rechts {
   right: 0;
   justify-content: flex-end;
+  /* Schmaler als links: rechts liegt die Tafel, und ihre Knoepfe sollen
+     anklickbar bleiben. Der Streifen bleibt im Rand ihrer Innenkante. */
+  width: clamp(46px, 3.4vw, 62px);
+  min-width: 0;
+  padding: 0 14px 0 0;
 }
 
 .is-focused .nachbar {
@@ -1059,28 +1041,17 @@ body {
     grid-row: 1;
   }
 
-  .book-details__position {
-  font-variant-numeric: tabular-nums;
-    grid-column: 2;
-    grid-row: 1;
-    margin: 0;
-  }
-
-  .book-details__position span:first-child::after {
-    width: 20px;
-  }
-
-  .book-details__copy {
+      .book-details__copy {
     grid-column: 1 / -1;
     grid-row: 2;
     align-self: auto;
     padding: 25px 0 18px;
   }
 
-  /* „Aus dem Programm" ist auf dem Handy nur Zeilenfresser — die Marke
-     „Seite A/B" wandert deshalb neben den Autor. */
+  /* Die Augenbraue traegt nur noch die Nummer — die passt auch aufs
+     Handy. Die Marke „Seite A/B" steht daneben beim Autor. */
   .book-details__copy .eyebrow {
-    display: none;
+    margin-bottom: 8px;
   }
 
   .seitenmarke--autor:not([hidden]) {
@@ -1093,12 +1064,7 @@ body {
     left: 20px;
   }
 
-  .book-details__position {
-    grid-column: 1 / -1;
-    justify-self: end;
-  }
-
-  .book-details h2 {
+    .book-details h2 {
     max-width: 100%;
     /* „Mathieu Lovats Selbstkreuzigung" lief bei 10vw rechts aus dem Bild:
        eine Schreibmaschinenschrift trennt nicht, ein langes Wort steht wie

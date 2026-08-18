@@ -36,7 +36,6 @@ export function regalStarten(wurzel: HTMLElement) {
     panelInhalt: pflicht<HTMLElement>(wurzel, '[data-panel-inhalt]'),
     panelText: pflicht<HTMLElement>(wurzel, '[data-panel-text]'),
     wischHinweis: pflicht<HTMLElement>(wurzel, '[data-wisch-hinweis]'),
-    panelZahl: pflicht(wurzel, '[data-panel-zahl]'),
     panelAugenbraue: pflicht(wurzel, '[data-panel-augenbraue]'),
     panelTitel: pflicht(wurzel, '[data-panel-titel]'),
     panelAutor: pflicht(wurzel, '[data-panel-autor]'),
@@ -91,10 +90,17 @@ export function regalStarten(wurzel: HTMLElement) {
     const danach = (aktiverIndex + 1) % katalog.length;
     const gekuerzt = (titel: string) =>
       titel.length > 24 ? `${titel.slice(0, 23).trimEnd()}…` : titel;
+    // Liegt Seite B vorn, bleibt sie es auch beim Blaettern — dann gehoert
+    // in die Nachbarzeile der Titel der zweiten Geschichte.
+    const nachbarTitel = (index: number) => {
+      const buch = katalog[index];
+      const zweite = seite === 'hinten' && buch.back ? buch.back : buch;
+      return gekuerzt(zweite.shortTitle);
+    };
     el.nachbarZahlZurueck.textContent = katalognummer(davor + 1);
-    el.nachbarTitelZurueck.textContent = `— ${gekuerzt(katalog[davor].shortTitle)}`;
+    el.nachbarTitelZurueck.textContent = `— ${nachbarTitel(davor)}`;
     el.nachbarZahlVor.textContent = katalognummer(danach + 1);
-    el.nachbarTitelVor.textContent = `${gekuerzt(katalog[danach].shortTitle)} —`;
+    el.nachbarTitelVor.textContent = `${nachbarTitel(danach)} —`;
     el.zurueck.setAttribute(
       'aria-label',
       `Vorheriger Band — ${katalog[davor].title}`,
@@ -127,7 +133,6 @@ export function regalStarten(wurzel: HTMLElement) {
     const gezeigt = seite === 'hinten' && buch.back ? buch.back : buch;
 
     el.panel.setAttribute('aria-label', `Angaben zu ${gezeigt.title}`);
-    el.panelZahl.textContent = katalognummer(gewaehlterIndex + 1);
     el.panelAugenbraue.textContent = katalognummer(gewaehlterIndex + 1);
     el.panelTitel.textContent = gezeigt.title;
     el.panelAutor.textContent = gezeigt.author;
@@ -353,6 +358,8 @@ export function regalStarten(wurzel: HTMLElement) {
       onSide: (naechsteSeite) => {
         seite = naechsteSeite;
         panelSetzen();
+        // Auch die Nachbarzeilen: sie zeigen die Seite, auf der man landet.
+        blaetternAnsichtSetzen();
         vorleseSetzen();
       },
       onStatus: (meldung) => {
