@@ -470,7 +470,7 @@ export class ShelfEngine {
     this.resizeObserver.observe(canvas);
     this.handleResize();
     this.callbacks.onReady();
-    this.callbacks.onStatus(`${this.booksData.length} Bände im Regal`);
+    this.callbacks.onStatus(`${this.booksData.length} Bände im Stapel`);
     this.animate();
 
     (
@@ -1495,7 +1495,7 @@ export class ShelfEngine {
           this.motionBookIndex = null;
           this.browseMotionPhase = "idle";
           this.atRest = true;
-          this.callbacks.onStatus(`${this.booksData.length} Bände im Regal`);
+          this.callbacks.onStatus(`${this.booksData.length} Bände im Stapel`);
           break;
         }
         this.motionBookIndex = this.activeIndex;
@@ -1539,7 +1539,13 @@ export class ShelfEngine {
     // angehoben, und nur solange der Blick weit weg steht. Nah heran und
     // im aufgeschlagenen Band bleibt alles, wie es war.
     const weit = this.mode === "browse" ? clamp(this.zoom - 1, 0, 0.45) : 0;
-    this.renderer.toneMappingExposure = grundBelichtung * (1 + weit * 0.34);
+    // Auf dem Handy kommt noch etwas dazu: kleines Bild, viel Schwarz
+    // ringsum, und die Umschlaege verlieren. Nur im Stapel und nur dort —
+    // am Schreibtisch und im aufgeschlagenen Band bleibt es, wie es war.
+    const handy =
+      this.mode === "browse" && this.canvas.clientWidth < 760 ? 0.13 : 0;
+    this.renderer.toneMappingExposure =
+      grundBelichtung * (1 + weit * 0.34 + handy);
 
     if (this.controls.enabled) this.controls.update();
     this.renderer.render(this.scene, this.camera);
@@ -1641,7 +1647,7 @@ export class ShelfEngine {
           this.callbacks.onSide(this.side);
         }
         this.callbacks.onMode(this.mode, null);
-        this.callbacks.onStatus(`${this.booksData.length} Bände im Regal`);
+        this.callbacks.onStatus(`${this.booksData.length} Bände im Stapel`);
         this.canvas.focus({ preventScroll: true });
       }
     }
@@ -2333,7 +2339,7 @@ export class ShelfEngine {
     this.controls.enabled = false;
     this.mode = "returning";
     this.callbacks.onMode(this.mode, this.selectedIndex);
-    this.callbacks.onStatus("Zurück ins Regal");
+    this.callbacks.onStatus("Zurück zum Stapel");
   }
 
   /**

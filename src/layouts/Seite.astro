@@ -33,7 +33,7 @@ const seiten = (await getCollection('seiten', ({ data }) => !data.versteckt)).so
         <span>{siteConfig.collectionName}</span>
       </a>
       <nav class="kopf__nav" aria-label="Hauptbereiche">
-        <a href="/" aria-current={pfad === '/' ? 'page' : undefined}>Regal</a>
+        <a href="/" aria-current={pfad === '/' ? 'page' : undefined}>Stapel</a>
         <a href="/programm" aria-current={istHier('/programm') ? 'page' : undefined}>
           Programm
         </a>

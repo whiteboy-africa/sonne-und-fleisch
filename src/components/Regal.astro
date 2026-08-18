@@ -24,7 +24,7 @@ const gesamt = katalognummer(katalog.length);
     data-regal-canvas
     role="application"
     tabindex="0"
-    aria-label={`Regal mit ${katalog.length} Bänden. Pfeiltasten blättern, Ziehen dreht die Ansicht, Eingabetaste holt den Band nach vorn.`}
+    aria-label={`Stapel mit ${katalog.length} Bänden. Pfeiltasten blättern, Ziehen dreht die Ansicht, Eingabetaste holt den Band nach vorn.`}
   ></canvas>
 
   <header class="site-header">
@@ -74,7 +74,7 @@ const gesamt = katalognummer(katalog.length);
     <span aria-hidden="true" class="arrow-icon arrow-icon--right"><span></span></span>
   </button>
 
-  <nav class="shelf-index" aria-label="Platz im Regal">
+  <nav class="shelf-index" aria-label="Platz im Stapel">
     <div class="shelf-index__ticks">
       {
         katalog.map((buch, index) => (
@@ -105,17 +105,20 @@ const gesamt = katalognummer(katalog.length);
     <p class="slogan">{siteConfig.slogan}</p>
   </nav>
 
+  {/* Der Weg zurueck steht ausserhalb der Tafel: die hat eine
+      Transformation, und darin waere er an sie gefesselt. Hier oben kann
+      er ueber dem Band stehen. */}
+  <button type="button" class="back-button" data-zum-regal>
+    <span aria-hidden="true" class="arrow-icon arrow-icon--left"><span></span></span>
+    <span>Zurück zum Stapel</span>
+  </button>
+
   {/* Kurzer Hinweis beim Aufschlagen: dass man weiterwischen kann, sieht
       man dem Bild sonst nicht an. Nur auf Geraeten mit Fingerbedienung. */}
   <p class="wisch-hinweis" data-wisch-hinweis aria-hidden="true"></p>
 
   <aside class="book-details" data-panel aria-hidden="true" aria-label="Angaben zum Band">
     <div class="book-details__inner" data-panel-inhalt hidden>
-      <button type="button" class="back-button" data-zum-regal>
-        <span aria-hidden="true" class="arrow-icon arrow-icon--left"><span></span></span>
-        <span>Zurück ins Regal</span>
-      </button>
-
       <div class="book-details__position">
         <span data-panel-zahl>001</span>
         <span data-gesamt>{gesamt}</span>
@@ -167,7 +170,7 @@ const gesamt = katalognummer(katalog.length);
   {/* Nur noch fuer Vorlesegeraete: die Meldung sagt, was gerade passiert.
       Im Bild stand sie bloss im Weg. */}
   <div class="experience-status nur-vorlesen" role="status" aria-live="polite">
-    <span data-status-text>Das Regal wird aufgebaut</span>
+    <span data-status-text>Der Stapel wird aufgebaut</span>
   </div>
 
   <div class="loading-screen" data-ladeschirm aria-hidden="false">
@@ -182,7 +185,7 @@ const gesamt = katalognummer(katalog.length);
   {/* Ausweg, wenn kein WebGL zur Verfügung steht oder die Szene abstürzt.
       Ohne ihn bliebe hier eine schwarze Fläche stehen. */}
   <div class="ohne-3d-ausweg" data-ausweg hidden>
-    <p>Dieses Gerät kann das Regal nicht aufbauen.</p>
+    <p>Dieses Gerät kann den Stapel nicht aufbauen.</p>
     <a href="/programm">Zum Programm als Liste</a>
   </div>
 

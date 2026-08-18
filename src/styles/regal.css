@@ -351,9 +351,9 @@ body {
 
 .shelf-index__weiter::before {
   position: absolute;
-  /* Laeuft ueber die 009 hinaus und verliert sich dann — ein harter
-     Schnitt am Bildrand wirkte wie ein abgesaegtes Ende. */
-  right: -220px;
+  /* Laeuft ueber die 009 hinaus und ist ausgelaufen, bevor die Parole
+     beginnt — zwischen Leiste und Parole liegen 38 Pixel Luft. */
+  right: -26px;
   bottom: 4px;
   left: 0;
   height: 1px;
@@ -508,18 +508,26 @@ body {
 
 .book-details__inner {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   height: 100%;
   padding: 27px clamp(28px, 4vw, 68px) 30px clamp(52px, 6vw, 98px);
   border-left: 1px solid rgba(19, 18, 16, 0.08);
 }
 
 .back-button {
+  position: absolute;
+  z-index: 24;
+  /* Auf der Linie der Tafel-Innenkante, damit er dort steht, wo er frueher
+     in der Tafel stand. */
+  top: 27px;
+  left: calc(100% - min(620px, 41vw) + clamp(52px, 6vw, 98px));
   display: inline-flex;
   gap: 13px;
   align-items: center;
-  justify-self: start;
   padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
   background: transparent;
   cursor: pointer;
   font-family: var(--schrift);
@@ -564,6 +572,11 @@ body {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--hairline) transparent;
+}
+
+.is-focused .back-button {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* Steht im Baum, aber nicht im Bild — fuer Vorlesegeraete. */
@@ -988,6 +1001,12 @@ body {
     height: 5px;
   }
 
+  /* Hochkant steht die Parole darunter, nicht daneben: hier darf die
+     Linie weiter laufen, bevor sie sich verliert. */
+  .shelf-index__weiter::before {
+    right: -120px;
+  }
+
   .shelf-index__ticks button span {
     bottom: 2px;
     height: 5px;
@@ -1011,11 +1030,10 @@ body {
     transform: translateY(100%);
   }
 
+  /* Keine Tafel: der Text steht einfach unter dem Band. Kein eigener
+     Grund, keine Kante — nur Schrift auf demselben Schwarz. */
   .book-details::before {
-    top: -55px;
-    background:
-      linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.94) 54px, var(--paper) 55px),
-      var(--paper);
+    display: none;
   }
 
   .is-focused .book-details {
@@ -1025,9 +1043,9 @@ body {
 
   .book-details__inner {
     grid-template-columns: 1fr auto;
-    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr);
     padding: 9px 20px max(14px, env(safe-area-inset-bottom));
-    border-top: 1px solid rgba(19, 18, 16, 0.08);
+    border-top: 0;
     border-left: 0;
   }
 
@@ -1060,11 +1078,8 @@ body {
     display: none;
   }
 
-  /* Der Weg zurueck steht oben ueber dem Band, nicht in der Tafel: dort
-     unten ist der Platz fuer den Text. */
+  /* Der Weg zurueck steht oben links ueber dem Band. */
   .back-button {
-    position: fixed;
-    z-index: 24;
     top: 56px;
     left: 20px;
   }

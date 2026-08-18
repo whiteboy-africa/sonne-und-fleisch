@@ -222,7 +222,7 @@ export function regalStarten(wurzel: HTMLElement) {
 
   canvas.setAttribute(
     'aria-label',
-    `Regal mit ${katalog.length} Bänden. Pfeiltasten blättern, Ziehen dreht die Ansicht, Eingabetaste holt den Band nach vorn.`,
+    `Stapel mit ${katalog.length} Bänden. Pfeiltasten blättern, Ziehen dreht die Ansicht, Eingabetaste holt den Band nach vorn.`,
   );
 
   blaetternAnsichtSetzen();
@@ -238,7 +238,7 @@ export function regalStarten(wurzel: HTMLElement) {
     console.warn('Regal: 3D-Ansicht nicht moeglich.', grund);
     wurzel.classList.add('is-ready', 'ohne-3d');
     wurzel.querySelector('[data-ladeschirm]')?.setAttribute('aria-hidden', 'true');
-    el.status.textContent = 'Das Regal laesst sich hier nicht aufbauen';
+    el.status.textContent = 'Der Stapel laesst sich hier nicht aufbauen';
     const ausweg = wurzel.querySelector<HTMLElement>('[data-ausweg]');
     if (ausweg) ausweg.hidden = false;
   }
