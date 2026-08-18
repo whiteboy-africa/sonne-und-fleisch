@@ -195,7 +195,8 @@ export function regalStarten(wurzel: HTMLElement) {
     // Rundherum statt an den Enden anschlagen.
     const ziel = (aktiverIndex + richtung + katalog.length) % katalog.length;
     if (modus === 'browse') engine?.presentBook(ziel);
-    else engine?.inspectOther(ziel);
+    // Richtung mitgeben: beim Umlauf springt die Nummer, die Hand nicht.
+    else engine?.inspectOther(ziel, richtung);
   }
   el.zurueck.addEventListener('click', () => nachbar(-1));
   el.vor.addEventListener('click', () => nachbar(1));

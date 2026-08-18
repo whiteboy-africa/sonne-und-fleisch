@@ -416,7 +416,8 @@ body {
 
 .book-details__inner {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  /* Nur noch eine Zeile: der Text. Kopfzeile und Nummern sind heraus. */
+  grid-template-rows: minmax(0, 1fr);
   height: 100%;
   padding: 27px clamp(28px, 4vw, 68px) 30px clamp(52px, 6vw, 98px);
   border-left: 1px solid rgba(19, 18, 16, 0.08);
@@ -446,7 +447,7 @@ body {
   text-transform: uppercase;
 }
 
-.back-button .book-details__copy {
+.book-details__copy {
   align-self: center;
   max-height: 100%;
   padding: 34px 0;
@@ -1029,8 +1030,8 @@ body {
   }
 
   .book-details__inner {
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr);
     padding: 9px 20px max(14px, env(safe-area-inset-bottom));
     border-top: 0;
     border-left: 0;
@@ -1041,9 +1042,9 @@ body {
     grid-row: 1;
   }
 
-      .book-details__copy {
-    grid-column: 1 / -1;
-    grid-row: 2;
+  .book-details__copy {
+    grid-column: 1;
+    grid-row: 1;
     align-self: auto;
     padding: 25px 0 18px;
   }

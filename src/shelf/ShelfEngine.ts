@@ -2199,7 +2199,12 @@ export class ShelfEngine {
    * Waehlt einen Band aus der Betrachtung heraus: der aufgeschlagene geht
    * zurueck, der neue kommt heraus und wird gleich aufgeschlagen.
    */
-  inspectOther(index: number) {
+  /**
+   * @param richtungVorgabe Wohin es gefuehlt geht. Beim Umlauf von 001 auf
+   * den letzten Band springt der Zaehler nach oben, die Hand aber ging nach
+   * links — ohne diese Vorgabe fuehre der Wechsel dann verkehrt herum.
+   */
+  inspectOther(index: number, richtungVorgabe?: 1 | -1) {
     const ziel = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
     if (this.mode === "browse") {
       this.focusBook(ziel);
@@ -2216,7 +2221,8 @@ export class ShelfEngine {
     // von der anderen Seite herein. Kein Rueckweg ueber den Stapel.
     this.wipeVon = this.selectedIndex;
     this.wipeNach = ziel;
-    this.wipeRichtung = ziel > this.selectedIndex ? 1 : -1;
+    this.wipeRichtung =
+      richtungVorgabe ?? (ziel > this.selectedIndex ? 1 : -1);
     this.wipeFortschritt = 0;
 
     // Die Stapelbuchhaltung mitfuehren, damit das Regal stimmt, wenn man
