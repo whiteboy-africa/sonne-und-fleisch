@@ -401,10 +401,17 @@ export class ShelfEngine {
    * Vorgabeabstands. Bleibt ueber einen Seitwaertswechsel hinweg stehen.
    */
   private inspectAbstandFaktor = 1;
+  /**
+   * Schraeglage des betrachteten Bandes. Kommt man ueber die Rueckseite
+   * herein, steht der Band um seine Querachse gedreht — dann kippt die
+   * Lage andersherum, und man muss sie spiegeln, damit Seite B genauso
+   * dasteht wie sonst Seite A.
+   */
+  private rollVorzeichen = 1;
   /** Steht der aufgestellte Band mit der Rueckseite nach vorn? */
   private stehendGedreht = false;
-  /** Seine Ausgangsdrehung, damit das Wenden wieder zurueckfindet. */
-  private stehendBasisYaw: number | null = null;
+  /** Seine Ausgangslage, damit das Wenden wieder zurueckfindet. */
+  private stehendBasisPitch: number | null = null;
   private pointerStartX = 0;
   private pointerLastX = 0;
   private pointerLastY = 0;
@@ -1359,10 +1366,16 @@ export class ShelfEngine {
     const zeigtRueckseite =
       band.data.back !== undefined && this.rueckseiteZurKamera(band);
     const seite: BookSide = zeigtRueckseite ? "hinten" : "vorn";
-    this.zielPitch = inspectDefaultPitch + (zeigtRueckseite ? Math.PI : 0);
+    // Seite B soll dabei genauso dastehen wie sonst Seite A: um die
+    // Querachse gedreht kippen Neigung, Drehung und Schraeglage
+    // andersherum, also werden sie gespiegelt.
+    this.zielPitch = zeigtRueckseite
+      ? Math.PI - inspectDefaultPitch
+      : inspectDefaultPitch;
+    this.zielYaw = zeigtRueckseite ? -inspectDefaultYaw : inspectDefaultYaw;
+    this.rollVorzeichen = zeigtRueckseite ? -1 : 1;
     this.inspectPitch = this.zielPitch;
-    this.zielYaw = inspectDefaultYaw;
-    this.inspectYaw = inspectDefaultYaw;
+    this.inspectYaw = this.zielYaw;
     if (seite !== this.side) {
       this.side = seite;
       this.callbacks.onSide(this.side);
@@ -1392,14 +1405,17 @@ export class ShelfEngine {
 
   /**
    * Wendet den aufgestellten Band im Regal — die F-Taste, wie beim
-   * aufgeschlagenen. Gedreht wird die Figur selbst, nicht die Ansicht:
-   * so stimmt hinterher auch, welche Seite beim Aufschlagen vorn liegt.
+   * aufgeschlagenen. Gedreht wird um die Querachse, nicht um die Hochachse:
+   * die zweite Geschichte steht kopfueber auf der Rueckseite, und nur so
+   * kommt sie richtig herum zum Stehen. Gedreht wird die Figur selbst,
+   * nicht die Ansicht — dann stimmt auch, welche Seite beim Aufschlagen
+   * vorn liegt.
    */
   flipStehenden() {
     if (this.mode !== "browse" || this.presentedIndex === null) return;
     const band = this.runtimeBooks[this.presentedIndex];
-    if (this.stehendBasisYaw === null) {
-      this.stehendBasisYaw = band.content.rotation.y;
+    if (this.stehendBasisPitch === null) {
+      this.stehendBasisPitch = band.content.rotation.x;
     }
     this.stehendGedreht = !this.stehendGedreht;
     this.callbacks.onStatus(
@@ -1830,16 +1846,21 @@ export class ShelfEngine {
       // Die Schraeglage liegt auf der Z-Achse. Sie gehoert nicht in die
       // Pose: nur der betrachtete Band hat sie, und die Kollisionspruefung
       // interessiert sie nicht.
-      selected.content.rotation.z = inspectDefaultRoll * motionFocus;
+      selected.content.rotation.z =
+        inspectDefaultRoll * this.rollVorzeichen * motionFocus;
       this.seiteAblesen(selected);
     }
 
     // Der gewendete Band dreht sich weich auf seine neue Lage.
-    if (this.mode === "browse" && this.presentedIndex !== null && this.stehendBasisYaw !== null) {
+    if (
+      this.mode === "browse" &&
+      this.presentedIndex !== null &&
+      this.stehendBasisPitch !== null
+    ) {
       const stehend = this.runtimeBooks[this.presentedIndex];
-      const ziel = this.stehendBasisYaw + (this.stehendGedreht ? Math.PI : 0);
-      stehend.content.rotation.y = damp(
-        stehend.content.rotation.y,
+      const ziel = this.stehendBasisPitch + (this.stehendGedreht ? Math.PI : 0);
+      stehend.content.rotation.x = damp(
+        stehend.content.rotation.x,
         ziel,
         this.reducedMotion ? 20 : 9,
         delta,
@@ -2294,7 +2315,7 @@ export class ShelfEngine {
   presentBook(index: number) {
     if (this.mode !== "browse") return;
     this.stehendGedreht = false;
-    this.stehendBasisYaw = null;
+    this.stehendBasisPitch = null;
     this.atRest = false;
     this.layDownPending = false;
     this.pendingFocusIndex = null;
