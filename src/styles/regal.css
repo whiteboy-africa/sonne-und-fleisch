@@ -204,115 +204,11 @@ body {
 }
 
 
-.shelf-arrow {
-  position: absolute;
-  z-index: 17;
-  top: 49%;
-  display: grid;
-  width: 46px;
-  height: 46px;
-  place-items: center;
-  border: 2px solid var(--ink);
-  background: rgba(0, 0, 0, 0.6);
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  transition:
-    opacity 260ms ease,
-    transform 260ms ease,
-    background-color 220ms ease;
-}
-
-.shelf-arrow:hover:not(:disabled) {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #000000;
-  transform: none;
-}
-
 /*
  * Die Pfeile gehoeren zum aufgeschlagenen Band, nicht ins Regal. Dort
  * blaettert man mit der Nummernleiste, dem Rad oder den Pfeiltasten.
  */
-.shelf-arrow {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.is-focused .shelf-arrow {
-  opacity: 0.62;
-  pointer-events: auto;
-}
-
-.is-focused .shelf-arrow:hover:not(:disabled) {
-  opacity: 1;
-}
-
-.is-focused .shelf-arrow:disabled {
-  cursor: default;
-  opacity: 0.2;
-}
-
-.shelf-arrow--left {
-  left: clamp(15px, 2.7vw, 44px);
-}
-
-.shelf-arrow--right {
-  right: clamp(15px, 2.7vw, 44px);
-}
-
-.arrow-icon {
-  position: relative;
-  display: block;
-  width: 17px;
-  height: 9px;
-}
-
-.arrow-icon span,
-.arrow-icon::before,
-.arrow-icon::after {
-  position: absolute;
-  display: block;
-  content: "";
-  background: currentColor;
-}
-
-.arrow-icon span {
-  top: 4px;
-  width: 17px;
-  height: 2px;
-}
-
-.arrow-icon::before,
-.arrow-icon::after {
-  width: 7px;
-  height: 2px;
-}
-
-.arrow-icon--right::before {
-  top: 2px;
-  right: -1px;
-  transform: rotate(45deg);
-}
-
-.arrow-icon--right::after {
-  right: -1px;
-  bottom: 2px;
-  transform: rotate(-45deg);
-}
-
-.arrow-icon--left::before {
-  top: 2px;
-  left: -1px;
-  transform: rotate(-45deg);
-}
-
-.arrow-icon--left::after {
-  bottom: 2px;
-  left: -1px;
-  transform: rotate(45deg);
-}
-
-.shelf-index {
+.is-focused .is-focused .is-focused .shelf-index {
   position: absolute;
   z-index: 19;
   right: clamp(24px, 5vw, 82px);
@@ -552,11 +448,7 @@ body {
   text-transform: uppercase;
 }
 
-.back-button .arrow-icon {
-  transform: scale(0.78);
-}
-
-.book-details__position {
+.back-button .book-details__position {
   font-variant-numeric: tabular-nums;
   display: flex;
   gap: 8px;
@@ -618,6 +510,88 @@ body {
   border: 0;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/*
+ * Nachbarschaft am Bildrand. Sichtbar ist nur eine schmale Zeile mit der
+ * Nummer; beim Darueberfahren waechst der Titel heraus. Angeklickt wird
+ * die ganze Spalte — acht Prozent der Breite, ohne Kopfzeile und ohne die
+ * Nummernleiste unten, damit dort nichts verdeckt wird.
+ */
+.nachbar {
+  position: absolute;
+  z-index: 17;
+  top: 92px;
+  bottom: 96px;
+  width: 8vw;
+  min-width: 74px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  border: 0;
+  background: transparent;
+  color: #55554f;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: color 150ms ease, opacity 200ms ease;
+}
+
+.nachbar--links {
+  left: 0;
+  justify-content: flex-start;
+}
+
+.nachbar--rechts {
+  right: 0;
+  justify-content: flex-end;
+}
+
+.is-focused .nachbar {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nachbar:hover,
+.nachbar:focus-visible {
+  color: var(--ink);
+}
+
+.nachbar__zeile {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-family: var(--schrift);
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+/* Der Titel waechst erst beim Darueberfahren heraus. */
+.nachbar__titel {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  transition:
+    max-width 150ms ease,
+    opacity 150ms ease;
+}
+
+.nachbar:hover .nachbar__titel,
+.nachbar:focus-visible .nachbar__titel {
+  max-width: 24ch;
+  opacity: 1;
+}
+
+/* Auf Fingergeraeten gibt es das nicht: dort wird gewischt. */
+@media (pointer: coarse) {
+  .nachbar {
+    display: none;
+  }
 }
 
 /* Wisch-Hinweis im aufgeschlagenen Band: kommt kurz, geht von selbst. */
@@ -1004,22 +978,7 @@ body {
     font-size: 14px;
   }
 
-  .shelf-arrow {
-    top: auto;
-    bottom: 60px;
-    width: 42px;
-    height: 42px;
-  }
-
-  .shelf-arrow--left {
-    left: 18px;
-  }
-
-  .shelf-arrow--right {
-    right: 18px;
-  }
-
-  .shelf-index {
+        .shelf-index {
     right: 20px;
     bottom: 26px;
     left: 20px;
@@ -1301,12 +1260,7 @@ body {
 
 /* Ohne 3D verschwinden die Bedienelemente, die nichts mehr steuern. */
 .ohne-3d .browse-caption,
-.ohne-3d .shelf-arrow,
-.ohne-3d .shelf-index {
-  display: none;
-}
-
-/* Der Tastenhinweis im Flip-Knopf. */
+.ohne-3d /* Der Tastenhinweis im Flip-Knopf. */
 .wenden-knopf kbd {
   padding: 1px 5px;
   border: 1px solid currentColor;

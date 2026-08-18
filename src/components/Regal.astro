@@ -56,22 +56,24 @@ const gesamt = katalognummer(katalog.length);
     <p class="browse-caption__author" data-blaettern-autor>{erstes.author}</p>
   </section>
 
-  <button
-    type="button"
-    class="shelf-arrow shelf-arrow--left"
-    data-zurueck
-    aria-label="Vorheriger Band"
-    disabled
-  >
-    <span aria-hidden="true" class="arrow-icon arrow-icon--left"><span></span></span>
+  {/* Nachbarschaft statt Pfeilkasten: am Rand steht die Nummer des Bandes
+      nebenan, beim Darueberfahren kommt sein Titel dazu. Der sichtbare Text
+      ist nur die Beschriftung — angeklickt wird ein breiter, unsichtbarer
+      Streifen am Bildrand. Auf Fingergeraeten faellt beides weg, dort wird
+      gewischt. */}
+  <button type="button" class="nachbar nachbar--links" data-zurueck>
+    <span class="nachbar__zeile">
+      <span aria-hidden="true">‹</span>
+      <span data-nachbar-zahl-zurueck>{katalognummer(katalog.length)}</span>
+      <span class="nachbar__titel" data-nachbar-titel-zurueck></span>
+    </span>
   </button>
-  <button
-    type="button"
-    class="shelf-arrow shelf-arrow--right"
-    data-vor
-    aria-label="Nächster Band"
-  >
-    <span aria-hidden="true" class="arrow-icon arrow-icon--right"><span></span></span>
+  <button type="button" class="nachbar nachbar--rechts" data-vor>
+    <span class="nachbar__zeile">
+      <span class="nachbar__titel" data-nachbar-titel-vor></span>
+      <span data-nachbar-zahl-vor>{katalognummer(2)}</span>
+      <span aria-hidden="true">›</span>
+    </span>
   </button>
 
   <nav class="shelf-index" aria-label="Platz im Stapel">
@@ -125,8 +127,9 @@ const gesamt = katalognummer(katalog.length);
       </div>
 
       <div class="book-details__copy" data-panel-text>
+        {/* Statt „Aus dem Programm" steht hier die Nummer des Bandes. */}
         <p class="eyebrow">
-          {siteConfig.editionEyebrow}
+          <span data-panel-augenbraue>{katalognummer(1)}</span>
           <span class="seitenmarke seitenmarke--kopf" data-seitenmarke hidden>Seite A</span>
         </p>
         <h2 data-panel-titel></h2>

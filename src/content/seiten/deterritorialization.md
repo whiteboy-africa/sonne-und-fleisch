@@ -1,6 +1,6 @@
 ---
 titel: Permanent Deterritorialization
-untertitel: Zehn Sätze.
+untertitel: 10 Theses for Ruthless Publishing
 reihenfolge: 20
 versteckt: true
 buchtext: true

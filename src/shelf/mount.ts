@@ -27,12 +27,17 @@ export function regalStarten(wurzel: HTMLElement) {
     blaetternAutor: pflicht(wurzel, '[data-blaettern-autor]'),
     zurueck: pflicht<HTMLButtonElement>(wurzel, '[data-zurueck]'),
     vor: pflicht<HTMLButtonElement>(wurzel, '[data-vor]'),
+    nachbarZahlZurueck: pflicht(wurzel, '[data-nachbar-zahl-zurueck]'),
+    nachbarTitelZurueck: pflicht(wurzel, '[data-nachbar-titel-zurueck]'),
+    nachbarZahlVor: pflicht(wurzel, '[data-nachbar-zahl-vor]'),
+    nachbarTitelVor: pflicht(wurzel, '[data-nachbar-titel-vor]'),
     ticks: Array.from(wurzel.querySelectorAll<HTMLButtonElement>('[data-tick]')),
     panel: pflicht<HTMLElement>(wurzel, '[data-panel]'),
     panelInhalt: pflicht<HTMLElement>(wurzel, '[data-panel-inhalt]'),
     panelText: pflicht<HTMLElement>(wurzel, '[data-panel-text]'),
     wischHinweis: pflicht<HTMLElement>(wurzel, '[data-wisch-hinweis]'),
     panelZahl: pflicht(wurzel, '[data-panel-zahl]'),
+    panelAugenbraue: pflicht(wurzel, '[data-panel-augenbraue]'),
     panelTitel: pflicht(wurzel, '[data-panel-titel]'),
     panelAutor: pflicht(wurzel, '[data-panel-autor]'),
     panelKlappentext: pflicht(wurzel, '[data-panel-klappentext]'),
@@ -80,8 +85,21 @@ export function regalStarten(wurzel: HTMLElement) {
     el.blaetternZahl.textContent = katalognummer(aktiverIndex + 1);
     el.blaetternTitel.textContent = buch.shortTitle;
     el.blaetternAutor.textContent = buch.author;
-    el.zurueck.disabled = aktiverIndex === 0;
-    el.vor.disabled = aktiverIndex === katalog.length - 1;
+    // Die Nachbarn stehen namentlich am Rand. Es geht rundherum: vor 001
+    // kommt der letzte Band, nach dem letzten wieder 001.
+    const davor = (aktiverIndex - 1 + katalog.length) % katalog.length;
+    const danach = (aktiverIndex + 1) % katalog.length;
+    const gekuerzt = (titel: string) =>
+      titel.length > 24 ? `${titel.slice(0, 23).trimEnd()}…` : titel;
+    el.nachbarZahlZurueck.textContent = katalognummer(davor + 1);
+    el.nachbarTitelZurueck.textContent = `— ${gekuerzt(katalog[davor].shortTitle)}`;
+    el.nachbarZahlVor.textContent = katalognummer(danach + 1);
+    el.nachbarTitelVor.textContent = `${gekuerzt(katalog[danach].shortTitle)} —`;
+    el.zurueck.setAttribute(
+      'aria-label',
+      `Vorheriger Band — ${katalog[davor].title}`,
+    );
+    el.vor.setAttribute('aria-label', `Nächster Band — ${katalog[danach].title}`);
     el.ticks.forEach((tick, index) => {
       const ist = index === aktiverIndex;
       tick.classList.toggle('is-active', ist);
@@ -110,6 +128,7 @@ export function regalStarten(wurzel: HTMLElement) {
 
     el.panel.setAttribute('aria-label', `Angaben zu ${gezeigt.title}`);
     el.panelZahl.textContent = katalognummer(gewaehlterIndex + 1);
+    el.panelAugenbraue.textContent = katalognummer(gewaehlterIndex + 1);
     el.panelTitel.textContent = gezeigt.title;
     el.panelAutor.textContent = gezeigt.author;
     el.panelKlappentext.textContent = gezeigt.description;
@@ -168,10 +187,8 @@ export function regalStarten(wurzel: HTMLElement) {
   // Die Pfeile tun dasselbe wie die Nummern: einen Band weiter. Im Regal
   // holen sie ihn heraus, beim aufgeschlagenen Band blättern sie weiter.
   function nachbar(richtung: -1 | 1) {
-    const ziel = Math.min(
-      katalog.length - 1,
-      Math.max(0, aktiverIndex + richtung),
-    );
+    // Rundherum statt an den Enden anschlagen.
+    const ziel = (aktiverIndex + richtung + katalog.length) % katalog.length;
     if (modus === 'browse') engine?.presentBook(ziel);
     else engine?.inspectOther(ziel);
   }

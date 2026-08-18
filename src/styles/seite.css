@@ -305,6 +305,17 @@
   text-align: right;
 }
 
+/* Der Traktat traegt seine Ueberschrift kleiner — sie ist lang, und der
+   Text darunter ist die Hauptsache. */
+.fliesstext.buchtext {
+  margin-top: 4px;
+}
+
+.seitenkopf:has(+ .fliesstext.buchtext) h1,
+.buchtext-kopf h1 {
+  font-size: clamp(28px, 3.6vw, 44px);
+}
+
 /* Der Traktat spricht wie ein Buch: der ganze Text in der Serife, nur die
    Marken ringsum bleiben Mono. */
 .fliesstext.buchtext p,
