@@ -134,6 +134,24 @@ das Programm, wo er als letzter Eintrag steht statt als neuester Band.
 Heissen beide Seiten gleich, sagt der Wenden-Knopf „Seite B" statt eines
 Titels.
 
+## Offen: die Handy-Ansicht des aufgeschlagenen Bandes
+
+Der naechste grosse Schritt, noch nicht gebaut. Ziel: unter 768px ein
+einziger Dokumentfluss, nichts `fixed`, nichts `sticky`.
+
+Reihenfolge von oben nach unten: Kopf mit Wortmarke und „Zurueck zum
+Stapel"; der Band, mittig, 80–85 % der Breite; auf seiner Hoehe links und
+rechts nur die Nachbarnummern (nie Titel) mit grossen unsichtbaren
+Tippflaechen; direkt darunter der Wenden-Knopf; dann der Textblock
+(Augenbraue, Titel, Autor, Klappentext, Zitat, Haarlinie, Angaben, „Zum
+Buch"); ganz unten die Nummernleiste als normales Fusselement.
+
+Weg faellt dabei die untere Tafel-Konstruktion. Gesten: waagerechtes
+Wischen ueber dem Band blaettert (Winkelschwelle 30 Grad, damit Scrollen
+gewinnt), Doppeltippen auf den Umschlag wendet. `dvh` statt `vh`,
+`env(safe-area-inset-bottom)` am Seitenende, keine waagerechte Ueberlauf,
+Tippziele mindestens 44px.
+
 ## Doppelcover (tête-bêche)
 
 Manche Bände haben zwei Vorderseiten: die zweite Geschichte steht kopfüber auf

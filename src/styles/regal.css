@@ -614,46 +614,6 @@ body {
   }
 }
 
-/* Wisch-Hinweis im aufgeschlagenen Band: kommt kurz, geht von selbst. */
-.wisch-hinweis {
-  position: absolute;
-  z-index: 23;
-  right: 0;
-  bottom: calc(min(38dvh, 380px) + 16px);
-  left: 0;
-  display: none;
-  margin: 0;
-  padding: 0 20px;
-  color: var(--ink-soft);
-  font-family: var(--schrift);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-align: center;
-  text-transform: uppercase;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 320ms ease;
-}
-
-@media (pointer: coarse) {
-  .is-focused .wisch-hinweis {
-    display: block;
-  }
-}
-
-.wisch-hinweis.is-sichtbar {
-  opacity: 1;
-}
-
-/* Waehrend des Wechsels verschwindet der Grund der Tafel. Er ist
-   undurchsichtig und deckt die rechten gut vierzig Prozent der Flaeche zu —
-   der Band faehrt zwar ueber den ganzen Schirm, war aber nur links davon zu
-   sehen. Genau daran sah es aus, als wische jede Haelfte fuer sich. */
-.book-details.is-wischend::before {
-  opacity: 0;
-}
-
 /* Der alte Text als Kopie, waehrend das Original schon den neuen Band
    zeigt. Sie haengt in der ganzen Flaeche, nicht in der Tafel: der Text
    soll neben dem Band ueber den Schirm fahren und erst am Bildrand

@@ -35,7 +35,6 @@ export function regalStarten(wurzel: HTMLElement) {
     panel: pflicht<HTMLElement>(wurzel, '[data-panel]'),
     panelInhalt: pflicht<HTMLElement>(wurzel, '[data-panel-inhalt]'),
     panelText: pflicht<HTMLElement>(wurzel, '[data-panel-text]'),
-    wischHinweis: pflicht<HTMLElement>(wurzel, '[data-wisch-hinweis]'),
     panelAugenbraue: pflicht(wurzel, '[data-panel-augenbraue]'),
     panelTitel: pflicht(wurzel, '[data-panel-titel]'),
     panelAutor: pflicht(wurzel, '[data-panel-autor]'),
@@ -233,30 +232,6 @@ export function regalStarten(wurzel: HTMLElement) {
       else engine?.inspectOther(index);
     });
   });
-  // Kurzer Hinweis beim Aufschlagen: dass die Textfläche weiterblättert,
-  // sieht man ihr nicht an. Er geht von selbst wieder weg — und sofort,
-  // sobald wirklich gewischt wurde.
-  let hinweisUhr: number | undefined;
-  function wischHinweisZeigen() {
-    if (!matchMedia('(pointer: coarse)').matches) return;
-    if (gewaehlterIndex === null || katalog.length < 2) return;
-    const text =
-      gewaehlterIndex === 0
-        ? 'Unten nach rechts wischen → nächster Band'
-        : gewaehlterIndex === katalog.length - 1
-          ? '← Unten nach links wischen → vorheriger Band'
-          : 'Unten wischen blättert weiter';
-    el.wischHinweis.textContent = text;
-    el.wischHinweis.classList.add('is-sichtbar');
-    window.clearTimeout(hinweisUhr);
-    hinweisUhr = window.setTimeout(wischHinweisVerstecken, 2800);
-  }
-
-  function wischHinweisVerstecken() {
-    window.clearTimeout(hinweisUhr);
-    el.wischHinweis.classList.remove('is-sichtbar');
-  }
-
   // Geblättert wird unten auf der Tafel. Über dem Band bleibt die Hand
   // zum Drehen und Zoomen frei.
   let wischStart: { x: number; y: number } | null = null;
@@ -272,7 +247,6 @@ export function regalStarten(wurzel: HTMLElement) {
     // Senkrecht ist Lesen, waagerecht ist Blättern.
     if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
     if (gewaehlterIndex === null) return;
-    wischHinweisVerstecken();
     engine?.inspectOther(gewaehlterIndex + (dx > 0 ? 1 : -1));
   });
   el.panel.addEventListener('pointercancel', () => {
@@ -327,18 +301,13 @@ export function regalStarten(wurzel: HTMLElement) {
         blaetternAnsichtSetzen();
         panelSetzen();
         vorleseSetzen();
-        if (modus === 'inspect' && vorher !== 'inspect') wischHinweisZeigen();
-        if (modus === 'browse' || modus === 'returning') {
-          wischHinweisVerstecken();
-          wipeAufraeumen();
-        }
+        if (modus === 'browse' || modus === 'returning') wipeAufraeumen();
       },
       // Der Wechsel ist ein Abblender: das Licht geht aus, im Dunkeln
       // wechselt der Text, dann kommt das Licht zurueck. Nichts faehrt
       // seitwaerts — die Engine sagt Bild fuer Bild, wie viel Licht da ist.
       onSwap: (index) => {
-        wischHinweisVerstecken();
-        gewaehlterIndex = index;
+            gewaehlterIndex = index;
         aktiverIndex = index;
         // Die Seite wird nicht zurueckgesetzt: sie kommt aus der Engine,
         // die beim Blaettern A bei A und B bei B laesst.

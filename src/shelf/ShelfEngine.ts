@@ -404,16 +404,6 @@ export class ShelfEngine {
   /** Auf dem Handy startet der Blick weiter hinten; nur einmal setzen. */
   private handyAbstandGesetzt = false;
   /**
-   * Der betrachtete Band geht leicht mit der Hand mit: das Telefon meldet
-   * seine Lage, der Band neigt sich ein paar Grad hinterher. Die erste
-   * Meldung ist der Nullpunkt — sonst springt der Band, je nachdem wie man
-   * das Geraet gerade haelt.
-   */
-  private neigungBasis: { beta: number; gamma: number } | null = null;
-  private neigungYaw = 0;
-  private neigungPitch = 0;
-  private neigungGefragt = false;
-  /**
    * Wenden im Regal: der Band kippt um seine Querachse, wie man ein Buch
    * in der Hand umdreht. Die zweite Geschichte steht kopfueber auf der
    * Rueckseite und kommt dadurch richtig herum zum Stehen.
@@ -1091,8 +1081,6 @@ export class ShelfEngine {
       }
     }
 
-    if (event.pointerType === "touch") this.neigungAnfragen();
-
     const wasClick = this.pointerTravel < 7 && Math.abs(event.clientX - this.pointerStartX) < 7;
     this.pointerDown = false;
     this.pointerId = null;
@@ -1129,45 +1117,6 @@ export class ShelfEngine {
       this.canvas.style.cursor = "grab";
     }
   };
-
-  private handleNeigung = (event: DeviceOrientationEvent) => {
-    if (event.beta === null || event.gamma === null) return;
-    if (this.mode !== "inspect" && this.mode !== "focusing") return;
-    if (!this.neigungBasis) {
-      this.neigungBasis = { beta: event.beta, gamma: event.gamma };
-    }
-    // Hoechstens etwa acht Grad — es soll mitgehen, nicht herumfuchteln.
-    this.neigungYaw = clamp(event.gamma - this.neigungBasis.gamma, -28, 28) * 0.0055;
-    this.neigungPitch =
-      -clamp(event.beta - this.neigungBasis.beta, -28, 28) * 0.0035;
-  };
-
-  /**
-   * Fragt beim ersten Fingertipp nach dem Lagesensor. iOS gibt ihn nur auf
-   * eine Geste hin heraus, darum haengt es hier und nicht am Seitenaufbau.
-   */
-  private neigungAnfragen() {
-    if (this.neigungGefragt) return;
-    this.neigungGefragt = true;
-    const klasse = window.DeviceOrientationEvent as
-      | (typeof DeviceOrientationEvent & {
-          requestPermission?: () => Promise<string>;
-        })
-      | undefined;
-    if (!klasse) return;
-    if (typeof klasse.requestPermission === "function") {
-      klasse
-        .requestPermission()
-        .then((antwort) => {
-          if (antwort === "granted") {
-            window.addEventListener("deviceorientation", this.handleNeigung);
-          }
-        })
-        .catch(() => {});
-      return;
-    }
-    window.addEventListener("deviceorientation", this.handleNeigung);
-  }
 
   private handleWindowBlur = () => {
     this.zeiger.clear();
@@ -1349,11 +1298,6 @@ export class ShelfEngine {
     this.selectedIndex = index;
     this.focusProgress = 0;
     this.mode = "focusing";
-    // Der Lagesensor bekommt einen frischen Nullpunkt: gezaehlt wird ab
-    // der Haltung, in der man den Band aufschlaegt.
-    this.neigungBasis = null;
-    this.neigungYaw = 0;
-    this.neigungPitch = 0;
 
     // Wer die Rueckseite des stehenden Bandes anschaut und ihn aufschlaegt,
     // will die zweite Geschichte sehen — nicht wieder Seite A.
@@ -1865,8 +1809,8 @@ export class ShelfEngine {
         selected,
         {
           ...pose,
-          yaw: pose.yaw + (this.inspectYaw + this.neigungYaw) * motionFocus,
-          pitch: pose.pitch + (this.inspectPitch + this.neigungPitch) * motionFocus,
+          yaw: pose.yaw + this.inspectYaw * motionFocus,
+          pitch: pose.pitch + this.inspectPitch * motionFocus,
         },
         false,
       );
@@ -2496,7 +2440,6 @@ export class ShelfEngine {
     this.canvas.removeEventListener("pointerup", this.handlePointerUp);
     this.canvas.removeEventListener("pointercancel", this.handlePointerCancel);
     this.canvas.removeEventListener("pointerleave", this.handlePointerLeave);
-    window.removeEventListener("deviceorientation", this.handleNeigung);
     window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("blur", this.handleWindowBlur);
 
