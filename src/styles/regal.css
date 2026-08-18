@@ -667,7 +667,8 @@ body {
 
 .book-details__description {
   max-width: 520px;
-  margin: 1.15em 0 0;
+  /* Nur hier mehr Luft: zwischen Autor und Klappentext. */
+  margin: 1.7em 0 0;
   font-family: var(--schrift);
   font-size: clamp(13px, 1.05vw, 15px);
   font-weight: 400;
