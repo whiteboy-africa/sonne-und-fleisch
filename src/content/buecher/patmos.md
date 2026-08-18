@@ -2,7 +2,7 @@
 # Doppelband aus zwei Platzhalter-Umschlägen.
 titel: Patmos
 kurztitel: Patmos
-autor: Autor eintragen
+autor: Mona Salva
 klappentext: >-
   Platzhalter: zwei bis vier Sätze zur ersten Geschichte.
 zitat: Platzhalter für einen Satz aus dem Buch.
@@ -17,17 +17,19 @@ motiv: continuum
 hoehe: 2.0
 dicke: 0.078
 reihenfolge: 5
+# Zweite Vorderseite: eine Titelseite in Fraktur, Schwarz auf Papierweiß.
 rueckseite:
-  titel: Zweite Seite — Titel eintragen
-  kurztitel: Zweite Seite
-  autor: Autor eintragen
+  titel: Superlucens Caligo
+  kurztitel: Superlucens Caligo
+  autor: Johannes von Ohrid
   klappentext: >-
-    Platzhalter: die Einführung in die andere Geschichte.
+    Platzhalter: die Einführung in Superlucens Caligo, die zweite
+    Geschichte des Bandes.
   cover_bild: /buecher/patmos/rueckseite.webp
-  cover_farbe: '#2f3a44'
-  akzent_farbe: '#a4553a'
-  schrift_farbe: '#ece3d2'
-  motiv: fracture
+  cover_farbe: '#12100e'
+  akzent_farbe: '#b9b1a0'
+  schrift_farbe: '#f1ece0'
+  motiv: schematic
 ---
 
 Platzhalter für die lange Beschreibung.

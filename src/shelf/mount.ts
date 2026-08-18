@@ -25,7 +25,6 @@ export function regalStarten(wurzel: HTMLElement) {
     blaetternZahl: pflicht(wurzel, '[data-blaettern-zahl]'),
     blaetternTitel: pflicht(wurzel, '[data-blaettern-titel]'),
     blaetternAutor: pflicht(wurzel, '[data-blaettern-autor]'),
-    ansehen: pflicht<HTMLButtonElement>(wurzel, '[data-ansehen]'),
     zurueck: pflicht<HTMLButtonElement>(wurzel, '[data-zurueck]'),
     vor: pflicht<HTMLButtonElement>(wurzel, '[data-vor]'),
     ticks: Array.from(wurzel.querySelectorAll<HTMLButtonElement>('[data-tick]')),
@@ -64,8 +63,6 @@ export function regalStarten(wurzel: HTMLElement) {
     el.blaetternZahl.textContent = katalognummer(aktiverIndex + 1);
     el.blaetternTitel.textContent = buch.shortTitle;
     el.blaetternAutor.textContent = buch.author;
-    el.ansehen.disabled = imFokus;
-    el.ansehen.setAttribute('aria-label', `${buch.title} ansehen`);
     el.zurueck.disabled = aktiverIndex === 0;
     el.vor.disabled = aktiverIndex === katalog.length - 1;
     el.ticks.forEach((tick, index) => {
@@ -147,7 +144,6 @@ export function regalStarten(wurzel: HTMLElement) {
 
   // „Band herausziehen" tut genau das. Aufgeschlagen wird mit einem Klick
   // auf den Band.
-  el.ansehen.addEventListener('click', () => engine?.presentBook(aktiverIndex));
   // Die Pfeile tun dasselbe wie die Nummern: einen Band weiter. Im Regal
   // holen sie ihn heraus, beim aufgeschlagenen Band blättern sie weiter.
   function nachbar(richtung: -1 | 1) {
@@ -224,7 +220,6 @@ export function regalStarten(wurzel: HTMLElement) {
       // Seite in zwei Hälften. Kopf- und Fußzeile bleiben stehen; bewegt
       // wird nur der Block, der zum Band gehört.
       onSwap: (index, richtung, dauer, weg) => {
-        const bereich = el.panel as HTMLElement;
         const text = el.panelText;
         // Genau der Weg des Bandes, in Pixeln. Vorher fuhr der Text nur
         // seine eigene Tafelbreite — ein Drittel der Strecke in derselben
@@ -236,7 +231,7 @@ export function regalStarten(wurzel: HTMLElement) {
         // Der alte Text bleibt als Kopie stehen und faehrt hinaus, waehrend
         // das Original schon den neuen Band zeigt und hereinkommt.
         const masse = text.getBoundingClientRect();
-        const rahmen = bereich.getBoundingClientRect();
+        const rahmen = wurzel.getBoundingClientRect();
         const kopie = text.cloneNode(true) as HTMLElement;
         kopie.setAttribute('aria-hidden', 'true');
         kopie.setAttribute('inert', '');
@@ -248,10 +243,10 @@ export function regalStarten(wurzel: HTMLElement) {
           height: `${masse.height}px`,
         });
         kopie.scrollTop = text.scrollTop;
-        // Waehrend des Wechsels wird an den Raendern der Tafel beschnitten,
-        // damit der hinausfahrende Text nicht ueber den Band wandert.
-        bereich.classList.add('is-wischend');
-        bereich.appendChild(kopie);
+        // In die ganze Flaeche gehaengt, nicht in die Tafel: so faehrt der
+        // Text neben dem Band ueber den Schirm und verschwindet erst am
+        // Bildrand. Die Tafel ist ohnehin schwarz wie der Rest.
+        wurzel.appendChild(kopie);
 
         const bewegung: KeyframeAnimationOptions = {
           duration: dauer,
@@ -288,7 +283,6 @@ export function regalStarten(wurzel: HTMLElement) {
         const aufraeumen = () => {
           hinaus.cancel();
           kopie.remove();
-          bereich.classList.remove('is-wischend');
         };
         Promise.allSettled([hinaus.finished, herein.finished]).then(
           aufraeumen,

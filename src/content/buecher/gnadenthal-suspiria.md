@@ -17,17 +17,20 @@ motiv: lattice
 hoehe: 2.0
 dicke: 0.078
 reihenfolge: 4
+# Zweite Vorderseite: ein Zeitschriftenumschlag in Rosa und Schwarz,
+# Farben von dort genommen.
 rueckseite:
-  titel: Zweite Seite — Titel eintragen
-  kurztitel: Zweite Seite
-  autor: J. von Ohrid
+  titel: Qorpus Delicti
+  kurztitel: Qorpus Delicti
+  autor: QRT
   klappentext: >-
-    Platzhalter: die Einführung in die andere Geschichte.
-  cover_bild: /buecher/gnadenthal-suspiria/rueckseite.webp
-  cover_farbe: '#3a3f52'
-  akzent_farbe: '#c2a15c'
-  schrift_farbe: '#efe9db'
-  motiv: orbit
+    Platzhalter: die Einführung in die zweite Geschichte des Bandes,
+    gesammelte Schriften 1996–1998.
+  cover_bild: /buecher/gnadenthal-suspiria/qorpus-delicti.webp
+  cover_farbe: '#232627'
+  akzent_farbe: '#e0839a'
+  schrift_farbe: '#d1c39f'
+  motiv: schematic
 ---
 
 Platzhalter für die lange Beschreibung.

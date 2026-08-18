@@ -23,7 +23,7 @@ reihenfolge: 2
 rueckseite:
   titel: Mountains of Sadness
   kurztitel: Mountains of Sadness
-  autor: Autor eintragen
+  autor: Christoph Laible
   klappentext: >-
     Platzhalter: die Einführung in die zweite Geschichte des Bandes.
   cover_bild: /buecher/robert-duval/rueckseite.webp

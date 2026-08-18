@@ -172,7 +172,7 @@ const introAzimuth = 0.15;
  * dieses Halten ist die steile Ansicht nach einer halben Sekunde vorbei und
  * niemand sieht sie.
  */
-const introHalten = 2.5;
+const introHalten = 2.0;
 /** Wie traege das Sinken danach ist. Klein heisst langsam. */
 const introTempo = 0.45;
 
@@ -376,6 +376,35 @@ export class ShelfEngine {
   private lastInputTime = 0;
   private pointerDown = false;
   private pointerId: number | null = null;
+  /** Alle Finger, die gerade auf dem Glas liegen. */
+  private zeiger = new Map<number, { x: number; y: number }>();
+  /** Fingerabstand und Zoom beim Ansetzen der zweiten Hand. */
+  private kneifAbstand = 0;
+  private kneifZoom = 1;
+  /** Beginn der laufenden Wischbewegung — fuer den Schwung beim Loslassen. */
+  private zeigerStartZeit = 0;
+  private pointerStartY = 0;
+  /** Auf dem Handy startet der Blick weiter hinten; nur einmal setzen. */
+  private handyAbstandGesetzt = false;
+  /**
+   * Der betrachtete Band geht leicht mit der Hand mit: das Telefon meldet
+   * seine Lage, der Band neigt sich ein paar Grad hinterher. Die erste
+   * Meldung ist der Nullpunkt — sonst springt der Band, je nachdem wie man
+   * das Geraet gerade haelt.
+   */
+  private neigungBasis: { beta: number; gamma: number } | null = null;
+  private neigungYaw = 0;
+  private neigungPitch = 0;
+  private neigungGefragt = false;
+  /**
+   * Selbst gewaehlter Abstand in der Betrachtung, als Vielfaches des
+   * Vorgabeabstands. Bleibt ueber einen Seitwaertswechsel hinweg stehen.
+   */
+  private inspectAbstandFaktor = 1;
+  /** Steht der aufgestellte Band mit der Rueckseite nach vorn? */
+  private stehendGedreht = false;
+  /** Seine Ausgangsdrehung, damit das Wenden wieder zurueckfindet. */
+  private stehendBasisYaw: number | null = null;
   private pointerStartX = 0;
   private pointerLastX = 0;
   private pointerLastY = 0;
@@ -909,11 +938,24 @@ export class ShelfEngine {
   };
 
   private handlePointerDown = (event: PointerEvent) => {
+    this.zeiger.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    // Zwei Finger heisst kneifen, nicht drehen: der Abstand zwischen ihnen
+    // steuert den Zoom, das Drehen setzt so lange aus.
+    if (this.zeiger.size === 2) {
+      const [a, b] = [...this.zeiger.values()];
+      this.kneifAbstand = Math.hypot(a.x - b.x, a.y - b.y);
+      this.kneifZoom = this.zielZoom;
+      this.pointerDown = false;
+      this.canvas.classList.remove("is-dragging");
+      return;
+    }
+
     if (this.mode === "inspect") {
       this.pointerDown = true;
       this.pointerId = event.pointerId;
       this.pointerLastX = event.clientX;
       this.pointerLastY = event.clientY;
+      this.wischWeg = 0;
       this.canvas.setPointerCapture(event.pointerId);
       this.canvas.classList.add("is-dragging");
       return;
@@ -922,6 +964,8 @@ export class ShelfEngine {
     this.pointerDown = true;
     this.pointerId = event.pointerId;
     this.pointerStartX = event.clientX;
+    this.pointerStartY = event.clientY;
+    this.zeigerStartZeit = performance.now();
     this.pointerLastX = event.clientX;
     this.pointerLastY = event.clientY;
     this.pointerTravel = 0;
@@ -932,14 +976,56 @@ export class ShelfEngine {
   private handlePointerMove = (event: PointerEvent) => {
     this.updatePointer(event);
 
+    const gemerkt = this.zeiger.get(event.pointerId);
+    if (gemerkt) {
+      gemerkt.x = event.clientX;
+      gemerkt.y = event.clientY;
+    }
+
+    // Zwei Finger: der Abstand zwischen ihnen ist der Zoom. Weiter
+    // auseinander heisst naeher heran.
+    if (this.zeiger.size >= 2) {
+      const [a, b] = [...this.zeiger.values()];
+      const abstand = Math.hypot(a.x - b.x, a.y - b.y);
+      if (this.kneifAbstand > 8 && abstand > 8 && this.mode === "browse") {
+        this.zielZoom = clamp(
+          this.kneifZoom * (this.kneifAbstand / abstand),
+          zoomNah,
+          zoomFern,
+        );
+        this.introLaeuft = false;
+        this.introGehalten = introHalten;
+        this.lastInputTime = performance.now();
+      }
+      return;
+    }
+
     // Im Betrachten dreht das Ziehen den Band: waagerecht um die Hochachse,
     // senkrecht um die Querachse. Ohne Anschlag — man soll ihn umdrehen und
     // auf den Kopf stellen koennen.
     if (this.mode === "inspect") {
       if (!this.pointerDown || event.pointerId !== this.pointerId) return;
       const proPixel = Math.PI / Math.max(320, this.canvas.clientWidth * 0.42);
-      this.zielYaw += (event.clientX - this.pointerLastX) * proPixel;
-      this.zielPitch += (event.clientY - this.pointerLastY) * proPixel;
+      const dx = event.clientX - this.pointerLastX;
+      const dy = event.clientY - this.pointerLastY;
+
+      // Auf dem Telefon blaettert der Daumen: waagerecht wischen holt den
+      // naechsten Band herein, senkrecht dreht ihn weiter. Mit der Maus
+      // dreht beides, da gibt es Pfeile und Leiste zum Blaettern.
+      if (event.pointerType === "touch") {
+        this.wischWeg += dx;
+        this.zielPitch += dy * proPixel;
+        this.pointerLastX = event.clientX;
+        this.pointerLastY = event.clientY;
+        if (Math.abs(this.wischWeg) > 56 && this.selectedIndex !== null) {
+          this.inspectOther(this.selectedIndex + (this.wischWeg > 0 ? 1 : -1));
+          this.wischWeg = 0;
+        }
+        return;
+      }
+
+      this.zielYaw += dx * proPixel;
+      this.zielPitch += dy * proPixel;
       this.pointerLastX = event.clientX;
       this.pointerLastY = event.clientY;
       return;
@@ -956,23 +1042,10 @@ export class ShelfEngine {
       this.pointerLastY = event.clientY;
       this.pointerTravel += Math.abs(dx) + Math.abs(dy);
 
-      // Auf dem Telefon blaettert eine waagerechte Wischbewegung, statt die
-      // Ansicht zu drehen — Drehen bleibt der senkrechten vorbehalten.
-      if (event.pointerType === "touch") {
-        this.wischWeg += dx;
-        if (Math.abs(this.wischWeg) > 56) {
-          this.browseBy(this.wischWeg > 0 ? -1 : 1);
-          this.wischWeg = 0;
-        }
-        this.zielElevation = clamp(
-          this.zielElevation + dy * (Math.PI / Math.max(420, this.canvas.clientWidth * 0.6)),
-          -0.34,
-          0.72,
-        );
-        this.pointerLastX = event.clientX;
-        this.pointerLastY = event.clientY;
-        return;
-      }
+      // Auf dem Telefon dreht ein Finger die Ansicht genauso wie die Maus:
+      // frueher blaetterte jedes waagerechte Wischen, und man kam nie um
+      // die Stapel herum. Geblaettert wird jetzt mit Schwung — ein kurzer,
+      // schneller Wisch beim Loslassen (siehe handlePointerUp).
       // Der aufgestellte Band bleibt beim Drehen stehen. Frueher legte er
       // sich ab einer gewissen Drehung wieder hin — damit kam man nie um
       // ihn herum, und seine Rueckseite bekam man nie zu sehen.
@@ -995,7 +1068,28 @@ export class ShelfEngine {
   };
 
   private handlePointerUp = (event: PointerEvent) => {
+    this.zeiger.delete(event.pointerId);
+    if (this.zeiger.size < 2) this.kneifAbstand = 0;
     if (event.pointerId !== this.pointerId) return;
+
+    // Ein kurzer, schneller Wisch quer blaettert weiter — langsames Ziehen
+    // dreht bloss die Ansicht. So geht auf dem Handy beides: umherschauen
+    // und blaettern.
+    if (
+      this.mode === "browse" &&
+      event.pointerType === "touch" &&
+      this.pointerDown
+    ) {
+      const weg = event.clientX - this.pointerStartX;
+      const hoch = Math.abs(event.clientY - this.pointerStartY);
+      const zeit = performance.now() - this.zeigerStartZeit;
+      if (Math.abs(weg) > 60 && Math.abs(weg) > hoch * 1.4 && zeit < 400) {
+        this.browseBy(weg > 0 ? -1 : 1);
+      }
+    }
+
+    if (event.pointerType === "touch") this.neigungAnfragen();
+
     const wasClick = this.pointerTravel < 7 && Math.abs(event.clientX - this.pointerStartX) < 7;
     this.pointerDown = false;
     this.pointerId = null;
@@ -1016,6 +1110,8 @@ export class ShelfEngine {
   };
 
   private handlePointerCancel = (event: PointerEvent) => {
+    this.zeiger.delete(event.pointerId);
+    if (this.zeiger.size < 2) this.kneifAbstand = 0;
     if (event.pointerId !== this.pointerId) return;
     this.pointerDown = false;
     this.pointerId = null;
@@ -1031,7 +1127,48 @@ export class ShelfEngine {
     }
   };
 
+  private handleNeigung = (event: DeviceOrientationEvent) => {
+    if (event.beta === null || event.gamma === null) return;
+    if (this.mode !== "inspect" && this.mode !== "focusing") return;
+    if (!this.neigungBasis) {
+      this.neigungBasis = { beta: event.beta, gamma: event.gamma };
+    }
+    // Hoechstens etwa acht Grad — es soll mitgehen, nicht herumfuchteln.
+    this.neigungYaw = clamp(event.gamma - this.neigungBasis.gamma, -28, 28) * 0.005;
+    this.neigungPitch =
+      -clamp(event.beta - this.neigungBasis.beta, -28, 28) * 0.0032;
+  };
+
+  /**
+   * Fragt beim ersten Fingertipp nach dem Lagesensor. iOS gibt ihn nur auf
+   * eine Geste hin heraus, darum haengt es hier und nicht am Seitenaufbau.
+   */
+  private neigungAnfragen() {
+    if (this.neigungGefragt) return;
+    this.neigungGefragt = true;
+    const klasse = window.DeviceOrientationEvent as
+      | (typeof DeviceOrientationEvent & {
+          requestPermission?: () => Promise<string>;
+        })
+      | undefined;
+    if (!klasse) return;
+    if (typeof klasse.requestPermission === "function") {
+      klasse
+        .requestPermission()
+        .then((antwort) => {
+          if (antwort === "granted") {
+            window.addEventListener("deviceorientation", this.handleNeigung);
+          }
+        })
+        .catch(() => {});
+      return;
+    }
+    window.addEventListener("deviceorientation", this.handleNeigung);
+  }
+
   private handleWindowBlur = () => {
+    this.zeiger.clear();
+    this.kneifAbstand = 0;
     this.pointerDown = false;
     this.pointerId = null;
     this.canvas.classList.remove("is-dragging");
@@ -1056,6 +1193,17 @@ export class ShelfEngine {
     ) {
       event.preventDefault();
       this.flipBook();
+      return;
+    }
+    // Im Regal wendet F den aufgestellten Band, damit man seine Rueckseite
+    // ansehen kann, ohne ihn erst aufzuschlagen.
+    if (
+      (event.key === "f" || event.key === "F") &&
+      this.mode === "browse" &&
+      this.presentedIndex !== null
+    ) {
+      event.preventDefault();
+      this.flipStehenden();
       return;
     }
     if (event.key === "Escape") {
@@ -1198,12 +1346,66 @@ export class ShelfEngine {
     this.selectedIndex = index;
     this.focusProgress = 0;
     this.mode = "focusing";
+    // Der Lagesensor bekommt einen frischen Nullpunkt: gezaehlt wird ab
+    // der Haltung, in der man den Band aufschlaegt.
+    this.neigungBasis = null;
+    this.neigungYaw = 0;
+    this.neigungPitch = 0;
+    this.inspectAbstandFaktor = 1;
+
+    // Wer die Rueckseite des stehenden Bandes anschaut und ihn aufschlaegt,
+    // will die zweite Geschichte sehen — nicht wieder Seite A.
+    const band = this.runtimeBooks[index];
+    const zeigtRueckseite =
+      band.data.back !== undefined && this.rueckseiteZurKamera(band);
+    const seite: BookSide = zeigtRueckseite ? "hinten" : "vorn";
+    this.zielPitch = inspectDefaultPitch + (zeigtRueckseite ? Math.PI : 0);
+    this.inspectPitch = this.zielPitch;
+    this.zielYaw = inspectDefaultYaw;
+    this.inspectYaw = inspectDefaultYaw;
+    if (seite !== this.side) {
+      this.side = seite;
+      this.callbacks.onSide(this.side);
+    }
     this.runtimeBooks.forEach((book) => {
       book.targetHover = 0;
     });
     this.callbacks.onMode(this.mode, index);
     this.callbacks.onStatus(
       `${this.runtimeBooks[index].data.shortTitle} wird herausgezogen`,
+    );
+  }
+
+  /** Schaut die Kamera auf den Deckel oder auf die Rueckseite des Bandes? */
+  private rueckseiteZurKamera(band: RuntimeBook) {
+    const deckelNormale = new THREE.Vector3(0, 0, 1).applyQuaternion(
+      band.content.getWorldQuaternion(new THREE.Quaternion()),
+    );
+    const zurKamera = new THREE.Vector3()
+      .subVectors(
+        this.camera.position,
+        band.content.getWorldPosition(new THREE.Vector3()),
+      )
+      .normalize();
+    return deckelNormale.dot(zurKamera) < 0;
+  }
+
+  /**
+   * Wendet den aufgestellten Band im Regal — die F-Taste, wie beim
+   * aufgeschlagenen. Gedreht wird die Figur selbst, nicht die Ansicht:
+   * so stimmt hinterher auch, welche Seite beim Aufschlagen vorn liegt.
+   */
+  flipStehenden() {
+    if (this.mode !== "browse" || this.presentedIndex === null) return;
+    const band = this.runtimeBooks[this.presentedIndex];
+    if (this.stehendBasisYaw === null) {
+      this.stehendBasisYaw = band.content.rotation.y;
+    }
+    this.stehendGedreht = !this.stehendGedreht;
+    this.callbacks.onStatus(
+      this.stehendGedreht
+        ? `${band.data.back?.shortTitle ?? band.data.shortTitle} liegt vorn`
+        : `${band.data.shortTitle} liegt vorn`,
     );
   }
 
@@ -1620,8 +1822,8 @@ export class ShelfEngine {
         selected,
         {
           ...pose,
-          yaw: pose.yaw + this.inspectYaw * motionFocus,
-          pitch: pose.pitch + this.inspectPitch * motionFocus,
+          yaw: pose.yaw + (this.inspectYaw + this.neigungYaw) * motionFocus,
+          pitch: pose.pitch + (this.inspectPitch + this.neigungPitch) * motionFocus,
         },
         false,
       );
@@ -1630,6 +1832,18 @@ export class ShelfEngine {
       // interessiert sie nicht.
       selected.content.rotation.z = inspectDefaultRoll * motionFocus;
       this.seiteAblesen(selected);
+    }
+
+    // Der gewendete Band dreht sich weich auf seine neue Lage.
+    if (this.mode === "browse" && this.presentedIndex !== null && this.stehendBasisYaw !== null) {
+      const stehend = this.runtimeBooks[this.presentedIndex];
+      const ziel = this.stehendBasisYaw + (this.stehendGedreht ? Math.PI : 0);
+      stehend.content.rotation.y = damp(
+        stehend.content.rotation.y,
+        ziel,
+        this.reducedMotion ? 20 : 9,
+        delta,
+      );
     }
 
     this.runtimeBooks.forEach((book) => {
@@ -1737,9 +1951,6 @@ export class ShelfEngine {
       width <= 1020
         ? Math.min(compactDetailMaxWidth, width * compactDetailWidthRatio)
         : Math.min(desktopDetailMaxWidth, width * desktopDetailWidthRatio);
-    const focusDistance = isMobile ? 5.8 : 5.4;
-    const verticalHalfSpan =
-      Math.tan(THREE.MathUtils.degToRad(this.camera.fov * 0.5)) * focusDistance;
     const clampedProgress = clamp(progress, 0, 1);
     const horizontalOffset = isMobile
       ? 0
@@ -1748,9 +1959,9 @@ export class ShelfEngine {
     // Bild deshalb ein Stueck angehoben, sonst klebt der Stapel ueber der
     // Beschriftung und oben bleibt eine leere Flaeche stehen.
     const grundVersatz = isMobile ? height * 0.05 : 0;
-    const fokusVersatz = isMobile
-      ? (0.28 / verticalHalfSpan) * height * 0.5
-      : 0;
+    // Hochkant liegt die Tafel unten im Bild. Der Band rueckt so weit nach
+    // oben, dass er ganz in der freien Flaeche darueber steht.
+    const fokusVersatz = isMobile ? height * 0.2 : 0;
     const verticalOffset =
       grundVersatz + (fokusVersatz - grundVersatz) * clampedProgress;
 
@@ -1771,12 +1982,27 @@ export class ShelfEngine {
     );
   }
 
+  /** Vorgabeabstand der Betrachtung, ohne eigenes Zutun. */
+  private grundAbstand() {
+    return this.canvas.clientWidth < 760 ? 6.7 : 5.4;
+  }
+
+  /** Wie weit die Kamera gerade steht, gemessen am Vorgabeabstand. */
+  private abstandFaktorJetzt() {
+    if (this.selectedIndex === null) return 1;
+    const band = this.runtimeBooks[this.selectedIndex];
+    const abstand = this.camera.position.distanceTo(
+      band.content.getWorldPosition(new THREE.Vector3()),
+    );
+    return clamp(abstand / this.grundAbstand(), 0.45, 2.4);
+  }
+
   private frameFocusedBook(
     worldPosition: THREE.Vector3,
     compositionProgress = 1,
   ) {
     const isMobile = this.canvas.clientWidth < 760;
-    const focusDistance = isMobile ? 5.8 : 5.4;
+    const focusDistance = this.grundAbstand() * this.inspectAbstandFaktor;
     this.applyFocusViewOffset(compositionProgress);
 
     this.focusCameraTarget.copy(worldPosition);
@@ -1795,6 +2021,13 @@ export class ShelfEngine {
     // steht dann links dahinter. Breites Fenster: dazwischen, dann sind
     // beide im Bild.
     const schmal = width < 760;
+    // Auf dem Handy faengt der Blick knapp ein Drittel weiter hinten an —
+    // dann sieht man die Nachbarstapel und hat Luft, sich umzusehen.
+    if (schmal && !this.handyAbstandGesetzt) {
+      this.handyAbstandGesetzt = true;
+      this.zoom = 1.3;
+      this.zielZoom = 1.3;
+    }
     const blickX = schmal ? pulledSideStep * 0.55 : pulledSideStep * 0.5;
     browseTarget.x = blickX;
     // Hochkant sitzt der Text unten im Bild: der Blick geht etwas tiefer,
@@ -1985,11 +2218,18 @@ export class ShelfEngine {
     const naechsteSeite: BookSide = zeigeHinten ? "hinten" : "vorn";
 
     this.controls.enabled = false;
-    this.zielYaw = inspectDefaultYaw;
-    this.zielPitch = inspectDefaultPitch + (zeigeHinten ? Math.PI : 0);
+    // Winkel und Zoom bleiben, wie man sie eingestellt hat — der naechste
+    // Band kommt in derselben Haltung herein. Nur wenn die Seite wechselt,
+    // dreht sich der Band um seine Querachse mit.
+    if (naechsteSeite !== this.side) {
+      this.zielPitch += Math.PI;
+    }
     // Sofort setzen: waehrend des Wechsels soll nichts nachlaufen.
     this.inspectYaw = this.zielYaw;
     this.inspectPitch = this.zielPitch;
+    // Den selbst gewaehlten Abstand merken, damit die Kamera ihn nach dem
+    // Wechsel wieder einnimmt statt auf den Vorgabeabstand zu springen.
+    this.inspectAbstandFaktor = this.abstandFaktorJetzt();
 
     if (naechsteSeite !== this.side) {
       this.side = naechsteSeite;
@@ -2013,7 +2253,7 @@ export class ShelfEngine {
    * zerfaellt genau in die zwei Haelften, die er nicht sein soll.
    */
   private wipeWegInPixeln() {
-    const abstand = this.canvas.clientWidth < 760 ? 5.8 : 5.4;
+    const abstand = this.canvas.clientWidth < 760 ? 6.7 : 5.4;
     const halbeHoehe =
       Math.tan(THREE.MathUtils.degToRad(this.camera.fov * 0.5)) * abstand;
     const proEinheit = Math.max(1, this.canvas.clientHeight) / (2 * halbeHoehe);
@@ -2053,6 +2293,8 @@ export class ShelfEngine {
 
   presentBook(index: number) {
     if (this.mode !== "browse") return;
+    this.stehendGedreht = false;
+    this.stehendBasisYaw = null;
     this.atRest = false;
     this.layDownPending = false;
     this.pendingFocusIndex = null;
@@ -2205,6 +2447,7 @@ export class ShelfEngine {
     this.canvas.removeEventListener("pointerup", this.handlePointerUp);
     this.canvas.removeEventListener("pointercancel", this.handlePointerCancel);
     this.canvas.removeEventListener("pointerleave", this.handlePointerLeave);
+    window.removeEventListener("deviceorientation", this.handleNeigung);
     window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("blur", this.handleWindowBlur);
 

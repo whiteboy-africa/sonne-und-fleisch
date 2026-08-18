@@ -1,7 +1,7 @@
 ---
 titel: Tokio Burning
 kurztitel: Tokio Burning
-autor: Farranggore
+autor: Christoph Laible
 klappentext: >-
   Platzhalter: zwei bis vier Sätze zur ersten Geschichte. Sie erscheinen im
   Regal, wenn der Band herausgezogen ist.

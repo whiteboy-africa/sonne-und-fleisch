@@ -196,43 +196,6 @@ body {
   line-height: 1.2;
 }
 
-.inspect-button {
-  display: inline-flex;
-  gap: 18px;
-  align-items: center;
-  margin-top: 22px;
-  padding: 10px 14px 9px;
-  border: 2px solid var(--ink);
-  background: transparent;
-  color: var(--ink);
-  cursor: pointer;
-  pointer-events: auto;
-  font-family: var(--schrift);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  transition: background 140ms steps(2), color 140ms steps(2);
-}
-
-.inspect-button:hover:not(:disabled) {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #000000;
-}
-
-.inspect-button:disabled {
-  opacity: 0.4;
-}
-
-.inspect-button span:last-child {
-  font-size: 13px;
-  font-weight: 500;
-  transition: transform 220ms ease;
-}
-
-.inspect-button:hover span:last-child {
-  transform: translate3d(2px, -2px, 0);
-}
 
 .shelf-arrow {
   position: absolute;
@@ -555,18 +518,14 @@ body {
   scrollbar-color: var(--hairline) transparent;
 }
 
-/* Waehrend eines Seitwaertswechsels wird an den Raendern der Tafel
-   beschnitten: der hinausfahrende Text verschwindet an ihrer Kante, statt
-   ueber den Band zu wandern. */
-.book-details.is-wischend {
-  overflow: hidden;
-}
-
 /* Der alte Text als Kopie, waehrend das Original schon den neuen Band
-   zeigt. Liegt genau ueber der Stelle, an der er eben noch stand. */
+   zeigt. Sie haengt in der ganzen Flaeche, nicht in der Tafel: der Text
+   soll neben dem Band ueber den Schirm fahren und erst am Bildrand
+   verschwinden — an der Tafelkante abgeschnitten sah es aus, als blinke
+   er weg, waehrend der Band noch faehrt. */
 .book-details__copy--kopie {
   position: absolute;
-  z-index: 1;
+  z-index: 22;
   margin: 0;
   overflow: hidden;
   pointer-events: none;
@@ -853,9 +812,10 @@ body {
   }
 
   .wordmark {
-    gap: 10px;
-    font-size: 11px;
-    letter-spacing: 0.12em;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
   }
 
   .wordmark__divider {
@@ -914,10 +874,6 @@ body {
     font-size: 14px;
   }
 
-  .inspect-button {
-    margin-top: 18px;
-  }
-
   .shelf-arrow {
     top: auto;
     bottom: 60px;
@@ -966,9 +922,10 @@ body {
     top: auto;
     bottom: 0;
     width: 100%;
-    /* Etwas hoeher als frueher: sonst lag der Wenden-Knopf — der einzige
-       Weg zur zweiten Geschichte — unter der Kante. */
-    height: min(56dvh, 540px);
+    /* Knapp unter der Haelfte: der Band soll darueber ganz zu sehen sein.
+       Sichtbar sind Kopfzeile, Titel und Autor; alles Weitere holt man
+       sich mit einer Wischbewegung in der Tafel herauf. */
+    height: min(45dvh, 440px);
     opacity: 0;
     transform: translateY(100%);
   }
