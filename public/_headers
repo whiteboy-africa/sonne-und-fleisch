@@ -1,0 +1,10 @@
+# Kopfzeilen fuer Cloudflare Pages.
+#
+# Solange der Verlag nicht oeffentlich ist, faellt die ganze Seite aus jedem
+# Suchindex. Das gilt hier fuer alle Dateien, nicht nur fuer HTML: ohne diese
+# Zeile landen die Umschlaege in der Bildersuche und die Sitemap im Index.
+#
+# Wenn der Verlag oeffentlich wird: diesen Block loeschen und in
+# src/shelf/verlag-config.ts `suchmaschinen` auf true stellen.
+/*
+  X-Robots-Tag: noindex, nofollow

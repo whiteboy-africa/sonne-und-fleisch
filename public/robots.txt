@@ -1,0 +1,9 @@
+# Kein Verbot, sondern Absicht: die Robots duerfen holen, was sie wollen —
+# sie bekommen bei jeder Datei „X-Robots-Tag: noindex" zurueck (public/_headers)
+# und werfen die Seite daraufhin aus dem Index.
+#
+# Ein „Disallow: /" waere hier schlechter: dann kaeme kein Bot mehr an die
+# noindex-Zeile, und eine von aussen verlinkte Adresse koennte trotzdem als
+# nackter Treffer in den Ergebnissen stehen.
+User-agent: *
+Disallow:

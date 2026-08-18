@@ -30,6 +30,14 @@ const kanonisch = new URL(Astro.url.pathname, Astro.site).href;
     <title>{seitenTitel}</title>
     <meta name="description" content={seitenBeschreibung} />
     <link rel="canonical" href={kanonisch} />
+    {
+      /* Nicht auffindbar, solange der Verlag nicht oeffentlich ist. Der
+         Riegel steht in verlag-config.ts und zusaetzlich in
+         public/_headers, damit auch Bilder aussen vor bleiben. */
+      !siteConfig.suchmaschinen && (
+        <meta name="robots" content="noindex, nofollow" />
+      )
+    }
     <meta name="theme-color" content="#000000" />
     <meta name="color-scheme" content="dark" />
 
@@ -42,7 +50,7 @@ const kanonisch = new URL(Astro.url.pathname, Astro.site).href;
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    {siteConfig.suchmaschinen && <link rel="sitemap" href="/sitemap-index.xml" />}
   </head>
   <body data-regalseite={regal ? 'ja' : undefined}>
     <slot />

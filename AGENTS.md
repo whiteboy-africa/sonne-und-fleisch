@@ -122,6 +122,24 @@ Die Werte stehen in `src/styles/basis.css` und gelten überall — auch die
 3D-Szene (`ShelfEngine.ts`, `roomColor`) muss dazu passen. Die Parole unten
 rechts steht in `src/shelf/verlag-config.ts`.
 
+## Nicht auffindbar
+
+Der Verlag steht online, soll aber vorerst in keiner Suchmaschine auftauchen.
+Zwei Riegel sorgen dafuer, und beide gehoeren zusammen:
+
+- `suchmaschinen: false` in `src/shelf/verlag-config.ts` setzt in jeder Seite
+  `<meta name="robots" content="noindex, nofollow">` und laesst den
+  Sitemap-Verweis im Kopf weg.
+- `public/_headers` schickt `X-Robots-Tag: noindex, nofollow` zu **jeder**
+  Datei — auch zu den Umschlaegen (sonst Bildersuche) und zur Sitemap.
+
+`public/robots.txt` verbietet absichtlich **nichts**. Ein `Disallow: /` wuerde
+die Bots von der noindex-Zeile fernhalten; eine von aussen verlinkte Adresse
+kaeme dann trotzdem als nackter Treffer in die Ergebnisse.
+
+Oeffentlich wird die Seite, indem man `suchmaschinen` auf `true` stellt und
+den Block in `public/_headers` loescht.
+
 ## Deutsch
 
 Sichtbarer Text trägt echte Umlaute. In Code-Kommentaren und Commit-Nachrichten
