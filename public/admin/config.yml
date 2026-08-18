@@ -55,9 +55,10 @@ collections:
         hint: 'Freitext, etwa „Broschur · 224 Seiten".'
       - name: verfuegbarkeit
         label: Verfügbarkeit
-        widget: string
+        widget: select
         default: In Vorbereitung
-        hint: 'Freitext, etwa „Lieferbar" oder „Erscheint im Frühjahr 2027".'
+        options: ['Verfügbar', 'In Vorbereitung', 'Vergriffen']
+        hint: 'Einer von drei Zuständen. Steht im Regal und im Programm.'
 
       - { name: isbn, label: ISBN, widget: string, required: false }
       - { name: preis, label: Preis, widget: string, required: false }

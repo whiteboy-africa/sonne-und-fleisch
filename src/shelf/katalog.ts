@@ -27,6 +27,19 @@ export const MOTIVE = [
 
 export type BookMotif = (typeof MOTIVE)[number];
 
+/**
+ * Die drei Zustaende, die ein Band im Programm haben kann. Freitext gab es
+ * hier frueher — damit stand auf jeder Seite etwas anderes, und die Liste
+ * liess sich nicht nach Zustand lesen.
+ */
+export const VERFUEGBARKEITEN = [
+  'Verfügbar',
+  'In Vorbereitung',
+  'Vergriffen',
+] as const;
+
+export type Verfuegbarkeit = (typeof VERFUEGBARKEITEN)[number];
+
 export type CatalogBook = {
   id: string;
   /** Releasenummer, dreistellig — steht auf dem Buchruecken. */

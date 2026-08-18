@@ -2,24 +2,25 @@
 // Das Programm als Liste — die Textfassung des Regals, auch ohne WebGL
 // lesbar und von Suchmaschinen erfassbar.
 import Seite from '../../layouts/Seite.astro';
-import { alleBuecher, buchPfad } from '../../buecher';
+import { programmListe, buchPfad } from '../../buecher';
 
-const buecher = await alleBuecher();
+// Neuester Band oben, aeltester unten. Die Nummer bleibt am Buch.
+const eintraege = await programmListe();
 ---
 
 <Seite
   titel="Programm"
-  augenbraue={`${buecher.length} ${buecher.length === 1 ? 'Band' : 'Bände'}`}
+  augenbraue={`${eintraege.length} ${eintraege.length === 1 ? 'Band' : 'Bände'}`}
   untertitel="Alles, was der Verlag bisher gemacht hat, und was als nächstes kommt."
   beschreibung="Das vollständige Programm des Verlags Sonne und Fleisch."
   weit
 >
   {
-    buecher.length === 0 ? (
+    eintraege.length === 0 ? (
       <p class="fliesstext">Das Programm wird gerade gesetzt.</p>
     ) : (
       <div class="programm">
-        {buecher.map((buch) => (
+        {eintraege.map(({ buch, nummer }) => (
           <a class="band" href={buchPfad(buch)}>
             <span
               class="band__ruecken"
@@ -33,6 +34,7 @@ const buecher = await alleBuecher();
               }
             </span>
             <span class="band__text">
+              <span class="band__nummer">{nummer}</span>
               <h2>{buch.data.titel}</h2>
               <p class="band__autor">{buch.data.autor}</p>
               <p class="band__klappentext">{buch.data.klappentext}</p>
@@ -45,7 +47,12 @@ const buecher = await alleBuecher();
               }
             </span>
             <span class="band__marge">
-              {buch.data.verfuegbarkeit}
+              <span
+                class="band__stand"
+                data-stand={buch.data.verfuegbarkeit}
+              >
+                {buch.data.verfuegbarkeit}
+              </span>
               <br />
               {buch.data.format}
               {buch.data.preis && (

@@ -1,6 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { MOTIVE } from './shelf/katalog';
+import { MOTIVE, VERFUEGBARKEITEN } from './shelf/katalog';
 
 // Ein Buch = eine Datei in src/content/buecher/. Der Dateiname ist der Slug
 // und damit die Adresse (/programm/<slug>) und der stabile Schluessel fuer
@@ -22,8 +22,8 @@ const buecher = defineCollection({
     zitat_von: z.string(),
     // Freitext, etwa "Broschur · 224 Seiten" oder "Leinen · 96 Seiten".
     format: z.string(),
-    // Freitext, etwa "Lieferbar" oder "Erscheint im Fruehjahr 2027".
-    verfuegbarkeit: z.string(),
+    // Einer von drei Zustaenden: Verfuegbar, In Vorbereitung, Vergriffen.
+    verfuegbarkeit: z.enum(VERFUEGBARKEITEN).default('In Vorbereitung'),
 
     // Angaben nur fuer die Buchseite, nicht fuers Regal.
     isbn: z.string().optional(),

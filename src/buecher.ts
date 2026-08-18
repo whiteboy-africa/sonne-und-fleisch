@@ -23,6 +23,22 @@ export async function alleBuecher(): Promise<Buch[]> {
   });
 }
 
+/**
+ * Das Programm als Liste: der neueste Band oben, der aelteste unten.
+ *
+ * Die Releasenummer haengt am Buch, nicht an der Zeile — sie kommt aus der
+ * Regalordnung (001 ist der erste Band) und bleibt deshalb dieselbe, egal wie
+ * herum die Liste sortiert ist.
+ */
+export async function programmListe(): Promise<
+  Array<{ buch: Buch; nummer: string }>
+> {
+  const buecher = await alleBuecher();
+  return buecher
+    .map((buch, position) => ({ buch, nummer: releasenummer(position) }))
+    .reverse();
+}
+
 /** Adresse der Buchseite. */
 export function buchPfad(buch: Buch): string {
   return `/programm/${buch.id}`;
