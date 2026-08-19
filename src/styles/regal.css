@@ -1278,7 +1278,7 @@ body {
     display: flex;
     flex-direction: column;
     height: auto;
-    min-height: 100dvh;
+    min-height: 100svh;
     /* Nur `visible`: sobald eine Achse `clip` bekommt, wird die andere zu
        `auto` — dann scrollt die Flaeche in sich selbst statt die Seite,
        und alles unterhalb des Falzes ist unerreichbar. Das Beschneiden
@@ -1296,12 +1296,23 @@ body {
     overflow-y: auto;
   }
 
-  /* Die Leinwand bleibt, wo sie ist — nur eben fest und hinten. */
+  /*
+   * Die Leinwand bleibt, wo sie ist — nur eben fest und hinten. Ihre Hoehe
+   * steht in `svh`, nicht in `dvh`: beim Scrollen faehrt die Adresszeile
+   * des Browsers ein und aus, `dvh` aendert sich dabei staendig, und jede
+   * Aenderung vermisst und baut die Szene neu auf. Genau das sieht man als
+   * Flackern. `svh` bleibt gleich, egal wie die Leiste steht.
+   */
   [data-handy-fluss='an'] .shelf-canvas {
     position: fixed;
     z-index: 0;
-    inset: 0;
-    height: 100dvh;
+    inset: 0 0 auto;
+    height: 100svh;
+    /* Eigene Ebene beim Zusammensetzen: dann schiebt der Browser sie beim
+       Scrollen, statt sie neu zu zeichnen. */
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
   }
 
   /* Die Tafel ist keine Tafel mehr, sondern Text auf der Seite. Der
@@ -1312,7 +1323,7 @@ body {
     order: 1;
     width: 100%;
     height: auto;
-    margin-top: 70dvh;
+    margin-top: 70svh;
     /* Undurchsichtig: der Text schiebt sich beim Scrollen wie ein Blatt
        ueber den Band, statt sich mit ihm zu ueberlagern. Oben laeuft er
        weich an, damit die Kante nicht als Balken wirkt. */
@@ -1403,9 +1414,9 @@ body {
        stehenbleiben. */
     position: absolute;
     z-index: 3;
-    top: 22dvh;
+    top: 22svh;
     bottom: auto;
-    height: 34dvh;
+    height: 34svh;
     width: 52px;
     min-width: 0;
     padding: 0 12px;
