@@ -730,6 +730,8 @@ export class ShelfEngine {
     pageBlock.name = "pageBlock";
     pageBlock.castShadow = true;
     pageBlock.receiveShadow = true;
+    // Ein Blatt hat keinen Buchblock: es ist nur der Bogen selbst.
+    pageBlock.visible = !book.sheet;
     physical.add(pageBlock);
 
     // Kein Deckel, sondern ein umgeschlagener Karton: duenn und randgleich.
@@ -769,6 +771,9 @@ export class ShelfEngine {
     spine.name = "spine";
     spine.position.x = -width * 0.5 + 0.007;
     spine.castShadow = true;
+    // Und keinen Ruecken. Genau der laesst ein duennes Buch trotzdem wie
+    // ein Buch aussehen.
+    spine.visible = !book.sheet;
     physical.add(spine);
 
 

@@ -21,11 +21,11 @@ cover_farbe: '#8b9266'
 akzent_farbe: '#a8584e'
 schrift_farbe: '#e2dfbe'
 motiv: wave
-# Quer und dünn: Breite geteilt durch Höhe, und ein Bogen statt eines
-# Buchblocks.
-hoehe: 1.3
-dicke: 0.009
+# Ein Bogen: quer, größer als ein Band, ohne Buchblock und ohne Rücken.
+hoehe: 1.7
+dicke: 0.006
 breite_verhaeltnis: 1.41
+blatt: true
 reihenfolge: 900
 ---
 

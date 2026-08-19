@@ -130,6 +130,7 @@ export function alsKatalogBuch(buch: Buch, position = 0): CatalogBook {
     ...(d.ruecken_bild ? { spineImage: d.ruecken_bild } : {}),
     ...(d.lebendig ? { living: true } : {}),
     ...(d.blind ? { blind: true } : {}),
+    ...(d.blatt ? { sheet: true } : {}),
     ...(d.rueckseite
       ? {
           back: {

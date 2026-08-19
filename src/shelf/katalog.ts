@@ -77,6 +77,12 @@ export type CatalogBook = {
    * traegt nur das Verlagszeichen, kein Bild und keinen Titel.
    */
   blind?: boolean;
+  /**
+   * Blatt statt Buch: nur der Bogen selbst, kein Buchblock, kein Ruecken.
+   * So sieht ein Poster im Stapel aus wie ein Poster und nicht wie ein
+   * sehr duennes Buch.
+   */
+  sheet?: boolean;
   linkLabel?: string;
   living?: boolean;
   /**

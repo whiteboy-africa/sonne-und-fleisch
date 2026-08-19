@@ -49,7 +49,7 @@ const buecher = defineCollection({
     // Ab 1,0: niedrig genug fuer ein quer liegendes Blatt.
     hoehe: z.number().min(1.0).max(2.6).default(2),
     // Ab 0,008: duenn genug fuer ein einzelnes Blatt.
-    dicke: z.number().min(0.008).max(0.2).default(0.078),
+    dicke: z.number().min(0.004).max(0.2).default(0.078),
     // Breite geteilt durch Hoehe. Vorgabe ist A5 (0,705), und dabei bleibt
     // es vorerst fuer alle Baende.
     //
@@ -80,6 +80,11 @@ const buecher = defineCollection({
      * ruecken echte Baende automatisch davor.
      */
     blind: z.boolean().default(false),
+    /**
+     * Blatt statt Buch: ein einzelner Bogen ohne Buchblock und ohne
+     * Ruecken. Fuer das Bild im Stapel, das kein Band ist.
+     */
+    blatt: z.boolean().default(false),
 
     // Doppelcover (tête-bêche): das Buch hat zwei Vorderseiten. Die zweite
     // ist kopfüber auf die Rückseite gedruckt — man dreht den Band um und
