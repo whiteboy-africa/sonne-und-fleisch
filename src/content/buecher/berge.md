@@ -24,7 +24,7 @@ motiv: wave
 # Quer und dünn: Breite geteilt durch Höhe, und ein Bogen statt eines
 # Buchblocks.
 hoehe: 1.3
-dicke: 0.014
+dicke: 0.009
 breite_verhaeltnis: 1.41
 reihenfolge: 900
 ---

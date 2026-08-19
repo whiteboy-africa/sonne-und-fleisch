@@ -67,6 +67,12 @@ export type MotionBookSize = {
 };
 
 export type MotionLayout = {
+  /**
+   * Hoehe der Mitte, auf der jedes aufgeschlagene Stueck steht — gemessen
+   * am hoechsten Band. Ohne diesen gemeinsamen Wert saesse ein niedriges
+   * Blatt tiefer als ein Buch, und beim Wechsel spraenge das Bild.
+   */
+  fokusHoehe: number;
   /** Oberkante der Platte, auf der die Stapel liegen. */
   floorTop: number;
   /** Tiefe, in der der aufgestellte Band steht. */
@@ -153,8 +159,11 @@ export function createMotionLayout(books: MotionBookSize[]): MotionLayout {
     maxHeight * 0.5; // halbe Laenge des liegenden Bandes
   const aufgestellt = maxHeight * 0.5 + leanedDepth * 0.5 * maximumFocusScale;
 
+  const lean = Math.abs(leanBack);
   return {
     floorTop: 0,
+    fokusHoehe:
+      maxHeight * 0.5 * Math.cos(lean) + maxThickness * 0.5 * Math.sin(lean),
     pulledZ:
       Math.max(flachAusgezogen, aufgestellt) +
       maxStackJitter +
@@ -285,7 +294,8 @@ export function focusedBookPose(
   const value = clamp01(progress);
   const clearanceProgress = smooth(Math.min(1, value / 0.55));
   const presentationProgress = smooth(Math.max(0, (value - 0.55) / 0.45));
-  const stand = standingY(place, layout);
+  // Vorn stehen alle auf derselben Hoehe, unabhaengig von ihrem Format.
+  const stand = layout.floorTop + layout.fokusHoehe;
 
   return {
     x: lerp(pulledSideStep, focusX, presentationProgress),

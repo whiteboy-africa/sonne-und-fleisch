@@ -713,12 +713,15 @@ export class ShelfEngine {
       metalness: 0,
     });
 
-    // Der Buchblock einer Broschur sitzt fast randlos im Umschlag.
+    // Der Buchblock einer Broschur sitzt fast randlos im Umschlag. Die
+    // untere Schranke muss mitgehen: bei einem einzelnen Blatt (0,014)
+    // ragte ein fester Mindestblock von 0,03 durch beide Deckel — man sah
+    // Papier statt Umschlag, und das Blatt wirkte dick.
     const pageBlock = new THREE.Mesh(
       new RoundedBoxGeometry(
         width - 0.022,
         book.height - 0.026,
-        Math.max(0.03, depth - 0.014),
+        Math.max(depth * 0.4, depth - 0.014),
         3,
         0.006,
       ),
@@ -733,7 +736,9 @@ export class ShelfEngine {
     const boardGeometry = new RoundedBoxGeometry(
       width,
       book.height,
-      0.008,
+      // Zwei Deckel muessen in die Dicke passen, sonst stecken sie
+      // ineinander.
+      Math.min(0.008, depth * 0.3),
       3,
       0.004,
     );
@@ -752,7 +757,13 @@ export class ShelfEngine {
     physical.add(backBoard);
 
     const spine = new THREE.Mesh(
-      new RoundedBoxGeometry(0.016, book.height, depth + 0.004, 3, 0.005),
+      new RoundedBoxGeometry(
+        Math.min(0.016, depth * 0.9),
+        book.height,
+        depth + 0.004,
+        3,
+        0.005,
+      ),
       boardMaterial,
     );
     spine.name = "spine";
