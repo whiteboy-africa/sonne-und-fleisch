@@ -1993,9 +1993,21 @@ export class ShelfEngine {
     );
   }
 
+  /** Zuletzt vermessene Groesse — gegen das Zittern beim Scrollen. */
+  private letzteGroesse = { breite: 0, hoehe: 0 };
+
   private handleResize = () => {
     const width = Math.max(1, this.canvas.clientWidth);
     const height = Math.max(1, this.canvas.clientHeight);
+
+    // Auf dem Handy meldet der Browser beim Scrollen laufend neue Hoehen,
+    // weil seine Adresszeile ein- und ausfaehrt. Jede Neuvermessung baut
+    // die Szene neu auf — das sieht man als Flackern. Kleine Aenderungen
+    // der Hoehe bei gleicher Breite werden deshalb uebergangen.
+    const nurHoehe = width === this.letzteGroesse.breite;
+    const winzig = Math.abs(height - this.letzteGroesse.hoehe) < 140;
+    if (nurHoehe && winzig && this.letzteGroesse.hoehe > 0) return;
+    this.letzteGroesse = { breite: width, hoehe: height };
     const dprCap = width < 760 ? 1.5 : 1.75;
     // Auf dem Handy wird nicht verschoben: der Band bleibt, wo er ist, und
     // laesst sich nur drehen und heranholen. Mit zwei Fingern wandert er

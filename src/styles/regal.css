@@ -1308,11 +1308,6 @@ body {
     z-index: 0;
     inset: 0 0 auto;
     height: 100svh;
-    /* Eigene Ebene beim Zusammensetzen: dann schiebt der Browser sie beim
-       Scrollen, statt sie neu zu zeichnen. */
-    transform: translateZ(0);
-    will-change: transform;
-    backface-visibility: hidden;
   }
 
   /* Die Tafel ist keine Tafel mehr, sondern Text auf der Seite. Der
