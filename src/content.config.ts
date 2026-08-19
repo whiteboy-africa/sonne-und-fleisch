@@ -46,8 +46,10 @@ const buecher = defineCollection({
     // A5 hoch entspricht 2,0. Die Dicke folgt dem Umfang — ein 96-Seiter
     // liegt bei 0,07, ein 384-Seiter bei 0,24. Die Breite rechnet das Regal
     // aus der Hoehe (Taschenbuchformat), sie steht nicht hier.
-    hoehe: z.number().min(1.4).max(2.4).default(2.0),
-    dicke: z.number().min(0.02).max(0.4).default(0.08),
+    // Ab 1,0: niedrig genug fuer ein quer liegendes Blatt.
+    hoehe: z.number().min(1.0).max(2.6).default(2),
+    // Ab 0,008: duenn genug fuer ein einzelnes Blatt.
+    dicke: z.number().min(0.008).max(0.2).default(0.078),
     // Breite geteilt durch Hoehe. Vorgabe ist A5 (0,705), und dabei bleibt
     // es vorerst fuer alle Baende.
     //
@@ -56,7 +58,9 @@ const buecher = defineCollection({
     // wird das Umschlagbild nicht mehr ins A5-Format gequetscht. Die Dicke
     // folgt genauso aus der Breite des Ruecken-Streifens, geteilt durch die
     // Bogenhoehe und mal der Buchhoehe.
-    breite_verhaeltnis: z.number().min(0.4).max(1.2).default(148 / 210),
+    // Ueber 1 heisst Querformat — dafuer gibt es das Blatt im Stapel, das
+    // kein Buch ist.
+    breite_verhaeltnis: z.number().min(0.4).max(1.8).default(148 / 210),
     // Eigenes Cover-Bild fuer die Vorderseite, etwa
     // "/buecher/mein-buch/cover.webp". Hochformat, moeglichst 2:3.
     // Ersetzt nur die Vorderseite; Ruecken, Rueckseite und Kanten
