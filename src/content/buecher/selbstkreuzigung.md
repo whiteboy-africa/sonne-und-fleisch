@@ -18,8 +18,8 @@ hoehe: 2.0
 dicke: 0.078
 reihenfolge: 6
 # Doppelcover: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
-# Gemalte Bildtafel auf getöntem Papier, Titel in Rot. Untertitel auf dem
-# Bild: „10,000 Dead Martyrs — A Study on Sensitivity".
+# Der Umschlag ist ein Holzschnitt in Schwarz auf Papierweiß. Untertitel auf
+# dem Bild: „10,000 Dead Martyrs: A Study on Sensitivitiy".
 rueckseite:
   titel: Corporal Curses
   kurztitel: Corporal Curses
@@ -29,10 +29,10 @@ rueckseite:
     erscheint, sobald man das Buch wendet.
   zitat: Platzhalter für einen Satz aus Corporal Curses.
   zitat_von: Verlagsnotiz
-  cover_bild: /buecher/selbstkreuzigung/corporal-curses-2.webp
-  cover_farbe: '#1d2f3a'
-  akzent_farbe: '#b52705'
-  schrift_farbe: '#dbbf88'
+  cover_bild: /buecher/selbstkreuzigung/corporal-curses.webp
+  cover_farbe: '#0f0d0c'
+  akzent_farbe: '#c9c1ad'
+  schrift_farbe: '#f2ebdd'
   motiv: gather
 ---
 
