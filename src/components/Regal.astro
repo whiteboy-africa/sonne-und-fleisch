@@ -16,7 +16,11 @@ const erstes = katalog[0];
 const gesamt = katalognummer(katalog.length);
 ---
 
-<main class="press-experience is-browsing" data-regal>
+<main
+  class="press-experience is-browsing"
+  data-regal
+  data-handy-fluss={siteConfig.handyFluss ? 'an' : 'aus'}
+>
   <script type="application/json" data-regal-daten set:html={JSON.stringify(katalog)} is:inline />
 
   <canvas

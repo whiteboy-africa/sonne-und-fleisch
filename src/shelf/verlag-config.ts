@@ -30,4 +30,11 @@ export const siteConfig = {
    * gilt — beide gehoeren umgestellt, wenn der Verlag oeffentlich wird.
    */
   suchmaschinen: false,
+  /**
+   * Handy-Fluss: auf schmalen Schirmen verlaesst die Bedienung die feste
+   * Lage und fliesst als normale Seite unter der Leinwand her. Die
+   * Leinwand selbst bleibt fest und ganz hinten. Auf `false` gestellt
+   * verhaelt sich alles wie zuvor.
+   */
+  handyFluss: true,
 } as const;

@@ -1264,3 +1264,152 @@ body {
   line-height: 1.5;
   opacity: 0.7;
 }
+
+/* --- Handy-Fluss ---------------------------------------------------------
+ *
+ * Auf schmalen Schirmen verlaesst die Bedienung die feste Lage: die
+ * Leinwand bleibt fest und ganz hinten, alles andere fliesst als normale
+ * Seite darueber. Oben steht ein Abstandhalter, damit der Band frei
+ * dasteht; darunter kommen Wenden-Knopf, Text und ganz am Ende die
+ * Nummernleiste. Schalter: `handyFluss` in verlag-config.ts.
+ */
+@media (max-width: 767px) {
+  [data-handy-fluss='an'].press-experience {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100dvh;
+    /* Nur `visible`: sobald eine Achse `clip` bekommt, wird die andere zu
+       `auto` — dann scrollt die Flaeche in sich selbst statt die Seite,
+       und alles unterhalb des Falzes ist unerreichbar. Das Beschneiden
+       waagerecht uebernimmt deshalb die Seite selbst. */
+    overflow: visible;
+  }
+
+  /* Der Stapel steht sonst still — im Handy-Fluss muss die Seite aber
+     scrollen koennen. Waagerecht bleibt sie beschnitten. */
+  html:has([data-handy-fluss='an']),
+  body:has([data-handy-fluss='an']) {
+    height: auto;
+    min-height: 100%;
+    overflow-x: clip;
+    overflow-y: auto;
+  }
+
+  /* Die Leinwand bleibt, wo sie ist — nur eben fest und hinten. */
+  [data-handy-fluss='an'] .shelf-canvas {
+    position: fixed;
+    z-index: 0;
+    inset: 0;
+    height: 100dvh;
+  }
+
+  /* Die Tafel ist keine Tafel mehr, sondern Text auf der Seite. Der
+     Abstandhalter darueber laesst dem Band seinen Platz. */
+  [data-handy-fluss='an'] .book-details {
+    position: static;
+    z-index: 2;
+    order: 1;
+    width: 100%;
+    height: auto;
+    margin-top: 70dvh;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    transition: none;
+  }
+
+  [data-handy-fluss='an'] .book-details__inner {
+    display: block;
+    height: auto;
+    padding: 0 20px;
+  }
+
+  [data-handy-fluss='an'] .book-details__copy {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    padding: 0;
+    overflow: visible;
+    opacity: 1;
+  }
+
+  /* Der Wenden-Knopf rueckt direkt unter den Band, in Daumenreichweite.
+     `display: contents` loest den festen Block auf, damit die einzelnen
+     Teile ihre Reihenfolge selbst bestimmen koennen. */
+  [data-handy-fluss='an'] .book-details__unten {
+    display: contents;
+  }
+
+  [data-handy-fluss='an'] .wenden-knopf {
+    order: -1;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 30px;
+  }
+
+  [data-handy-fluss='an'] .book-details__oben {
+    display: block;
+    order: 0;
+    min-height: 0;
+    padding-right: 0;
+    overflow: visible;
+  }
+
+  [data-handy-fluss='an'] .book-details dl {
+    order: 1;
+  }
+
+  [data-handy-fluss='an'] .official-link,
+  [data-handy-fluss='an'] .einsenden-notiz {
+    order: 2;
+  }
+
+  /* Die Nummernleiste steht als Fusszeile am Ende der Seite. */
+  [data-handy-fluss='an'] .shelf-index {
+    position: static;
+    order: 2;
+    width: 100%;
+    margin-top: 54px;
+    padding: 0 20px calc(28px + env(safe-area-inset-bottom));
+    opacity: 1;
+  }
+
+  [data-handy-fluss='an'] .shelf-index__ticks button {
+    /* Tippziel: sichtbar duenn, anfassbar breit. */
+    min-height: 44px;
+  }
+
+  [data-handy-fluss='an'] .shelf-index__ticks,
+  [data-handy-fluss='an'] .shelf-index__weiter {
+    height: 44px;
+  }
+
+  /* Die Nachbarn stehen auf Buchhoehe am Rand: nur Nummern, kein Titel,
+     mit grossen unsichtbaren Tippflaechen. */
+  [data-handy-fluss='an'] .nachbar {
+    display: flex;
+    position: fixed;
+    z-index: 3;
+    top: 22dvh;
+    bottom: auto;
+    height: 34dvh;
+    width: 52px;
+    min-width: 0;
+    padding: 0 12px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  [data-handy-fluss='an'] .nachbar__titel {
+    display: none;
+  }
+
+  [data-handy-fluss='an'] .browse-caption {
+    z-index: 2;
+  }
+
+  [data-handy-fluss='an'] .site-header {
+    position: fixed;
+  }
+}
