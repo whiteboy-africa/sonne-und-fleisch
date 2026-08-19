@@ -1313,6 +1313,14 @@ body {
     width: 100%;
     height: auto;
     margin-top: 70dvh;
+    /* Undurchsichtig: der Text schiebt sich beim Scrollen wie ein Blatt
+       ueber den Band, statt sich mit ihm zu ueberlagern. Oben laeuft er
+       weich an, damit die Kante nicht als Balken wirkt. */
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0) 0,
+      var(--paper) 56px
+    );
     opacity: 1;
     pointer-events: auto;
     transform: none;
@@ -1322,7 +1330,7 @@ body {
   [data-handy-fluss='an'] .book-details__inner {
     display: block;
     height: auto;
-    padding: 0 20px;
+    padding: 56px 20px 0;
   }
 
   [data-handy-fluss='an'] .book-details__copy {
@@ -1370,6 +1378,7 @@ body {
     position: static;
     order: 2;
     width: 100%;
+    background: var(--paper);
     margin-top: 54px;
     padding: 0 20px calc(28px + env(safe-area-inset-bottom));
     opacity: 1;
@@ -1389,7 +1398,10 @@ body {
      mit grossen unsichtbaren Tippflaechen. */
   [data-handy-fluss='an'] .nachbar {
     display: flex;
-    position: fixed;
+    /* Nicht fest, sondern an der Flaeche: die Nachbarn gehoeren zum Band
+       und sollen mit ihm nach oben verschwinden, nicht ueber dem Text
+       stehenbleiben. */
+    position: absolute;
     z-index: 3;
     top: 22dvh;
     bottom: auto;
