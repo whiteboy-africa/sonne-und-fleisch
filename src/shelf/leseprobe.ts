@@ -22,6 +22,8 @@ import { siteConfig } from './verlag-config';
 export type Seitendaten = {
   title: string;
   shortTitle: string;
+  /** Steht als laufender Titel auf der linken Seite. */
+  author: string;
   accent: string;
   cover: string;
   excerpt?: BookExcerpt;
@@ -44,6 +46,11 @@ const handyBreite = 768;
  * Bild durchgeht, lang genug, dass nichts springt.
  */
 const uebergabeZeit = 120;
+
+/** So weit laesst sich die Seite vergroessern. */
+const lupeGrenze = 4;
+/** Ein Doppelklick geht auf diese Stufe — und wieder zurueck. */
+const lupeStufe = 2.4;
 
 /*
  * Zeilen auf einer ganz geschwaerzten Seite. Grosszuegig gerechnet: nach
@@ -115,6 +122,7 @@ function noetig<T extends Element>(wurzel: ParentNode, wahl: string): T {
 export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
   const schale = noetig<HTMLElement>(wurzel, '[data-leseprobe]');
   const band = noetig<HTMLElement>(wurzel, '[data-leseprobe-band]');
+  const rahmen = noetig<HTMLElement>(wurzel, '[data-leseprobe-rahmen]');
   const spanne = noetig<HTMLElement>(wurzel, '[data-leseprobe-spanne]');
   const grund = noetig<HTMLElement>(wurzel, '[data-leseprobe-grund]');
   const zuKnopf = noetig<HTMLButtonElement>(wurzel, '[data-leseprobe-zu]');
@@ -130,6 +138,23 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
   let radSperre = 0;
   let radZuletzt = 0;
 
+  // --- Die Lupe ------------------------------------------------------------
+  //
+  // Eine echte Buchseite auf einem Schirm ist klein: 7,81 Zoll Hoehe auf
+  // 590 Pixel ergibt eben eine kleine Schrift. Statt zwischen „echter Satz"
+  // und „lesbar" zu waehlen, darf man hineingehen — mit zwei Fingern, und
+  // am Schreibtisch mit Strg und dem Rad (so kommt auch das Kneifen auf dem
+  // Trackpad an) oder mit einem Doppelklick.
+  let lupe = 1;
+  let lupeX = 0;
+  let lupeY = 0;
+  /** Zeiger, die gerade auf der Seite liegen — fuer das Kneifen. */
+  const finger = new Map<number, { x: number; y: number }>();
+  let kneifAbstand = 0;
+  let kneifLupe = 1;
+  let schiebtVon: { x: number; y: number; lx: number; ly: number } | null = null;
+  let gezogen = 0;
+
   const einzeln = () =>
     window.matchMedia(`(max-width: ${handyBreite - 1}px), (pointer: coarse)`)
       .matches;
@@ -139,12 +164,17 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
 
   // ---------------------------------------------------------------- Seiten
 
-  function kolumne(titel: string, nummer: number, rechts: boolean) {
+  /**
+   * Die Kolumne, wie im gedruckten Band: **links der Autor, rechts der
+   * Titel** — und die Ziffer jeweils aussen. So steht es in Yellow Fever,
+   * und so steht es hier auch, wo die Seite nachgebaut ist.
+   */
+  function kolumne(nummer: number, rechts: boolean) {
     const kopf = document.createElement('p');
-    kopf.className = `blatt__kolumne${rechts ? ' blatt__kolumne--rechts' : ''}`;
+    kopf.className = 'blatt__kolumne';
     const name = document.createElement('span');
     name.className = 'blatt__laufender';
-    name.textContent = titel;
+    name.textContent = rechts ? aktuellerTitel : aktuellerAutor;
     const zahl = document.createElement('span');
     zahl.className = 'blatt__zahl';
     zahl.textContent = String(nummer);
@@ -171,7 +201,11 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     absatz.append(balken);
   }
 
-  function fensterBlatt(titel: string, seite: Seitenart & { art: 'fenster' }) {
+  function fensterBlatt(
+    titel: string,
+    seite: Seitenart & { art: 'fenster' },
+    rechts: boolean,
+  ) {
     const blatt = document.createElement('article');
 
     // Liegt die echte Seite als Bild vor, ist alles schon drauf: Kolumne,
@@ -189,7 +223,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     }
 
     blatt.className = 'blatt blatt--fenster';
-    blatt.append(kolumne(titel, seite.nummer, false));
+    blatt.append(kolumne(seite.nummer, rechts));
 
     const satz = document.createElement('div');
     satz.className = 'blatt__satz';
@@ -231,7 +265,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     }
 
     blatt.className = 'blatt blatt--schwarz';
-    blatt.append(kolumne(titel, seite.nummer, rechts));
+    blatt.append(kolumne(seite.nummer, rechts));
 
     const satz = document.createElement('div');
     satz.className = 'blatt__satz blatt__satz--voll';
@@ -289,7 +323,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
   }
 
   function blattBauen(seite: Seitenart, titel: string, buch: CatalogBook, rechts: boolean) {
-    if (seite.art === 'fenster') return fensterBlatt(titel, seite);
+    if (seite.art === 'fenster') return fensterBlatt(titel, seite, rechts);
     if (seite.art === 'schwarz') return schwarzBlatt(titel, seite, rechts);
     return schlussBlatt(buch);
   }
@@ -298,11 +332,13 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
 
   let aktuellesBuch: CatalogBook | null = null;
   let aktuellerTitel = '';
+  let aktuellerAutor = '';
 
   function zeigen() {
     if (!aktuellesBuch) return;
     const solo = einzeln();
     spanne.classList.toggle('leseprobe__spanne--einzeln', solo);
+    rahmen.classList.toggle('leseprobe__rahmen--einzeln', solo);
     spanne.replaceChildren();
 
     if (solo) {
@@ -315,9 +351,11 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
       // nur zwei Zeilen in der Mitte des Satzspiegels.
       if (links?.art === 'schluss') {
         spanne.classList.add('leseprobe__spanne--tafel');
+        rahmen.classList.add('leseprobe__rahmen--tafel');
         spanne.append(blattBauen(links, aktuellerTitel, aktuellesBuch, false));
       } else {
         spanne.classList.remove('leseprobe__spanne--tafel');
+        rahmen.classList.remove('leseprobe__rahmen--tafel');
         if (links) spanne.append(blattBauen(links, aktuellerTitel, aktuellesBuch, false));
         if (rechts) spanne.append(blattBauen(rechts, aktuellerTitel, aktuellesBuch, true));
       }
@@ -354,6 +392,56 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
       });
   }
 
+  /**
+   * Setzt Vergroesserung und Verschiebung. Verschoben wird nur so weit, dass
+   * kein Rand der Seite in den Rahmen hereinrutscht — sonst haette man
+   * schwarze Ecken neben dem Papier.
+   */
+  function lupeSetzen() {
+    const kasten = rahmen.getBoundingClientRect();
+    const grenzeX = ((lupe - 1) * kasten.width) / 2;
+    const grenzeY = ((lupe - 1) * kasten.height) / 2;
+    lupeX = Math.max(-grenzeX, Math.min(grenzeX, lupeX));
+    lupeY = Math.max(-grenzeY, Math.min(grenzeY, lupeY));
+    spanne.style.transform =
+      lupe === 1
+        ? ''
+        : `translate(${lupeX.toFixed(2)}px, ${lupeY.toFixed(2)}px) scale(${lupe.toFixed(4)})`;
+    if (lupe > 1) rahmen.dataset.lupe = 'an';
+    else delete rahmen.dataset.lupe;
+  }
+
+  /**
+   * Vergroessert um einen Punkt herum: was unter dem Zeiger liegt, bleibt
+   * unter dem Zeiger. Ohne das zoomt man immer in die Mitte und verliert die
+   * Stelle, die man gerade lesen wollte.
+   */
+  function lupeAendern(ziel: number, punktX: number, punktY: number) {
+    const vorher = lupe;
+    const neu = Math.max(1, Math.min(lupeGrenze, ziel));
+    if (neu === vorher) return;
+    const kasten = rahmen.getBoundingClientRect();
+    const px = punktX - (kasten.left + kasten.width / 2);
+    const py = punktY - (kasten.top + kasten.height / 2);
+    const faktor = neu / vorher;
+    lupeX = px - (px - lupeX) * faktor;
+    lupeY = py - (py - lupeY) * faktor;
+    lupe = neu;
+    if (lupe === 1) {
+      lupeX = 0;
+      lupeY = 0;
+    }
+    lupeSetzen();
+  }
+
+  /** Beim Umblaettern faengt die neue Seite unvergroessert an. */
+  function lupeZurueck() {
+    lupe = 1;
+    lupeX = 0;
+    lupeY = 0;
+    lupeSetzen();
+  }
+
   /** Die letzte Stelle — bei Doppelseiten die halbe Zahl der Seiten. */
   function letzteStelle() {
     return einzeln() ? folge.length - 1 : Math.ceil(folge.length / 2) - 1;
@@ -365,6 +453,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     // Vor dem Fenster ist nichts, hinter der Schlusstafel auch nicht.
     if (ziel < 0 || ziel > letzteStelle()) return;
     stelle = ziel;
+    lupeZurueck();
     zeigen();
     const seite = einzeln() ? folge[stelle] : folge[stelle * 2];
     haken.melden(
@@ -385,14 +474,18 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     const titel = gezeigt.shortTitle;
     aktuellesBuch = buch;
     aktuellerTitel = titel;
+    aktuellerAutor = gezeigt.author;
     folge = seitenFolge(probe);
     // Das Licht auf dem Papier kommt aus dem Umschlag der Seite, die man
     // gerade liest — dieselbe Farbe, die in der Szene auf den Band faellt.
+    lupeZurueck();
+    rahmen.style.setProperty('--akzent', gezeigt.accent);
     spanne.style.setProperty('--akzent', gezeigt.accent);
     spanne.style.setProperty('--umschlag', gezeigt.cover);
     // Breite durch Hoehe — dasselbe Mass, mit dem der Band im Regal gebaut
     // wird. Sonst stuende eine 5,06x7,81-Seite in einem A5-Rahmen.
     spanne.style.setProperty('--seitenverhaeltnis', String(buch.widthRatio));
+    rahmen.style.setProperty('--seitenverhaeltnis', String(buch.widthRatio));
     stelle = 0;
     ausloeser = von;
     offen = true;
@@ -420,21 +513,21 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
       // genuegt das Ueberblenden.
       const ziel = einzeln() ? null : haken.rahmen();
       if (ziel && ziel.breite > 1 && ziel.hoehe > 1) {
-        const jetzt = spanne.getBoundingClientRect();
+        const jetzt = rahmen.getBoundingClientRect();
         const breit = ziel.breite / jetzt.width;
         const hoch = ziel.hoehe / jetzt.height;
         const dx = ziel.links + ziel.breite / 2 - (jetzt.left + jetzt.width / 2);
         const dy = ziel.oben + ziel.hoehe / 2 - (jetzt.top + jetzt.height / 2);
-        spanne.style.transition = 'none';
-        spanne.style.transform =
+        rahmen.style.transition = 'none';
+        rahmen.style.transform =
           `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) ` +
           `scale(${breit.toFixed(4)}, ${hoch.toFixed(4)})`;
-        void spanne.offsetHeight;
-        spanne.style.transition = `transform ${uebergabeZeit}ms ease-out`;
-        spanne.style.transform = '';
+        void rahmen.offsetHeight;
+        rahmen.style.transition = `transform ${uebergabeZeit}ms ease-out`;
+        rahmen.style.transform = '';
         window.setTimeout(() => {
-          spanne.style.transition = '';
-          spanne.style.transform = '';
+          rahmen.style.transition = '';
+          rahmen.style.transform = '';
         }, uebergabeZeit + 40);
       }
       // Einmal messen lassen, sonst faengt der Uebergang nicht an: der
@@ -510,24 +603,104 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
 
   // Geblaettert wird an den Aussenkanten der Spanne. Die Mitte bleibt frei,
   // damit man Text mit der Maus anfassen kann, ohne umzublaettern.
-  spanne.addEventListener('click', (ereignis) => {
+  rahmen.addEventListener('click', (ereignis) => {
     if (!offen || inBewegung) return;
     if ((ereignis.target as HTMLElement).closest('a')) return;
-    const kasten = spanne.getBoundingClientRect();
+    // Wer geschoben hat, wollte schieben und nicht blaettern.
+    if (gezogen > 6) return;
+    // Vergroessert wird nicht geblaettert: dort fasst man die Seite an.
+    if (lupe > 1) return;
+    const kasten = rahmen.getBoundingClientRect();
     const anteil = (ereignis.clientX - kasten.left) / kasten.width;
     const kante = einzeln() ? 0.5 : 0.34;
     if (anteil <= kante) blaettern(-1);
     else if (anteil >= 1 - kante) blaettern(1);
   });
 
-  spanne.addEventListener('pointermove', (ereignis) => {
+  // Doppelklick geht hinein und wieder heraus — am Schreibtisch der
+  // kuerzeste Weg, auf dem Telefon der Doppeltipp.
+  rahmen.addEventListener('dblclick', (ereignis) => {
+    if (!offen || inBewegung) return;
+    ereignis.preventDefault();
+    lupeAendern(lupe > 1 ? 1 : lupeStufe, ereignis.clientX, ereignis.clientY);
+  });
+
+  rahmen.addEventListener('pointermove', (ereignis) => {
     if (!offen) return;
-    const kasten = spanne.getBoundingClientRect();
+
+    // Zwei Finger: der Abstand zwischen ihnen ist die Vergroesserung.
+    const gemerkt = finger.get(ereignis.pointerId);
+    if (gemerkt) {
+      gemerkt.x = ereignis.clientX;
+      gemerkt.y = ereignis.clientY;
+    }
+    if (finger.size >= 2) {
+      const [a, b] = [...finger.values()];
+      const abstand = Math.hypot(a.x - b.x, a.y - b.y);
+      if (kneifAbstand > 8 && abstand > 8) {
+        lupeAendern(
+          (kneifLupe * abstand) / kneifAbstand,
+          (a.x + b.x) / 2,
+          (a.y + b.y) / 2,
+        );
+      }
+      return;
+    }
+
+    // Ein Finger auf der vergroesserten Seite: schieben.
+    if (schiebtVon) {
+      const dx = ereignis.clientX - schiebtVon.x;
+      const dy = ereignis.clientY - schiebtVon.y;
+      gezogen = Math.abs(dx) + Math.abs(dy);
+      lupeX = schiebtVon.lx + dx;
+      lupeY = schiebtVon.ly + dy;
+      lupeSetzen();
+      return;
+    }
+
+    if (lupe > 1) {
+      rahmen.dataset.kante = '';
+      return;
+    }
+    const kasten = rahmen.getBoundingClientRect();
     const anteil = (ereignis.clientX - kasten.left) / kasten.width;
     const kante = einzeln() ? 0.5 : 0.34;
     const zurueck = anteil <= kante && stelle > 0;
     const vor = anteil >= 1 - kante && stelle < letzteStelle();
-    spanne.dataset.kante = zurueck ? 'zurueck' : vor ? 'vor' : '';
+    rahmen.dataset.kante = zurueck ? 'zurueck' : vor ? 'vor' : '';
+  });
+
+  rahmen.addEventListener('pointerdown', (ereignis) => {
+    if (!offen || inBewegung) return;
+    finger.set(ereignis.pointerId, { x: ereignis.clientX, y: ereignis.clientY });
+    gezogen = 0;
+    if (finger.size === 2) {
+      const [a, b] = [...finger.values()];
+      kneifAbstand = Math.hypot(a.x - b.x, a.y - b.y);
+      kneifLupe = lupe;
+      schiebtVon = null;
+      return;
+    }
+    if (finger.size === 1 && lupe > 1) {
+      schiebtVon = {
+        x: ereignis.clientX,
+        y: ereignis.clientY,
+        lx: lupeX,
+        ly: lupeY,
+      };
+      rahmen.setPointerCapture(ereignis.pointerId);
+    }
+  });
+
+  const fingerWeg = (ereignis: PointerEvent) => {
+    finger.delete(ereignis.pointerId);
+    if (finger.size < 2) kneifAbstand = 0;
+    if (finger.size === 0) schiebtVon = null;
+  };
+  rahmen.addEventListener('pointerup', fingerWeg);
+  rahmen.addEventListener('pointercancel', fingerWeg);
+  rahmen.addEventListener('pointerleave', (ereignis) => {
+    if (!schiebtVon) fingerWeg(ereignis);
   });
 
   // Scrollen blaettert. Ein Rad-Ereignis kommt in Schueben; gezaehlt wird
@@ -537,6 +710,30 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     (ereignis) => {
       if (!offen || inBewegung) return;
       ereignis.preventDefault();
+
+      // Zwei Finger auseinander auf dem Trackpad (und Strg mit dem Mausrad)
+      // kommen als Rad-Ereignis mit gedrueckter Strg-Taste an. Das ist
+      // Vergroessern, kein Blaettern — dieselbe Unterscheidung wie im Regal.
+      if (ereignis.ctrlKey || ereignis.metaKey) {
+        // Ein Trackpad meldet viele kleine Schritte, ein Mausrad einen
+        // grossen (etwa 100 auf einmal). Ohne Deckel springt die Seite beim
+        // Rad um ein Drittel pro Rastung; mit ihm bleibt beides brauchbar.
+        const schritt = Math.max(
+          0.88,
+          Math.min(1.14, 1 - ereignis.deltaY * 0.0032),
+        );
+        lupeAendern(lupe * schritt, ereignis.clientX, ereignis.clientY);
+        return;
+      }
+
+      // Vergroessert wird nicht geblaettert, sondern geschoben.
+      if (lupe > 1) {
+        lupeX -= ereignis.deltaX;
+        lupeY -= ereignis.deltaY;
+        lupeSetzen();
+        return;
+      }
+
       const jetzt = performance.now();
       if (jetzt < radSperre) return;
       // Nach einer Pause faengt das Zaehlen von vorn an — sonst addiert sich
@@ -634,6 +831,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     if (!offen) return;
     const grenze = letzteStelle();
     if (stelle > grenze) stelle = grenze;
+    lupeSetzen();
     zeigen();
   });
 

@@ -68,42 +68,70 @@
  * Die Doppelseite. Zwei A5-Seiten nebeneinander sind 1,41 zu 1 — dasselbe
  * Verhaeltnis, das die Baende im Regal tragen.
  */
+/*
+ * Der Rahmen haelt das Mass der Doppelseite und schneidet ab, was darueber
+ * hinausragt. Darin laesst sich die Seite vergroessern und verschieben,
+ * ohne ins Schwarze zu laufen.
+ *
+ * Gemessen wird ueber die Hoehe, nicht ueber die Breite: mit gesetzter
+ * Breite und `max-height` haelt das Seitenverhaeltnis nicht, und aus zwei
+ * Seiten wird ein flaches Band. Die Hoehe nimmt, was da ist — hoechstens
+ * 82 % des Fensters, und nie mehr, als 94 % Breite zulassen.
+ *
+ * Das Verhaeltnis kommt vom Band selbst (`--seitenverhaeltnis`, Breite
+ * durch Hoehe), nicht fest von A5: Yellow Fever ist ein
+ * 5,06x7,81-Zoll-Taschenbuch (0,648), und eine echte Seite aus dessen
+ * Druckdatei passt in einen A5-Rahmen nicht ohne Quetschen.
+ *
+ * Dieselben Zahlen stehen in `ShelfEngine.ts` (`aufschlagFuellung…`): der
+ * Band in der Szene wird genau so gross gerechnet. Wer hier etwas aendert,
+ * aendert es dort mit — sonst springt die Doppelseite bei der Uebergabe.
+ */
+.leseprobe__rahmen {
+  position: relative;
+  height: min(82dvh, calc(94vw / (var(--seitenverhaeltnis, 0.705) * 2)));
+  width: auto;
+  aspect-ratio: calc(var(--seitenverhaeltnis, 0.705) * 2) / 1;
+  overflow: hidden;
+  box-shadow:
+    0 40px 90px rgba(0, 0, 0, 0.62),
+    0 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+/*
+ * Papier, Korn, Licht und Bund liegen **hier**, nicht auf den einzelnen
+ * Seiten. Das ist kein Ordnungssinn, sondern der Grund, warum das Blaettern
+ * nicht flackert: die Seiten werden bei jedem Umblaettern neu gebaut, und
+ * ein frisches Element muss seinen Grund neu rastern — beim Papierkorn ist
+ * das ein SVG-Filter samt `multiply`, teuer genug fuer ein sichtbares
+ * Aufblitzen. Die Doppelseite dagegen bleibt stehen, ihr Grund wird einmal
+ * gezeichnet und nie wieder.
+ *
+ * Von oben faellt das Licht in der Farbe des Umschlags — derselbe Schein,
+ * unter dem der Band in der Szene steht. Nur ein Hauch: das Papier bleibt
+ * Papier.
+ */
 .leseprobe__spanne {
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
+  width: 100%;
+  height: 100%;
+  /* Vergroessert wird um die Mitte, verschoben davor — beides setzt
+     `shelf/leseprobe.ts` als eine Transformation. */
+  transform-origin: center center;
   /*
-   * Gemessen wird ueber die Hoehe, nicht ueber die Breite: mit gesetzter
-   * Breite und `max-height` haelt das Seitenverhaeltnis nicht, und aus zwei
-   * A5-Seiten wird ein flaches Band. Die Hoehe nimmt, was da ist — hoechstens
-   * 82 % des Fensters, und nie mehr, als 94 % Breite zulassen.
+   * Die Doppelseite ist der Massstab fuer den Satz darauf: `cqh` ist ein
+   * Prozent ihrer Hoehe, also ein Prozent der Seitenhoehe. Der Container
+   * muss **hier** stehen, nicht an der einzelnen Seite — eine Seite ist fuer
+   * ihre eigenen Werte kein Container, und `cqw` fiele auf die Fensterbreite
+   * zurueck.
    *
-   * Dieselben Zahlen stehen in `ShelfEngine.ts` (`aufschlagFuellung…`): der
-   * Band in der Szene wird genau so gross gerechnet. Wer hier etwas aendert,
-   * aendert es dort mit — sonst springt die Doppelseite bei der Uebergabe.
+   * `--rand` ist der Seitenrand: am Bogen 12,3 % der Seitenbreite, und eine
+   * Seite ist die halbe Spanne.
    */
-  /*
-   * Das Verhaeltnis kommt vom Band selbst (`--seitenverhaeltnis`, Breite
-   * durch Hoehe), nicht mehr fest von A5: Yellow Fever ist ein
-   * 5,06x7,81-Zoll-Taschenbuch (0,648), und eine echte Seite aus dessen
-   * Druckdatei passt in einen A5-Rahmen nicht ohne Quetschen.
-   */
-  height: min(82dvh, calc(94vw / (var(--seitenverhaeltnis, 0.705) * 2)));
-  width: auto;
-  aspect-ratio: calc(var(--seitenverhaeltnis, 0.705) * 2) / 1;
-  /*
-   * Papier, Korn, Licht und Bund liegen **hier**, nicht auf den einzelnen
-   * Seiten. Das ist kein Ordnungssinn, sondern der Grund, warum das
-   * Blaettern nicht mehr flackert: die Seiten werden bei jedem Umblaettern
-   * neu gebaut, und ein frisches Element muss seinen Grund neu rastern —
-   * beim Papierkorn ist das ein SVG-Filter samt `multiply`, teuer genug
-   * fuer ein sichtbares Aufblitzen. Die Doppelseite dagegen bleibt stehen,
-   * ihr Grund wird einmal gezeichnet und nie wieder.
-   *
-   * Von oben faellt das Licht in der Farbe des Umschlags — derselbe Schein,
-   * unter dem der Band in der Szene steht. Nur ein Hauch: das Papier bleibt
-   * Papier.
-   */
+  container-type: size;
+  --rand: 6.15cqw;
   background:
     linear-gradient(
       90deg,
@@ -121,13 +149,12 @@
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='k'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23k)' opacity='0.34'/%3E%3C/svg%3E"),
     #ece8dd;
   background-blend-mode: normal, normal, multiply, normal;
-  box-shadow:
-    0 40px 90px rgba(0, 0, 0, 0.62),
-    0 2px 0 rgba(0, 0, 0, 0.5);
 }
 
 .leseprobe__spanne--tafel {
   grid-template-columns: 1fr;
+  /* Eine Seite auf der ganzen Spanne: der Rand ist wieder der volle. */
+  --rand: 12.3cqw;
 }
 
 /*
@@ -136,13 +163,15 @@
  * einem schmalen, hohen Schirm kurz und breit, und der Text passt nicht
  * mehr darauf. Lieber eine Seite, die das Telefon ist.
  */
-.leseprobe__spanne--einzeln {
-  grid-template-columns: 1fr;
+.leseprobe__rahmen--einzeln {
   width: 92vw;
   height: 78dvh;
   aspect-ratio: auto;
-  /* Auf dem Telefon fuellt die Seite den Schirm; ein Seitenbild darin
-     behaelt sein Verhaeltnis von selbst (`object-fit: contain`). */
+}
+
+.leseprobe__spanne--einzeln {
+  grid-template-columns: 1fr;
+  --rand: 12.3cqw;
   /* Wie oben, nur ohne Bund: eine Seite hat keinen. */
   background:
     linear-gradient(
@@ -156,12 +185,21 @@
 }
 
 /* Beim Blaettern zeigt der Zeiger, wohin es geht. */
-.leseprobe__spanne[data-kante='vor'] {
+.leseprobe__rahmen[data-kante='vor'] {
   cursor: e-resize;
 }
 
-.leseprobe__spanne[data-kante='zurueck'] {
+.leseprobe__rahmen[data-kante='zurueck'] {
   cursor: w-resize;
+}
+
+/* Vergroessert: der Zeiger fasst an, statt zu blaettern. */
+.leseprobe__rahmen[data-lupe='an'] {
+  cursor: grab;
+}
+
+.leseprobe__rahmen[data-lupe='an']:active {
+  cursor: grabbing;
 }
 
 /* --------------------------------------------------------------- Das Blatt */
@@ -176,7 +214,15 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: clamp(24px, 3.4vw, 46px) clamp(22px, 3vw, 44px);
+  /*
+   * Der Satzspiegel ist am gedruckten Bogen abgemessen (Yellow Fever,
+   * 364 x 562 pt): Seitenrand 12,3 % der Breite, Kopf bei 4,6 % der Hoehe,
+   * Fuss 5 %. Gerechnet wird in Container-Einheiten — `cqw`/`cqh` sind ein
+   * Prozent der Seitenbreite beziehungsweise -hoehe. Damit steht der Satz
+   * auf jeder Bildschirmgroesse im selben Verhaeltnis zur Seite wie im
+   * Buch, und die nachgebauten Seiten sitzen wie die echten.
+   */
+  padding: 4.6cqh var(--rand, 6.15cqw) 5cqh;
   overflow: hidden;
   color: #17140f;
   background: none;
@@ -191,34 +237,48 @@
   }
 }
 
-/* Die Kolumne: laufender Titel und Seitenzahl. Sie bleibt auch dort stehen,
-   wo der ganze Satz geschwaerzt ist — die Buchhaltung ueberlebt, entzogen
-   wird nur der Inhalt. */
+/*
+ * Die Kolumne: laufender Titel und Seitenzahl, darunter eine Haarlinie.
+ *
+ * Sie ist dem gedruckten Band nachgesetzt — dieselbe Serife wie der Text,
+ * gesperrte Versalien, die Ziffer aussen, der Titel zur Mitte hin, und der
+ * Strich darunter. Vorher stand hier die Bedienschrift des Regals; neben
+ * einer echten Seite aus der Druckdatei sah das aus wie zwei verschiedene
+ * Buecher. Die nachgebauten Seiten sollen aus demselben Band kommen wie die
+ * echten — nur der Titel wechselt.
+ *
+ * Sie bleibt auch dort stehen, wo der ganze Satz geschwaerzt ist: die
+ * Buchhaltung ueberlebt, entzogen wird nur der Inhalt.
+ */
 .blatt__kolumne {
   display: flex;
-  gap: 12px;
+  gap: 1.6em;
   align-items: baseline;
-  margin: 0 0 clamp(16px, 2.2vw, 26px);
-  color: rgba(23, 20, 15, 0.58);
-  font-family: var(--schrift);
-  font-size: clamp(9px, 0.72vw, 10.5px);
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  margin: 0 0 2.2cqh;
+  padding-bottom: 3.2cqh;
+  border-bottom: 1px solid rgba(23, 20, 15, 0.5);
+  color: rgba(23, 20, 15, 0.82);
+  font-family: var(--schrift-buch);
+  font-size: 1.35cqh;
+  font-weight: 400;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
-.blatt__kolumne--rechts {
-  justify-content: flex-end;
-}
-
 .blatt__laufender {
+  flex: 1;
   overflow: hidden;
+  /* Zur Mitte hin, wie im Band: die Ziffer steht aussen, der Titel innen. */
+  text-align: center;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .blatt__zahl {
   flex: none;
+  /* Die Seitenzahl ist gross gesetzt, nicht versal — wie gedruckt. */
+  font-size: 1.25em;
+  letter-spacing: 0;
   font-variant-numeric: tabular-nums;
 }
 
@@ -228,10 +288,14 @@
   min-height: 0;
   overflow: hidden;
   font-family: var(--schrift-buch);
-  /* Gross genug, dass der Satz die Seite fuellt: die Spalte ist nur eine
-     halbe Doppelseite breit, und zu klein gesetzt bliebe unten Luft. */
-  font-size: clamp(15px, 1.26vw, 18px);
-  line-height: 1.64;
+  /*
+   * Ebenfalls am Bogen gemessen: 28 Zeilen auf 82,8 % der Seitenhoehe
+   * ergeben knapp 3 % Zeilenabstand, bei 1,6 Durchschuss also 1,85 % der
+   * Seitenhoehe Schriftgroesse. Der nachgebaute Satz steht damit so auf der
+   * Seite wie der gedruckte.
+   */
+  font-size: 1.85cqh;
+  line-height: 1.6;
   text-align: justify;
   hyphens: auto;
   -webkit-hyphens: auto;
@@ -472,8 +536,12 @@
 
 @media (max-width: 767px), (pointer: coarse) {
 
-  /* Lieber weniger Zeilen als kleinere Schrift: unter 16px liest niemand
-     mehr Prosa auf einem Telefon. */
+  /*
+   * Lieber weniger Zeilen als kleinere Schrift: unter 16px liest niemand
+   * mehr Prosa auf einem Telefon. Hier gilt darum **nicht** das Mass des
+   * Bogens (1,85 % der Seitenhoehe waeren keine 12 Pixel), sondern eine
+   * Groesse, die man in der Hand lesen kann.
+   */
   .blatt__satz {
     font-size: clamp(16px, 4.3vw, 19px);
     line-height: 1.62;
@@ -505,6 +573,12 @@
 
   .blatt {
     padding: clamp(22px, 6vw, 34px) clamp(20px, 5.5vw, 30px);
+  }
+
+  .blatt__kolumne {
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    font-size: 10px;
   }
 }
 

@@ -230,7 +230,11 @@ const gesamt = katalognummer(katalog.length);
       aria-label="Leseprobe"
       tabindex="-1"
     >
-      <div class="leseprobe__spanne" data-leseprobe-spanne></div>
+      {/* Der Rahmen haelt die Groesse und schneidet ab; die Spanne darin
+          laesst sich vergroessern und verschieben. */}
+      <div class="leseprobe__rahmen" data-leseprobe-rahmen>
+        <div class="leseprobe__spanne" data-leseprobe-spanne></div>
+      </div>
       <button type="button" class="leseprobe__zu" data-leseprobe-zu>
         <span>Zuklappen</span>
         <kbd aria-hidden="true">ESC</kbd>
