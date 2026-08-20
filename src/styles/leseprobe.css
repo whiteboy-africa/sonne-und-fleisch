@@ -137,6 +137,30 @@
   container-type: size;
   --rand: 6.15cqw;
   background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='k'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23k)' opacity='0.34'/%3E%3C/svg%3E"),
+    #ece8dd;
+  background-blend-mode: multiply, normal;
+}
+
+/*
+ * Bund und Licht liegen **ueber** den Seiten, nicht unter ihnen.
+ *
+ * Der Grund ist nicht Geschmack: eine echte Seite aus der Druckdatei ist
+ * ein Bild und deckt den Untergrund zu. Ihr `multiply` hilft nicht, weil
+ * `.blatt` durch die Anschlag-Animation einen eigenen Stapelkontext bildet
+ * und das Mischen dort endet — der Bund lag darunter und war weg. Als
+ * Auflage trifft er beide gleich, die gezeichnete Seite wie die
+ * photographierte. Und richtig ist es ohnehin so: den Schatten wirft der
+ * Falz auf das Papier, nicht das Papier auf den Falz.
+ */
+.leseprobe__spanne::after {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  background:
     linear-gradient(
       90deg,
       transparent calc(50% - 26px),
@@ -147,12 +171,19 @@
     ),
     linear-gradient(
       178deg,
-      color-mix(in srgb, var(--akzent, #d8b25a) 16%, transparent),
+      color-mix(in srgb, var(--akzent, #d8b25a) 22%, transparent),
       transparent 40%
-    ),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='k'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23k)' opacity='0.34'/%3E%3C/svg%3E"),
-    #ece8dd;
-  background-blend-mode: normal, normal, multiply, normal;
+    );
+}
+
+/* Eine einzelne Seite hat keinen Bund — dort bleibt nur das Licht. */
+.leseprobe__spanne--tafel::after,
+.leseprobe__spanne--einzeln::after {
+  background: linear-gradient(
+    178deg,
+    color-mix(in srgb, var(--akzent, #d8b25a) 22%, transparent),
+    transparent 40%
+  );
 }
 
 .leseprobe__spanne--tafel {
@@ -176,16 +207,11 @@
 .leseprobe__spanne--einzeln {
   grid-template-columns: 1fr;
   --rand: 12.3cqw;
-  /* Wie oben, nur ohne Bund: eine Seite hat keinen. */
+  /* Wie oben; Bund und Licht liegen als Auflage darueber. */
   background:
-    linear-gradient(
-      178deg,
-      color-mix(in srgb, var(--akzent, #d8b25a) 16%, transparent),
-      transparent 40%
-    ),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='k'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23k)' opacity='0.34'/%3E%3C/svg%3E"),
     #ece8dd;
-  background-blend-mode: normal, multiply, normal;
+  background-blend-mode: multiply, normal;
 }
 
 /* Beim Blaettern zeigt der Zeiger, wohin es geht. */

@@ -1355,6 +1355,23 @@ body {
     display: contents;
   }
 
+  /*
+   * Die Leseprobe steht **ueber** dem Wenden-Knopf, direkt unter dem Band:
+   * hineinsehen ist die staerkere Handlung als umdrehen. Ohne eigene
+   * Ordnung landete sie im Textblock weit unten — auf einem Telefon heisst
+   * das: erst scrollen, um zu ahnen, dass es sie gibt.
+   */
+  [data-handy-fluss='an'] .leseprobe-zeile {
+    order: -2;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    /* Tippziel, nicht Textzeile. */
+    min-height: 44px;
+    margin: 0 0 10px;
+    font-size: 12px;
+  }
+
   [data-handy-fluss='an'] .wenden-knopf {
     order: -1;
     justify-content: center;
