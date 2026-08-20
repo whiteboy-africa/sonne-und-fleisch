@@ -168,6 +168,20 @@ uebrigen Baende bleiben also, wie sie sind.
 Heissen beide Seiten gleich, sagt der Wenden-Knopf „Seite B" statt eines
 Titels.
 
+## Was offen ist
+
+Ausformuliert liegen die naechsten beiden Auftraege unter `docs/offen/`:
+
+- `blatt-ohne-nummer.md` — das Blatt aus der Nummerierung nehmen, nur ueber
+  den Stapel erreichbar, und von ihm aus rechts zum ersten, links zum
+  letzten echten Band. **Als Naechstes dran.** Die Voruntersuchung steht
+  schon drin: an welchen vier Stellen die Nummer heute aus der Position
+  gerechnet wird und wo das Blaettern haengt.
+- `hover-licht.md` — der Schwebezustand als Licht statt als Aufhellung.
+  Harte Regel: die Farben des Umschlags bleiben unangetastet, Licht bewegt
+  sich nur um den Band herum. Der heutige `emissive`-Hover in
+  `ShelfEngine.ts` (`umschlagHover`) ist genau das, was dabei wegfaellt.
+
 ## Offen: die Handy-Ansicht des aufgeschlagenen Bandes
 
 Der naechste grosse Schritt, noch nicht gebaut. Ziel: unter 768px ein
