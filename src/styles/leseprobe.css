@@ -258,7 +258,16 @@
   display: flex;
   gap: 1.6em;
   align-items: baseline;
-  margin: 0 0 2.2cqh;
+  /*
+   * Der Abstand **unter** der Linie steht nicht hier, sondern am Satz
+   * darunter (`.blatt__satz`). Grund: das Regal setzt in `regal.css` allen
+   * Absaetzen `margin: 0`, und diese Regel
+   * (`.press-experience :is(… p …)`) wiegt schwerer als eine einzelne
+   * Klasse. Ein `margin-bottom` hier waere still verschwunden — der Satz
+   * klebte an der Haarlinie, und die Kolumne sah aus, als haette sie
+   * keine.
+   */
+  margin: 0;
   padding-bottom: 3.2cqh;
   border-bottom: 1px solid rgba(23, 20, 15, 0.5);
   color: rgba(23, 20, 15, 0.82);
@@ -290,6 +299,8 @@
 .blatt__satz {
   flex: 1;
   min-height: 0;
+  /* Der Abstand unter der Kolumnenlinie — siehe dort. */
+  margin-top: 2.4cqh;
   overflow: hidden;
   /* Die Schrift des Bandes, wenn er eine mitbringt (`leseprobe_schrift`) —
      sonst die Hausserife. Yellow Fever ist in Times gesetzt, und die
@@ -591,9 +602,12 @@
   }
 
   .blatt__kolumne {
-    margin-bottom: 14px;
     padding-bottom: 10px;
     font-size: 10px;
+  }
+
+  .blatt__satz {
+    margin-top: 14px;
   }
 }
 
