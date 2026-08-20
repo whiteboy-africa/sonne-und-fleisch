@@ -922,7 +922,13 @@ export class ShelfEngine {
       THREE.PlaneGeometry,
       THREE.MeshPhysicalMaterial
     >(
-      new THREE.PlaneGeometry(Math.max(0.02, depth - 0.006), book.height - 0.014),
+      new THREE.PlaneGeometry(
+        // Die untere Schranke muss mit der Dicke mitgehen: bei einem
+        // 0,6 mm duennen Bogen stand hier sonst ein 2 mm breiter Streifen
+        // an der Kante — der weisse Balken mit der Nummer darauf.
+        Math.max(depth * 0.6, depth - 0.006),
+        book.height - 0.014,
+      ),
       new THREE.MeshPhysicalMaterial({
         map: spineTexture,
         color: spineTexture ? 0xffffff : new THREE.Color(book.cover),
@@ -933,6 +939,8 @@ export class ShelfEngine {
     spineSurface.name = "spineArtwork";
     spineSurface.rotation.y = -Math.PI / 2;
     spineSurface.position.x = -width * 0.5 - 0.005;
+    // Ein Blatt hat keinen Ruecken und traegt keine Nummer an der Kante.
+    spineSurface.visible = !book.sheet;
     physical.add(spineSurface);
 
     let livingMaterial: THREE.ShaderMaterial | undefined;
