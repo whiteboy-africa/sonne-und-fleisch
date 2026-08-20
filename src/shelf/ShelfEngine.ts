@@ -202,27 +202,43 @@ const wipeDauer = abblendAb + abblendHalten + abblendAuf;
 const grundBelichtung = 0.94;
 
 /**
- * Ein Bogen liegt nie eben. Er wellt sich, zieht sich an einer Ecke hoch,
+ * Ein Bogen liegt nie eben. Er wellt sich, zieht sich an den Ecken hoch,
  * behaelt die Erinnerung an die Mappe, in der er lag — beim Aquarell dazu
  * den Wellenschlag vom nassen Malen. Eine mathematisch ebene Flaeche wirkt
- * immer nach Karton, deshalb bekommt das Blatt eine sehr leichte Woelbung:
- * gut anderthalb Millimeter ueber die ganze Breite.
+ * immer nach Karton.
  *
- * @param richtung 1 fuer die Vorderseite, -1 fuer die Rueckseite — dann
- * liegen beide Seiten parallel statt sich zur Linse zu woelben.
+ * Zwei Anteile: eine flache Welle ueber das ganze Blatt (gut drei
+ * Millimeter) und ein Hochziehen der Ecken (noch einmal zwei). Zusammen
+ * rund fuenf Millimeter auf einem Bogen von einem Vierteilmeter Breite —
+ * sichtbar, aber nicht wellig wie ein Tuch.
+ *
+ * @param seite Die Rueckseite ist um die Hochachse gedreht: dadurch kehrt
+ * sich ihre Tiefe um und ihre Breite spiegelt sich. Beides muss beim
+ * Rechnen umgekehrt werden, sonst woelben sich die zwei Seiten
+ * gegeneinander und schneiden sich — bei kleinen Ausschlaegen unsichtbar,
+ * bei groesseren sofort.
  */
-function gewellterBogen(breite: number, hoehe: number, richtung: 1 | -1) {
-  const geometrie = new THREE.PlaneGeometry(breite, hoehe, 28, 20);
+function gewellterBogen(
+  breite: number,
+  hoehe: number,
+  seite: "vorn" | "hinten",
+) {
+  const geometrie = new THREE.PlaneGeometry(breite, hoehe, 32, 24);
   const punkte = geometrie.attributes.position;
-  // Etwa 1,6 mm im Maszstab der Szene (eine Einheit sind gut 10,5 cm).
-  const ausschlag = 0.015;
+  const hinten = seite === "hinten";
+  // Eine Einheit sind gut 10,5 cm: 0,03 ist etwa ein Drittel Zentimeter.
+  const welleAusschlag = 0.03;
+  const eckenAusschlag = 0.02;
   for (let i = 0; i < punkte.count; i += 1) {
-    const u = punkte.getX(i) / breite;
+    const u = (punkte.getX(i) / breite) * (hinten ? -1 : 1);
     const v = punkte.getY(i) / hoehe;
     const welle =
-      Math.sin((u + 0.18) * Math.PI * 1.6) * 0.6 +
-      Math.sin((v - 0.12) * Math.PI * 1.2) * 0.4;
-    punkte.setZ(i, welle * ausschlag * richtung);
+      Math.sin((u + 0.18) * Math.PI * 1.7) * 0.6 +
+      Math.sin((v - 0.12) * Math.PI * 1.3) * 0.4;
+    // Die Ecken heben ab: quadratisch nach aussen, in der Mitte null.
+    const ecken = (u * u + v * v * 0.8) * 4;
+    const tiefe = welle * welleAusschlag + ecken * eckenAusschlag;
+    punkte.setZ(i, hinten ? -tiefe : tiefe);
   }
   geometrie.computeVertexNormals();
   return geometrie;
@@ -854,7 +870,7 @@ export class ShelfEngine {
       THREE.MeshPhysicalMaterial
     >(
       book.sheet
-        ? gewellterBogen(width, book.height, 1)
+        ? gewellterBogen(width, book.height, "vorn")
         : new THREE.PlaneGeometry(width - 0.012, book.height - 0.012),
       new THREE.MeshPhysicalMaterial({
         map: frontTexture,
@@ -880,7 +896,7 @@ export class ShelfEngine {
       THREE.MeshStandardMaterial
     >(
       book.sheet
-        ? gewellterBogen(width, book.height, -1)
+        ? gewellterBogen(width, book.height, "hinten")
         : new THREE.PlaneGeometry(width - 0.012, book.height - 0.012),
       new THREE.MeshStandardMaterial({
         map: backTexture,
