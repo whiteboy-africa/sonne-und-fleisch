@@ -70,6 +70,16 @@ const buecher = defineCollection({
     // Einer von drei Zustaenden: Verfuegbar, In Vorbereitung, Vergriffen.
     verfuegbarkeit: z.enum(VERFUEGBARKEITEN).default('In Vorbereitung'),
 
+    /**
+     * Die Schrift, in der der Band gesetzt ist — fuer die nachgebauten
+     * Seiten der Leseprobe. Ohne Angabe die Hausserife.
+     *
+     * Yellow Fever ist in Times New Roman gesetzt (steht so in der
+     * Druckdatei); die nachgebauten Seiten daneben sollen nicht in einer
+     * anderen Serife stehen. Als CSS-Schriftfolge eintragen, etwa
+     * `'Times New Roman', Times, serif`.
+     */
+    leseprobe_schrift: z.string().optional(),
     // Gesamtumfang des Bandes. Steht am Ende der Leseprobe: „Weiter nur
     // im Band — 224 Seiten". Ohne Angabe faellt die Zahl aus dem Satz.
     seiten_zahl: z.number().int().min(1).optional(),

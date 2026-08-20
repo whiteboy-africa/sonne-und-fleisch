@@ -398,12 +398,19 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
    * schwarze Ecken neben dem Papier.
    */
   function lupeSetzen() {
-    const kasten = rahmen.getBoundingClientRect();
-    const grenzeX = ((lupe - 1) * kasten.width) / 2;
-    const grenzeY = ((lupe - 1) * kasten.height) / 2;
+    // Die Uebergabe hat hier womoeglich noch einen Uebergang liegen; die
+    // Lupe soll aber sofort folgen, nicht in 120 ms nachziehen.
+    rahmen.style.transition = '';
+    // Geschoben wird hoechstens so weit, bis die Kante des Bandes am
+    // Bildrand steht. Ist der Band in einer Richtung kleiner als das
+    // Fenster, gibt es dort nichts zu schieben.
+    const breite = rahmen.offsetWidth * lupe;
+    const hoehe = rahmen.offsetHeight * lupe;
+    const grenzeX = Math.max(0, (breite - window.innerWidth) / 2);
+    const grenzeY = Math.max(0, (hoehe - window.innerHeight) / 2);
     lupeX = Math.max(-grenzeX, Math.min(grenzeX, lupeX));
     lupeY = Math.max(-grenzeY, Math.min(grenzeY, lupeY));
-    spanne.style.transform =
+    rahmen.style.transform =
       lupe === 1
         ? ''
         : `translate(${lupeX.toFixed(2)}px, ${lupeY.toFixed(2)}px) scale(${lupe.toFixed(4)})`;
@@ -420,9 +427,11 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     const vorher = lupe;
     const neu = Math.max(1, Math.min(lupeGrenze, ziel));
     if (neu === vorher) return;
+    // Der Bezugspunkt ist die Mitte des **unverschobenen** Bandes; der
+    // Kasten ist ja schon verschoben und vergroessert.
     const kasten = rahmen.getBoundingClientRect();
-    const px = punktX - (kasten.left + kasten.width / 2);
-    const py = punktY - (kasten.top + kasten.height / 2);
+    const px = punktX - (kasten.left + kasten.width / 2 - lupeX);
+    const py = punktY - (kasten.top + kasten.height / 2 - lupeY);
     const faktor = neu / vorher;
     lupeX = px - (px - lupeX) * faktor;
     lupeY = py - (py - lupeY) * faktor;
@@ -486,6 +495,12 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     // wird. Sonst stuende eine 5,06x7,81-Seite in einem A5-Rahmen.
     spanne.style.setProperty('--seitenverhaeltnis', String(buch.widthRatio));
     rahmen.style.setProperty('--seitenverhaeltnis', String(buch.widthRatio));
+    // Die Schrift des Bandes, wenn er eine mitbringt — sonst die Hausserife.
+    if (buch.excerptFont) {
+      rahmen.style.setProperty('--schrift-probe', buch.excerptFont);
+    } else {
+      rahmen.style.removeProperty('--schrift-probe');
+    }
     stelle = 0;
     ausloeser = von;
     offen = true;
@@ -527,7 +542,9 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
         rahmen.style.transform = '';
         window.setTimeout(() => {
           rahmen.style.transition = '';
-          rahmen.style.transform = '';
+          // Nicht blind leeren: von hier an gehoert die Transformation der
+          // Lupe. (Beim Aufschlagen steht sie auf 1, also raeumt das auf.)
+          lupeSetzen();
         }, uebergabeZeit + 40);
       }
       // Einmal messen lassen, sonst faengt der Uebergang nicht an: der
@@ -734,6 +751,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
         return;
       }
 
+
       const jetzt = performance.now();
       if (jetzt < radSperre) return;
       // Nach einer Pause faengt das Zaehlen von vorn an — sonst addiert sich
@@ -759,7 +777,10 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
       if (ereignis.key === 'Escape') {
         ereignis.preventDefault();
         ereignis.stopPropagation();
-        schliessen();
+        // Herangefahren faehrt ESC erst zurueck und schliesst dann. Sonst
+        // waere der einzige Weg aus der Vergroesserung das Zuklappen.
+        if (lupe > 1) lupeZurueck();
+        else schliessen();
         return;
       }
       // Eine gehaltene Taste blaettert nicht durch das ganze Buch: bei vier

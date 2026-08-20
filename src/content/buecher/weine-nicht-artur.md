@@ -11,6 +11,8 @@ zitat: Platzhalter für einen Satz aus dem Buch.
 zitat_von: Verlagsnotiz
 format: Broschur
 verfuegbarkeit: In Vorbereitung
+# Gesetzt in Times New Roman — so steht es in der Druckdatei.
+leseprobe_schrift: "'Times New Roman', Times, serif"
 seiten_zahl: 224
 cover_bild: /buecher/weine-nicht-artur/cover.webp
 # Platzhalter-Leseprobe. Was in [[doppelten Klammern]] steht, wird beim

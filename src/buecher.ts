@@ -196,6 +196,7 @@ export function alsKatalogBuch(buch: Buch, position = 0): CatalogBook {
     ...(d.lebendig ? { living: true } : {}),
     ...(d.bestell_link ? { orderUrl: d.bestell_link } : {}),
     ...(d.seiten_zahl ? { pages: d.seiten_zahl } : {}),
+    ...(d.leseprobe_schrift ? { excerptFont: d.leseprobe_schrift } : {}),
     ...(d.leseprobe
       ? {
           excerpt: leseprobeLesen(

@@ -117,6 +117,8 @@ export type CatalogBook = {
   orderUrl?: string;
   /** Gesamtumfang in Seiten — die Zahl auf der Schlusstafel. */
   pages?: number;
+  /** Schriftfolge der nachgebauten Leseprobe-Seiten. */
+  excerptFont?: string;
   /**
    * Die Leseprobe der ersten Seite. Fehlt sie, laesst sich der Band nicht
    * aufschlagen: kein Klick auf den Umschlag, keine Zeile in den Angaben.

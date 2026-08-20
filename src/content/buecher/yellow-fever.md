@@ -11,6 +11,8 @@ zitat: Platzhalter für einen Satz aus dem Buch.
 zitat_von: Verlagsnotiz
 format: Broschur
 verfuegbarkeit: In Vorbereitung
+# Gesetzt in Times New Roman — so steht es in der Druckdatei.
+leseprobe_schrift: "'Times New Roman', Times, serif"
 seiten_zahl: 192
 cover_bild: /buecher/yellow-fever/cover.webp
 # Dieser Band behaelt seinen gedruckten Ruecken aus dem Bogen.

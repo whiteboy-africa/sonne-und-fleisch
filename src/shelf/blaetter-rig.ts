@@ -82,11 +82,17 @@ function damp(jetzt: number, ziel: number, lambda: number, delta: number) {
 }
 
 /**
- * Zeichnet eine geschwaerzte Seite auf eine Leinwand — dasselbe Muster, das
- * die Doppelseite im Dokument setzt (`schwaerzung.ts`). Die Blaetter im
- * Bild und die Seiten zum Lesen kommen so aus demselben Buch.
+ * Zeichnet eine geschwaerzte Seite auf eine Leinwand — nach derselben
+ * Vorlage wie die Doppelseite im Dokument: derselbe Papierton, dieselbe
+ * Kolumne mit ihrer Haarlinie, dasselbe Balkenmuster (`schwaerzung.ts`).
+ *
+ * In der Kolumne steht nicht der Titel des Bandes, sondern schlicht
+ * „Sonne und Fleisch" links und „Vorschau" rechts. Die Blaetter fliegen in
+ * einer halben Sekunde vorbei — lesen wird das niemand, und ein falscher
+ * Titel waere schlechter als gar keiner. Sichtbar ist nur, dass dort eine
+ * Kolumne steht und ein Strich darunter, und genau das soll man sehen.
  */
-function schwaerzungLeinwand(saat: number): HTMLCanvasElement {
+function schwaerzungLeinwand(saat: number, rechts: boolean): HTMLCanvasElement {
   const breite = 512;
   const hoehe = Math.round(breite / 0.705);
   const leinwand = document.createElement('canvas');
@@ -98,32 +104,48 @@ function schwaerzungLeinwand(saat: number): HTMLCanvasElement {
   stift.fillStyle = papierTon;
   stift.fillRect(0, 0, breite, hoehe);
 
-  const rand = breite * 0.13;
+  // Dieselben Verhaeltnisse wie im Dokument (siehe `styles/leseprobe.css`):
+  // Seitenrand 12,3 % der Breite, Kopf bei 4,6 % der Hoehe.
+  const rand = breite * 0.123;
   const spalte = breite - rand * 2;
-  const kopf = hoehe * 0.1;
-  const satzHoehe = hoehe - kopf - hoehe * 0.09;
+
+  // Die Kolumne: gesperrte Versalien, Ziffer aussen, Haarlinie darunter.
+  const kopfSchrift = Math.round(hoehe * 0.0135);
+  stift.fillStyle = 'rgba(23, 20, 15, 0.82)';
+  stift.font = `${kopfSchrift}px Georgia, 'Times New Roman', serif`;
+  stift.textBaseline = 'alphabetic';
+  const wort = rechts ? 'VORSCHAU' : 'SONNE UND FLEISCH';
+  const gesperrt = wort.split('').join('\u2009');
+  const kopfY = hoehe * 0.059;
+  stift.textAlign = 'center';
+  stift.fillText(gesperrt, breite / 2, kopfY);
+  stift.textAlign = rechts ? 'right' : 'left';
+  stift.font = `${Math.round(kopfSchrift * 1.25)}px Georgia, 'Times New Roman', serif`;
+  stift.fillText(
+    String(40 + (Math.abs(Math.round(saat)) % 40)),
+    rechts ? breite - rand : rand,
+    kopfY,
+  );
+  stift.textAlign = 'left';
+
+  const linieY = Math.round(hoehe * 0.101);
+  stift.fillRect(rand, linieY, spalte, Math.max(1, Math.round(hoehe * 0.0012)));
+
+  const kopf = hoehe * 0.122;
+  const satzHoehe = hoehe - kopf - hoehe * 0.05;
   const zeilenAbstand = satzHoehe / zeilenJeBlatt;
   const balkenHoehe = zeilenAbstand * 0.58;
-  const wortLuecke = spalte * 0.022;
-
   stift.fillStyle = schwaerzungTon;
   balkenMuster(saat, zeilenJeBlatt).forEach((zeile, index) => {
     const y = kopf + index * zeilenAbstand;
     const einzug = zeile.einzug ? spalte * 0.06 : 0;
     const zeilenBreite = spalte * zeile.breite - einzug;
-    const gewichte = zeile.stuecke.reduce((summe, wert) => summe + wert, 0);
-    const nutzbar = zeilenBreite - wortLuecke * (zeile.stuecke.length - 1);
-    let x = rand + einzug;
-    zeile.stuecke.forEach((gewicht, stelle) => {
-      const breiteStueck = (nutzbar * gewicht) / gewichte;
-      const lage = balkenLage(saat * 97 + index * 5 + stelle);
-      stift.save();
-      stift.translate(x, y);
-      stift.rotate((lage.dreh * Math.PI) / 180);
-      stift.fillRect(0, 0, breiteStueck, balkenHoehe);
-      stift.restore();
-      x += breiteStueck + wortLuecke;
-    });
+    const lage = balkenLage(saat * 97 + index * 5);
+    stift.save();
+    stift.translate(rand + einzug, y);
+    stift.rotate((lage.dreh * Math.PI) / 180);
+    stift.fillRect(0, 0, zeilenBreite, balkenHoehe);
+    stift.restore();
   });
 
   return leinwand;
@@ -206,7 +228,7 @@ export function blaetterRigBauen(werte: {
           new THREE.MeshStandardMaterial({
             map: (() => {
               const textur = new THREE.CanvasTexture(
-                schwaerzungLeinwand(saat + i * 17),
+                schwaerzungLeinwand(saat + i * 17, i % 2 === 1),
               );
               textur.colorSpace = THREE.SRGBColorSpace;
               textur.anisotropy = werte.anisotropie;
