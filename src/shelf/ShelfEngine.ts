@@ -3,6 +3,11 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import type { CatalogBook } from "./katalog";
 import {
+  blaetterRigBauen,
+  takt as blaetterTakt,
+  type BlaetterRig,
+} from "./blaetter-rig";
+import {
   bookVolumesOverlap,
   browseMotionPose,
   browsePhaseDuration,
@@ -24,7 +29,7 @@ import {
   createFrontCover,
   createSpineCover,
 } from "./cover-art";
-import { siteConfig } from "./verlag-config";
+import { siteConfig, type OeffnenModus } from "./verlag-config";
 
 export type ShelfMode = "browse" | "focusing" | "inspect" | "returning";
 /** Bei Doppelbaenden: 'vorn' ist die erste Geschichte, 'hinten' die zweite. */
@@ -52,6 +57,16 @@ type ShelfCallbacks = {
   onWipeEnde: () => void;
   onStatus: (message: string) => void;
   onReady: () => void;
+  /**
+   * Der Umschlag wurde angeklickt. Ob daraus etwas wird, entscheidet die
+   * Bedienung: nur wo eine Leseprobe liegt, schlaegt der Band auf.
+   */
+  onAufschlagen: () => void;
+  /**
+   * Hat die Seite, die gerade vorn liegt, eine Leseprobe? Davon haengt ab,
+   * ob der Umschlag ueberhaupt anfassbar aussieht.
+   */
+  kannAufschlagen: () => boolean;
 };
 
 type RuntimeBook = {
@@ -246,6 +261,17 @@ function gewellterBogen(
 
 /** Die leere Rueckseite eines Bogens: Papierweiss, kein reines Weiss. */
 const blattRueckseite = "#f4f1ea";
+/*
+ * Der Bogen ist gewellt (`gewellterBogen`), und diese Woelbung steht in
+ * keiner Dicke und in keiner Kollisionspruefung: beide rechnen mit einem
+ * flachen Quader von 0,006. Ohne Luft taucht der Bogen dort, wo er
+ * durchhaengt, in den Deckel des Bandes darunter — dann schaut eine
+ * Buchecke mitten durch das Bild. Also bekommt ein Blatt im Stapel Luft
+ * nach unten (so tief senkt sich die Welle) und nach oben (so hoch heben
+ * die Ecken ab).
+ */
+const blattSenke = 0.034;
+const blattHebung = 0.072;
 
 const inspectDefaultYaw = 0.44;
 const inspectDefaultPitch = -0.07;
@@ -259,6 +285,68 @@ const inspectionIdleLift = 0.014;
 const inspectionIdlePitch = THREE.MathUtils.degToRad(0.28);
 const inspectionIdleYaw = THREE.MathUtils.degToRad(0.48);
 const inspectionIdleRoll = THREE.MathUtils.degToRad(0.22);
+
+/*
+ * Das Aufschlagen. Eine Sekunde und ein Fuenftel, in drei Zuegen, die
+ * einander ueberlappen:
+ *
+ *   0,00 – 0,50  der Band kommt flach und nah heran
+ *   0,26 – 0,66  der Deckel klappt nach links auf
+ *   0,50 – 0,94  die Blaetter fliegen durch — schwarz, alle
+ *   0,94         die Doppelseite im Dokument uebernimmt
+ *
+ * Der letzte Punkt ist der wichtigste: genau dort, wo Text auf einer Textur
+ * unscharf wuerde, hoert 3D auf. Gelesen wird nur im Dokument.
+ */
+/**
+ * Zwei Wege, ein Geruest. `lichtschnitt` ist der aeltere: starre Ebenen,
+ * die vorbeifliegen. `pages3d` sind echte, sich biegende Blaetter — der
+ * dauert etwas laenger, weil eine Kaskade Zeit braucht, um als Kaskade
+ * gelesen zu werden.
+ */
+const aufschlagTakte = {
+  lichtschnitt: {
+    dauer: 1.2,
+    zurueck: 0.6,
+    anflugBis: 0.5,
+    uebergabeBei: 0.94,
+  },
+  pages3d: {
+    dauer: 1.35,
+    zurueck: 0.85,
+    anflugBis: blaetterTakt.anflugBis,
+    uebergabeBei: blaetterTakt.uebergabeBei,
+  },
+} as const;
+
+const aufschlagDeckelVon = 0.26;
+const aufschlagDeckelBis = 0.66;
+const aufschlagRiffelVon = 0.5;
+/*
+ * Das Riffeln ist ein Stueck vor der Uebergabe durch. Die Blaetter muessen
+ * sichtbar zur Ruhe kommen — auf der einen hellen Seite. Endeten sie erst
+ * mit der Uebergabe, saehe man nie, worauf sie stehenbleiben.
+ */
+const aufschlagRiffelBis = 0.87;
+/** So viele Blaetter fliegen durch. Mehr sieht man ohnehin nicht. */
+const riffelBlaetter = 8;
+/*
+ * Wie gross der aufgeschlagene Band im Bild steht. Die Zahlen sind
+ * dieselben, mit denen die Doppelseite im Dokument gesetzt ist
+ * (`styles/leseprobe.css`: 94vw breit, hoechstens 82dvh hoch) — nur so
+ * faellt die Uebergabe von der Szene ins Dokument nicht auf.
+ */
+const aufschlagFuellungHoehe = 0.82;
+const aufschlagFuellungBreite = 0.94;
+/*
+ * Der Ton der Seiten in der Szene. Etwas dunkler angesetzt als das Papier
+ * im Dokument (#ece8dd): hier faellt das harte Licht der Szene darauf, und
+ * mit dem Dokumentwert stand die Seite gleissend weiss da. So treffen sich
+ * die beiden bei der Uebergabe.
+ */
+const aufschlagPapier = "#d6d2c5";
+/** Und das Schwarz der geschwaerzten Blaetter. */
+const aufschlagSchwarz = "#0a0a0a";
 
 
 /**
@@ -446,6 +534,38 @@ export class ShelfEngine {
   private kneifZoom = 1;
   /** Beginn der laufenden Wischbewegung — fuer den Schwung beim Loslassen. */
   private zeigerStartZeit = 0;
+
+  // --- Der aufgeschlagene Band ---------------------------------------------
+  /** aus: zu. auf: klappt auf. offen: die Doppelseite liest. zu: klappt zu. */
+  private aufschlagStufe: "aus" | "auf" | "offen" | "zu" = "aus";
+  private aufschlagZeit = 0;
+  private aufschlagIndex: number | null = null;
+  private aufschlagRig: THREE.Group | null = null;
+  private aufschlagDeckel: THREE.Group | null = null;
+  private aufschlagBlaetter: THREE.Group[] = [];
+  /** Die Flaechen des echten Bandes, die der Deckel des Rigs vertritt. */
+  private aufschlagVerdeckt: THREE.Object3D[] = [];
+  private aufschlagMuell: Array<THREE.Material | THREE.BufferGeometry> = [];
+  private aufschlagUebergabe: (() => void) | null = null;
+  private aufschlagFertig: (() => void) | null = null;
+  private aufschlagUebergeben = false;
+  /** Zeigt beim Aufschlagen die zweite Seite zur Kamera? */
+  private aufschlagHinten = false;
+  /** Welcher der beiden Wege gerade laeuft. */
+  private aufschlagArt: OeffnenModus = "lichtschnitt";
+  /** Das Blaetter-Rig — nur da, solange ein Band aufgeschlagen ist. */
+  private blaetterRig: BlaetterRig | null = null;
+  /**
+   * Kamera und Blickpunkt, wie sie vor dem Aufschlagen standen. Beim
+   * Zuklappen wird genau dorthin zurueckgefahren — die Betrachtung soll
+   * danach aussehen wie davor, nicht ungefaehr so.
+   */
+  private aufschlagKameraVorher = new THREE.Vector3();
+  private aufschlagZielVorher = new THREE.Vector3();
+  private aufschlagAbstandVorher = 5.4;
+  /** Liegt der Zeiger auf dem Umschlag des betrachteten Bandes? */
+  private umschlagHoverZiel = 0;
+  private umschlagHover = 0;
   private pointerStartY = 0;
   /** Auf dem Handy startet der Blick weiter hinten; nur einmal setzen. */
   private handyAbstandGesetzt = false;
@@ -531,6 +651,7 @@ export class ShelfEngine {
           browse: (index: number) => void;
           returnToShelf: () => void;
           aufschlagen: (index: number) => void;
+          takt: (sekunden?: number) => void;
           intro: () => void;
         };
       }
@@ -565,6 +686,25 @@ export class ShelfEngine {
         this.callbacks.onActiveIndex(ziel);
         this.callbacks.onSide(this.side);
         this.callbacks.onMode(this.mode, ziel);
+      },
+      /**
+       * Spult die Szene von Hand vor: `takt(0.4)` rechnet vier Zehntel
+       * Sekunde in festen Sechzigstel-Schritten durch und zeichnet danach.
+       *
+       * Gebraucht wird das, wo der Browser die Bildschleife anhaelt — in
+       * einem versteckten Tab etwa, oder unter einem Pruefwerkzeug. Ohne
+       * das laesst sich eine Bewegung, die ueber eine Sekunde laeuft, dort
+       * nicht ansehen.
+       */
+      takt: (sekunden = 1 / 60) => {
+        const schritte = Math.max(1, Math.round(sekunden * 60));
+        for (let i = 0; i < schritte; i += 1) {
+          const jetzt = performance.now();
+          this.updateState(1 / 60, jetzt);
+          this.updateBooks(1 / 60, jetzt / 1000);
+        }
+        if (this.controls.enabled) this.controls.update();
+        this.renderer.render(this.scene, this.camera);
       },
       // Spielt den Ankunftsblick noch einmal ab — zum Einstellen von
       // Haltezeit, Hoehe und Tempo, ohne die Seite neu zu laden.
@@ -672,8 +812,11 @@ export class ShelfEngine {
       order.forEach((index) => {
         const book = this.runtimeBooks[index];
         if (!book) return;
+        // Das Blatt woelbt sich; die Dicke weiss davon nichts.
+        const blatt = Boolean(book.data.sheet);
+        if (blatt) cursor += blattSenke;
         book.place.stackY = cursor + book.data.thickness * 0.5;
-        cursor += book.data.thickness;
+        cursor += book.data.thickness + (blatt ? blattHebung : 0);
       });
     });
   }
@@ -1007,6 +1150,8 @@ export class ShelfEngine {
   }
 
   private handleWheel = (event: WheelEvent) => {
+    // Ein aufgeschlagener Band blaettert selbst; das Regal ruht.
+    if (this.aufschlagStufe !== "aus") return;
     if (this.mode !== "browse") return;
 
     // Zwei Finger auseinander auf dem Trackpad (und Strg mit dem Mausrad
@@ -1036,6 +1181,7 @@ export class ShelfEngine {
   };
 
   private handlePointerDown = (event: PointerEvent) => {
+    if (this.aufschlagStufe !== "aus") return;
     this.zeiger.set(event.pointerId, { x: event.clientX, y: event.clientY });
     // Zwei Finger heisst kneifen, nicht drehen: der Abstand zwischen ihnen
     // steuert den Zoom, das Drehen setzt so lange aus.
@@ -1053,6 +1199,11 @@ export class ShelfEngine {
       this.pointerId = event.pointerId;
       this.pointerLastX = event.clientX;
       this.pointerLastY = event.clientY;
+      // Auch hier gilt: unter sechs Pixeln ist es ein Klick, darueber ein
+      // Ziehen. Ein Klick auf den Umschlag schlaegt den Band auf.
+      this.pointerStartX = event.clientX;
+      this.pointerStartY = event.clientY;
+      this.pointerTravel = 0;
       this.wischWeg = 0;
       this.canvas.setPointerCapture(event.pointerId);
       this.canvas.classList.add("is-dragging");
@@ -1072,6 +1223,7 @@ export class ShelfEngine {
   };
 
   private handlePointerMove = (event: PointerEvent) => {
+    if (this.aufschlagStufe !== "aus") return;
     this.updatePointer(event);
 
     const gemerkt = this.zeiger.get(event.pointerId);
@@ -1102,10 +1254,21 @@ export class ShelfEngine {
     // senkrecht um die Querachse. Ohne Anschlag — man soll ihn umdrehen und
     // auf den Kopf stellen koennen.
     if (this.mode === "inspect") {
-      if (!this.pointerDown || event.pointerId !== this.pointerId) return;
+      if (!this.pointerDown || event.pointerId !== this.pointerId) {
+        // Ohne gedrueckte Taste: nur zeigen, dass der Umschlag anfassbar
+        // ist. Ein Zeiger und ein Hauch Licht, mehr nicht.
+        const ueber =
+          this.raycastBook() === this.selectedIndex &&
+          this.selectedIndex !== null &&
+          this.callbacks.kannAufschlagen();
+        this.umschlagHoverZiel = ueber ? 1 : 0;
+        this.canvas.style.cursor = ueber ? "pointer" : "grab";
+        return;
+      }
       const proPixel = Math.PI / Math.max(320, this.canvas.clientWidth * 0.42);
       const dx = event.clientX - this.pointerLastX;
       const dy = event.clientY - this.pointerLastY;
+      this.pointerTravel += Math.abs(dx) + Math.abs(dy);
 
       // Auch mit dem Finger wird hier gedreht — geblaettert wird unten auf
       // der Textflaeche. Ueber dem Band bleibt die Hand zum Drehen und
@@ -1154,6 +1317,7 @@ export class ShelfEngine {
   };
 
   private handlePointerUp = (event: PointerEvent) => {
+    if (this.aufschlagStufe !== "aus") return;
     this.zeiger.delete(event.pointerId);
     if (this.zeiger.size < 2) this.kneifAbstand = 0;
     if (event.pointerId !== this.pointerId) return;
@@ -1180,6 +1344,16 @@ export class ShelfEngine {
     this.canvas.classList.remove("is-dragging");
     if (this.canvas.hasPointerCapture(event.pointerId)) {
       this.canvas.releasePointerCapture(event.pointerId);
+    }
+    if (this.mode === "inspect" && wasClick) {
+      // Der Band selbst ist der erste Weg in die Leseprobe. Ob eine da ist,
+      // weiss die Bedienung — hier wird nur gemeldet, dass jemand auf den
+      // Umschlag getippt hat.
+      this.updatePointer(event);
+      if (this.raycastBook() === this.selectedIndex) {
+        this.callbacks.onAufschlagen();
+      }
+      return;
     }
     if (this.mode === "browse" && wasClick) {
       this.updatePointer(event);
@@ -1220,6 +1394,9 @@ export class ShelfEngine {
   };
 
   private handleKeyDown = (event: KeyboardEvent) => {
+    // Solange ein Band aufgeschlagen ist, gehoeren die Tasten ihm: kein
+    // Wenden, kein Bandwechsel, kein Zurueck ins Regal.
+    if (this.aufschlagStufe !== "aus") return;
     // Wer gerade in ein Feld schreibt, meint nicht das Regal.
     const ziel = event.target as HTMLElement | null;
     if (
@@ -1442,6 +1619,7 @@ export class ShelfEngine {
    * vorn liegt.
    */
   flipStehenden() {
+    if (this.aufschlagStufe !== "aus") return;
     if (this.mode !== "browse" || this.presentedIndex === null) return;
     const band = this.runtimeBooks[this.presentedIndex];
     if (this.stehendBasisPitch === null) {
@@ -1721,6 +1899,7 @@ export class ShelfEngine {
       this.updateBrowseMotion(delta);
     }
     this.updateWipe(delta);
+    this.updateAufschlag(delta);
   }
 
   /**
@@ -1895,22 +2074,54 @@ export class ShelfEngine {
         focusZ,
         focusScale,
       );
+      let yaw = pose.yaw + this.inspectYaw * motionFocus;
+      let pitch = pose.pitch + this.inspectPitch * motionFocus;
+      let x = pose.x;
+      let scale = pose.scale;
+      let roll = inspectDefaultRoll * motionFocus;
+
+      // Beim Aufschlagen legt sich der Band flach zur Kamera, waechst auf
+      // Lesegroesse und rueckt um eine halbe Breite nach rechts — dann
+      // steht die Doppelseite, die gleich aufgeht, in der Mitte.
+      const anflug = this.anflugAnteil();
+      if (anflug > 0 && this.aufschlagIndex === this.selectedIndex) {
+        // Die naechstgelegene flache Lage, nicht die absolute: wer den Band
+        // von Hand auf den Kopf gestellt hat, soll ihn nicht ploetzlich
+        // herumreissen sehen.
+        const flachYaw = Math.round(yaw / (Math.PI * 2)) * Math.PI * 2;
+        const flachPitch = Math.round(pitch / Math.PI) * Math.PI;
+        yaw = THREE.MathUtils.lerp(yaw, flachYaw, anflug);
+        pitch = THREE.MathUtils.lerp(pitch, flachPitch, anflug);
+        roll *= 1 - anflug;
+        scale = THREE.MathUtils.lerp(
+          scale,
+          this.aufschlagGroesse(selected, pose.z),
+          anflug,
+        );
+        x = THREE.MathUtils.lerp(x, selected.width * 0.5 * scale, anflug);
+        this.updateAufschlagRig(this.aufschlagAnteil(), delta);
+      }
+
       // Ohne Kollisionspruefung: beim Betrachten ist der Rest des Regals
       // ausgeblendet, es gibt nichts zu treffen — eine Pruefung koennte die
       // Drehung nur blockieren.
-      this.commitBookPose(
-        selected,
-        {
-          ...pose,
-          yaw: pose.yaw + this.inspectYaw * motionFocus,
-          pitch: pose.pitch + this.inspectPitch * motionFocus,
-        },
-        false,
-      );
+      this.commitBookPose(selected, { ...pose, x, yaw, pitch, scale }, false);
       // Die Schraeglage liegt auf der Z-Achse. Sie gehoert nicht in die
       // Pose: nur der betrachtete Band hat sie, und die Kollisionspruefung
       // interessiert sie nicht.
-      selected.content.rotation.z = inspectDefaultRoll * motionFocus;
+      selected.content.rotation.z = roll;
+
+      // Der Hauch Licht auf dem Umschlag, wenn der Zeiger darauf liegt: die
+      // einzige Zusage, dass hier etwas aufgeht.
+      const heben =
+        this.mode === "inspect" && this.aufschlagStufe === "aus"
+          ? this.umschlagHoverZiel
+          : 0;
+      this.umschlagHover = damp(this.umschlagHover, heben, 12, delta);
+      const schein = this.umschlagHover * 0.075;
+      selected.frontSurface.material.emissive.setScalar(schein);
+      selected.backSurface.material.emissive.setScalar(schein);
+
       this.seiteAblesen(selected);
     }
 
@@ -1993,6 +2204,9 @@ export class ShelfEngine {
   private seiteAblesen(selected: RuntimeBook) {
     if (!selected.data.back) return;
     if (this.mode !== "inspect") return;
+    // Waehrend des Aufschlagens dreht sich der Band von selbst flach. Das
+    // ist keine Handbewegung und darf keinen Seitenwechsel melden.
+    if (this.aufschlagStufe !== "aus") return;
 
     const deckelNormale = new THREE.Vector3(0, 0, 1).applyQuaternion(
       selected.content.getWorldQuaternion(new THREE.Quaternion()),
@@ -2142,7 +2356,13 @@ export class ShelfEngine {
       // nie zustande.
       this.camera.position.copy(this.blickpunkt(0));
       this.camera.lookAt(browseTarget);
-    } else if (this.mode === "inspect" && this.selectedIndex !== null) {
+    } else if (
+      this.mode === "inspect" &&
+      this.selectedIndex !== null &&
+      // Beim aufgeschlagenen Band nicht: der fuehrt die Kamera selbst, und
+      // ein Neurahmen mittendrin risse sie zurueck auf die alte Lage.
+      this.aufschlagStufe === "aus"
+    ) {
       const worldPosition = new THREE.Vector3();
       this.runtimeBooks[this.selectedIndex].content.getWorldPosition(
         worldPosition,
@@ -2164,6 +2384,17 @@ export class ShelfEngine {
     this.pileOrder.forEach((reihe) => {
       const oben = reihe[reihe.length - 1];
       if (oben !== undefined) this.loadCover(oben);
+    });
+
+    // Das Blatt ist die Ausnahme: **sein Bild wird immer geladen.**
+    //
+    // Ein Buch ohne geladenen Umschlag sieht aus wie ein Buch — es steht in
+    // seiner Einbandfarbe da, und man wartet nicht darauf. Ein Blatt ohne
+    // sein Bild ist ein olivgruenes Rechteck und sieht aus wie ein Fehler:
+    // beim Blatt **ist** das Bild der Gegenstand, es hat sonst nichts. Also
+    // kostet es die eine Datei, egal wie weit weg es liegt.
+    this.runtimeBooks.forEach((band, stelle) => {
+      if (band.data.sheet) this.loadCover(stelle);
     });
 
     for (
@@ -2247,6 +2478,7 @@ export class ShelfEngine {
 
 
   browseBy(direction: number) {
+    if (this.aufschlagStufe !== "aus") return;
     if (this.mode !== "browse") return;
     this.browseTo(Math.round(this.targetScrollIndex) + direction);
   }
@@ -2257,6 +2489,7 @@ export class ShelfEngine {
    * Steht dagegen schon ein Band vorn, wechselt er.
    */
   browseTo(index: number) {
+    if (this.aufschlagStufe !== "aus") return;
     if (this.mode !== "browse") return;
     const next = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
     this.pendingFocusIndex = null;
@@ -2279,6 +2512,8 @@ export class ShelfEngine {
    * links — ohne diese Vorgabe fuehre der Wechsel dann verkehrt herum.
    */
   inspectOther(index: number, richtungVorgabe?: 1 | -1) {
+    // Ein aufgeschlagener Band wechselt nicht den Band.
+    if (this.aufschlagStufe !== "aus") return;
     const ziel = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
     if (this.mode === "browse") {
       this.focusBook(ziel);
@@ -2390,6 +2625,7 @@ export class ShelfEngine {
   }
 
   presentBook(index: number) {
+    if (this.aufschlagStufe !== "aus") return;
     if (this.mode !== "browse") return;
     this.stehendGedreht = false;
     this.stehendBasisPitch = null;
@@ -2405,6 +2641,7 @@ export class ShelfEngine {
   }
 
   focusBook(index = this.activeIndex) {
+    if (this.aufschlagStufe !== "aus") return;
     this.atRest = false;
     if (this.mode !== "browse") return;
     const next = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
@@ -2425,6 +2662,8 @@ export class ShelfEngine {
   }
 
   returnToShelf() {
+    // Zugeklappt wird der Band von der Leseprobe selbst, nicht von hier.
+    if (this.aufschlagStufe !== "aus") return;
     if (this.mode === "browse" && this.pendingFocusIndex !== null) {
       this.pendingFocusIndex = null;
       this.callbacks.onStatus("Abgebrochen");
@@ -2451,12 +2690,420 @@ export class ShelfEngine {
    * mit der Hand dreht.
    */
   flipBook() {
+    // Ein aufgeschlagener Band wendet nicht.
+    if (this.aufschlagStufe !== "aus") return;
     if (this.selectedIndex === null) return;
     if (this.mode !== "inspect" && this.mode !== "focusing") return;
     this.zielPitch += Math.PI;
   }
 
+  /**
+   * Die Anfahrt zur Leseprobe: der Band kommt flach heran, der Deckel geht
+   * auf, die Blaetter fliegen durch — und dann uebernimmt das Dokument.
+   *
+   * `uebergabe` wird genau einmal gerufen, an der Stelle, an der Text auf
+   * einer Textur unscharf wuerde. `fertig`, wenn alles steht.
+   */
+  leseprobeAnfahren(uebergabe: () => void, fertig: () => void) {
+    if (this.mode !== "inspect" || this.selectedIndex === null) {
+      // Ohne betrachteten Band gibt es nichts anzufahren — dann schlaegt
+      // die Doppelseite ohne Anflug auf.
+      uebergabe();
+      fertig();
+      return;
+    }
+    const band = this.runtimeBooks[this.selectedIndex];
+    this.aufschlagIndex = this.selectedIndex;
+    this.aufschlagArt = this.aufschlagArtWaehlen();
+    this.aufschlagHinten = this.rueckseiteZurKamera(band);
+    this.aufschlagUebergabe = uebergabe;
+    this.aufschlagFertig = fertig;
+    this.aufschlagUebergeben = false;
+    this.aufschlagZeit = 0;
+    this.aufschlagStufe = "auf";
+    // Merken, wie die Betrachtung stand — der Rueckweg fuehrt genau hierher.
+    this.aufschlagKameraVorher.copy(this.camera.position);
+    this.aufschlagZielVorher.copy(this.controls.target);
+    this.aufschlagAbstandVorher =
+      this.camera.position.z -
+      band.content.getWorldPosition(new THREE.Vector3()).z;
+    // Waehrend des Aufschlagens fasst niemand die Kamera an.
+    this.controls.enabled = false;
+    this.rigAufbauen(band);
+    this.canvas.style.cursor = "default";
+  }
+
+  /** Der Takt des gerade laufenden Weges. */
+  private aufschlagTakt() {
+    return aufschlagTakte[this.aufschlagArt];
+  }
+
+  /**
+   * Welcher Weg gilt hier? Am Schreibtisch die Blaetter, auf Fingergeraeten
+   * der aeltere, billigere Weg — dort zaehlt jedes Bild.
+   */
+  private aufschlagArtWaehlen(): OeffnenModus {
+    const handy =
+      this.canvas.clientWidth < 760 ||
+      window.matchMedia("(pointer: coarse)").matches;
+    const gewaehlt = handy
+      ? siteConfig.oeffnenModus.handy
+      : siteConfig.oeffnenModus.schreibtisch;
+    return gewaehlt === "pages3d" ? "pages3d" : "lichtschnitt";
+  }
+
+  /** Der Rueckweg vom aufgeschlagenen Band zum stehenden. */
+  leseprobeZurueck(fertig: () => void) {
+    if (this.aufschlagStufe === "aus") {
+      fertig();
+      return;
+    }
+    this.aufschlagFertig = fertig;
+    this.aufschlagStufe = "zu";
+  }
+
+  /**
+   * Wo die aufgeschlagene Doppelseite im Bild steht — in Bildschirmpunkten,
+   * relativ zur Leinwand.
+   *
+   * Damit legt die Doppelseite im Dokument sich genau auf die in der Szene,
+   * bevor sie eingeblendet wird. Ohne dieses Mass muesste man beide Groessen
+   * getrennt ausrechnen und hoffen, dass sie sich treffen; hier wird
+   * gemessen statt gehofft.
+   */
+  leseprobeRahmen() {
+    if (this.aufschlagIndex === null) return null;
+    const band = this.runtimeBooks[this.aufschlagIndex];
+    const welt = band.content.getWorldPosition(new THREE.Vector3());
+    const halbeBreite = band.width * band.pose.scale;
+    const halbeHoehe = band.data.height * band.pose.scale * 0.5;
+    // Die Doppelseite: eine Buchbreite links vom Bund, eine rechts.
+    const bund = welt.x - band.width * 0.5 * band.pose.scale;
+
+    let links = Infinity;
+    let rechts = -Infinity;
+    let oben = Infinity;
+    let unten = -Infinity;
+    const breite = this.canvas.clientWidth;
+    const hoehe = this.canvas.clientHeight;
+    // Gemessen wird im Fenster, nicht auf der Leinwand: die Doppelseite im
+    // Dokument liegt im Fenster, und nur dort treffen sich die beiden.
+    const kasten = this.canvas.getBoundingClientRect();
+    for (const x of [bund - halbeBreite, bund + halbeBreite]) {
+      for (const y of [welt.y - halbeHoehe, welt.y + halbeHoehe]) {
+        const punkt = new THREE.Vector3(x, y, welt.z).project(this.camera);
+        const px = (punkt.x * 0.5 + 0.5) * breite + kasten.left;
+        const py = (-punkt.y * 0.5 + 0.5) * hoehe + kasten.top;
+        links = Math.min(links, px);
+        rechts = Math.max(rechts, px);
+        oben = Math.min(oben, py);
+        unten = Math.max(unten, py);
+      }
+    }
+    return {
+      links,
+      oben,
+      breite: rechts - links,
+      hoehe: unten - oben,
+    };
+  }
+
+  /** Liegt ein Band aufgeschlagen da (oder ist gerade dabei)? */
+  istAufgeschlagen() {
+    return this.aufschlagStufe !== "aus";
+  }
+
+  /**
+   * Wie weit der Band offen ist, 0 bis 1 — der eine Wert, an dem Anflug,
+   * Deckel und Blaetter haengen.
+   */
+  private aufschlagAnteil() {
+    if (this.aufschlagStufe === "aus") return 0;
+    if (this.aufschlagStufe === "offen") return 1;
+    return clamp(this.aufschlagZeit / this.aufschlagTakt().dauer, 0, 1);
+  }
+
+  /** Der Anflug ist in der ersten Haelfte des Aufschlagens durch. */
+  private anflugAnteil() {
+    if (this.aufschlagStufe === "aus") return 0;
+    if (this.aufschlagStufe === "offen") return 1;
+    return easeOutCubic(
+      clamp(this.aufschlagAnteil() / this.aufschlagTakt().anflugBis, 0, 1),
+    );
+  }
+
+  /**
+   * Wie gross der Band sein muss, damit die aufgeschlagene Doppelseite
+   * genauso im Bild steht wie die Doppelseite im Dokument. Gerechnet wird
+   * aus dem Sichtkegel der Kamera, nicht aus einer festen Zahl — sonst
+   * springt beim Uebergang die Groesse, sobald jemand das Fenster anfasst.
+   */
+  private aufschlagGroesse(band: RuntimeBook, bandZ: number) {
+    const abstand = Math.max(1.5, this.camera.position.z - bandZ);
+    const sichtHoehe =
+      2 * Math.tan(THREE.MathUtils.degToRad(this.camera.fov) * 0.5) * abstand;
+    const sichtBreite = sichtHoehe * this.camera.aspect;
+    const nachHoehe = (sichtHoehe * aufschlagFuellungHoehe) / band.data.height;
+    // Die aufgeschlagene Doppelseite ist zwei Seiten breit.
+    const nachBreite =
+      (sichtBreite * aufschlagFuellungBreite) / (band.width * 2);
+    return Math.min(nachHoehe, nachBreite);
+  }
+
+  private updateAufschlag(delta: number) {
+    if (this.aufschlagStufe === "aus") return;
+
+    // Der Blick geht auf die Mitte der Doppelseite, nicht auf die Mitte des
+    // Bandes: aufgeschlagen liegt die halbe Seite links vom Buchruecken.
+    // Und der Versatz fuer die Tafel geht weg — die ist jetzt verdeckt.
+    const band =
+      this.aufschlagIndex === null
+        ? null
+        : this.runtimeBooks[this.aufschlagIndex];
+    if (band) {
+      const anflug = this.anflugAnteil();
+      this.applyFocusViewOffset(1 - anflug);
+      const welt = band.content.getWorldPosition(new THREE.Vector3());
+      // Aufgeschlagen: der Blick auf die Mitte der Doppelseite. Zu: genau
+      // dorthin, wo er vorher stand. Dazwischen wird gemischt — bei
+      // `anflug = 0` steht wieder Zeichen fuer Zeichen die alte Ansicht.
+      const offen = new THREE.Vector3(
+        welt.x - band.width * 0.5 * band.pose.scale,
+        welt.y,
+        welt.z,
+      );
+      const ziel = this.aufschlagZielVorher.clone().lerp(offen, anflug);
+      const kameraOffen = new THREE.Vector3(
+        offen.x,
+        offen.y,
+        welt.z + this.aufschlagAbstandVorher,
+      );
+      const kamera = this.aufschlagKameraVorher
+        .clone()
+        .lerp(kameraOffen, anflug);
+      const tempo = 1 - Math.exp(-14 * delta);
+      this.controls.target.lerp(ziel, tempo);
+      this.camera.position.lerp(kamera, tempo);
+      this.camera.lookAt(this.controls.target);
+    }
+
+    if (this.aufschlagStufe === "auf") {
+      const takt = this.aufschlagTakt();
+      this.aufschlagZeit = Math.min(takt.dauer, this.aufschlagZeit + delta);
+      const anteil = this.aufschlagZeit / takt.dauer;
+      if (!this.aufschlagUebergeben && anteil >= takt.uebergabeBei) {
+        this.aufschlagUebergeben = true;
+        this.aufschlagUebergabe?.();
+        this.aufschlagUebergabe = null;
+      }
+      if (this.aufschlagZeit >= takt.dauer) {
+        this.aufschlagStufe = "offen";
+        this.aufschlagFertig?.();
+        this.aufschlagFertig = null;
+      }
+      return;
+    }
+    if (this.aufschlagStufe === "zu") {
+      // Zugeklappt wird schneller als aufgeschlagen.
+      const takt = this.aufschlagTakt();
+      this.aufschlagZeit = Math.max(
+        0,
+        this.aufschlagZeit - delta * (takt.dauer / takt.zurueck),
+      );
+      if (this.aufschlagZeit <= 0) {
+        this.aufschlagStufe = "aus";
+        this.aufschlagIndex = null;
+        this.rigAbbauen();
+        this.controls.enabled = this.mode === "inspect";
+        this.aufschlagFertig?.();
+        this.aufschlagFertig = null;
+      }
+    }
+  }
+
+  /**
+   * Baut den Aufschlag-Aufbau: ein Deckel am Bund, davor ein Stapel
+   * schwarzer Blaetter und darunter das helle Fenster-Blatt.
+   *
+   * Der echte Umschlag des Bandes wird so lange ausgeblendet — der Deckel
+   * hier vertritt ihn, und er traegt dieselbe Textur. Ein zweiter Umschlag
+   * an derselben Stelle flimmerte sonst.
+   */
+  private rigAufbauen(band: RuntimeBook) {
+    this.rigAbbauen();
+    if (this.aufschlagArt === "pages3d") {
+      this.blaetterRigAufbauen(band);
+      return;
+    }
+    const breite = band.width;
+    const hoehe = band.data.height;
+    const tiefe = band.data.thickness;
+    // Vorn oder hinten: das Rig sitzt auf der Seite, die zur Kamera zeigt.
+    const seite = this.aufschlagHinten ? -1 : 1;
+
+    const papier = new THREE.MeshStandardMaterial({
+      color: aufschlagPapier,
+      roughness: 0.92,
+      side: THREE.DoubleSide,
+    });
+    const geschwaerzt = new THREE.MeshStandardMaterial({
+      color: aufschlagSchwarz,
+      roughness: 0.96,
+      side: THREE.DoubleSide,
+    });
+    const blattForm = new THREE.PlaneGeometry(breite - 0.018, hoehe - 0.018);
+    this.aufschlagMuell.push(papier, geschwaerzt, blattForm);
+
+    const rig = new THREE.Group();
+    rig.name = `aufschlag:${band.data.id}`;
+
+    // Das Fenster: die eine helle Seite, auf der das Riffeln stehenbleibt.
+    const fenster = new THREE.Mesh(blattForm, papier);
+    fenster.position.z = seite * (tiefe * 0.5 - 0.0006);
+    rig.add(fenster);
+
+    // Die Blaetter. Alle schwarz — bis auf das letzte: es wird beim
+    // Umschlagen zur linken Seite des Fensters.
+    this.aufschlagBlaetter = [];
+    for (let i = 0; i < riffelBlaetter; i += 1) {
+      const angel = new THREE.Group();
+      angel.position.set(
+        -breite * 0.5,
+        0,
+        seite * (tiefe * 0.5 + 0.0009 * (riffelBlaetter - i)),
+      );
+      const blatt = new THREE.Mesh(
+        blattForm,
+        i === riffelBlaetter - 1 ? papier : geschwaerzt,
+      );
+      blatt.position.x = (breite - 0.018) * 0.5;
+      angel.add(blatt);
+      rig.add(angel);
+      this.aufschlagBlaetter.push(angel);
+    }
+
+    // Der Deckel: dieselbe Textur wie der echte Umschlag, am Bund
+    // angeschlagen. Innen liegt Papier — beim Aufklappen sieht man es.
+    const deckelAngel = new THREE.Group();
+    deckelAngel.position.set(
+      -breite * 0.5,
+      0,
+      seite * (tiefe * 0.5 + 0.0062),
+    );
+    const umschlag = new THREE.Mesh(
+      new THREE.PlaneGeometry(breite - 0.012, hoehe - 0.012),
+      this.aufschlagHinten
+        ? band.backSurface.material
+        : band.frontSurface.material,
+    );
+    umschlag.position.x = (breite - 0.012) * 0.5;
+    if (this.aufschlagHinten) umschlag.rotation.y = Math.PI;
+    const innen = new THREE.Mesh(blattForm, papier);
+    innen.position.set((breite - 0.012) * 0.5, 0, seite * -0.0016);
+    deckelAngel.add(umschlag, innen);
+    rig.add(deckelAngel);
+    this.aufschlagDeckel = deckelAngel;
+
+    band.inspectionIdle.add(rig);
+    this.aufschlagRig = rig;
+
+    // Der echte Umschlag tritt zurueck, solange sein Vertreter da ist.
+    const decke = this.aufschlagHinten ? band.backSurface : band.frontSurface;
+    const brett = band.physical.getObjectByName(
+      this.aufschlagHinten ? "backBoard" : "frontBoard",
+    );
+    this.aufschlagVerdeckt = [decke, ...(brett ? [brett] : [])];
+    this.aufschlagVerdeckt.forEach((teil) => {
+      teil.visible = false;
+    });
+  }
+
+  /**
+   * Das Blaetter-Rig: Deckel am Bund, ein Stapel sich biegender Blaetter.
+   * Es entsteht erst beim Aufschlagen und wird beim Zuklappen wieder
+   * abgeraeumt — zehn Baende trugen sonst zehn Knochenketten mit sich.
+   */
+  private blaetterRigAufbauen(band: RuntimeBook) {
+    const rig = blaetterRigBauen({
+      breite: band.width,
+      hoehe: band.data.height,
+      tiefe: band.data.thickness,
+      seite: this.aufschlagHinten ? -1 : 1,
+      deckelStoff: this.aufschlagHinten
+        ? band.backSurface.material
+        : band.frontSurface.material,
+      deckelGedreht: this.aufschlagHinten,
+      saat: band.index * 131 + 7,
+      anisotropie: Math.min(
+        8,
+        this.renderer.capabilities.getMaxAnisotropy(),
+      ),
+    });
+    band.inspectionIdle.add(rig.gruppe);
+    this.blaetterRig = rig;
+
+    // Der echte Umschlag tritt zurueck, solange sein Vertreter da ist.
+    const decke = this.aufschlagHinten ? band.backSurface : band.frontSurface;
+    const brett = band.physical.getObjectByName(
+      this.aufschlagHinten ? "backBoard" : "frontBoard",
+    );
+    this.aufschlagVerdeckt = [decke, ...(brett ? [brett] : [])];
+    this.aufschlagVerdeckt.forEach((teil) => {
+      teil.visible = false;
+    });
+  }
+
+  private rigAbbauen() {
+    this.aufschlagVerdeckt.forEach((teil) => {
+      teil.visible = true;
+    });
+    this.aufschlagVerdeckt = [];
+    this.blaetterRig?.entsorgen();
+    this.blaetterRig = null;
+    this.aufschlagRig?.removeFromParent();
+    this.aufschlagRig = null;
+    this.aufschlagDeckel = null;
+    this.aufschlagBlaetter = [];
+    this.aufschlagMuell.forEach((stueck) => stueck.dispose());
+    this.aufschlagMuell = [];
+  }
+
+  /**
+   * Setzt Deckel und Blaetter auf den Stand, den der Fortschritt vorgibt.
+   * Die Blaetter fliegen nacheinander los, jedes ein Stueck spaeter — das
+   * ist das Riffeln.
+   */
+  private updateAufschlagRig(anteil: number, delta: number) {
+    if (this.blaetterRig) {
+      this.blaetterRig.setzen(anteil, delta);
+      return;
+    }
+    if (!this.aufschlagRig) return;
+    const seite = this.aufschlagHinten ? 1 : -1;
+
+    const deckel = clamp(
+      (anteil - aufschlagDeckelVon) / (aufschlagDeckelBis - aufschlagDeckelVon),
+      0,
+      1,
+    );
+    if (this.aufschlagDeckel) {
+      this.aufschlagDeckel.rotation.y = seite * Math.PI * easeOutCubic(deckel);
+    }
+
+    const zahl = this.aufschlagBlaetter.length;
+    const spanne = aufschlagRiffelBis - aufschlagRiffelVon;
+    // Jedes Blatt bekommt ein eigenes, ueberlappendes Fenster. Das letzte
+    // ist mit `aufschlagRiffelBis` durch — dort steht das Riffeln still.
+    const fenster = spanne / (zahl * 0.62);
+    this.aufschlagBlaetter.forEach((angel, i) => {
+      const beginn = aufschlagRiffelVon + (spanne - fenster) * (i / Math.max(1, zahl - 1));
+      const eigen = clamp((anteil - beginn) / fenster, 0, 1);
+      angel.rotation.y = seite * Math.PI * easeOutCubic(eigen);
+    });
+  }
+
   resetFocusView() {
+    if (this.aufschlagStufe !== "aus") return;
     if (this.mode !== "inspect" || this.selectedIndex === null) return;
     this.zielYaw = inspectDefaultYaw;
     this.zielPitch = inspectDefaultPitch;
@@ -2515,6 +3162,35 @@ export class ShelfEngine {
       ),
       activeIndex: this.activeIndex,
       selectedIndex: this.selectedIndex,
+      // Der aufgeschlagene Band, in Zahlen — sonst laesst sich an der
+      // Anfahrt nichts einstellen, ohne zu raten.
+      aufschlag: {
+        stufe: this.aufschlagStufe,
+        anteil: Number(this.aufschlagAnteil().toFixed(3)),
+        bandX: Number(
+          (this.aufschlagIndex === null
+            ? 0
+            : this.runtimeBooks[this.aufschlagIndex].content.getWorldPosition(
+                new THREE.Vector3(),
+              ).x
+          ).toFixed(3),
+        ),
+        bandScale: Number(
+          (this.aufschlagIndex === null
+            ? 0
+            : this.runtimeBooks[this.aufschlagIndex].pose.scale
+          ).toFixed(3),
+        ),
+        kameraX: Number(this.camera.position.x.toFixed(3)),
+        deckelGrad: Math.round(
+          ((this.aufschlagDeckel?.rotation.y ?? 0) * 180) / Math.PI,
+        ),
+        blattGrad: this.aufschlagBlaetter.map((angel) =>
+          Math.round((angel.rotation.y * 180) / Math.PI),
+        ),
+        art: this.aufschlagArt,
+        rahmen: this.leseprobeRahmen(),
+      },
       books: this.runtimeBooks.length,
       drawCalls: info.render.calls,
       triangles: info.render.triangles,
@@ -2535,6 +3211,7 @@ export class ShelfEngine {
   }
 
   dispose() {
+    this.rigAbbauen();
     this.isDisposed = true;
     cancelAnimationFrame(this.animationFrame);
     this.resizeObserver.disconnect();

@@ -4,6 +4,7 @@
 
 import { ShelfEngine, type BookSide, type ShelfMode } from './ShelfEngine';
 import type { CatalogBook } from './katalog';
+import { leseprobeAnhaengen } from './leseprobe';
 import { siteConfig } from './verlag-config';
 
 // Katalognummern: drei Stellen, fuehrende Nullen. 001, 002, 003.
@@ -53,6 +54,8 @@ export function regalStarten(wurzel: HTMLElement) {
     ),
     status: pflicht(wurzel, '[data-status-text]'),
     vorlese: pflicht(wurzel, '[data-vorlese]'),
+    leseprobeZeile: pflicht<HTMLButtonElement>(wurzel, '[data-leseprobe-zeile]'),
+    leseprobeSeite: pflicht(wurzel, '[data-leseprobe-seite]'),
   };
 
   let engine: ShelfEngine | null = null;
@@ -71,6 +74,45 @@ export function regalStarten(wurzel: HTMLElement) {
   let seite: BookSide = 'vorn';
 
   const gesamt = katalognummer(katalog.length);
+
+  /**
+   * Der aufgeschlagene Band. Die Anfahrt in 3D haengt an der Engine; hier
+   * steht nur, wer sie anstoesst. Ist die Engine noch nicht da (oder
+   * abgestuerzt), schlaegt die Doppelseite ohne Anflug auf — lesen muss man
+   * koennen, auch wenn die Szene fehlt.
+   */
+  const leseprobe = leseprobeAnhaengen(wurzel, {
+    anfahren: (uebergabe, fertig) => {
+      if (engine) engine.leseprobeAnfahren(uebergabe, fertig);
+      else {
+        uebergabe();
+        fertig();
+      }
+    },
+    zurueckfahren: (fertig) => {
+      if (engine) engine.leseprobeZurueck(fertig);
+      else fertig();
+    },
+    rahmen: () => engine?.leseprobeRahmen() ?? null,
+    melden: (text) => {
+      el.vorlese.textContent = text;
+    },
+  });
+
+  /**
+   * Schlaegt den Band auf, der gerade vorn liegt — und zwar auf der Seite,
+   * die man ansieht. Ein Doppelband hat zwei Geschichten und zwei Proben;
+   * welche gilt, entscheidet die Lage des Bandes, nicht der Knopfdruck.
+   */
+  function leseprobeOeffnen(von: HTMLElement | null) {
+    if (!siteConfig.leseprobe) return;
+    if (modus === 'browse' || gewaehlterIndex === null) return;
+    if (leseprobe.istBesetzt()) return;
+    const buch = katalog[gewaehlterIndex];
+    const gezeigt = seite === 'hinten' && buch.back ? buch.back : buch;
+    if (!gezeigt.excerpt) return;
+    leseprobe.oeffnen(buch, gezeigt, von);
+  }
 
   function blaetternAnsichtSetzen() {
     const buch = katalog[aktiverIndex];
@@ -187,6 +229,18 @@ export function regalStarten(wurzel: HTMLElement) {
         marke.textContent = seite === 'vorn' ? 'Seite A' : 'Seite B';
       });
     }
+    // Die Leseprobe gehoert der Seite, die vorn liegt. Hat sie keine,
+    // steht die Zeile nicht da — und der Band laesst sich dort auch nicht
+    // aufschlagen.
+    const probe = siteConfig.leseprobe ? gezeigt.excerpt : undefined;
+    el.leseprobeZeile.hidden = !probe;
+    if (probe) {
+      el.leseprobeSeite.textContent = String(probe.page);
+      el.leseprobeZeile.setAttribute(
+        'aria-label',
+        `Leseprobe aus ${gezeigt.title}, Seite ${probe.page}, aufschlagen`,
+      );
+    }
     el.panelFormat.textContent = buch.format;
     el.panelVerfuegbarkeit.textContent = buch.availability;
     el.panelLink.href = buch.url;
@@ -214,6 +268,8 @@ export function regalStarten(wurzel: HTMLElement) {
   // Die Pfeile tun dasselbe wie die Nummern: einen Band weiter. Im Regal
   // holen sie ihn heraus, beim aufgeschlagenen Band blättern sie weiter.
   function nachbar(richtung: -1 | 1) {
+    // Ein aufgeschlagener Band wechselt nicht den Band.
+    if (leseprobe.istBesetzt()) return;
     const ziel = aktiverIndex + richtung;
     // Vor dem ersten und nach dem letzten Band ist nichts.
     if (ziel < 0 || ziel > katalog.length - 1) return;
@@ -226,6 +282,7 @@ export function regalStarten(wurzel: HTMLElement) {
   // Beschreibung kommt erst, wenn man dann auf den Band selbst klickt.
   el.ticks.forEach((tick, index) => {
     tick.addEventListener('click', () => {
+      if (leseprobe.istBesetzt()) return;
       // Im Regal: nur herausholen. Beim aufgeschlagenen Band: direkt zum
       // naechsten weiterblättern, ohne Umweg über das Regal.
       if (modus === 'browse') engine?.presentBook(index);
@@ -236,11 +293,12 @@ export function regalStarten(wurzel: HTMLElement) {
   // zum Drehen und Zoomen frei.
   let wischStart: { x: number; y: number } | null = null;
   el.panel.addEventListener('pointerdown', (ereignis) => {
-    if (ereignis.pointerType !== 'touch') return;
+    if (ereignis.pointerType !== 'touch' || leseprobe.istBesetzt()) return;
     wischStart = { x: ereignis.clientX, y: ereignis.clientY };
   });
   el.panel.addEventListener('pointerup', (ereignis) => {
     if (!wischStart || ereignis.pointerType !== 'touch') return;
+    if (leseprobe.istBesetzt()) return;
     const dx = ereignis.clientX - wischStart.x;
     const dy = ereignis.clientY - wischStart.y;
     wischStart = null;
@@ -253,8 +311,18 @@ export function regalStarten(wurzel: HTMLElement) {
     wischStart = null;
   });
 
-  el.zurRegal.addEventListener('click', () => engine?.returnToShelf());
-  el.wenden.addEventListener('click', () => engine?.flipBook());
+  el.zurRegal.addEventListener('click', () => {
+    if (leseprobe.istBesetzt()) return;
+    engine?.returnToShelf();
+  });
+  el.wenden.addEventListener('click', () => {
+    // Ein aufgeschlagener Band wendet nicht.
+    if (leseprobe.istBesetzt()) return;
+    engine?.flipBook();
+  });
+  el.leseprobeZeile.addEventListener('click', () =>
+    leseprobeOeffnen(el.leseprobeZeile),
+  );
 
   wurzel.querySelectorAll('[data-gesamt]').forEach((element) => {
     element.textContent = gesamt;
@@ -329,6 +397,16 @@ export function regalStarten(wurzel: HTMLElement) {
       },
       onStatus: (meldung) => {
         el.status.textContent = meldung;
+      },
+      // Ein Klick auf den Umschlag des betrachteten Bandes. Ob daraus etwas
+      // wird, entscheidet sich hier: nur wo eine Leseprobe liegt.
+      onAufschlagen: () => leseprobeOeffnen(null),
+      kannAufschlagen: () => {
+        if (!siteConfig.leseprobe) return false;
+        if (modus === 'browse' || gewaehlterIndex === null) return false;
+        const buch = katalog[gewaehlterIndex];
+        const gezeigt = seite === 'hinten' && buch.back ? buch.back : buch;
+        return Boolean(gezeigt.excerpt);
       },
       onReady: () => {
         wurzel.classList.add('is-ready');

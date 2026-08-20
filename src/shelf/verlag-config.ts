@@ -37,4 +37,37 @@ export const siteConfig = {
    * verhaelt sich alles wie zuvor.
    */
   handyFluss: true,
+  /**
+   * Der aufschlagbare Band. Auf `false` gestellt bleibt alles wie zuvor:
+   * der Umschlag laesst sich nicht anklicken, die Zeile „Leseprobe" steht
+   * nicht in den Angaben, und die Baende tragen keine Probe mit sich.
+   */
+  leseprobe: true,
+  /**
+   * Wohin „Vormerken" am Ende der Leseprobe fuehrt, solange ein Band nicht
+   * lieferbar ist. Ist er lieferbar, geht die Zeile stattdessen an seinen
+   * eigenen Bestell-Link.
+   */
+  vormerkenAdresse: 'salve@sonneundfleisch.com',
+  /**
+   * Wie der Band aufgeht. Zwei Wege, beide fertig gebaut:
+   *
+   * - `pages3d` — der Deckel klappt auf, und **echte Blaetter** schlagen um.
+   *   Jedes ist ein gebeugtes Netz an einer Knochenkette und woelbt sich
+   *   mitten in der Drehung wie Papier (`blaetter-rig.ts`).
+   * - `lichtschnitt` — der aeltere Weg: der Deckel klappt auf, die Blaetter
+   *   sind starre schwarze Ebenen, die vorbeifliegen. Billiger zu rechnen.
+   *
+   * Am Schreibtisch `pages3d`, auf Fingergeraeten `lichtschnitt`: dort
+   * zaehlt jedes Bild, und die Knochenketten sind noch nicht auf schwachen
+   * Telefonen gemessen. Zum Vergleichen laesst sich beides umstellen; der
+   * aeltere Weg bleibt unveraendert liegen.
+   */
+  oeffnenModus: {
+    schreibtisch: 'pages3d',
+    handy: 'lichtschnitt',
+  },
 } as const;
+
+/** Die beiden Wege, auf denen ein Band aufgeht. */
+export type OeffnenModus = 'pages3d' | 'lichtschnitt';

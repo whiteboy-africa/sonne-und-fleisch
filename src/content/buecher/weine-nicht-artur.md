@@ -11,7 +11,26 @@ zitat: Platzhalter für einen Satz aus dem Buch.
 zitat_von: Verlagsnotiz
 format: Broschur
 verfuegbarkeit: In Vorbereitung
+seiten_zahl: 224
 cover_bild: /buecher/weine-nicht-artur/cover.webp
+# Platzhalter-Leseprobe. Was in [[doppelten Klammern]] steht, wird beim
+# Bauen herausgeschnitten und als Balken gedruckt — es steht in keinem HTML.
+leseprobe:
+  seite: 47
+  text: >-
+    Der Zug hielt an einer Station, die keinen Namen mehr trug. Artur zählte
+    die Waggons, bis er bei [[siebzehn]] aufhörte, und sah dabei zu, wie der
+    Schaffner die Liste in seiner Manteltasche verschwinden ließ. Draußen
+    stand der Nebel so dicht über den Gleisen, dass man die Hand nicht sah.
+
+
+    Später erzählte man, es habe in jener Nacht [[keinen Fahrplan gegeben]], und niemand widersprach. Die Frau am Fenster
+    schrieb etwas auf, faltete das Blatt zweimal und schob es unter die
+    Sitzbank, wo es bis heute liegt.
+
+
+    Er fragte sie, woher sie komme. Sie sagte einen Ort, den er nicht kannte,
+    und dann sagte sie noch, dass [[|17]]
 # Farben für Rücken, Rückseite und Kanten — aus dem Umschlag genommen:
 # das Nachtblau des Himmels, das Gold der Schrift.
 cover_farbe: '#2e240e'
@@ -36,7 +55,23 @@ rueckseite:
   zitat: Platzhalter für einen Satz aus Lichas.
   zitat_von: Verlagsnotiz
   cover_bild: /buecher/weine-nicht-artur/lichas.webp
-  cover_farbe: '#242617'
+  # Die zweite Geschichte hat ihre eigene Probe, an ihrer eigenen Stelle.
+  leseprobe:
+    seite: 138
+    text: >-
+      Lichas ging vor der Prozession her und trug nichts. Das war seine
+      Aufgabe: vorangehen und nichts tragen, damit alle sahen, dass
+      [[der Kasten längst leer war]]. Die Steine waren warm von der Sonne des
+      Vortags.
+
+
+      In der dritten Stunde blieb er stehen. Die Reihe hinter ihm blieb auch
+      stehen, ohne dass jemand ein Zeichen gegeben hätte, und in dieser
+      Stille hörte man [[das Wasser unter der Straße]]. Er zählte bis zehn.
+
+
+      Dann setzte er den Fuß wieder auf und sagte, ohne sich umzudrehen,
+      dass es von hier an [[|17]]
   akzent_farbe: '#c8912f'
   schrift_farbe: '#e8ddc0'
   motiv: wave

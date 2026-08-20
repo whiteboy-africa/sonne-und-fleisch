@@ -1,5 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import type { CatalogBook } from './shelf/katalog';
+import type { BookExcerpt, CatalogBook, ExcerptPart } from './shelf/katalog';
 import { siteConfig } from './shelf/verlag-config';
 
 export type Buch = CollectionEntry<'buecher'>;
@@ -48,6 +48,12 @@ export type ProgrammEintrag = {
  * Die Releasenummer haengt am Buch, nicht an der Zeile — sie kommt aus der
  * Regalordnung (001 ist der erste Band) und bleibt deshalb dieselbe, egal wie
  * herum die Liste sortiert ist.
+ *
+ * In der Liste stehen nur Baende. Der Blindband (`blind`) und das Blatt
+ * (`blatt`) fallen heraus: das eine ist die offene Stelle, das andere ein
+ * Bogen Papier — beide gehoeren in den Stapel, nicht in die Bibliografie.
+ * Ihre Seiten unter /programm/<slug> bleiben erreichbar, und die Nummern der
+ * uebrigen Baende aendern sich nicht: gezaehlt wird vor dem Aussortieren.
  */
 export async function programmListe(): Promise<ProgrammEintrag[]> {
   const buecher = await alleBuecher();
@@ -85,12 +91,71 @@ export async function programmListe(): Promise<ProgrammEintrag[]> {
         ],
       };
     })
-    .reverse()
-    // Der Blindband schliesst die Liste ab, egal wie herum sortiert wird:
-    // er ist die offene Stelle, nicht der neueste Band.
-    .sort((links, rechts) =>
-      Number(links.buch.data.blind) - Number(rechts.buch.data.blind),
-    );
+    .filter(({ buch }) => !buch.data.blind && !buch.data.blatt)
+    .reverse();
+}
+
+
+/**
+ * Uebersetzt den Text einer Leseprobe in Absaetze aus Text- und
+ * Balkenstuecken — und schneidet dabei heraus, was geschwaerzt ist.
+ *
+ * `[[Klartext]]` wird zu einem Balken, der so breit ist wie der Klartext
+ * lang. Der Klartext selbst bleibt hier: er geht nicht in den Rueckgabewert
+ * und steht deshalb in keinem ausgelieferten HTML. Das ist der ganze Sinn
+ * der Sache — ein Balken, unter dem etwas steht, das sich im Quelltext
+ * nachlesen liesse, waere keiner.
+ *
+ * `[[|18]]` setzt einen Balken ohne Klartext, achtzehn Zeichen breit.
+ *
+ * Endet die Probe auf einem Balken, schliesst dieser die letzte Zeile ab
+ * (`last`) — der Satz hoert mitten drin auf, und der Rest ist weg.
+ */
+function leseprobeLesen(
+  text: string | undefined,
+  seite: number,
+  bild?: string,
+  geschwaerzt?: string[],
+): BookExcerpt {
+  const seiten = geschwaerzt?.length ? { blackImages: geschwaerzt } : {};
+  // Liegt die echte Seite als Bild vor, gibt es nichts zu setzen: das Buch
+  // hat seinen Satz schon, samt gedruckter Schwaerzung.
+  if (bild) return { page: seite, paragraphs: [], image: bild, ...seiten };
+  if (!text) return { page: seite, paragraphs: [], ...seiten };
+  const marke = /\[\[([^\]]*)\]\]/g;
+  const absaetze = text
+    .split(/\n\s*\n/)
+    .map((absatz) => absatz.trim())
+    .filter((absatz) => absatz.length > 0);
+
+  const paragraphs = absaetze.map((absatz) => {
+    const stuecke: ExcerptPart[] = [];
+    let gelesen = 0;
+    for (const treffer of absatz.matchAll(marke)) {
+      const davor = absatz.slice(gelesen, treffer.index);
+      if (davor) stuecke.push({ text: davor.replace(/\s+/g, ' ') });
+      const inhalt = treffer[1];
+      // „|18" heisst: achtzehn Zeichen breit, ohne Klartext darunter.
+      const eigeneBreite = /^\|\s*(\d+)$/.exec(inhalt);
+      const zeichen = eigeneBreite
+        ? Number(eigeneBreite[1])
+        : inhalt.trim().length;
+      // Zu schmal liest sich wie ein Druckfehler, zu breit sprengt die
+      // Spalte. Zwei bis vierzig Zeichen.
+      stuecke.push({ bar: Math.min(40, Math.max(2, zeichen)) });
+      gelesen = (treffer.index ?? 0) + treffer[0].length;
+    }
+    const rest = absatz.slice(gelesen);
+    if (rest) stuecke.push({ text: rest.replace(/\s+/g, ' ') });
+    return stuecke;
+  });
+
+  // Der letzte Balken des letzten Absatzes schliesst die Zeile.
+  const letzter = paragraphs.at(-1);
+  const abschluss = letzter?.at(-1);
+  if (abschluss && 'bar' in abschluss) abschluss.last = true;
+
+  return { page: seite, paragraphs, ...seiten };
 }
 
 /** Adresse der Buchseite. */
@@ -129,6 +194,18 @@ export function alsKatalogBuch(buch: Buch, position = 0): CatalogBook {
     ...(d.cover_bild ? { coverImage: d.cover_bild } : {}),
     ...(d.ruecken_bild ? { spineImage: d.ruecken_bild } : {}),
     ...(d.lebendig ? { living: true } : {}),
+    ...(d.bestell_link ? { orderUrl: d.bestell_link } : {}),
+    ...(d.seiten_zahl ? { pages: d.seiten_zahl } : {}),
+    ...(d.leseprobe
+      ? {
+          excerpt: leseprobeLesen(
+            d.leseprobe.text,
+            d.leseprobe.seite,
+            d.leseprobe.bild,
+            d.leseprobe.geschwaerzt,
+          ),
+        }
+      : {}),
     ...(d.blind ? { blind: true } : {}),
     ...(d.blatt ? { sheet: true } : {}),
     ...(d.rueckseite
@@ -147,6 +224,16 @@ export function alsKatalogBuch(buch: Buch, position = 0): CatalogBook {
             motif: d.rueckseite.motiv ?? d.motiv,
             ...(d.rueckseite.cover_bild
               ? { coverImage: d.rueckseite.cover_bild }
+              : {}),
+            ...(d.rueckseite.leseprobe
+              ? {
+                  excerpt: leseprobeLesen(
+                    d.rueckseite.leseprobe.text,
+                    d.rueckseite.leseprobe.seite,
+                    d.rueckseite.leseprobe.bild,
+                    d.rueckseite.leseprobe.geschwaerzt,
+                  ),
+                }
               : {}),
           },
         }

@@ -80,6 +80,40 @@ collections:
         hint: 'Etwa „dem Französischen". Leer lassen, wenn es keine Übersetzung ist.'
       - { name: reihe, label: Reihe, widget: string, required: false }
 
+      - name: seiten_zahl
+        label: Seitenzahl des Bandes
+        widget: number
+        required: false
+        value_type: int
+        min: 1
+        hint: 'Gesamtumfang. Steht am Ende der Leseprobe: „Weiter nur im Band — 224 Seiten".'
+      - name: leseprobe
+        label: Leseprobe (erste Seite)
+        widget: object
+        required: false
+        collapsed: true
+        hint: >-
+          Die eine offene Stelle im sonst geschwärzten Band. Ohne Leseprobe
+          lässt sich der Band im Regal nicht aufschlagen.
+        fields:
+          - name: seite
+            label: Seitenzahl
+            widget: number
+            value_type: int
+            min: 1
+            hint: Auf welcher Seite das Fenster steht.
+          - name: text
+            label: Text
+            widget: text
+            hint: >-
+              Höchstens eine Buchseite Prosa; sie hört mitten im Satz auf. Was
+              geschwärzt werden soll, kommt in doppelte Klammern:
+              „er zählte bis [[dreiundzwanzig]]" wird zu einem Balken. Der
+              Text in den Klammern erscheint nirgends auf der Seite — nur
+              seine Länge wird zur Breite des Balkens. Für einen Balken ohne
+              Text: [[|18]]. Am Schluss ein Balken, dann bricht der Satz
+              sichtbar ab.
+
       - name: cover_bild
         label: Umschlag (Vorderseite)
         widget: image
@@ -175,6 +209,26 @@ collections:
           - { name: klappentext, label: Einführung, widget: text }
           - { name: zitat, label: Zitat, widget: string, required: false }
           - { name: zitat_von, label: Zitat von, widget: string, required: false }
+          - name: leseprobe
+            label: Leseprobe (zweite Seite)
+            widget: object
+            required: false
+            collapsed: true
+            hint: >-
+              Eigene Leseprobe der zweiten Geschichte, an ihrer eigenen
+              Stelle im Band.
+            fields:
+              - name: seite
+                label: Seitenzahl
+                widget: number
+                value_type: int
+                min: 1
+              - name: text
+                label: Text
+                widget: text
+                hint: >-
+                  Wie vorn: [[doppelte Klammern]] werden zu Balken, der Text
+                  darin erscheint nirgends.
           - name: cover_bild
             label: Umschlag (zweite Vorderseite)
             widget: image

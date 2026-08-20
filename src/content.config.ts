@@ -2,6 +2,51 @@ import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { MOTIVE, VERFUEGBARKEITEN } from './shelf/katalog';
 
+/**
+ * Die Leseprobe: eine einzige offene Stelle in einem sonst geschwaerzten
+ * Block. Jede Seite eines Doppelbandes hat ihre eigene.
+ *
+ * Geschwaerzt wird **im Text selbst**, nicht ueber eine Liste von
+ * Positionen daneben: `[[hier steht der Klartext]]` wird zum Balken. Was
+ * zwischen den Klammern steht, verlaesst den Build nicht — es wird beim
+ * Uebersetzen herausgeschnitten und kommt nie ins HTML. Nur seine Laenge
+ * bleibt uebrig und wird zur Breite des Balkens. Wer einen Balken ohne
+ * Klartext will, schreibt `[[|18]]` fuer achtzehn Zeichen Breite.
+ *
+ * Eine Liste von Positionen waere beim ersten Umschreiben des Satzes
+ * verrutscht; im Text kann das nicht passieren.
+ */
+const leseprobe = z
+  .object({
+    // Die Seitenzahl, auf der das Fenster steht — die **im Buch**, nicht die
+    // im PDF. Sie steht in der Kolumne und in der Zeile „Leseprobe — S. 47".
+    seite: z.number().int().min(1),
+    // Hoechstens eine Buchseite Prosa. Sie hoert mitten im Satz auf; den
+    // Rest der letzten Zeile schliesst ein Balken.
+    text: z.string().optional(),
+    /**
+     * Die **echte gesetzte Seite** als Bild, etwa
+     * "/buecher/yellow-fever/leseprobe-s30.webp". Ist sie da, wird sie
+     * gezeigt statt des gesetzten Textes: dann steht dort der Satz des
+     * Buches mit seinen Schriften, seinem Umbruch und seinen gedruckten
+     * Schwaerzungen, nicht unser Nachbau.
+     *
+     * Aus dem Druck-PDF geholt, auf Papierton multipliziert und als WebP
+     * abgelegt (siehe AGENTS.md, „Echte Seiten aus dem Druck-PDF").
+     */
+    bild: z.string().optional(),
+    /**
+     * Die Seiten hinter dem Fenster, ebenfalls als echte Seiten — schon
+     * geschwaerzt ausgespielt (`scripts/seite-schwaerzen.mjs`). In der
+     * Reihenfolge, in der sie kommen. Wo keine mehr da ist, zeichnet die
+     * Seite ihre Balken selbst.
+     */
+    geschwaerzt: z.array(z.string()).optional(),
+  })
+  .refine((werte) => Boolean(werte.text || werte.bild), {
+    message: 'Eine Leseprobe braucht entweder `text` oder `bild`.',
+  });
+
 // Ein Buch = eine Datei in src/content/buecher/. Der Dateiname ist der Slug
 // und damit die Adresse (/programm/<slug>) und der stabile Schluessel fuer
 // Cover-Dateien unter public/buecher/<slug>/.
@@ -24,6 +69,13 @@ const buecher = defineCollection({
     format: z.string(),
     // Einer von drei Zustaenden: Verfuegbar, In Vorbereitung, Vergriffen.
     verfuegbarkeit: z.enum(VERFUEGBARKEITEN).default('In Vorbereitung'),
+
+    // Gesamtumfang des Bandes. Steht am Ende der Leseprobe: „Weiter nur
+    // im Band — 224 Seiten". Ohne Angabe faellt die Zahl aus dem Satz.
+    seiten_zahl: z.number().int().min(1).optional(),
+    // Die Leseprobe der ersten Seite. Fehlt sie, laesst sich der Band
+    // nicht aufschlagen und die Zeile „Leseprobe" steht nicht da.
+    leseprobe: leseprobe.optional(),
 
     // Angaben nur fuer die Buchseite, nicht fuers Regal.
     isbn: z.string().optional(),
@@ -104,6 +156,9 @@ const buecher = defineCollection({
         zitat_von: z.string().optional(),
         // Eigenes Bild für die zweite Vorderseite.
         cover_bild: z.string().optional(),
+        // Die zweite Geschichte hat ihre eigene Leseprobe — das Fenster
+        // sitzt in ihrem Text, nicht in dem der ersten.
+        leseprobe: leseprobe.optional(),
         // Eigene Farben und eigenes Muster. Ohne Angabe die von vorn.
         cover_farbe: z.string().optional(),
         akzent_farbe: z.string().optional(),

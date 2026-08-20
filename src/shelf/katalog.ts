@@ -42,6 +42,31 @@ export const VERFUEGBARKEITEN = [
 
 export type Verfuegbarkeit = (typeof VERFUEGBARKEITEN)[number];
 
+/**
+ * Ein Stueck Leseprobe: entweder Text oder ein Balken. Der Klartext unter
+ * einem Balken existiert hier nicht mehr — er wurde beim Uebersetzen aus
+ * dem Frontmatter herausgeschnitten (`src/buecher.ts`). Uebrig ist nur
+ * seine Breite in Zeichen. Was geschwaerzt ist, steht in keinem HTML.
+ */
+export type ExcerptPart =
+  | { text: string }
+  | { bar: number; /** Schliesst die letzte Zeile ab. */ last?: true };
+
+export type BookExcerpt = {
+  /** Seitenzahl des Fensters, wie sie im Buch steht. */
+  page: number;
+  /** Absaetze, jeder aus Text- und Balkenstuecken. Leer, wenn `image` steht. */
+  paragraphs: ExcerptPart[][];
+  /**
+   * Die echte gesetzte Seite als Bild. Ist sie da, zeigt das Fenster sie
+   * statt des nachgebauten Satzes — samt Kolumne, Umbruch und den im Buch
+   * **gedruckten** Schwaerzungen.
+   */
+  image?: string;
+  /** Die geschwaerzten Folgeseiten als echte Seiten, der Reihe nach. */
+  blackImages?: string[];
+};
+
 export type CatalogBook = {
   id: string;
   /** Releasenummer, dreistellig — steht auf dem Buchruecken. */
@@ -86,6 +111,18 @@ export type CatalogBook = {
   linkLabel?: string;
   living?: boolean;
   /**
+   * Wohin bestellt wird. Nur gesetzt, wenn im Frontmatter ein
+   * `bestell_link` steht — die Schlusstafel der Leseprobe braucht ihn.
+   */
+  orderUrl?: string;
+  /** Gesamtumfang in Seiten — die Zahl auf der Schlusstafel. */
+  pages?: number;
+  /**
+   * Die Leseprobe der ersten Seite. Fehlt sie, laesst sich der Band nicht
+   * aufschlagen: kein Klick auf den Umschlag, keine Zeile in den Angaben.
+   */
+  excerpt?: BookExcerpt;
+  /**
    * Zweite Vorderseite. Ist sie gesetzt, ist der Band ein Doppelcover
    * (tête-bêche): die zweite Geschichte steht kopfüber auf der Rückseite,
    * man dreht das Buch um und auf den Kopf.
@@ -105,4 +142,6 @@ export type BookBackFace = {
   ink: string;
   motif: BookMotif;
   coverImage?: string;
+  /** Die zweite Geschichte hat ihre eigene Leseprobe. */
+  excerpt?: BookExcerpt;
 };

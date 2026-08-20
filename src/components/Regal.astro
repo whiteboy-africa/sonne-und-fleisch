@@ -158,6 +158,16 @@ const gesamt = katalognummer(katalog.length);
           </div>
         </dl>
 
+        {/* Der zweite Weg in den Band — der erste ist der Umschlag selbst.
+            Eine Zeile, kein Knopfrahmen. Sie ist zugleich der Weg fuer die
+            Tastatur: anwaehlbar, Eingabetaste schlaegt auf. Ohne Leseprobe
+            steht sie nicht da. */}
+        <button type="button" class="leseprobe-zeile" data-leseprobe-zeile hidden>
+          <span>Leseprobe</span>
+          <span aria-hidden="true">—</span>
+          <span>S.&nbsp;<span data-leseprobe-seite></span></span>
+        </button>
+
         {/* Wenden: dreht den Band um und auf den Kopf. Bei Doppelbänden
             wechselt damit auch die Beschreibung auf die andere Geschichte. */}
         <button type="button" class="wenden-knopf" data-wenden>
@@ -201,6 +211,31 @@ const gesamt = katalognummer(katalog.length);
   <div class="ohne-3d-ausweg" data-ausweg hidden>
     <p>Dieses Gerät kann den Stapel nicht aufbauen.</p>
     <a href="/programm">Zum Programm als Liste</a>
+  </div>
+
+  {/*
+      Der aufgeschlagene Band. Bis er gebraucht wird, steht hier nur die
+      Huelle — die Seiten baut das Skript aus den Daten des Bandes, damit
+      geschwaerzter Text gar nicht erst im Dokument steht.
+
+      Der Grund darunter ist der Ausgang: ein Klick ins Schwarze schliesst.
+  */}
+  <div class="leseprobe" data-leseprobe hidden>
+    <div class="leseprobe__grund" data-leseprobe-grund></div>
+    <div
+      class="leseprobe__band"
+      data-leseprobe-band
+      role="dialog"
+      aria-modal="true"
+      aria-label="Leseprobe"
+      tabindex="-1"
+    >
+      <div class="leseprobe__spanne" data-leseprobe-spanne></div>
+      <button type="button" class="leseprobe__zu" data-leseprobe-zu>
+        <span>Zuklappen</span>
+        <kbd aria-hidden="true">ESC</kbd>
+      </button>
+    </div>
   </div>
 
   <div class="sr-only" aria-live="polite" data-vorlese></div>
