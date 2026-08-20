@@ -201,6 +201,9 @@ const wipeDauer = abblendAb + abblendHalten + abblendAuf;
 /** Belichtung der Szene, wenn der Blick normal nah steht. */
 const grundBelichtung = 0.94;
 
+/** Die leere Rueckseite eines Bogens: Papierweiss, kein reines Weiss. */
+const blattRueckseite = "#f4f1ea";
+
 const inspectDefaultYaw = 0.44;
 const inspectDefaultPitch = -0.07;
 /**
@@ -793,12 +796,15 @@ export class ShelfEngine {
     // tête-bêche-Band gedruckt: umdrehen genuegt nicht, man muss ihn auch
     // auf den Kopf stellen.
     const zweiteSeite = backFaceAsBook(book);
-    const backTexture = zweiteSeite?.coverImage
-      ? null
-      : toTexture(
-          zweiteSeite ? createFrontCover(zweiteSeite) : createBackCover(book),
-          this.renderer,
-        );
+    // Ein Blatt hat hinten nichts: kein Klappentext, kein Zitat, kein
+    // Verlagszeichen. Nur die leere Rueckseite des Bogens.
+    const backTexture =
+      book.sheet || zweiteSeite?.coverImage
+        ? null
+        : toTexture(
+            zweiteSeite ? createFrontCover(zweiteSeite) : createBackCover(book),
+            this.renderer,
+          );
     if (zweiteSeite && backTexture) {
       backTexture.center.set(0.5, 0.5);
       backTexture.rotation = Math.PI;
@@ -835,8 +841,11 @@ export class ShelfEngine {
       new THREE.PlaneGeometry(width - 0.012, book.height - 0.012),
       new THREE.MeshStandardMaterial({
         map: backTexture,
-        color: backTexture ? 0xffffff : new THREE.Color(book.cover),
-        roughness: 0.72,
+        color: backTexture
+          ? 0xffffff
+          : new THREE.Color(book.sheet ? blattRueckseite : book.cover),
+        // Papier ist matter als ein Einband.
+        roughness: book.sheet ? 0.94 : 0.72,
       }),
     );
     backSurface.name = "backArtwork";
