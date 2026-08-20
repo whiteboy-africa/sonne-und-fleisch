@@ -201,6 +201,33 @@ const wipeDauer = abblendAb + abblendHalten + abblendAuf;
 /** Belichtung der Szene, wenn der Blick normal nah steht. */
 const grundBelichtung = 0.94;
 
+/**
+ * Ein Bogen liegt nie eben. Er wellt sich, zieht sich an einer Ecke hoch,
+ * behaelt die Erinnerung an die Mappe, in der er lag — beim Aquarell dazu
+ * den Wellenschlag vom nassen Malen. Eine mathematisch ebene Flaeche wirkt
+ * immer nach Karton, deshalb bekommt das Blatt eine sehr leichte Woelbung:
+ * gut anderthalb Millimeter ueber die ganze Breite.
+ *
+ * @param richtung 1 fuer die Vorderseite, -1 fuer die Rueckseite — dann
+ * liegen beide Seiten parallel statt sich zur Linse zu woelben.
+ */
+function gewellterBogen(breite: number, hoehe: number, richtung: 1 | -1) {
+  const geometrie = new THREE.PlaneGeometry(breite, hoehe, 28, 20);
+  const punkte = geometrie.attributes.position;
+  // Etwa 1,6 mm im Maszstab der Szene (eine Einheit sind gut 10,5 cm).
+  const ausschlag = 0.015;
+  for (let i = 0; i < punkte.count; i += 1) {
+    const u = punkte.getX(i) / breite;
+    const v = punkte.getY(i) / hoehe;
+    const welle =
+      Math.sin((u + 0.18) * Math.PI * 1.6) * 0.6 +
+      Math.sin((v - 0.12) * Math.PI * 1.2) * 0.4;
+    punkte.setZ(i, welle * ausschlag * richtung);
+  }
+  geometrie.computeVertexNormals();
+  return geometrie;
+}
+
 /** Die leere Rueckseite eines Bogens: Papierweiss, kein reines Weiss. */
 const blattRueckseite = "#f4f1ea";
 
@@ -745,13 +772,19 @@ export class ShelfEngine {
       // ineinander.
       Math.min(0.008, depth * 0.3),
       3,
-      0.004,
+      // Papier hat scharfe Kanten, geschnitten oder gerissen. Ein Zehntel
+      // der Buchrundung — sonst sieht ein 0,6 mm duenner Bogen aus wie ein
+      // rundum abgerundetes Kissen.
+      book.sheet ? 0.0004 : 0.004,
     );
     const frontBoard = new THREE.Mesh(boardGeometry, boardMaterial);
     frontBoard.name = "frontBoard";
     frontBoard.position.z = depth * 0.5;
     frontBoard.castShadow = true;
     frontBoard.receiveShadow = true;
+    // Beim Blatt tragen die Bogenflaechen selbst — ein Karton dazwischen
+    // waere flach, wo der Bogen sich woelbt, und wuerde durchstossen.
+    frontBoard.visible = !book.sheet;
     physical.add(frontBoard);
 
     const backBoard = new THREE.Mesh(boardGeometry, boardMaterial);
@@ -759,6 +792,7 @@ export class ShelfEngine {
     backBoard.position.z = -depth * 0.5;
     backBoard.castShadow = true;
     backBoard.receiveShadow = true;
+    backBoard.visible = !book.sheet;
     physical.add(backBoard);
 
     const spine = new THREE.Mesh(
@@ -819,18 +853,25 @@ export class ShelfEngine {
       THREE.PlaneGeometry,
       THREE.MeshPhysicalMaterial
     >(
-      new THREE.PlaneGeometry(width - 0.012, book.height - 0.012),
+      book.sheet
+        ? gewellterBogen(width, book.height, 1)
+        : new THREE.PlaneGeometry(width - 0.012, book.height - 0.012),
       new THREE.MeshPhysicalMaterial({
         map: frontTexture,
         color: frontTexture ? 0xffffff : new THREE.Color(book.cover),
-        roughness: 0.66,
-        metalness: 0.02,
-        clearcoat: book.motif === "gather" ? 0.18 : 0.05,
+        // Papier ist matt. Ein Buchdeckel darf glaenzen, ein Bogen nicht.
+        roughness: book.sheet ? 0.95 : 0.66,
+        metalness: book.sheet ? 0 : 0.02,
+        clearcoat: book.sheet ? 0 : book.motif === "gather" ? 0.18 : 0.05,
         clearcoatRoughness: 0.48,
       }),
     );
     frontSurface.name = "frontArtwork";
-    frontSurface.position.z = depth * 0.5 + 0.006;
+    // Beim Blatt liegt die Flaeche am Bogen selbst, nicht ueber einem
+    // Deckel — und sie wirft den Schatten, den sonst der Deckel wirft.
+    frontSurface.position.z = book.sheet ? depth * 0.5 : depth * 0.5 + 0.006;
+    frontSurface.castShadow = Boolean(book.sheet);
+    frontSurface.receiveShadow = Boolean(book.sheet);
     physical.add(frontSurface);
 
 
@@ -838,14 +879,16 @@ export class ShelfEngine {
       THREE.PlaneGeometry,
       THREE.MeshStandardMaterial
     >(
-      new THREE.PlaneGeometry(width - 0.012, book.height - 0.012),
+      book.sheet
+        ? gewellterBogen(width, book.height, -1)
+        : new THREE.PlaneGeometry(width - 0.012, book.height - 0.012),
       new THREE.MeshStandardMaterial({
         map: backTexture,
         color: backTexture
           ? 0xffffff
           : new THREE.Color(book.sheet ? blattRueckseite : book.cover),
         // Papier ist matter als ein Einband.
-        roughness: book.sheet ? 0.94 : 0.72,
+        roughness: book.sheet ? 0.95 : 0.72,
       }),
     );
     backSurface.name = "backArtwork";
@@ -854,8 +897,9 @@ export class ShelfEngine {
       // ueber die Textur, nicht ueber das Netz.
       backSurface.userData.zweiteSeite = true;
     }
-    backSurface.position.z = -depth * 0.5 - 0.006;
+    backSurface.position.z = book.sheet ? -depth * 0.5 : -depth * 0.5 - 0.006;
     backSurface.rotation.y = Math.PI;
+    backSurface.castShadow = Boolean(book.sheet);
     physical.add(backSurface);
 
     const spineSurface = new THREE.Mesh<
