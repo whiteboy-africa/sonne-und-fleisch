@@ -47,6 +47,13 @@ const handyBreite = 768;
  */
 const uebergabeZeit = 120;
 
+/**
+ * Wie lange ein Blatt zum Umschlagen braucht. Laenger als der frueher hier
+ * stehende harte Schnitt (120 ms), weil ein Blatt eine Bewegung ist und
+ * kein Wechsel — aber kurz genug, dass schnelles Blaettern nicht wartet.
+ */
+const wendeZeit = 440;
+
 /** So weit laesst sich die Seite vergroessern. */
 const lupeGrenze = 4;
 /** Ein Doppelklick geht auf diese Stufe — und wieder zurueck. */
@@ -154,6 +161,8 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
   let kneifLupe = 1;
   let schiebtVon: { x: number; y: number; lx: number; ly: number } | null = null;
   let gezogen = 0;
+  /** Das Blatt, das gerade umschlaegt — hoechstens eines. */
+  let wender: HTMLElement | null = null;
 
   const einzeln = () =>
     window.matchMedia(`(max-width: ${handyBreite - 1}px), (pointer: coarse)`)
@@ -362,6 +371,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     }
     zeilenKuerzen();
     schale.classList.toggle('ist-am-anfang', stelle === 0);
+    // `zeigen()` baut die Spanne neu — ein Blatt von vorher gehoert weg.
     schale.classList.toggle('ist-am-ende', stelle >= letzteStelle());
   }
 
@@ -456,14 +466,106 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     return einzeln() ? folge.length - 1 : Math.ceil(folge.length / 2) - 1;
   }
 
+  /**
+   * Raeumt ein umschlagendes Blatt weg. Wer schnell blaettert, soll nicht
+   * warten muessen: das laufende Blatt faellt einfach an seinen Platz, und
+   * das naechste faengt an.
+   */
+  function wenderWeg() {
+    wender?.remove();
+    wender = null;
+  }
+
+  /**
+   * Laesst ein Blatt umschlagen.
+   *
+   * Das Blatt hat zwei Seiten: vorn die Seite, die man verlaesst, hinten
+   * die, auf der man landet — genau wie Papier. Deshalb wird das alte
+   * Element **verschoben** und nicht kopiert, und die Rueckseite ist ein
+   * Abzug der neuen Seite. Waehrend es sich dreht, liegt die fertige neue
+   * Doppelseite schon darunter; das Blatt deckt sie nur noch zu, bis es
+   * liegt.
+   */
+  function wenden(alt: HTMLElement, neu: HTMLElement, richtung: 1 | -1) {
+    wenderWeg();
+    const blatt = document.createElement('div');
+    blatt.className = `wender ${richtung === 1 ? 'wender--vor' : 'wender--zurueck'}`;
+    blatt.setAttribute('aria-hidden', 'true');
+
+    const vorn = document.createElement('div');
+    vorn.className = 'wender__flaeche wender__flaeche--vorn';
+    vorn.append(alt);
+
+    const hinten = document.createElement('div');
+    hinten.className = 'wender__flaeche wender__flaeche--hinten';
+    hinten.append(neu.cloneNode(true));
+
+    blatt.append(vorn, hinten);
+    spanne.append(blatt);
+    wender = blatt;
+
+    const lauf = blatt.animate(
+      [
+        { transform: 'rotateY(0deg)' },
+        { transform: `rotateY(${richtung === 1 ? -180 : 180}deg)` },
+      ],
+      {
+        duration: wendeZeit,
+        /*
+         * Zieht an, laeuft aus: ein Blatt wird angehoben und faellt dann.
+         *
+         * Die Stuetzpunkte muessen in x aufsteigen. Hier stand einmal
+         * `cubic-bezier(0.34, 0.02, 0.2, 1)` — mit x2 kleiner als x1, und
+         * damit faltet sich die Kurve: das Blatt stand schon nach einem
+         * Viertel der Zeit senkrecht und war fuer den Rest der Bewegung
+         * unsichtbar.
+         */
+        easing: 'cubic-bezier(0.42, 0.04, 0.32, 1)',
+        fill: 'forwards',
+      },
+    );
+    const aufraeumen = () => {
+      if (wender === blatt) wenderWeg();
+    };
+    lauf.finished.then(aufraeumen).catch(aufraeumen);
+    // Netz: in einem verborgenen Fenster laufen Animationen nicht, und das
+    // Blatt bliebe sonst fuer immer quer im Bild stehen.
+    window.setTimeout(aufraeumen, wendeZeit + 600);
+  }
+
   function blaettern(richtung: 1 | -1) {
     if (!offen || inBewegung) return;
     const ziel = stelle + richtung;
     // Vor dem Fenster ist nichts, hinter der Schlusstafel auch nicht.
     if (ziel < 0 || ziel > letzteStelle()) return;
+
+    // Die Seite, die verlassen wird: beim Vorwaertsblaettern die rechte,
+    // rueckwaerts die linke. Auf dem Telefon gibt es nur die eine.
+    const vorher = [...spanne.querySelectorAll<HTMLElement>('.blatt')];
+    const tafelVorher = spanne.classList.contains('leseprobe__spanne--tafel');
+    const alteSeite =
+      richtung === 1 ? vorher[vorher.length - 1] : vorher[0];
+
     stelle = ziel;
     lupeZurueck();
+    wenderWeg();
     zeigen();
+
+    // In die Schlusstafel hinein und aus ihr heraus wird nicht umgeschlagen:
+    // sie ist keine Seite, sondern eine Tafel ueber die ganze Spanne, und
+    // ein Blatt mit ihr als Rueckseite saehe aus wie ein Satzfehler.
+    const tafelJetzt = spanne.classList.contains('leseprobe__spanne--tafel');
+    const nachher = [...spanne.querySelectorAll<HTMLElement>('.blatt')];
+    const neueSeite = richtung === 1 ? nachher[0] : nachher[nachher.length - 1];
+    if (
+      alteSeite &&
+      neueSeite &&
+      !tafelVorher &&
+      !tafelJetzt &&
+      !wenigerBewegung()
+    ) {
+      wenden(alteSeite, neueSeite, richtung);
+    }
     const seite = einzeln() ? folge[stelle] : folge[stelle * 2];
     haken.melden(
       seite?.art === 'schluss'
@@ -592,6 +694,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
       // Ansichten uebereinander, von denen keine stimmte.
       wurzel.classList.remove('ist-aufgeschlagen');
       schale.hidden = true;
+      wenderWeg();
       spanne.replaceChildren();
       aktuellesBuch = null;
       // Der Fokus geht dorthin zurueck, wo er herkam.

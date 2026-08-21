@@ -232,6 +232,78 @@
   cursor: grabbing;
 }
 
+/* ----------------------------------------------------- Das Blatt, das umschlaegt */
+
+/*
+ * Beim Blaettern schlaegt ein echtes Blatt um: vorn die Seite, die man
+ * verlaesst, hinten die, auf der man landet. Es dreht sich um den Bund —
+ * vorwaerts nach links, rueckwaerts nach rechts —, und darunter liegt die
+ * fertige neue Doppelseite schon bereit.
+ *
+ * Die Fluchtpunkttiefe sitzt an der Spanne, damit beide Seiten denselben
+ * Blickwinkel haben; ohne sie waere die Drehung flach wie eine Klappe.
+ */
+.leseprobe__spanne {
+  perspective: 2400px;
+  perspective-origin: center center;
+}
+
+.wender {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.wender--vor {
+  left: 50%;
+  transform-origin: left center;
+}
+
+.wender--zurueck {
+  left: 0;
+  transform-origin: right center;
+}
+
+/* Eine einzelne Seite nimmt die ganze Spanne. */
+.leseprobe__spanne--einzeln .wender {
+  width: 100%;
+}
+
+.leseprobe__spanne--einzeln .wender--vor {
+  left: 0;
+}
+
+.wender__flaeche {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  /* Der Bogen wirft einen Schatten auf das, was unter ihm liegt. */
+  box-shadow: 0 0 34px rgba(24, 20, 14, 0.28);
+  background: #ece8dd;
+}
+
+.wender__flaeche--hinten {
+  transform: rotateY(180deg);
+}
+
+.wender__flaeche .blatt {
+  width: 100%;
+  height: 100%;
+  /* Kein Einblenden auf einem Blatt, das ohnehin in Bewegung ist. */
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wender {
+    display: none;
+  }
+}
+
 /* --------------------------------------------------------------- Das Blatt */
 
 /*
