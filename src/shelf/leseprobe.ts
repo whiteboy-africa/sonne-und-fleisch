@@ -55,19 +55,21 @@ const uebergabeZeit = 120;
 const wendeZeit = 440;
 
 /**
- * In so viele Glieder ist das umschlagende Blatt geteilt. Jedes traegt ein
- * Stueck der Woelbung; zusammen ergeben sie den Bogen, den Papier wirft,
- * wenn man es am Bund anhebt. Acht reichen — mehr sieht man nicht, und
- * jedes Glied kostet einen Abzug der Seite.
+ * Wie weit sich das Blatt beim Umschlagen aus der Ebene neigt — die freie
+ * Ecke kommt der Kamera entgegen, wie bei Papier, das man anhebt.
+ *
+ * Hier stand einmal eine Kette aus acht ineinandersteckenden Gliedern, die
+ * sich wirklich bog, wie die Knochenkette im Blaetter-Rig. In Standbildern
+ * sah sie richtig aus und in Bewegung falsch: eine lebende Seite laesst
+ * sich in CSS nur biegen, indem man sie in Streifen schneidet, und
+ * geschnittene Kanten zeichnen sich beim Drehen als Naehte ab — auch mit
+ * Ueberlappung, weil jede Streifenkante einzeln geglaettet wird. Ein Blatt
+ * aus einem Stueck hat keine Naht; die Natuerlichkeit kommt stattdessen
+ * aus Neigung, Hub und dem Licht, das ueber die Seite laeuft.
  */
-const wendeGlieder = 8;
-
-/**
- * Wie stark sich ein Glied gegen das vorige neigt, wenn die Woelbung am
- * groessten ist. Mal sieben Gelenke ergibt das den ganzen Bogen — dieselbe
- * Groessenordnung wie `form.bogen` im Blaetter-Rig.
- */
-const wendeBogen = 6.4;
+const wendeNeigung = 7;
+/** Wie weit das Blatt sich dabei aus der Seite hebt. */
+const wendeHub = 40;
 
 /** So weit laesst sich die Seite vergroessern. */
 const lupeGrenze = 4;
@@ -506,50 +508,43 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     const blatt = document.createElement('div');
     blatt.className = `wender ${richtung === 1 ? 'wender--vor' : 'wender--zurueck'}`;
     blatt.setAttribute('aria-hidden', 'true');
-    blatt.style.setProperty('--glieder', String(wendeGlieder));
-
-    // Die Kette: jedes Glied haengt am vorigen und neigt sich ein Stueck
-    // gegen es. Weil sie ineinander stecken, addieren sich die Neigungen —
-    // aus lauter geraden Stuecken wird ein Bogen. Genau so beugt das
-    // Blaetter-Rig seine Knochen, nur dass hier das Dokument rechnet.
-    let anker: HTMLElement = blatt;
-    for (let i = 0; i < wendeGlieder; i += 1) {
-      const glied = document.createElement('div');
-      glied.className = `wender__glied${i > 0 ? ' wender__glied--folge' : ''}`;
-
-      for (const [seite, inhalt] of [
-        ['vorn', alt],
-        ['hinten', neu],
-      ] as const) {
-        const flaeche = document.createElement('div');
-        flaeche.className = `wender__flaeche wender__flaeche--${seite}`;
-        const abzug = document.createElement('div');
-        abzug.className = 'wender__abzug';
-        // Jedes Glied zeigt seinen Streifen derselben Seite: der Abzug ist
-        // so breit wie das ganze Blatt und so weit nach links geschoben,
-        // dass durch den Ausschnitt der richtige Streifen faellt.
-        abzug.style.setProperty('--streifen', String(i));
-        abzug.append(
-          seite === 'vorn' && i === 0 ? inhalt : (inhalt.cloneNode(true) as HTMLElement),
-        );
-        flaeche.append(abzug);
-        glied.append(flaeche);
-      }
-
-      anker.append(glied);
-      anker = glied;
+    for (const [seite, inhalt] of [
+      ['vorn', alt],
+      ['hinten', neu],
+    ] as const) {
+      const flaeche = document.createElement('div');
+      flaeche.className = `wender__flaeche wender__flaeche--${seite}`;
+      flaeche.append(
+        seite === 'vorn' ? inhalt : (inhalt.cloneNode(true) as HTMLElement),
+      );
+      // Das Licht, das ueber die Seite laeuft, waehrend sie sich hebt: es
+      // tut, was die Woelbung taete, ohne die Seite zu zerschneiden.
+      const glanz = document.createElement('div');
+      glanz.className = 'wender__glanz';
+      flaeche.append(glanz);
+      blatt.append(flaeche);
     }
 
     spanne.append(blatt);
     wender = blatt;
 
     const ende = richtung === 1 ? -180 : 180;
-    const bogen = richtung === 1 ? -wendeBogen : wendeBogen;
+    const neigung = richtung === 1 ? -wendeNeigung : wendeNeigung;
     const lauf = blatt.animate(
       [
-        { transform: 'rotateY(0deg)', '--bogen': '0deg' },
-        { transform: `rotateY(${ende * 0.5}deg)`, '--bogen': `${bogen}deg`, offset: 0.5 },
-        { transform: `rotateY(${ende}deg)`, '--bogen': '0deg' },
+        {
+          transform: 'rotateY(0deg) rotateX(0deg) translateZ(0px)',
+          '--glanz': '0',
+        },
+        {
+          transform: `rotateY(${ende * 0.5}deg) rotateX(${neigung}deg) translateZ(${wendeHub}px)`,
+          '--glanz': '1',
+          offset: 0.5,
+        },
+        {
+          transform: `rotateY(${ende}deg) rotateX(0deg) translateZ(0px)`,
+          '--glanz': '0',
+        },
       ] as unknown as Keyframe[],
       {
         duration: wendeZeit,
