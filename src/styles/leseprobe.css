@@ -155,23 +155,35 @@
  */
 .leseprobe__spanne::after {
   position: absolute;
-  z-index: 3;
+  /*
+   * Ueber den ruhenden Seiten, aber **unter** dem Blatt, das umschlaegt:
+   * den Schatten wirft der Falz auf das, was liegt, nicht auf ein Blatt,
+   * das gerade angehoben ist.
+   */
+  z-index: 1;
   inset: 0;
   content: '';
   pointer-events: none;
-  mix-blend-mode: multiply;
+  /*
+   * Kein `mix-blend-mode` mehr. Ein mischender Layer laesst sich nicht
+   * eigenstaendig komponieren — er muss bei jedem Bild neu mit seinem
+   * Untergrund verrechnet werden, waehrend die Transformation des Bandes
+   * laengst durch ist. Beim Heranfahren und Schieben hinkte der Bund
+   * darum sichtbar nach. Als gewoehnlicher Verlauf ueber dem Papier sieht
+   * er genauso aus und wandert mit.
+   */
   background:
     linear-gradient(
       90deg,
       transparent calc(50% - 26px),
-      rgba(24, 20, 14, 0.16) calc(50% - 9px),
-      rgba(24, 20, 14, 0.3) 50%,
-      rgba(24, 20, 14, 0.16) calc(50% + 9px),
+      rgba(24, 20, 14, 0.14) calc(50% - 9px),
+      rgba(24, 20, 14, 0.26) 50%,
+      rgba(24, 20, 14, 0.14) calc(50% + 9px),
       transparent calc(50% + 26px)
     ),
     linear-gradient(
       178deg,
-      color-mix(in srgb, var(--akzent, #d8b25a) 22%, transparent),
+      color-mix(in srgb, var(--akzent, #d8b25a) 15%, transparent),
       transparent 40%
     );
 }
@@ -248,6 +260,17 @@
   perspective-origin: center center;
 }
 
+/*
+ * Die Woelbung des umschlagenden Blattes wird als Winkel animiert und
+ * vererbt sich die Kette hinunter. Ohne `@property` waere sie nur ein
+ * Text, den man nicht weich veraendern kann.
+ */
+@property --bogen {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
 .wender {
   position: absolute;
   z-index: 2;
@@ -255,6 +278,7 @@
   bottom: 0;
   width: 50%;
   transform-style: preserve-3d;
+  transform-origin: left center;
   pointer-events: none;
 }
 
@@ -277,13 +301,39 @@
   left: 0;
 }
 
+/*
+ * Ein Glied der Kette. Das erste ist so breit wie ein Achtel des Blattes,
+ * jedes folgende sitzt am rechten Rand seines Vorgaengers und ist genauso
+ * breit — weil es in ihm steckt, addieren sich die Neigungen zum Bogen.
+ */
+.wender__glied {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc(100% / var(--glieder, 8));
+  transform-style: preserve-3d;
+  transform-origin: left center;
+}
+
+.wender__glied--folge {
+  left: 100%;
+  width: 100%;
+  transform: rotateY(var(--bogen));
+}
+
 .wender__flaeche {
   position: absolute;
-  inset: 0;
+  /*
+   * Einen halben Pixel nach rechts ueber das Glied hinaus: schraeg gestellt
+   * blieb zwischen den Streifen sonst eine Haarlinie stehen, und die Kette
+   * bekam acht feine Naehte quer ueber die Seite. Der Ueberstand zeigt ein
+   * Stueck des naechsten Streifens — also genau das, was dort ohnehin
+   * steht, weil es dieselbe Seite ist.
+   */
+  inset: 0 -0.6px 0 0;
   overflow: hidden;
   backface-visibility: hidden;
-  /* Der Bogen wirft einen Schatten auf das, was unter ihm liegt. */
-  box-shadow: 0 0 34px rgba(24, 20, 14, 0.28);
   background: #ece8dd;
 }
 
@@ -291,11 +341,34 @@
   transform: rotateY(180deg);
 }
 
-.wender__flaeche .blatt {
+/*
+ * Der Abzug der Seite ist so breit wie das ganze Blatt und so weit nach
+ * links geschoben, dass durch den Ausschnitt des Gliedes genau sein
+ * Streifen faellt. So steht ueber alle Glieder hinweg **eine** Seite, auch
+ * wenn sie in acht Stuecken gebogen wird.
+ */
+.wender__abzug {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--streifen, 0) * -100%);
+  width: calc(var(--glieder, 8) * 100%);
+}
+
+.wender__abzug .blatt {
   width: 100%;
   height: 100%;
   /* Kein Einblenden auf einem Blatt, das ohnehin in Bewegung ist. */
   animation: none;
+}
+
+/*
+ * Der Schatten gehoert dem **ganzen** Blatt, nicht jedem Glied. Lag er an
+ * den Gliedern, zeichnete jedes seinen eigenen Rand nach, und die Kette
+ * bekam acht sichtbare Naehte quer ueber die Seite.
+ */
+.wender {
+  box-shadow: 0 0 30px rgba(24, 20, 14, 0.24);
 }
 
 @media (prefers-reduced-motion: reduce) {

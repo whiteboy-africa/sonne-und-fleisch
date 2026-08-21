@@ -54,6 +54,21 @@ const uebergabeZeit = 120;
  */
 const wendeZeit = 440;
 
+/**
+ * In so viele Glieder ist das umschlagende Blatt geteilt. Jedes traegt ein
+ * Stueck der Woelbung; zusammen ergeben sie den Bogen, den Papier wirft,
+ * wenn man es am Bund anhebt. Acht reichen — mehr sieht man nicht, und
+ * jedes Glied kostet einen Abzug der Seite.
+ */
+const wendeGlieder = 8;
+
+/**
+ * Wie stark sich ein Glied gegen das vorige neigt, wenn die Woelbung am
+ * groessten ist. Mal sieben Gelenke ergibt das den ganzen Bogen — dieselbe
+ * Groessenordnung wie `form.bogen` im Blaetter-Rig.
+ */
+const wendeBogen = 6.4;
+
 /** So weit laesst sich die Seite vergroessern. */
 const lupeGrenze = 4;
 /** Ein Doppelklick geht auf diese Stufe — und wieder zurueck. */
@@ -491,24 +506,51 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     const blatt = document.createElement('div');
     blatt.className = `wender ${richtung === 1 ? 'wender--vor' : 'wender--zurueck'}`;
     blatt.setAttribute('aria-hidden', 'true');
+    blatt.style.setProperty('--glieder', String(wendeGlieder));
 
-    const vorn = document.createElement('div');
-    vorn.className = 'wender__flaeche wender__flaeche--vorn';
-    vorn.append(alt);
+    // Die Kette: jedes Glied haengt am vorigen und neigt sich ein Stueck
+    // gegen es. Weil sie ineinander stecken, addieren sich die Neigungen —
+    // aus lauter geraden Stuecken wird ein Bogen. Genau so beugt das
+    // Blaetter-Rig seine Knochen, nur dass hier das Dokument rechnet.
+    let anker: HTMLElement = blatt;
+    for (let i = 0; i < wendeGlieder; i += 1) {
+      const glied = document.createElement('div');
+      glied.className = `wender__glied${i > 0 ? ' wender__glied--folge' : ''}`;
 
-    const hinten = document.createElement('div');
-    hinten.className = 'wender__flaeche wender__flaeche--hinten';
-    hinten.append(neu.cloneNode(true));
+      for (const [seite, inhalt] of [
+        ['vorn', alt],
+        ['hinten', neu],
+      ] as const) {
+        const flaeche = document.createElement('div');
+        flaeche.className = `wender__flaeche wender__flaeche--${seite}`;
+        const abzug = document.createElement('div');
+        abzug.className = 'wender__abzug';
+        // Jedes Glied zeigt seinen Streifen derselben Seite: der Abzug ist
+        // so breit wie das ganze Blatt und so weit nach links geschoben,
+        // dass durch den Ausschnitt der richtige Streifen faellt.
+        abzug.style.setProperty('--streifen', String(i));
+        abzug.append(
+          seite === 'vorn' && i === 0 ? inhalt : (inhalt.cloneNode(true) as HTMLElement),
+        );
+        flaeche.append(abzug);
+        glied.append(flaeche);
+      }
 
-    blatt.append(vorn, hinten);
+      anker.append(glied);
+      anker = glied;
+    }
+
     spanne.append(blatt);
     wender = blatt;
 
+    const ende = richtung === 1 ? -180 : 180;
+    const bogen = richtung === 1 ? -wendeBogen : wendeBogen;
     const lauf = blatt.animate(
       [
-        { transform: 'rotateY(0deg)' },
-        { transform: `rotateY(${richtung === 1 ? -180 : 180}deg)` },
-      ],
+        { transform: 'rotateY(0deg)', '--bogen': '0deg' },
+        { transform: `rotateY(${ende * 0.5}deg)`, '--bogen': `${bogen}deg`, offset: 0.5 },
+        { transform: `rotateY(${ende}deg)`, '--bogen': '0deg' },
+      ] as unknown as Keyframe[],
       {
         duration: wendeZeit,
         /*
