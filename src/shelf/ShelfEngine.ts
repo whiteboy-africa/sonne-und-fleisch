@@ -2635,6 +2635,28 @@ export class ShelfEngine {
     // Angekommen: der neue Band ist der betrachtete. Der Bezugspunkt der
     // Reihe wandert mit, die Weltposition bleibt dabei gleich.
     const nach = this.wipeNach;
+
+    // Und der hinausgefahrene Band legt sich zurueck in den Stapel.
+    //
+    // Die Buchhaltung hatte ihn schon zurueckgelegt (`returnToPile` beim
+    // Start des Wechsels), seine **Lage** aber stand weiter auf
+    // Betrachtungsgroesse: vorn, gross, schraeg. Zu sehen war das nicht,
+    // solange man im Betrachten blieb — dort ist ausser dem betrachteten
+    // Band alles ausgeblendet. Erst beim Zurueckgehen zum Stapel kam er
+    // wieder zum Vorschein und stand in voller Groesse quer vor der Reihe,
+    // neben dem Band, den man gerade angesehen hatte.
+    //
+    // Zurueckgelegt wird hier, im Dunkeln des Abblenders — gesehen hat das
+    // niemand, und beim naechsten Blick liegt der Band, wo er hingehoert.
+    const hinaus = this.runtimeBooks[this.wipeVon];
+    this.commitBookPose(
+      hinaus,
+      stackedBookPose(hinaus.place, this.motionLayout),
+      false,
+    );
+    // Die Schraeglage gehoert der Betrachtung. Ein liegender Band hat keine.
+    hinaus.content.rotation.z = 0;
+
     this.selectedIndex = nach;
     this.activeIndex = nach;
     this.scrollIndex = nach;
