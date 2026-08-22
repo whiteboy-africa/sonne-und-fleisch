@@ -10,6 +10,7 @@
     "dev": "node scripts/cms-kopieren.mjs && astro dev",
     "build": "node scripts/cms-kopieren.mjs && astro build",
     "preview": "astro preview",
+    "magazin:build": "node scripts/magazin-bauen.mjs",
     "check": "astro check",
     "postinstall": "node scripts/cms-kopieren.mjs",
     "astro": "astro"
