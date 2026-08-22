@@ -106,6 +106,20 @@ export function seitenRigBauen(werte: {
   z: number;
   /** Abstand zweier Blaetter im Stapel. */
   blattAbstand: number;
+  /**
+   * Wo der Bund liegt, in Rig-Koordinaten — die Achse, um die sich jedes
+   * Blatt dreht.
+   *
+   * Beim **Band** liegt er an der linken Kante des Buchkoerpers, und der
+   * ist um seine Mitte gebaut: `-breite / 2`. Beim **Heft** liegt er im
+   * Ursprung, denn dort ist der Bund die Mitte der Doppelseite und alles
+   * andere haengt daran — die beiden Bloecke ebenso wie die Kamera.
+   *
+   * Ohne diesen Griff erbte das Heft die Lage des Bandes und stand um eine
+   * halbe Seitenbreite neben der Kamera. Zu sehen war das erst, als die
+   * gemessenen Zahlen stimmten und das Bild nicht.
+   */
+  bund: number;
   /** +1: der Stapel liegt vorn. -1: der Band ist gewendet. */
   seite: 1 | -1;
   stoff: (index: number) => THREE.Material | THREE.Material[];
@@ -163,7 +177,7 @@ export function seitenRigBauen(werte: {
     // verschwindet das Blatt mitten in der Drehung aus dem Bild.
     netz.frustumCulled = false;
     netz.position.set(
-      -breite * 0.5,
+      werte.bund,
       0,
       werte.z + seite * werte.blattAbstand * (werte.blaetter - i),
     );

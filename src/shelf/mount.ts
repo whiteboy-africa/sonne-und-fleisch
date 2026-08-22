@@ -56,9 +56,15 @@ export function regalStarten(wurzel: HTMLElement) {
     vorlese: pflicht(wurzel, '[data-vorlese]'),
     leseprobeZeile: pflicht<HTMLButtonElement>(wurzel, '[data-leseprobe-zeile]'),
     leseprobeSeite: pflicht(wurzel, '[data-leseprobe-seite]'),
+    heftZeilen: pflicht<HTMLElement>(wurzel, '[data-heft-zeilen]'),
+    heftZu: pflicht<HTMLButtonElement>(wurzel, '[data-heft-zu]'),
   };
 
   let engine: ShelfEngine | null = null;
+  /** Liegt ein Geschichtsschritt fuer das Heft auf dem Stapel? */
+  let heftGeschichte = false;
+  /** Hat der Zurueck-Knopf des Browsers geschlossen? */
+  let heftVomZurueck = false;
   /**
    * Kopie weg, Verschiebung weg. Wird am Ende des Wechsels gerufen — und
    * sicherheitshalber auch, wenn die Betrachtung vorher verlassen wird:
@@ -72,6 +78,8 @@ export function regalStarten(wurzel: HTMLElement) {
   let gewaehlterIndex: number | null = null;
   let modus: ShelfMode = 'browse';
   let seite: BookSide = 'vorn';
+  /** Liegt das Heft offen? Dann gehoert die Bedienung ihm. */
+  let heftOffen = false;
 
   const gesamt = katalognummer(katalog.length);
 
@@ -165,7 +173,10 @@ export function regalStarten(wurzel: HTMLElement) {
     }
     el.ticks.forEach((tick) => {
       const index = Number(tick.dataset.stelle);
-      const ist = index === aktiverIndex;
+      // Solange das Heft offen ist, gehoert keine Marke niemandem: das Heft
+      // traegt keine Nummer und steht in keiner Reihe. Eine leuchtende
+      // Marke behauptete das Gegenteil.
+      const ist = index === aktiverIndex && !heftOffen;
       tick.classList.toggle('is-active', ist);
       tick.classList.toggle('ist-blind', Boolean(katalog[index]?.blind));
       // Die Leiste bleibt auch im Fokus bedienbar.
@@ -270,8 +281,9 @@ export function regalStarten(wurzel: HTMLElement) {
   // Die Pfeile tun dasselbe wie die Nummern: einen Band weiter. Im Regal
   // holen sie ihn heraus, beim aufgeschlagenen Band blättern sie weiter.
   function nachbar(richtung: -1 | 1) {
-    // Ein aufgeschlagener Band wechselt nicht den Band.
-    if (leseprobe.istBesetzt()) return;
+    // Ein aufgeschlagener Band wechselt nicht den Band — und das Heft
+    // kennt gar keine Nachbarn.
+    if (leseprobe.istBesetzt() || heftOffen) return;
     // Am Blatt vorbei — und von ihm aus an die Enden der Reihe.
     const ziel = nachbarIndex(katalog, aktiverIndex, richtung);
     if (ziel === null) return;
@@ -285,7 +297,7 @@ export function regalStarten(wurzel: HTMLElement) {
   el.ticks.forEach((tick) => {
     const index = Number(tick.dataset.stelle);
     tick.addEventListener('click', () => {
-      if (leseprobe.istBesetzt()) return;
+      if (leseprobe.istBesetzt() || heftOffen) return;
       // Im Regal: nur herausholen. Beim aufgeschlagenen Band: direkt zum
       // naechsten weiterblättern, ohne Umweg über das Regal.
       if (modus === 'browse') engine?.presentBook(index);
@@ -297,6 +309,7 @@ export function regalStarten(wurzel: HTMLElement) {
   let wischStart: { x: number; y: number } | null = null;
   el.panel.addEventListener('pointerdown', (ereignis) => {
     if (ereignis.pointerType !== 'touch' || leseprobe.istBesetzt()) return;
+    if (heftOffen) return;
     wischStart = { x: ereignis.clientX, y: ereignis.clientY };
   });
   el.panel.addEventListener('pointerup', (ereignis) => {
@@ -315,14 +328,17 @@ export function regalStarten(wurzel: HTMLElement) {
   });
 
   el.zurRegal.addEventListener('click', () => {
-    if (leseprobe.istBesetzt()) return;
+    if (leseprobe.istBesetzt() || heftOffen) return;
     engine?.returnToShelf();
   });
   el.wenden.addEventListener('click', () => {
-    // Ein aufgeschlagener Band wendet nicht.
-    if (leseprobe.istBesetzt()) return;
+    // Ein aufgeschlagener Band wendet nicht — und ein Heft ueberhaupt nie.
+    if (leseprobe.istBesetzt() || heftOffen) return;
     engine?.flipBook();
   });
+  // Die erste der beiden Zeilen unter dem Heft. Die zweite ist ein
+  // gewoehnlicher Verweis auf die Datei und braucht kein Skript.
+  el.heftZu.addEventListener('click', () => engine?.heftSchliessen());
   el.leseprobeZeile.addEventListener('click', () =>
     leseprobeOeffnen(el.leseprobeZeile),
   );
@@ -411,6 +427,31 @@ export function regalStarten(wurzel: HTMLElement) {
       onStatus: (meldung) => {
         el.status.textContent = meldung;
       },
+      // Das Heft raeumt den Schirm frei. Alles, was das Regal sonst
+      // anbietet, verschwindet (`ist-heft` in `styles/magazin.css`); die
+      // zwei Zeilen kommen. Der Zurueck-Knopf des Browsers schliesst
+      // wieder, wie beim aufgeschlagenen Band.
+      onHeft: (offen, buch) => {
+        heftOffen = offen;
+        wurzel.classList.toggle('ist-heft', offen);
+        el.heftZeilen.hidden = !offen;
+        // Die Leiste neu setzen: die aktive Marke faellt weg und kommt
+        // wieder.
+        blaetternAnsichtSetzen();
+        if (offen) {
+          el.vorlese.textContent = `${buch?.title ?? 'Das Heft'} liegt aufgeschlagen. Pfeiltasten blättern, Escape schließt.`;
+          if (!heftGeschichte) {
+            heftGeschichte = true;
+            window.history.pushState({ heft: true }, '');
+          }
+        } else if (heftGeschichte) {
+          heftGeschichte = false;
+          // Kam das Schliessen selbst vom Zurueck-Knopf, ist der Schritt
+          // schon abgeraeumt — noch einmal zurueck traege die Seite fort.
+          if (!heftVomZurueck) window.history.back();
+          heftVomZurueck = false;
+        }
+      },
       // Ein Klick auf den Umschlag des betrachteten Bandes. Ob daraus etwas
       // wird, entscheidet sich hier: nur wo eine Leseprobe liegt.
       onAufschlagen: () => leseprobeOeffnen(null),
@@ -424,6 +465,17 @@ export function regalStarten(wurzel: HTMLElement) {
       onReady: () => {
         wurzel.classList.add('is-ready');
         wurzel.querySelector('[data-ladeschirm]')?.setAttribute('aria-hidden', 'true');
+        // `/magazin` geht ohne Umweg in die Leseposition: kein Stapel, aus
+        // dem man sich erst herausklicken muesste.
+        //
+        // Einen Zug spaeter, nicht sofort: `onReady` faellt noch **im**
+        // Erbauer, und `engine` bekommt seinen Wert erst, wenn der fertig
+        // ist. Ein Aufruf von hier ginge ins Leere — dieselbe Falle wie
+        // beim Direkteinstieg ueber `/?band=`.
+        if (wurzel.dataset.regalDirekt === 'magazin') {
+          window.setTimeout(() => engine?.heftOeffnen(), 0);
+          return;
+        }
         // Wer mit /?band=008 kommt, will genau diesen Band aufgeschlagen
         // sehen — etwa auf dem Weg zurueck von den Einsendungen. Ein
         // einzelner Anstoss verpufft, solange der Band noch im Stapel
@@ -452,6 +504,16 @@ export function regalStarten(wurzel: HTMLElement) {
   }
 
   void starten().catch(aufgeben);
+
+  // Der Zurueck-Knopf des Browsers schliesst das Heft — derselbe Weg wie
+  // beim aufgeschlagenen Band. Wer auf `/magazin` angekommen ist, hat
+  // keinen Schritt davor: dann fuehrt der Knopf, wie er soll, aus der
+  // Seite heraus.
+  window.addEventListener('popstate', () => {
+    if (!heftOffen) return;
+    heftVomZurueck = true;
+    engine?.heftSchliessen();
+  });
 
   // Astro laedt Seiten im Browser neu ein; ein zurueckgelassener
   // WebGL-Kontext waere ein Leck.

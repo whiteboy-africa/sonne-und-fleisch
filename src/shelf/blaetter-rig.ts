@@ -200,6 +200,9 @@ export function blaetterRigBauen(werte: {
     blaetter: form.blaetter,
     z: seite * tiefe * 0.5,
     blattAbstand,
+    // Der Bund an der linken Kante des Buchkoerpers: der ist um seine
+    // Mitte gebaut.
+    bund: -breite * 0.5,
     seite,
     form: { segmente: form.segmente, lambda: form.lambda },
     stoff: (i) => {

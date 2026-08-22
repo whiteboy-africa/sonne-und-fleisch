@@ -1,0 +1,25 @@
+---
+// Das Heft, direkt. Dieselbe Seite wie die Startseite — derselbe Stapel,
+// dieselbe Szene —, nur dass sie ohne Umweg in die Leseposition geht: kein
+// Stapel, aus dem man sich erst herausklicken muesste.
+//
+// Sie steht in keiner Sitemap (siehe `astro.config.mjs`) und traegt keine
+// eigene Beschreibung im Programm. Ein Heft ist kein Band der Reihe.
+import Basis from '../layouts/Basis.astro';
+import Regal from '../components/Regal.astro';
+import { katalogFuerRegal } from '../buecher';
+import '../styles/regal.css';
+import '../styles/leseprobe.css';
+import '../styles/magazin.css';
+
+const katalog = await katalogFuerRegal();
+const heft = katalog.find((buch) => buch.magazine);
+
+// Ohne Heft im Katalog gibt es hier nichts zu lesen — dann zurueck zum
+// Stapel, statt eine leere Leseposition zu zeigen.
+if (!heft) return Astro.redirect('/');
+---
+
+<Basis regal titel={heft.title} beschreibung={heft.description}>
+  <Regal katalog={katalog} direkt="magazin" />
+</Basis>

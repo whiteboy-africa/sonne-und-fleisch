@@ -108,6 +108,13 @@ export type CatalogBook = {
    * sehr duennes Buch.
    */
   sheet?: boolean;
+  /**
+   * Magazin statt Buch: ein Heft, das sich blaettern laesst. Ist das
+   * gesetzt, ist der Eintrag ein Sonderobjekt — es traegt keine Nummer,
+   * steht in keiner Leiste und geht angeklickt in seine eigene
+   * Leseposition statt in die Betrachtung.
+   */
+  magazine?: MagazineData;
   linkLabel?: string;
   living?: boolean;
   /**
@@ -132,6 +139,16 @@ export type CatalogBook = {
   back?: BookBackFace;
 };
 
+/** Wo die Seiten des Heftes liegen und wie viele es sind. */
+export type MagazineData = {
+  /** Immer gerade: ein Heft hat Doppelseiten. */
+  pages: number;
+  /** Darunter liegen `0001.webp` aufwaerts. */
+  folder: string;
+  /** Wohin die zweite der beiden Zeilen unter dem Heft fuehrt. */
+  pdf: string;
+};
+
 export type BookBackFace = {
   title: string;
   shortTitle: string;
@@ -149,13 +166,26 @@ export type BookBackFace = {
 };
 
 /**
- * Der Nachbar in der Reihe — **am Blatt vorbei**.
+ * Steht dieser Eintrag in der Reihe der Baende?
  *
- * Das Blatt liegt im Stapel, steht aber nicht in der Reihe: normales
- * Blaettern geht daran vorbei, und man kommt an es heran, indem man es
- * anfasst. Steht man auf ihm, fuehrt der Weg an die Enden der Reihe: nach
- * rechts zum ersten Band, nach links zum letzten echten — der Blindband
- * ist die offene Stelle, kein Ziel.
+ * Zwei liegen im Stapel, ohne dazuzugehoeren: das **Blatt** ist ein Bogen
+ * Papier, das **Heft** eine Zeitschrift. Beide haben keine Nummer, keine
+ * Marke in der Leiste und keinen Platz in der Reihenfolge — man kommt an
+ * sie heran, indem man sie anfasst, nicht indem man zu ihnen blaettert.
+ *
+ * Der Blindband dagegen **ist** eine Station: die offene Stelle am Ende.
+ */
+export function ausserDerReihe(buch: CatalogBook | undefined): boolean {
+  return Boolean(buch?.sheet || buch?.magazine);
+}
+
+/**
+ * Der Nachbar in der Reihe — **an Blatt und Heft vorbei**.
+ *
+ * Normales Blaettern geht an beiden vorbei. Steht man auf einem von ihnen,
+ * fuehrt der Weg an die Enden der Reihe: nach rechts zum ersten Band, nach
+ * links zum letzten echten — der Blindband ist die offene Stelle, kein
+ * Ziel.
  *
  * Gibt `null` zurueck, wo nichts mehr kommt; es wird nicht umgelaufen.
  */
@@ -164,11 +194,11 @@ export function nachbarIndex(
   von: number,
   richtung: 1 | -1,
 ): number | null {
-  const echt = (buch: CatalogBook) => !buch.sheet && !buch.blind;
+  const echt = (buch: CatalogBook) => !ausserDerReihe(buch) && !buch.blind;
 
-  if (katalog[von]?.sheet) {
+  if (ausserDerReihe(katalog[von])) {
     if (richtung === 1) {
-      const erster = katalog.findIndex((buch) => !buch.sheet);
+      const erster = katalog.findIndex((buch) => !ausserDerReihe(buch));
       return erster === -1 ? null : erster;
     }
     for (let i = katalog.length - 1; i >= 0; i -= 1) {
@@ -178,7 +208,7 @@ export function nachbarIndex(
   }
 
   for (let i = von + richtung; i >= 0 && i < katalog.length; i += richtung) {
-    if (!katalog[i].sheet) return i;
+    if (!ausserDerReihe(katalog[i])) return i;
   }
   return null;
 }

@@ -11,7 +11,13 @@ export default defineConfig({
     sitemap({
       // Die CMS-Oberflaeche gehoert nicht in die Sitemap. Entwuerfe stehen
       // ohnehin nicht im Programm und werden nicht gebaut.
-      filter: (seite) => !seite.includes('/admin'),
+      //
+      // Und das Heft nicht: es ist kein Band der Reihe, es steht nicht im
+      // Programm, und eine Zeitschrift, die man blaettert, ist kein
+      // Dokument, das eine Suchmaschine indizieren soll. Dieselbe Regel
+      // wie in `programmListe()`.
+      filter: (seite) =>
+        !seite.includes('/admin') && !seite.includes('/magazin'),
     }),
   ],
   // Die Entwicklerleiste unten im Bild stoert beim Beurteilen der Szene.

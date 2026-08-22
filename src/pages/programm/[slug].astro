@@ -6,14 +6,22 @@
 // Text rechts). Das ist die stille Uebersetzung des Wendens im Regal.
 import { render } from 'astro:content';
 import Seite from '../../layouts/Seite.astro';
-import { alleBuecher, releasenummer, type Buch } from '../../buecher';
+import { alleBuecher, nummernFolge, type Buch } from '../../buecher';
 
+// Eine Seite je Band — und je Sonderobjekt, das eine Nummer traegt. Das
+// Heft bekommt keine: es hat seine eigene Adresse (`/magazin`), und eine
+// zweite unter `/programm/` waere ein Band, der es nicht ist. Das Blatt
+// behaelt seine Seite, es steht nur ohne Nummer da.
 export async function getStaticPaths() {
   const buecher = await alleBuecher();
-  return buecher.map((buch, position) => ({
-    params: { slug: buch.id },
-    props: { buch, nummer: releasenummer(position) },
-  }));
+  const nummern = nummernFolge(buecher);
+  return buecher
+    .map((buch, position) => ({ buch, nummer: nummern[position] ?? '' }))
+    .filter(({ buch }) => buch.data.magazin === undefined)
+    .map(({ buch, nummer }) => ({
+      params: { slug: buch.id },
+      props: { buch, nummer },
+    }));
 }
 
 interface Props {
@@ -98,7 +106,7 @@ const bestellung =
 <Seite
   titel={paarTitel}
   untertitel={paarAutor}
-  augenbraue={`Aus dem Programm · ${nummer}`}
+  augenbraue={nummer ? `Aus dem Programm · ${nummer}` : 'Aus dem Programm'}
   beschreibung={d.klappentext}
   weit
 >

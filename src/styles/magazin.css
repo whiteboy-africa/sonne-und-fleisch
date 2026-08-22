@@ -1,0 +1,157 @@
+/*
+ * Das Heft in seiner Leseposition.
+ *
+ * Diese Datei besteht fast nur aus Wegnehmen. Der Auftrag ist kurz: „Sonst
+ * nichts auf dem Schirm — keine Leiste, kein Zaehler, keine Werkzeuge."
+ * Also verschwindet alles, was das Regal sonst anbietet, und uebrig
+ * bleiben genau zwei Zeilen.
+ *
+ * Was **nicht** verschwindet, ist die Nummernleiste. Sie steht gedimmt und
+ * ohne aktive Marke da: das Heft hat keine Nummer, also kann keine Marke
+ * ihm gehoeren — und eine Leiste, in der ploetzlich ein fremder Punkt
+ * leuchtete, waere eine Behauptung, das Heft stuende in der Reihe.
+ */
+
+.press-experience.ist-heft .site-header,
+.press-experience.ist-heft .browse-caption,
+.press-experience.ist-heft .nachbar,
+.press-experience.ist-heft .back-button,
+.press-experience.ist-heft .book-details,
+.press-experience.ist-heft .slogan {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+/* Die Randabdunklung des Schwebezustands gehoert dem Stapel, nicht hier. */
+.press-experience.ist-heft::after {
+  opacity: 0;
+}
+
+/* In der Leseposition wird nicht gescrollt: es gibt nichts unter dem Heft. */
+.press-experience.ist-heft {
+  overflow: hidden;
+}
+
+/*
+ * Die Leiste bleibt stehen und tritt zurueck. Keine Marke ist aktiv,
+ * keine ist anzufassen: waehrend das Heft offen ist, fuehrt von hier kein
+ * Weg irgendwohin.
+ */
+.press-experience.ist-heft .shelf-index__ticks {
+  opacity: 0.24;
+  pointer-events: none;
+  transition:
+    opacity 220ms ease;
+}
+
+/*
+ * Kein aktiver Punkt: die Marke wird nicht ueberschrieben, sondern gar
+ * nicht erst gesetzt (`blaetternAnsichtSetzen` in `mount.ts`). Eine
+ * ueberschriebene Marke bliebe eine Marke — sie saehe nur anders aus.
+ */
+
+/*
+ * Die zwei Zeilen.
+ *
+ * Sie stehen unter dem Heft, nicht daneben und nicht darueber, und sie
+ * sehen aus wie die uebrige Bedienung des Hauses: Mono, klein, gesperrt,
+ * gedimmt. Beim Darueberfahren gehen sie in die Giftfarbe — dieselbe
+ * Zusage wie ueberall sonst.
+ */
+/*
+ * `fixed`, nicht `absolute`. Auf dem Telefon fliesst die Bedienung des
+ * Regals als normale Seite unter der Leinwand her (`handyFluss`), und
+ * `.press-experience` ist dort viel hoeher als das Fenster — absolut
+ * gesetzt landeten die beiden Zeilen vierhundert Bildpunkte unterhalb des
+ * Randes und waren schlicht nicht da.
+ */
+.heft-zeilen {
+  position: fixed;
+  z-index: 18;
+  right: 0;
+  bottom: clamp(22px, 3.5dvh, 40px);
+  left: 0;
+  display: flex;
+  gap: clamp(20px, 4vw, 46px);
+  justify-content: center;
+  padding: 0 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+}
+
+.press-experience.ist-heft .heft-zeilen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.heft-zeile {
+  display: inline-flex;
+  gap: 0.5em;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font-family: var(--schrift);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.heft-zeile:hover,
+.heft-zeile:focus-visible {
+  color: var(--accent);
+}
+
+/*
+ * Auf dem Telefon steht eine Seite allein, und die beiden Zeilen ruecken
+ * enger zusammen. Tiefer als hier duerfen sie nicht: darunter liegt der
+ * Streifen, auf dem getippt wird.
+ */
+@media (max-width: 767px) {
+  .heft-zeilen {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
+    gap: 22px;
+  }
+
+  /*
+   * Die Tafel wird nicht bloss unsichtbar, sie geht weg. Auf dem Telefon
+   * steht sie im Dokumentfluss, und eine unsichtbare Tafel von tausend
+   * Bildpunkten Hoehe laesst sich weiterhin scrollen — dann wischt man am
+   * Heft vorbei ins Leere.
+   */
+  .press-experience.ist-heft .book-details,
+  .press-experience.ist-heft .browse-caption {
+    display: none;
+  }
+
+  .heft-zeile {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+  }
+}
+
+/*
+ * Ohne Bewegung faellt auch das Ein- und Ausblenden weg — der Auftrag sagt
+ * „harter Wechsel", und das gilt fuer das Bild wie fuer die Zeilen.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .heft-zeilen,
+  .heft-zeile,
+  .press-experience.ist-heft .site-header,
+  .press-experience.ist-heft .browse-caption,
+  .press-experience.ist-heft .nachbar,
+  .press-experience.ist-heft .back-button,
+  .press-experience.ist-heft .book-details,
+  .press-experience.ist-heft .slogan,
+  .press-experience.ist-heft .shelf-index__ticks {
+    transition: none;
+  }
+}

@@ -49,11 +49,12 @@ export type ProgrammEintrag = {
  * Regalordnung (001 ist der erste Band) und bleibt deshalb dieselbe, egal wie
  * herum die Liste sortiert ist.
  *
- * In der Liste stehen nur Baende. Der Blindband (`blind`) und das Blatt
- * (`blatt`) fallen heraus: das eine ist die offene Stelle, das andere ein
- * Bogen Papier — beide gehoeren in den Stapel, nicht in die Bibliografie.
- * Ihre Seiten unter /programm/<slug> bleiben erreichbar, und die Nummern der
- * uebrigen Baende aendern sich nicht: gezaehlt wird vor dem Aussortieren.
+ * In der Liste stehen nur Baende. Der Blindband (`blind`), das Blatt
+ * (`blatt`) und das Heft (`magazin`) fallen heraus: das erste ist die
+ * offene Stelle, das zweite ein Bogen Papier, das dritte eine Zeitschrift —
+ * alle drei gehoeren in den Stapel, nicht in die Bibliografie. Die Nummern
+ * der uebrigen Baende aendern sich nicht: gezaehlt wird vor dem
+ * Aussortieren.
  */
 export async function programmListe(): Promise<ProgrammEintrag[]> {
   const buecher = await alleBuecher();
@@ -92,7 +93,10 @@ export async function programmListe(): Promise<ProgrammEintrag[]> {
         ],
       };
     })
-    .filter(({ buch }) => !buch.data.blind && !buch.data.blatt)
+    .filter(
+      ({ buch }) =>
+        !buch.data.blind && !buch.data.blatt && !buch.data.magazin,
+    )
     .reverse();
 }
 
@@ -178,8 +182,8 @@ export function alsKatalogBuch(
   const d = buch.data;
   return {
     id: buch.id,
-    // Das Blatt bekommt keine — es steht nicht in der Reihe.
-    release: nummer ?? (d.blatt ? '' : releasenummer(position)),
+    // Blatt und Heft bekommen keine — sie stehen nicht in der Reihe.
+    release: nummer ?? (ausserDerReihe(buch) ? '' : releasenummer(position)),
     title: d.titel,
     shortTitle: d.kurztitel ?? d.titel,
     author: d.autor,
@@ -215,6 +219,15 @@ export function alsKatalogBuch(
       : {}),
     ...(d.blind ? { blind: true } : {}),
     ...(d.blatt ? { sheet: true } : {}),
+    ...(d.magazin
+      ? {
+          magazine: {
+            pages: d.magazin.seiten,
+            folder: d.magazin.ordner,
+            pdf: d.magazin.pdf,
+          },
+        }
+      : {}),
     ...(d.rueckseite
       ? {
           back: {
@@ -258,19 +271,25 @@ export function releasenummer(position: number): string {
   return String(position + 1).padStart(3, '0');
 }
 
+/** Liegt der Eintrag bloss im Stapel, ohne in der Reihe zu stehen? */
+export function ausserDerReihe(buch: Buch): boolean {
+  return buch.data.blatt || buch.data.magazin !== undefined;
+}
+
 /**
  * Die Nummern des ganzen Programms, in Regalordnung.
  *
- * **Das Blatt zaehlt nicht mit.** Es ist kein Band: es hat keinen Ruecken,
- * keine Nummer und keinen Platz in der Reihe — es liegt im Stapel, und man
- * kommt an es heran, indem man es anfasst. Ohne diese Ausnahme ruecken alle
- * Baende hinter ihm um eins weiter, und der Blindband, der die offene Stelle
- * markiert, traegt ploetzlich 010 statt 009.
+ * **Blatt und Heft zaehlen nicht mit.** Keins von beiden ist ein Band: sie
+ * haben keinen Ruecken, keine Nummer und keinen Platz in der Reihe — sie
+ * liegen im Stapel, und man kommt an sie heran, indem man sie anfasst. Ohne
+ * diese Ausnahme ruecken alle Baende hinter ihnen weiter, und der
+ * Blindband, der die offene Stelle markiert, traegt ploetzlich 011 statt
+ * 009.
  */
 export function nummernFolge(buecher: Buch[]): Array<string | undefined> {
   let zaehler = 0;
   return buecher.map((buch) =>
-    buch.data.blatt ? undefined : releasenummer(zaehler++),
+    ausserDerReihe(buch) ? undefined : releasenummer(zaehler++),
   );
 }
 

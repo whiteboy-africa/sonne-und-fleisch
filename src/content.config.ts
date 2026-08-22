@@ -148,6 +148,30 @@ const buecher = defineCollection({
      */
     blatt: z.boolean().default(false),
 
+    /**
+     * Magazin statt Buch: ein Heft, das sich blaettern laesst.
+     *
+     * Steht dieser Block da, ist der Eintrag kein Band, sondern ein
+     * Sonderobjekt wie das Blatt — ohne Nummer, ohne Marke in der Leiste,
+     * nicht im Programm und nicht in der Sitemap. Angeklickt schlaegt es
+     * nicht auf wie ein Band, sondern geht in seine eigene Leseposition.
+     *
+     * Die Seiten liegen als WebP unter `ordner` und heissen `0001.webp`
+     * aufwaerts; sie kommen aus `npm run magazin:build` und nicht von Hand.
+     * `seiten` muss gerade sein — ein Heft hat Doppelseiten.
+     */
+    magazin: z
+      .object({
+        // So viele Seiten liegen im Ordner. Der Bau meldet die Zahl.
+        seiten: z.number().int().min(2).refine((zahl) => zahl % 2 === 0, {
+          message: 'Ein Heft hat eine gerade Seitenzahl.',
+        }),
+        ordner: z.string().default('/magazin/pages'),
+        // Wohin die zweite der beiden Zeilen unter dem Heft fuehrt.
+        pdf: z.string().default('/magazin/magazin.pdf'),
+      })
+      .optional(),
+
     // Doppelcover (tête-bêche): das Buch hat zwei Vorderseiten. Die zweite
     // ist kopfüber auf die Rückseite gedruckt — man dreht den Band um und
     // stellt ihn auf den Kopf, dann fängt die andere Geschichte an.

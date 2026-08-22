@@ -13,6 +13,7 @@ import {
   type LichtGriff,
   type Stufe,
 } from "./hover-licht";
+import { magazinForm, magazinRigBauen, type MagazinRig } from "./magazin-rig";
 import {
   blaetterRigBauen,
   takt as blaetterTakt,
@@ -78,6 +79,13 @@ type ShelfCallbacks = {
    * ob der Umschlag ueberhaupt anfassbar aussieht.
    */
   kannAufschlagen: () => boolean;
+  /**
+   * Das Heft geht in seine Leseposition — oder wieder heraus. Solange es
+   * offen ist, raeumt die Bedienung den Schirm frei: keine Kopfzeile, keine
+   * Tafel, keine Nachbarschaft, keine aktive Marke in der Leiste. Uebrig
+   * bleiben zwei Zeilen.
+   */
+  onHeft: (offen: boolean, buch: CatalogBook | null) => void;
 };
 
 type RuntimeBook = {
@@ -373,6 +381,40 @@ const aufschlagPapier = "#d6d2c5";
 /** Und das Schwarz der geschwaerzten Blaetter. */
 const aufschlagSchwarz = "#0a0a0a";
 
+/*
+ * Die Leseposition des Heftes.
+ *
+ * Das Heft faehrt nicht zur Kamera — die Kamera faehrt zu ihm. Es bleibt
+ * liegen, wo es lag, richtet sich auf und waechst auf seine wahre Groesse;
+ * der Rest ist eine Entfernung, ausgerechnet aus dem Fenster. Deshalb gibt
+ * es hier kein Gegenstueck zu `aufschlagFuellung`, das mit einer
+ * CSS-Zeile uebereinstimmen muesste: es kommt kein Dokument darueber, das
+ * Heft ist von Anfang bis Ende ein Gegenstand in der Szene.
+ */
+const heftAnfahrt = 1.05;
+const heftZurueck = 0.6;
+/** Ab hier geht der Umschlag auf — mitten in der Anfahrt. */
+const heftDeckelAb = 0.42;
+/*
+ * Wie viel des Fensters die Doppelseite nimmt.
+ *
+ * Nicht mehr: unter dem Heft muss Platz fuer die zwei Zeilen bleiben, und
+ * ueber ihm fuer die Luft, die ein Gegenstand braucht, um ein Gegenstand zu
+ * sein. Bei 0,86 lagen die Zeilen auf der Seite.
+ */
+const heftFuellungHoehe = 0.78;
+const heftFuellungBreite = 0.9;
+/** Auf dem Telefon steht eine Seite allein und darf breiter stehen. */
+const heftFuellungEinzeln = 0.9;
+/**
+ * Der Streifen an der Aussenkante, an dem ein Blatt anzufassen ist —
+ * Anteil der Seitenbreite. Die Mitte gehoert dem Bund: dort greift
+ * niemand nach einer Seite.
+ */
+const heftKante = 0.34;
+/** So lange schnappt ein losgelassenes Blatt, statt zu treiben. */
+const heftSchnappen = 0.3;
+
 
 /**
  * Baut aus der zweiten Vorderseite einen vollwertigen Buchdatensatz, damit
@@ -627,6 +669,46 @@ export class ShelfEngine {
    * in beiden Faellen gleich.
    */
   private schwebeVonAussen = false;
+
+  // --- Das Heft ------------------------------------------------------------
+  private heftStufe: "aus" | "auf" | "offen" | "zu" = "aus";
+  private heftIndex: number | null = null;
+  private heftRig: MagazinRig | null = null;
+  /** Der Band, dessen Koerper das Rig gerade vertritt. */
+  private heftVerdeckt: RuntimeBook | null = null;
+  /** Umgeschlagene Blaetter. 1 ist die erste Doppelseite. */
+  private heftStelle = 1;
+  /** Auf dem Telefon: welche Haelfte der Doppelseite gerade dran ist. */
+  private heftEinzelSeite: 1 | -1 = 1;
+  private heftZeit = 0;
+  private heftSchnappZeit = 0;
+  private heftZug: {
+    blatt: number;
+    richtung: 1 | -1;
+    vonX: number;
+    vonY: number;
+    anteil: number;
+    bogen: number;
+    gezogen: boolean;
+  } | null = null;
+  private heftTippVon: { x: number; y: number } | null = null;
+  /** Wo die Doppelseite im Fenster steht — das Ziehen rechnet danach. */
+  private heftSchirm = { mitteX: 0, mitteY: 0, spanneX: 1, spanneY: 1 };
+  private heftStartOrt = new THREE.Vector3();
+  private heftStartDreh = new THREE.Quaternion();
+  private heftStartSkalaV = new THREE.Vector3(1, 1, 1);
+  private heftStartSkala = 1;
+  private heftLeseOrt = new THREE.Vector3();
+  private heftLeseDreh = new THREE.Quaternion();
+  private heftKameraVorher = new THREE.Vector3();
+  private heftZielVorher = new THREE.Vector3();
+  /** Rechenplaetze — kein neuer Vektor je Bild. */
+  private heftZielOrt = new THREE.Vector3();
+  private heftKameraOrt = new THREE.Vector3();
+  private heftMessZiel = new THREE.Vector3();
+  private heftMessKamera = new THREE.Vector3();
+  private heftMessOrt = new THREE.Vector3();
+
   private pointerStartY = 0;
   /** Auf dem Handy startet der Blick weiter hinten; nur einmal setzen. */
   private handyAbstandGesetzt = false;
@@ -717,6 +799,9 @@ export class ShelfEngine {
           browse: (index: number) => void;
           returnToShelf: () => void;
           aufschlagen: (index: number) => void;
+          heftAuf: (index?: number) => void;
+          heftZu: () => void;
+          heftBlaettern: (richtung: 1 | -1) => void;
           takt: (sekunden?: number) => void;
           intro: () => void;
           hoverFx: typeof HOVER_FX;
@@ -734,6 +819,9 @@ export class ShelfEngine {
       // und der naechste Schwenk holt weiter aus. Zum Einstellen im Bild,
       // ohne die Seite neu zu laden.
       hoverStufen: stufen,
+      heftAuf: (index?: number) => this.heftOeffnen(index),
+      heftZu: () => this.heftSchliessen(),
+      heftBlaettern: (richtung: 1 | -1) => this.heftBlaettern(richtung),
       focus: (index) => this.focusBook(index),
       browse: (index) => this.browseTo(index),
       returnToShelf: () => this.returnToShelf(),
@@ -1279,6 +1367,12 @@ export class ShelfEngine {
   private handleWheel = (event: WheelEvent) => {
     // Ein aufgeschlagener Band blaettert selbst; das Regal ruht.
     if (this.aufschlagStufe !== "aus") return;
+    // Und das Heft kennt keinen Zoom — auf keinem Weg, auch nicht ueber
+    // das Rad oder das Kneifen auf dem Trackpad. Es gibt eine Entfernung.
+    if (this.heftStufe !== "aus") {
+      event.preventDefault();
+      return;
+    }
     if (this.mode !== "browse") return;
 
     // Zwei Finger auseinander auf dem Trackpad (und Strg mit dem Mausrad
@@ -1309,6 +1403,12 @@ export class ShelfEngine {
 
   private handlePointerDown = (event: PointerEvent) => {
     if (this.aufschlagStufe !== "aus") return;
+    // Das Heft nimmt die Hand ganz fuer sich: kein Drehen, kein Kneifen,
+    // kein Herausziehen. Nur Blaettern und der Weg hinaus.
+    if (this.heftStufe !== "aus") {
+      this.heftZugStart(event);
+      return;
+    }
     this.zeiger.set(event.pointerId, { x: event.clientX, y: event.clientY });
     // Zwei Finger heisst kneifen, nicht drehen: der Abstand zwischen ihnen
     // steuert den Zoom, das Drehen setzt so lange aus.
@@ -1351,6 +1451,10 @@ export class ShelfEngine {
 
   private handlePointerMove = (event: PointerEvent) => {
     if (this.aufschlagStufe !== "aus") return;
+    if (this.heftStufe !== "aus") {
+      this.heftZugBewegen(event);
+      return;
+    }
     this.updatePointer(event);
 
     const gemerkt = this.zeiger.get(event.pointerId);
@@ -1445,6 +1549,10 @@ export class ShelfEngine {
 
   private handlePointerUp = (event: PointerEvent) => {
     if (this.aufschlagStufe !== "aus") return;
+    if (this.heftStufe !== "aus") {
+      this.heftZugEnde(event);
+      return;
+    }
     this.zeiger.delete(event.pointerId);
     if (this.zeiger.size < 2) this.kneifAbstand = 0;
     if (event.pointerId !== this.pointerId) return;
@@ -1486,15 +1594,27 @@ export class ShelfEngine {
       this.updatePointer(event);
       const hit = this.raycastBook();
       if (hit !== null) {
-        // Zwei Schritte: ein liegender Band kommt erst heraus. Erst ein
-        // Klick auf den bereits aufgestellten schlaegt ihn auf.
-        if (hit === this.presentedIndex) this.focusBook(hit);
-        else this.presentBook(hit);
+        // Das Heft ist kein Band: es wird nicht erst herausgeholt und dann
+        // aufgeschlagen. Ein Klick, und man liest.
+        if (this.runtimeBooks[hit].data.magazine) {
+          this.heftOeffnen(hit);
+        } else if (hit === this.presentedIndex) {
+          // Zwei Schritte: ein liegender Band kommt erst heraus. Erst ein
+          // Klick auf den bereits aufgestellten schlaegt ihn auf.
+          this.focusBook(hit);
+        } else {
+          this.presentBook(hit);
+        }
       }
     }
   };
 
   private handlePointerCancel = (event: PointerEvent) => {
+    if (this.heftStufe !== "aus") {
+      this.heftZug = null;
+      this.heftTippVon = null;
+      return;
+    }
     this.zeiger.delete(event.pointerId);
     if (this.zeiger.size < 2) this.kneifAbstand = 0;
     if (event.pointerId !== this.pointerId) return;
@@ -1532,6 +1652,21 @@ export class ShelfEngine {
       ziel instanceof HTMLTextAreaElement ||
       ziel instanceof HTMLSelectElement
     ) {
+      return;
+    }
+
+    // Dem Heft gehoeren drei Tasten und sonst keine. Kein F, kein Wenden,
+    // kein Bandwechsel, keine Nachbarschaft.
+    if (this.heftStufe !== "aus") {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        this.heftSchliessen();
+        return;
+      }
+      if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+        event.preventDefault();
+        this.heftBlaettern(event.key === "ArrowRight" ? 1 : -1);
+      }
       return;
     }
 
@@ -1750,6 +1885,9 @@ export class ShelfEngine {
    * vorn liegt.
    */
   flipStehenden() {
+    // Solange das Heft offen ist, geht daran nichts vorbei: kein
+    // Bandwechsel, keine Nachbarschaft, kein Wenden.
+    if (this.heftStufe !== "aus") return;
     if (this.aufschlagStufe !== "aus") return;
     if (this.mode !== "browse" || this.presentedIndex === null) return;
     const band = this.runtimeBooks[this.presentedIndex];
@@ -2049,6 +2187,7 @@ export class ShelfEngine {
     }
     this.updateWipe(delta);
     this.updateAufschlag(delta);
+    this.updateHeft(delta);
   }
 
   /**
@@ -2300,8 +2439,15 @@ export class ShelfEngine {
         book.content.position.y = settled;
       }
 
+      // In der Leseposition steht das Heft still: eine Entfernung heisst
+      // auch, dass sie sich nicht bewegt.
       const idleTarget =
-        isSelected && this.mode === "inspect" && !this.reducedMotion ? 1 : 0;
+        isSelected &&
+        this.mode === "inspect" &&
+        this.heftStufe === "aus" &&
+        !this.reducedMotion
+          ? 1
+          : 0;
       book.idleAmount = damp(book.idleAmount, idleTarget, 5, delta);
       const idleStrength = isSelected ? book.idleAmount : 0;
       const idlePhase = elapsed * 0.78 + book.index * 0.37;
@@ -2844,6 +2990,9 @@ export class ShelfEngine {
 
 
   browseBy(direction: number) {
+    // Solange das Heft offen ist, geht daran nichts vorbei: kein
+    // Bandwechsel, keine Nachbarschaft, kein Wenden.
+    if (this.heftStufe !== "aus") return;
     if (this.aufschlagStufe !== "aus") return;
     if (this.mode !== "browse") return;
     // Am Blatt vorbei: es steht nicht in der Reihe.
@@ -2866,6 +3015,9 @@ export class ShelfEngine {
    * Steht dagegen schon ein Band vorn, wechselt er.
    */
   browseTo(index: number) {
+    // Solange das Heft offen ist, geht daran nichts vorbei: kein
+    // Bandwechsel, keine Nachbarschaft, kein Wenden.
+    if (this.heftStufe !== "aus") return;
     if (this.aufschlagStufe !== "aus") return;
     if (this.mode !== "browse") return;
     const next = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
@@ -2889,6 +3041,9 @@ export class ShelfEngine {
    * links — ohne diese Vorgabe fuehre der Wechsel dann verkehrt herum.
    */
   inspectOther(index: number, richtungVorgabe?: 1 | -1) {
+    // Solange das Heft offen ist, geht daran nichts vorbei: kein
+    // Bandwechsel, keine Nachbarschaft, kein Wenden.
+    if (this.heftStufe !== "aus") return;
     // Ein aufgeschlagener Band wechselt nicht den Band.
     if (this.aufschlagStufe !== "aus") return;
     const ziel = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
@@ -3024,6 +3179,9 @@ export class ShelfEngine {
   }
 
   presentBook(index: number) {
+    // Solange das Heft offen ist, geht daran nichts vorbei: kein
+    // Bandwechsel, keine Nachbarschaft, kein Wenden.
+    if (this.heftStufe !== "aus") return;
     if (this.aufschlagStufe !== "aus") return;
     if (this.mode !== "browse") return;
     this.stehendGedreht = false;
@@ -3041,6 +3199,7 @@ export class ShelfEngine {
 
   focusBook(index = this.activeIndex) {
     if (this.aufschlagStufe !== "aus") return;
+    if (this.heftStufe !== "aus") return;
     this.atRest = false;
     if (this.mode !== "browse") return;
     const next = clamp(Math.round(index), 0, this.runtimeBooks.length - 1);
@@ -3063,6 +3222,12 @@ export class ShelfEngine {
   returnToShelf() {
     // Zugeklappt wird der Band von der Leseprobe selbst, nicht von hier.
     if (this.aufschlagStufe !== "aus") return;
+    // Und das Heft geht seinen eigenen Weg zurueck: erst faehrt es zu,
+    // dann faellt es hier durch und der Stapel kommt wieder.
+    if (this.heftStufe !== "aus") {
+      this.heftSchliessen();
+      return;
+    }
     if (this.mode === "browse" && this.pendingFocusIndex !== null) {
       this.pendingFocusIndex = null;
       this.callbacks.onStatus("Abgebrochen");
@@ -3100,6 +3265,9 @@ export class ShelfEngine {
    * mit der Hand dreht.
    */
   flipBook() {
+    // Solange das Heft offen ist, geht daran nichts vorbei: kein
+    // Bandwechsel, keine Nachbarschaft, kein Wenden.
+    if (this.heftStufe !== "aus") return;
     // Ein aufgeschlagener Band wendet nicht.
     if (this.aufschlagStufe !== "aus") return;
     if (this.selectedIndex === null) return;
@@ -3115,6 +3283,8 @@ export class ShelfEngine {
    * einer Textur unscharf wuerde. `fertig`, wenn alles steht.
    */
   leseprobeAnfahren(uebergabe: () => void, fertig: () => void) {
+    // Ein Heft hat keine Leseprobe: es **ist** eine.
+    if (this.heftStufe !== "aus") return;
     if (this.mode !== "inspect" || this.selectedIndex === null) {
       // Ohne betrachteten Band gibt es nichts anzufahren — dann schlaegt
       // die Doppelseite ohne Anflug auf.
@@ -3512,8 +3682,477 @@ export class ShelfEngine {
     });
   }
 
+  // ======================================================== Das Heft =======
+  //
+  // Das Magazin ist kein Band, und es geht nicht auf wie einer. Ein Klick
+  // im Stapel fuehrt geradewegs in **eine** Leseposition: eine Entfernung,
+  // keine freie Kamera, kein Zoom, kein Vollbild. Auf dem Schirm steht
+  // nichts ausser dem Heft und zwei Zeilen darunter.
+  //
+  // Geblaettert wird auf vier Wegen, und alle vier meinen dasselbe: die
+  // Ecke ziehen, auf die Aussenkante klicken, die Pfeiltasten, wischen.
+  // Mehr Bedienung gibt es nicht — kein Zaehler, keine Leiste, keine
+  // Werkzeuge.
+
+  /** Der erste Eintrag, der ein Heft ist. `/magazin` braucht ihn. */
+  heftIndexFinden(): number | null {
+    const gefunden = this.runtimeBooks.findIndex((band) => band.data.magazine);
+    return gefunden === -1 ? null : gefunden;
+  }
+
+  /** Liegt das Heft gerade offen — oder faehrt es gerade dorthin? */
+  istHeftOffen() {
+    return this.heftStufe !== "aus";
+  }
+
+  /**
+   * Geht in die Leseposition. Ein Zug, nicht zwei: das Heft wird nicht erst
+   * herausgeholt und dann aufgeschlagen, es faehrt in einem heran und
+   * schlaegt unterwegs den Umschlag auf.
+   */
+  heftOeffnen(index?: number) {
+    if (this.aufschlagStufe !== "aus" || this.heftStufe !== "aus") return;
+    const ziel = index ?? this.heftIndexFinden();
+    if (ziel === null) return;
+    const band = this.runtimeBooks[ziel];
+    if (!band?.data.magazine) return;
+
+    // Wo das Heft im Stapel liegt — von dort startet die Anfahrt. Die Lage
+    // wird eingefroren: von hier an scrollt der Stapel nicht mehr, und was
+    // hinter dem Heft liegt, verschwindet ohnehin.
+    band.content.updateWorldMatrix(true, false);
+    band.content.matrixWorld.decompose(
+      this.heftStartOrt,
+      this.heftStartDreh,
+      this.heftStartSkalaV,
+    );
+    this.heftStartSkala = this.heftStartSkalaV.x;
+    // Gelesen wird dort, wo es liegt. Es kommt nicht zur Kamera, die
+    // Kamera kommt zu ihm — deshalb genuegt eine Entfernung.
+    this.heftLeseOrt.copy(this.heftStartOrt);
+    this.heftLeseDreh.identity();
+
+    this.heftKameraVorher.copy(this.camera.position);
+    this.heftZielVorher.copy(this.controls.target);
+
+    this.takeFromPile(ziel);
+    this.atRest = false;
+    this.layDownPending = false;
+    this.pendingFocusIndex = null;
+    this.swapZu = null;
+    this.browseMotionPhase = "idle";
+    this.presentedIndex = ziel;
+    this.selectedIndex = ziel;
+    this.activeIndex = ziel;
+    this.scrollIndex = ziel;
+    this.targetScrollIndex = ziel;
+    // Der gewohnte Fokus-Fahrplan laeuft mit: an ihm haengt, wann der
+    // uebrige Stapel verschwindet. Das Heft selbst faehrt auf eigener Bahn,
+    // und weil beide etwa gleich lang sind, faellt der Schnitt mitten in
+    // die Bewegung — dorthin, wo ihn niemand sieht.
+    this.focusProgress = 0;
+    this.mode = "focusing";
+    this.runtimeBooks.forEach((buch) => {
+      buch.targetHover = 0;
+    });
+
+    this.heftIndex = ziel;
+    this.heftStelle = 1;
+    this.heftEinzelSeite = 1;
+    this.heftZeit = 0;
+    this.heftSchnappZeit = 0;
+    this.heftZug = null;
+    this.heftStufe = "auf";
+    this.heftRigAufbauen(band);
+
+    this.controls.enabled = false;
+    this.canvas.style.cursor = "default";
+    this.callbacks.onMode(this.mode, ziel);
+    this.callbacks.onHeft(true, band.data);
+    this.callbacks.onStatus(`${band.data.shortTitle} wird aufgeschlagen`);
+  }
+
+  /** Zurueck zum Stapel. Der Rueckweg ist derselbe, nur schneller. */
+  heftSchliessen() {
+    if (this.heftStufe === "aus" || this.heftStufe === "zu") return;
+    this.heftZug = null;
+    this.heftStufe = "zu";
+    this.callbacks.onHeft(false, null);
+    this.callbacks.onStatus("Zurück zum Stapel");
+  }
+
+  /**
+   * Ein Blatt weiter oder zurueck. Auf dem Telefon steht eine Seite allein,
+   * dort geht es seitenweise: erst wechselt der Blick auf die andere
+   * Haelfte, dann schlaegt das Blatt um.
+   *
+   * Hier wird **nicht** geschnappt. Geschnappt wird nur, was jemand
+   * losgelassen hat — eine Ecke, die zurueckfaellt oder durchfaellt. Eine
+   * Taste ist kein Loslassen: dort soll man das Blatt umschlagen sehen, und
+   * dafuer braucht es die gewohnten drei Zehntel.
+   */
+  heftBlaettern(richtung: 1 | -1) {
+    if (this.heftStufe === "aus" || !this.heftRig) return;
+    if (this.heftEinzeln()) {
+      // Rechte Seite und vorwaerts heisst: Blatt umschlagen und links
+      // wieder anfangen. Sonst nur die Haelfte wechseln.
+      if (richtung === 1 && this.heftEinzelSeite === 1) {
+        if (this.heftStelle >= this.heftRig.blaetter) return;
+        this.heftStelle += 1;
+        this.heftEinzelSeite = -1;
+      } else if (richtung === -1 && this.heftEinzelSeite === -1) {
+        if (this.heftStelle <= 0) return;
+        this.heftStelle -= 1;
+        this.heftEinzelSeite = 1;
+      } else {
+        this.heftEinzelSeite = richtung === 1 ? 1 : -1;
+      }
+      return;
+    }
+    const naechste = clamp(this.heftStelle + richtung, 0, this.heftRig.blaetter);
+    if (naechste === this.heftStelle) return;
+    this.heftStelle = naechste;
+  }
+
+  /**
+   * Wo die Doppelseite gerade im Fenster steht — Mitte, halbe Breite und
+   * halbe Hoehe in Bildpunkten. Daraus rechnet das Ziehen, welche Ecke
+   * angefasst wurde und wie weit sie herum ist.
+   */
+  private heftSchirmMessen() {
+    if (!this.heftRig) return;
+    const breite = this.canvas.clientWidth;
+    const hoehe = this.canvas.clientHeight;
+    const gruppe = this.heftRig.gruppe;
+    gruppe.updateWorldMatrix(true, false);
+    const nachSchirm = (x: number, y: number) => {
+      const punkt = this.heftMessOrt
+        .set(x, y, 0)
+        .applyMatrix4(gruppe.matrixWorld)
+        .project(this.camera);
+      return {
+        x: (punkt.x * 0.5 + 0.5) * breite,
+        y: (-punkt.y * 0.5 + 0.5) * hoehe,
+      };
+    };
+    const bund = nachSchirm(0, 0);
+    const kante = nachSchirm(this.heftRig.halbeBreite, 0);
+    const oben = nachSchirm(0, this.heftRig.halbeHoehe);
+    this.heftSchirm.mitteX = bund.x;
+    this.heftSchirm.mitteY = bund.y;
+    this.heftSchirm.spanneX = Math.max(24, Math.abs(kante.x - bund.x));
+    this.heftSchirm.spanneY = Math.max(24, Math.abs(oben.y - bund.y));
+  }
+
+  /**
+   * Liegt der Punkt auf dem Heft? Sonst ist ein Klick der Ausgang.
+   *
+   * `spanneX` ist der Weg vom Bund zur Aussenkante — **eine** Seite, und
+   * damit schon die halbe Doppelseite. Wer hier verdoppelt, macht das Heft
+   * doppelt so breit, wie es ist, und der Klick ins Schwarze landet noch
+   * auf dem Heft.
+   */
+  private heftGetroffen(x: number, y: number) {
+    const dy = Math.abs(y - this.heftSchirm.mitteY);
+    if (dy > this.heftSchirm.spanneY) return false;
+    // Einzeln steht die Seite ueber die ganze Breite, und der Bund liegt am
+    // Rand: waagerecht ist dann alles Heft. Was daneben liegt, liegt
+    // darueber oder darunter.
+    if (this.heftEinzeln()) return true;
+    return Math.abs(x - this.heftSchirm.mitteX) <= this.heftSchirm.spanneX;
+  }
+
+  /**
+   * Anfassen. Auf dem aeusseren Drittel einer Seite liegt die Kante: dort
+   * nimmt man das Blatt in die Hand. Ein kurzer Druck dort blaettert, ein
+   * langer zieht die Ecke.
+   */
+  private heftZugStart(event: PointerEvent) {
+    if (!this.heftRig || this.heftStufe !== "offen") return false;
+    const kasten = this.canvas.getBoundingClientRect();
+    const x = event.clientX - kasten.left;
+    const y = event.clientY - kasten.top;
+    if (!this.heftGetroffen(x, y)) {
+      // Neben dem Heft wird nichts angefasst — aber der Druck wird gemerkt:
+      // ein kurzer Klick ins Schwarze ist der Ausgang, und ohne diese
+      // Zeile bliebe er wirkungslos.
+      this.heftTippVon = { x, y };
+      return false;
+    }
+    if (this.heftEinzeln()) {
+      // Auf dem Telefon wird getippt, nicht gezogen: die beiden Haelften
+      // des Schirms sind die ganze Bedienung.
+      this.heftTippVon = { x, y };
+      return true;
+    }
+    const seite: 1 | -1 = x >= this.heftSchirm.mitteX ? 1 : -1;
+    const anteilQuer =
+      Math.abs(x - this.heftSchirm.mitteX) / this.heftSchirm.spanneX;
+    if (anteilQuer < 1 - heftKante) {
+      // Die Mitte gehoert dem Bund. Dort wird nichts angefasst.
+      this.heftTippVon = null;
+      return true;
+    }
+    const blatt = seite === 1 ? this.heftStelle : this.heftStelle - 1;
+    if (blatt < 0 || blatt >= this.heftRig.blaetter) {
+      this.heftTippVon = null;
+      return true;
+    }
+    this.heftZug = {
+      blatt,
+      richtung: seite,
+      vonX: x,
+      vonY: y,
+      anteil: seite === 1 ? 0 : 1,
+      bogen: 0,
+      gezogen: false,
+    };
+    this.heftTippVon = { x, y };
+    this.canvas.setPointerCapture(event.pointerId);
+    return true;
+  }
+
+  /** Ziehen: die Ecke folgt der Hand, und das Blatt woelbt sich dabei. */
+  private heftZugBewegen(event: PointerEvent) {
+    const zug = this.heftZug;
+    if (!zug || !this.heftRig) return;
+    const kasten = this.canvas.getBoundingClientRect();
+    const x = event.clientX - kasten.left;
+    const y = event.clientY - kasten.top;
+    const weg = (zug.vonX - x) * zug.richtung;
+    if (Math.abs(weg) > 5) zug.gezogen = true;
+    // Von der Aussenkante bis ueber den Bund hinweg ist eine ganze
+    // Umdrehung. Deshalb die doppelte Spanne.
+    const fortschritt = clamp(weg / (this.heftSchirm.spanneX * 1.7), 0, 1);
+    zug.anteil = zug.richtung === 1 ? fortschritt : 1 - fortschritt;
+
+    // Die Woelbung: der Grundbogen der Bewegung, dazu was die Hand
+    // senkrecht daran zieht. Wer die Ecke hochzieht, rollt das Blatt
+    // staerker ein — das ist der elastische Teil.
+    const quer = clamp(
+      Math.abs(y - zug.vonY) / Math.max(60, this.heftSchirm.spanneY),
+      0,
+      1,
+    );
+    const grund = Math.sin(Math.PI * Math.pow(fortschritt, 0.85));
+    // Das Vorzeichen folgt der Richtung: rueckwaerts woelbt sich das Blatt
+    // andersherum, sonst knickte es in die falsche Seite.
+    zug.bogen =
+      (grund * magazinForm.bogen + quer * magazinForm.bogenZug) * zug.richtung;
+  }
+
+  /**
+   * Loslassen. Ueber der Haelfte faellt das Blatt weiter, darunter zurueck —
+   * und beides schnappt, statt zu treiben.
+   */
+  private heftZugEnde(event: PointerEvent) {
+    const kasten = this.canvas.getBoundingClientRect();
+    const x = event.clientX - kasten.left;
+    const y = event.clientY - kasten.top;
+    const zug = this.heftZug;
+    const tipp = this.heftTippVon;
+    this.heftZug = null;
+    this.heftTippVon = null;
+    if (this.canvas.hasPointerCapture(event.pointerId)) {
+      this.canvas.releasePointerCapture(event.pointerId);
+    }
+    if (!this.heftRig || this.heftStufe !== "offen") return;
+
+    const kurz =
+      tipp !== null && Math.hypot(x - tipp.x, y - tipp.y) < 7;
+
+    // Ein Klick daneben ist der Ausgang.
+    if (!this.heftGetroffen(x, y) && kurz) {
+      this.heftSchliessen();
+      return;
+    }
+
+    if (this.heftEinzeln()) {
+      // Die beiden Haelften sind die des **Schirms**, nicht die der
+      // Doppelseite. Einzeln steht der Bund am Rand — mal links, mal
+      // rechts, je nachdem welche Seite gerade dran ist —, und wer von ihm
+      // aus rechnet, blaettert bei jedem zweiten Tippen rueckwaerts.
+      if (kurz && this.heftGetroffen(x, y)) {
+        this.heftBlaettern(x >= this.canvas.clientWidth * 0.5 ? 1 : -1);
+      }
+      return;
+    }
+
+    if (!zug) return;
+    if (!zug.gezogen && kurz) {
+      // Ein kurzer Druck auf die Kante blaettert, ohne dass jemand zieht.
+      this.heftBlaettern(zug.richtung);
+      return;
+    }
+    // Ueber der Haelfte faellt es weiter.
+    const weiter = zug.richtung === 1 ? zug.anteil > 0.5 : zug.anteil < 0.5;
+    if (weiter) {
+      this.heftStelle = clamp(
+        this.heftStelle + zug.richtung,
+        0,
+        this.heftRig.blaetter,
+      );
+    }
+    this.heftSchnappZeit = heftSchnappen;
+  }
+
+  /** Eine Seite statt einer Doppelseite: auf dem Telefon. */
+  private heftEinzeln() {
+    return (
+      this.canvas.clientWidth < 768 ||
+      window.matchMedia("(pointer: coarse)").matches
+    );
+  }
+
+  /**
+   * **Die** Entfernung. Sie kommt aus dem Fenster und aus nichts sonst:
+   * die Doppelseite (auf dem Telefon die einzelne Seite) soll darin
+   * stehen, ganz und mit etwas Luft. Kein Zoom greift hier ein — es gibt
+   * keinen.
+   */
+  private heftAbstand() {
+    if (!this.heftRig) return 5;
+    const halb = Math.tan(THREE.MathUtils.degToRad(this.camera.fov) * 0.5);
+    const einzeln = this.heftEinzeln();
+    // `halbeBreite` ist schon die halbe **Doppelseite** — eine Seite breit,
+    // vom Bund bis zur Aussenkante. Einzeln steht nur die halbe davon.
+    const halbeBreite = this.heftRig.halbeBreite * (einzeln ? 0.5 : 1);
+    const fuellungB = einzeln ? heftFuellungEinzeln : heftFuellungBreite;
+    const nachHoehe =
+      this.heftRig.halbeHoehe / (halb * heftFuellungHoehe);
+    const nachBreite =
+      halbeBreite / (halb * this.camera.aspect * fuellungB);
+    return Math.max(nachHoehe, nachBreite);
+  }
+
+  /**
+   * Wie weit die Kamera seitlich steht. Aufgeschlagen: mittig ueber dem
+   * Bund. Auf dem Telefon: ueber der Seite, die gerade dran ist.
+   */
+  private heftVersatzX() {
+    if (!this.heftRig || !this.heftEinzeln()) return 0;
+    return (this.heftRig.halbeBreite * 0.5) * this.heftEinzelSeite;
+  }
+
+  private heftRigAufbauen(band: RuntimeBook) {
+    this.heftRigAbbauen();
+    const daten = band.data.magazine;
+    if (!daten) return;
+    const rig = magazinRigBauen({
+      breite: band.width,
+      hoehe: band.data.height,
+      seiten: daten.pages,
+      ordner: daten.folder,
+      anisotropie: Math.min(8, this.renderer.capabilities.getMaxAnisotropy()),
+    });
+    rig.gruppe.position.copy(this.heftStartOrt);
+    rig.gruppe.quaternion.copy(this.heftStartDreh);
+    rig.gruppe.scale.setScalar(this.heftStartSkala);
+    this.scene.add(rig.gruppe);
+    this.heftRig = rig;
+    // Der Koerper des Heftes tritt zurueck: das Rig steht an seiner Stelle,
+    // und zwei Hefte an derselben Stelle flimmerten.
+    band.content.visible = false;
+    this.heftVerdeckt = band;
+  }
+
+  private heftRigAbbauen() {
+    this.heftRig?.entsorgen();
+    this.heftRig = null;
+    if (this.heftVerdeckt) {
+      this.heftVerdeckt.content.visible = true;
+      this.heftVerdeckt = null;
+    }
+  }
+
+  /** Das Heft, Bild fuer Bild. */
+  private updateHeft(delta: number) {
+    if (this.heftStufe === "aus" || !this.heftRig) return;
+
+    if (this.heftStufe === "auf") {
+      this.heftZeit = Math.min(heftAnfahrt, this.heftZeit + delta);
+      if (this.heftZeit >= heftAnfahrt) this.heftStufe = "offen";
+    } else if (this.heftStufe === "zu") {
+      this.heftZeit = Math.max(
+        0,
+        this.heftZeit - delta * (heftAnfahrt / heftZurueck),
+      );
+      if (this.heftZeit <= 0) {
+        this.heftStufe = "aus";
+        this.heftIndex = null;
+        this.heftRigAbbauen();
+        this.returnToShelf();
+        return;
+      }
+    }
+
+    const roh =
+      this.heftStufe === "offen" ? 1 : this.heftZeit / heftAnfahrt;
+    // Ohne Bewegung steht die Leseposition sofort da.
+    const anflug = this.reducedMotion ? (roh > 0 ? 1 : 0) : easeOutCubic(roh);
+
+    // Die Lage: aus dem Stapel in die Leseposition. Das Heft bleibt, wo es
+    // liegt, und richtet sich nur auf — die Kamera kommt zu ihm.
+    const gruppe = this.heftRig.gruppe;
+    gruppe.position.lerpVectors(this.heftStartOrt, this.heftLeseOrt, anflug);
+    gruppe.quaternion
+      .copy(this.heftStartDreh)
+      .slerp(this.heftLeseDreh, anflug);
+    gruppe.scale.setScalar(
+      THREE.MathUtils.lerp(this.heftStartSkala, 1, anflug),
+    );
+
+    // Die Tafel ist weg, also auch ihr Versatz.
+    this.applyFocusViewOffset(1 - anflug);
+
+    const abstand = this.heftAbstand();
+    const mitte = this.heftLeseOrt;
+    const versatz = this.heftVersatzX() * anflug;
+    this.heftZielOrt.set(mitte.x + versatz, mitte.y, mitte.z);
+    const zielJetzt = this.heftMessZiel
+      .copy(this.heftZielVorher)
+      .lerp(this.heftZielOrt, anflug);
+    this.heftKameraOrt.set(
+      this.heftZielOrt.x,
+      this.heftZielOrt.y,
+      mitte.z + abstand,
+    );
+    const kameraJetzt = this.heftMessKamera
+      .copy(this.heftKameraVorher)
+      .lerp(this.heftKameraOrt, anflug);
+    const tempo = this.reducedMotion ? 1 : 1 - Math.exp(-14 * delta);
+    this.controls.target.lerp(zielJetzt, tempo);
+    this.camera.position.lerp(kameraJetzt, tempo);
+    this.camera.lookAt(this.controls.target);
+
+    // Der Umschlag geht unterwegs auf: bis dahin liegt das Heft zu.
+    const stelle =
+      this.heftStufe === "zu" || anflug < heftDeckelAb ? 0 : this.heftStelle;
+    if (this.heftSchnappZeit > 0) {
+      this.heftSchnappZeit = Math.max(0, this.heftSchnappZeit - delta);
+    }
+    this.heftRig.setzen(
+      {
+        stelle,
+        zug: this.heftZug
+          ? {
+              blatt: this.heftZug.blatt,
+              anteil: this.heftZug.anteil,
+              bogen: this.heftZug.bogen,
+            }
+          : null,
+        schnapp: this.heftSchnappZeit > 0,
+        ohneBewegung: this.reducedMotion,
+      },
+      delta,
+    );
+
+    this.heftSchirmMessen();
+  }
+
   resetFocusView() {
     if (this.aufschlagStufe !== "aus") return;
+    if (this.heftStufe !== "aus") return;
     if (this.mode !== "inspect" || this.selectedIndex === null) return;
     this.zielYaw = inspectDefaultYaw;
     this.zielPitch = inspectDefaultPitch;
@@ -3596,6 +4235,49 @@ export class ShelfEngine {
           (stufen[this.schwebeStufe()].schwenkGrad * this.schwenk).toFixed(1),
         ),
       },
+      // Das Heft, in Zahlen. Der Texturvorrat steht hier, weil die Zusage
+      // „der Speicher bleibt flach" sonst nicht nachzumessen waere: er darf
+      // beim Durchblaettern nicht wachsen.
+      heft: {
+        stufe: this.heftStufe,
+        stelle: this.heftStelle,
+        blaetter: this.heftRig?.blaetter ?? 0,
+        einzeln: this.heftEinzeln(),
+        seite: this.heftEinzelSeite,
+        abstand: Number(this.heftAbstand().toFixed(3)),
+        zug: this.heftZug
+          ? {
+              blatt: this.heftZug.blatt,
+              anteil: Number(this.heftZug.anteil.toFixed(3)),
+              bogen: Number(this.heftZug.bogen.toFixed(3)),
+            }
+          : null,
+        /*
+         * Der Versatz des Blickfeldes.
+         *
+         * Er steht hier, weil er einmal die halbe Doppelseite aus dem Bild
+         * geschoben hat und man ihm das nicht ansieht: die Tafel der
+         * Betrachtung ruecht das Bild ueber ein schiefes Blickfeld zur
+         * Seite (`applyFocusViewOffset`), und wer nachmisst, wo die Seite
+         * steht, rechnet ohne ihn — die Zahlen stimmen dann, das Bild
+         * nicht. In der Leseposition gibt es keine Tafel, also gehoert er
+         * hier auf null.
+         */
+        sichtVersatz: this.camera.view?.enabled
+          ? Number(this.camera.view.offsetX.toFixed(1))
+          : 0,
+        // Wo die Doppelseite wirklich im Fenster steht. Gemessen, nicht
+        // gerechnet — das Ziehen haengt daran, und eine Seite, die anders
+        // steht als angenommen, faengt die Ecke an der falschen Stelle.
+        schirm: {
+          mitteX: Number(this.heftSchirm.mitteX.toFixed(1)),
+          mitteY: Number(this.heftSchirm.mitteY.toFixed(1)),
+          spanneX: Number(this.heftSchirm.spanneX.toFixed(1)),
+          spanneY: Number(this.heftSchirm.spanneY.toFixed(1)),
+        },
+        seitenbilder: this.heftRig?.texturen() ?? 0,
+        staende: this.heftRig?.staende() ?? [],
+      },
       // Der aufgeschlagene Band, in Zahlen — sonst laesst sich an der
       // Anfahrt nichts einstellen, ohne zu raten.
       aufschlag: {
@@ -3645,6 +4327,7 @@ export class ShelfEngine {
   }
 
   dispose() {
+    this.heftRigAbbauen();
     this.rigAbbauen();
     this.isDisposed = true;
     cancelAnimationFrame(this.animationFrame);
