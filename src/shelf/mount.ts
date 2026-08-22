@@ -326,6 +326,16 @@ export function regalStarten(wurzel: HTMLElement) {
   el.leseprobeZeile.addEventListener('click', () =>
     leseprobeOeffnen(el.leseprobeZeile),
   );
+  // Beide Wege in den Band gehoeren zusammen: liegt der Zeiger auf der
+  // Zeile, geht der Band in denselben Schwebezustand, als laege er auf dem
+  // Umschlag. Der Tastenfokus zaehlt mit — wer sich mit der Tabulatortaste
+  // hierher bewegt, sieht dasselbe.
+  (['pointerenter', 'focus'] as const).forEach((art) =>
+    el.leseprobeZeile.addEventListener(art, () => engine?.schwebeErzwingen(true)),
+  );
+  (['pointerleave', 'blur'] as const).forEach((art) =>
+    el.leseprobeZeile.addEventListener(art, () => engine?.schwebeErzwingen(false)),
+  );
 
   wurzel.querySelectorAll('[data-gesamt]').forEach((element) => {
     element.textContent = gesamt;

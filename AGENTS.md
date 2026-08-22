@@ -168,19 +168,140 @@ uebrigen Baende bleiben also, wie sie sind.
 Heissen beide Seiten gleich, sagt der Wenden-Knopf „Seite B" statt eines
 Titels.
 
+## Der Schwebezustand: Licht, keine Aufhellung
+
+Liegt der Zeiger auf einem Band, veraendert das die Farben seines Umschlags
+**nicht**. Kein `emissive`, keine Tonwertaenderung. Was sich bewegt, ist das
+Licht um den Band herum. Nachgemessen im Stapel, wo die Szene beweisbar
+stillsteht: derselbe Umschlag ruhend und schwebend, Bildpunkt fuer
+Bildpunkt — auf dem Cover null Unterschied. Der ganze Unterschied liegt auf
+Silhouette, Blockkante, Glanzstelle und Rand.
+
+Alles steht in `shelf/hover-licht.ts`: die gemeinsamen Werte in `licht`, die
+stufenabhaengigen in `stufen`, dazu die Schalter in `HOVER_FX`. Beide Tafeln
+haengen am Pruefstand und lassen sich im laufenden Bild drehen:
+
+```
+__PRESS_LIBRARY__.hoverFx.swing = false
+__PRESS_LIBRARY__.hoverStufen.betrachtung.schwenkGrad = 40
+__PRESS_LIBRARY__.diagnostics().schwebe   // Stufe, Saum, Lack, Rand, Schwenk
+```
+
+### Zwei Stufen
+
+Die beiden Ansichten haben verschieden viel Raum, also bekommen sie
+verschieden viel Licht.
+
+| | Stapel | Betrachtung |
+| --- | --- | --- |
+| Saum | ×1, auf 150 ms / ab 200 ms | **×2**, auf 100 ms / ab 250 ms, breiterer Uebergang |
+| Schwenk | 12° | **26°** |
+| Randabdunklung | 0,50 | **0,88**, Kern zieht auf 20 % zu |
+| Glanzband | aus | aus |
+
+Im **Stapel** liegen Nachbarn herum: der Rueckzug traegt die Bewegung, der
+Saum ist der Beiklang. Diese Werte sind eingestellt und stehen fest.
+
+In der **Betrachtung** gibt es keine Nachbarn, die zuruecktreten koennten —
+dort muss der Raum selbst weichen. Die Randabdunklung traegt hier die ganze
+Bewegung; Saum und Schwenk kommen doppelt so stark dazu.
+
+### Die drei Mittel
+
+- **`rim` — Kantenlicht.** Ein warmweisser Saum an der Silhouette. Zwei
+  Teile, weil einer nicht reicht: ein Fresnel-Term zeichnet die aeussere
+  Kante, erreicht aber die Blockkante nicht — ein Band liegt flach, und die
+  Kamera steht kaum 14 Grad darueber, da zeigt die Blockkante frontal zur
+  Kamera und hat gar keinen streifenden Winkel. Dazu kommt deshalb ein
+  **Streiflicht**, das nur den Koerper trifft: Deckel, Ruecken, Buchblock.
+  Es liegt im Material und nicht als Lampe in der Szene, weil three.js
+  Lichtebenen gegen die **Kamera** prueft und nicht gegen das angeleuchtete
+  Netz (`object.isLight && object.layers.test( camera.layers )`) — eine
+  Lampe haette entweder alles getroffen oder nichts. Im Material dagegen
+  liegt die Trennung ohnehin: Koerper und Umschlagflaechen haben eigene
+  Materialien, und der Term haengt nur in den ersten. Das Cover ist damit
+  nicht rechnerisch unberuehrt, sondern unerreichbar.
+- **`swing` — Lichtschwenk.** Das Fuehrungslicht wandert um die Hochachse,
+  in etwa 300 ms, ohne Nachfedern. Der Glanz wandert mit, der Band dreht
+  sich um kein Grad. Auf farbigen Bildpunkten verschiebt das den Farbton im
+  Median um 0 Grad; nur die Glanzstelle selbst geht weiter, und genau die
+  darf.
+- **`recede` — der Raum tritt zurueck.** Im Stapel gehen die **anderen**
+  Baende um 20 % zurueck, das Ziel bleibt unangetastet und wirkt dadurch
+  heller. Die Daempfung sitzt in den Materialien der Nachbarn, nicht in den
+  Lichtern: der Raum ist schwarz, es gibt weder Boden noch Wand, also ist
+  „Grundlicht faehrt zurueck" hier dasselbe Bild wie „alle uebrigen Baende
+  faehren zurueck" — nur trifft es so das Ziel nicht mit. Dazu die
+  Randabdunklung ueber der Leinwand, deren heller Kern dem schwebenden Band
+  folgt (`--schwebe-x`/`--schwebe-y` auf `.press-experience`); waere sie
+  fest zentriert, dunkelte sie einen Band am Bildrand mit ab.
+- **`sheenSweep` — das Glanzband, abgeschaltet.** Es las sich wie
+  Produktglanz: der Wisch, mit dem ein Werbebild seine Ware poliert. In
+  beiden Ansichten aus. Der Weg dorthin steht noch da und ist neu
+  eingestellt, falls er je wieder gebraucht wird — 800 statt 400 ms,
+  dreimal so breit (ein weicher Verlauf ueber eine halbe Umschlagbreite,
+  keine Kante) und halb so hell. Es soll dann lesen wie eine Wolke, die
+  vorbeizieht. Zum Ausprobieren braucht es beide Schalter:
+
+  ```
+  __PRESS_LIBRARY__.hoverFx.sheenSweep = true
+  __PRESS_LIBRARY__.hoverStufen.betrachtung.sheen = true
+  ```
+
+  Es faehrt **einmal** je Aufschweben und bleibt dann liegen, nie in
+  Schleife — nachgemessen: nach dem Lauf kein einziger veraenderter
+  Bildpunkt mehr.
+
+Getragen wird der Schwebezustand damit von dreien: Saum, Rand und der
+Giftfarbe auf der Leseprobe-Zeile. Wer alle vier Schalter auslegt, bekommt
+null veraenderte Bildpunkte — die Schalter sind das ganze Tor.
+
+### Der Lack auf dem Umschlag
+
+Eine Broschur ist kaschiert, und kaschiertes Papier glaenzt: `clearcoat`
+0,22 bei `clearcoatRoughness` 0,4 auf der Umschlagflaeche. Vorher lag dort
+fast keiner (0,05), und darum hatte der Umschlag kaum eine Glanzstelle — ein
+Lichtschwenk, dessen Glanz man nicht wandern sieht, ist kein Schwenk.
+
+Zwischendurch stand hier 0,35 bei 0,25 Rauheit. Das war eine frische Folie
+unter Ladenlicht: ueber dem oberen Umschlagdrittel lag ein breiter heller
+Schleier, der nicht im Bild steckte. Jetzt ist es eine matte Kaschierung,
+die schon eine Weile am Kiosk lag — weniger Lack, und der Glanz, den es
+noch gibt, laeuft breit aus statt sich zu einem Fleck zu ziehen.
+
+Lack aendert **nur** den Glanz; die Farbe darunter bleibt. Nachgemessen
+gegen den eingefrorenen Stapel: groesster Einzelunterschied 19 von 765, im
+Mittel 1,0 — im Bild nicht zu unterscheiden. Ein Blatt bleibt roh,
+unkaschiertes Papier glaenzt nicht.
+
+`HOVER_FX.detailClearcoatBoost` (DETAIL_CLEARCOAT_BOOST, standardmaessig
+**aus**) legt in der Betrachtung, und nur solange der Zeiger auf dem Band
+liegt, 0,15 Lack dazu. Eine Eskalationsstufe zum Ausprobieren, falls Saum
+und Rand zu leise bleiben.
+
+### Beide Wege in den Band gehoeren zusammen
+
+Der Umschlag und die Zeile „Leseprobe — S. xx" fuehren an dieselbe Stelle,
+also leuchten sie gemeinsam:
+
+- Zeiger auf dem Band → die Zeile faerbt sich in die Giftfarbe
+  (`.ist-schwebend .leseprobe-zeile` in `styles/leseprobe.css`).
+- Zeiger auf der Zeile → der Band geht in denselben Schwebezustand
+  (`engine.schwebeErzwingen()`, verdrahtet in `mount.ts`; der Tastenfokus
+  zaehlt mit).
+
+Dazu `cursor: pointer` auf dem anfassbaren Band.
+
+Auf Fingergeraeten laeuft **nichts** davon: ein Finger, der den Umschlag
+beruehrt, hat ihn schon angefasst. Nachgemessen unter `(pointer: coarse)`:
+kein veraenderter Bildpunkt, keine Klasse, keine Randabdunklung.
+
 ## Was offen ist
 
-Ausformuliert liegen die naechsten beiden Auftraege unter `docs/offen/`:
-
-- `blatt-ohne-nummer.md` — das Blatt aus der Nummerierung nehmen, nur ueber
-  den Stapel erreichbar, und von ihm aus rechts zum ersten, links zum
-  letzten echten Band. **Als Naechstes dran.** Die Voruntersuchung steht
-  schon drin: an welchen vier Stellen die Nummer heute aus der Position
-  gerechnet wird und wo das Blaettern haengt.
-- `hover-licht.md` — der Schwebezustand als Licht statt als Aufhellung.
-  Harte Regel: die Farben des Umschlags bleiben unangetastet, Licht bewegt
-  sich nur um den Band herum. Der heutige `emissive`-Hover in
-  `ShelfEngine.ts` (`umschlagHover`) ist genau das, was dabei wegfaellt.
+Der naechste ausformulierte Schritt steht unten unter „Offen: die
+Handy-Ansicht des aufgeschlagenen Bandes". `docs/offen/` gibt es nicht
+mehr: beide Auftraege, die dort lagen, sind gebaut — das Blatt ohne Nummer
+und der Schwebezustand als Licht.
 
 ## Offen: die Handy-Ansicht des aufgeschlagenen Bandes
 

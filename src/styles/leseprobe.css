@@ -680,6 +680,16 @@
   transition: color 160ms ease;
 }
 
+/*
+ * Die Kopplung, Richtung Band → Zeile: liegt der Zeiger auf dem Umschlag,
+ * faerbt sich die Zeile in die Giftfarbe — dieselbe Farbe, die sie
+ * annimmt, wenn man sie selbst anfaehrt. Beides ist derselbe Weg in
+ * dasselbe Buch, also sieht beides gleich aus.
+ *
+ * (Die Gegenrichtung — Zeile → Band — liegt in `mount.ts`: die Zeile
+ * meldet ihren Schwebezustand an die Engine, und der Band leuchtet.)
+ */
+.ist-schwebend .leseprobe-zeile,
 .leseprobe-zeile:hover,
 .leseprobe-zeile:focus-visible {
   color: var(--accent);

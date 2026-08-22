@@ -55,6 +55,40 @@ body {
   opacity: 1;
 }
 
+/*
+ * Die Randabdunklung des Schwebezustands: der Raum tritt zurueck, wenn der
+ * Zeiger auf einem Band liegt.
+ *
+ * Sie liegt ueber der Leinwand, aber unter allem, was bedienbar ist — die
+ * Kopfzeile, die Tafel und die Leisten stehen ab z-index 16. Ihr heller Kern
+ * folgt dem Band, ueber dem geschwebt wird (`--schwebe-x`/`--schwebe-y`, aus
+ * `ShelfEngine`): so zieht sich der Raum um **ihn** zusammen, statt einen
+ * Band am Bildrand mit abzudunkeln.
+ *
+ * Ruhend ist `--schwebe-staerke` nicht gesetzt und der Verlauf damit voellig
+ * unsichtbar — das Bild sieht aus wie zuvor.
+ */
+.press-experience::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--schwebe-staerke, 0);
+  background: radial-gradient(
+    circle at var(--schwebe-x, 50%) var(--schwebe-y, 50%),
+    rgb(0 0 0 / 0) var(--schwebe-innen, 54%),
+    rgb(0 0 0 / 0.92) 130%
+  );
+}
+
+/* Auf Fingergeraeten gibt es keinen Schwebezustand — und nichts davon. */
+@media (hover: none), (pointer: coarse) {
+  .press-experience::after {
+    display: none;
+  }
+}
+
 .site-header {
   position: absolute;
   /* Ueber der Tafel: sonst verschwinden Programm, Verlag und Kontakt im

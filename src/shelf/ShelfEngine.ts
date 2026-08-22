@@ -3,6 +3,17 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { nachbarIndex, type CatalogBook } from "./katalog";
 import {
+  HOVER_FX,
+  daempfen,
+  licht,
+  lichtEinbauen,
+  saumSchwelle,
+  streifRichtungSetzen,
+  stufen,
+  type LichtGriff,
+  type Stufe,
+} from "./hover-licht";
+import {
   blaetterRigBauen,
   takt as blaetterTakt,
   type BlaetterRig,
@@ -91,6 +102,12 @@ type RuntimeBook = {
   spineSurface: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshPhysicalMaterial>;
   pickProxy: THREE.Mesh;
   livingMaterial?: THREE.ShaderMaterial;
+  /** Alle Materialien des Bandes — ueber sie tritt er zurueck. */
+  lichtAlle: LichtGriff[];
+  /** Der Koerper: Deckel, Ruecken, Buchblock. Nur er traegt das Kantenlicht. */
+  lichtSaum: LichtGriff[];
+  /** Die Umschlagflaechen. Nur ueber sie faehrt das Glanzband. */
+  lichtWisch: LichtGriff[];
   x: number;
   width: number;
   pose: BookPose;
@@ -110,6 +127,14 @@ const browseCamera = new THREE.Vector3(0, 3.05, 8.3);
 const browseTarget = new THREE.Vector3(0, 0.8, 0.5);
 /** Schwarz. Kein Raum, keine Wand, kein Boden — nur die Umschlaege. */
 const roomColor = "#000000";
+/** Um sie schwenkt das Fuehrungslicht. */
+const hochachse = new THREE.Vector3(0, 1, 0);
+
+/** Sanft an, sanft aus — fuer das Glanzband, das einmal ueberfaehrt. */
+function weichEin(wert: number) {
+  const t = THREE.MathUtils.clamp(wert, 0, 1);
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
 /** Der Schnitt der Buchbloecke — billiges Werkdruckpapier, leicht vergilbt. */
 const pageColor = new THREE.Color("#cbc3b0");
 /** So viele Baende vor und hinter dem aktiven bekommen ihr Cover-Bild. */
@@ -565,7 +590,43 @@ export class ShelfEngine {
   private aufschlagAbstandVorher = 5.4;
   /** Liegt der Zeiger auf dem Umschlag des betrachteten Bandes? */
   private umschlagHoverZiel = 0;
-  private umschlagHover = 0;
+  /**
+   * Der Schwebezustand. Alles darin ist Licht: ein Saum an der Silhouette,
+   * ein Schwenk des Fuehrungslichts, ein Zuruecktreten des Raums. Am
+   * Material des betrachteten Bandes wird nichts angefasst — siehe
+   * `hover-licht.ts`.
+   */
+  private fuehrungslicht: THREE.DirectionalLight | null = null;
+  private fuehrungslichtRuhe = new THREE.Vector3();
+  /** 0 bis 1 — wie weit das Fuehrungslicht herumgewandert ist. */
+  private schwenk = 0;
+  /** 0 bis 1 — wie weit der Raum zurueckgetreten ist. */
+  private rueckzug = 0;
+  /** 0 bis 1 — wie schwarz die Raender stehen. */
+  private randSchwaerze = 0;
+  /** Sekunden seit dem Aufschweben; treibt das Glanzband. Null heisst: laeuft nicht. */
+  private wischZeit = 0;
+  /** Der Band, ueber dem der Zeiger im letzten Bild lag. */
+  private schwebeVorher: number | null = null;
+  /** Zuletzt an das Markup gemeldete Randwerte — nur Aenderungen werden geschrieben. */
+  private randGemeldet = "";
+  /** Wo der helle Kern der Randabdunklung steht, in Prozent der Leinwand. */
+  private randMitteX = 50;
+  private randMitteY = 50;
+  /** Rechenplatz fuer die Lage des Kerns — kein neuer Vektor je Bild. */
+  private randOrt = new THREE.Vector3();
+  /**
+   * Gibt es hier ueberhaupt einen Zeiger, der schweben kann? Auf
+   * Fingergeraeten nicht — dort laeuft nichts davon.
+   */
+  private feinzeiger = true;
+  /**
+   * Der Schwebezustand, von aussen gesetzt: der Zeiger liegt nicht auf dem
+   * Band, sondern auf der Zeile „Leseprobe — S. xx", die auf denselben Band
+   * zeigt. Beides ist derselbe Griff nach demselben Buch, also leuchtet es
+   * in beiden Faellen gleich.
+   */
+  private schwebeVonAussen = false;
   private pointerStartY = 0;
   /** Auf dem Handy startet der Blick weiter hinten; nur einmal setzen. */
   private handyAbstandGesetzt = false;
@@ -600,6 +661,11 @@ export class ShelfEngine {
     this.callbacks = callbacks;
     this.reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
+    ).matches;
+    // Auf Fingergeraeten gibt es keinen Schwebezustand. Ein Finger, der den
+    // Umschlag beruehrt, hat ihn schon angefasst — er schwebt nicht darueber.
+    this.feinzeiger = window.matchMedia(
+      "(hover: hover) and (pointer: fine)",
     ).matches;
 
     this.renderer = new THREE.WebGLRenderer({
@@ -653,10 +719,21 @@ export class ShelfEngine {
           aufschlagen: (index: number) => void;
           takt: (sekunden?: number) => void;
           intro: () => void;
+          hoverFx: typeof HOVER_FX;
+          hoverStufen: typeof stufen;
         };
       }
     ).__PRESS_LIBRARY__ = {
       diagnostics: () => this.getDiagnostics(),
+      // Die vier Schalter des Schwebezustands, im laufenden Bild umlegbar:
+      // `__PRESS_LIBRARY__.hoverFx.swing = false` und der Schwenk bleibt aus.
+      // So lassen sich Kantenlicht, Schwenk, Rueckzug und Glanzband
+      // nebeneinander ansehen, ohne die Seite neu zu laden.
+      hoverFx: HOVER_FX,
+      // Und die beiden Stufen dazu: `hoverStufen.betrachtung.schwenkGrad = 40`
+      // und der naechste Schwenk holt weiter aus. Zum Einstellen im Bild,
+      // ohne die Seite neu zu laden.
+      hoverStufen: stufen,
       focus: (index) => this.focusBook(index),
       browse: (index) => this.browseTo(index),
       returnToShelf: () => this.returnToShelf(),
@@ -752,14 +829,17 @@ export class ShelfEngine {
     key.shadow.camera.far = 22;
     key.shadow.bias = -0.0005;
     this.scene.add(key);
+    // Das Fuehrungslicht ist das, was beim Schweben um den Band herumgeht.
+    // Seine Ruhelage wird gemerkt, damit der Schwenk immer von dort aus
+    // rechnet und sich nicht Bild um Bild aufaddiert.
+    this.fuehrungslicht = key;
+    this.fuehrungslichtRuhe.copy(key.position);
 
     // Eine schwache kalte Kante von hinten rechts, damit die Stapel nicht
     // im Schatten verschwinden.
     const rim = new THREE.DirectionalLight("#8f98a0", 0.55);
     rim.position.set(5, 3, -4);
     this.scene.add(rim);
-
-
 
     this.scene.add(this.shelfGroup);
     this.shelfGroup.add(this.shelfFurniture);
@@ -1021,8 +1101,12 @@ export class ShelfEngine {
         // Papier ist matt. Ein Buchdeckel darf glaenzen, ein Bogen nicht.
         roughness: book.sheet ? 0.95 : 0.66,
         metalness: book.sheet ? 0 : 0.02,
-        clearcoat: book.sheet ? 0 : book.motif === "gather" ? 0.18 : 0.05,
-        clearcoatRoughness: 0.48,
+        // Eine Broschur ist kaschiert. Vorher lag hier fast kein Lack
+        // (0,05), und darum hatte der Umschlag kaum eine Glanzstelle — der
+        // Lichtschwenk bewegte etwas, das man nicht sehen konnte. Ein Blatt
+        // bleibt roh: unkaschiertes Papier glaenzt nicht.
+        clearcoat: book.sheet ? 0 : licht.lack,
+        clearcoatRoughness: book.sheet ? 0.48 : licht.lackRauheit,
       }),
     );
     frontSurface.name = "frontArtwork";
@@ -1111,6 +1195,46 @@ export class ShelfEngine {
     inspectionIdle.add(pickProxy);
     this.pickTargets.push(pickProxy);
 
+    // Der Schwebezustand greift ueber die Materialien an, nicht ueber neue
+    // Gegenstaende: kein zweites Netz, keine Huelle, kein Nachzeichnen der
+    // Silhouette. Das Kantenlicht bekommt nur der Koerper — die
+    // Umschlagflaechen liegen flach und wuerden davon aufgehellt, und genau
+    // das darf nicht passieren.
+    const halbeBreite = width * 0.5;
+    const lichtSaum = [
+      lichtEinbauen(boardMaterial, {
+        saum: true,
+        streif: true,
+        spanne: halbeBreite,
+      }),
+      lichtEinbauen(paperMaterial, {
+        saum: true,
+        streif: true,
+        spanne: halbeBreite,
+      }),
+    ];
+    // Ein Blatt hat keinen Koerper — kein Deckel, kein Ruecken, kein Block.
+    // Dort tragen die Bogenflaechen selbst die Silhouette, und weil der
+    // Bogen sich woelbt, drehen sich seine Normalen an den Kanten wirklich
+    // weg: der Fresnel-Term greift dort, wo er beim flachen Deckel ins Leere
+    // liefe.
+    const bogenSaum = Boolean(book.sheet);
+    const lichtWisch = [
+      lichtEinbauen(frontSurface.material, {
+        saum: bogenSaum,
+        spanne: halbeBreite,
+      }),
+      lichtEinbauen(backSurface.material, {
+        saum: bogenSaum,
+        spanne: halbeBreite,
+      }),
+      lichtEinbauen(spineSurface.material, {
+        saum: false,
+        spanne: Math.max(depth * 0.5, 0.004),
+      }),
+    ];
+    if (bogenSaum) lichtSaum.push(lichtWisch[0], lichtWisch[1]);
+
     return {
       data: book,
       index,
@@ -1126,6 +1250,9 @@ export class ShelfEngine {
       spineSurface,
       pickProxy,
       livingMaterial,
+      lichtAlle: [...new Set([...lichtSaum, ...lichtWisch])],
+      lichtSaum,
+      lichtWisch,
       x,
       width,
       pose,
@@ -2133,17 +2260,9 @@ export class ShelfEngine {
       // interessiert sie nicht.
       selected.content.rotation.z = roll;
 
-      // Der Hauch Licht auf dem Umschlag, wenn der Zeiger darauf liegt: die
-      // einzige Zusage, dass hier etwas aufgeht.
-      const heben =
-        this.mode === "inspect" && this.aufschlagStufe === "aus"
-          ? this.umschlagHoverZiel
-          : 0;
-      this.umschlagHover = damp(this.umschlagHover, heben, 12, delta);
-      const schein = this.umschlagHover * 0.075;
-      selected.frontSurface.material.emissive.setScalar(schein);
-      selected.backSurface.material.emissive.setScalar(schein);
-
+      // Hier stand die Aufhellung: ein `emissive` von 0,075 auf beiden
+      // Deckelflaechen. Sie ist weg. Die Zusage, dass hier etwas aufgeht,
+      // gibt jetzt das Licht um den Band herum — `aktualisiereSchwebelicht`.
       this.seiteAblesen(selected);
     }
 
@@ -2216,6 +2335,231 @@ export class ShelfEngine {
         );
       }
     });
+
+    this.aktualisiereSchwebelicht(delta);
+  }
+
+  /**
+   * Ueber welchem Band liegt der Zeiger — und darf er dort ueberhaupt
+   * schweben?
+   *
+   * Im Stapel ist es der Band unter dem Zeiger, in der Betrachtung der
+   * betrachtete, solange er noch zu ist. Auf Fingergeraeten gibt es keinen
+   * Schwebezustand: dort ist die Antwort immer `null`, und alles laeuft in
+   * die Ruhelage zurueck.
+   */
+  private schwebeBand(): number | null {
+    // Die Meldung der Zeile gilt nur in der Betrachtung. Verschwindet die
+    // Zeile mit der Ansicht, kommt kein `pointerleave` mehr — ohne diese
+    // Zeile bliebe der Band leuchten, obwohl der Zeiger laengst woanders
+    // liegt.
+    if (this.mode !== "inspect") this.schwebeVonAussen = false;
+    if (!this.feinzeiger) return null;
+    if (this.aufschlagStufe !== "aus") return null;
+    if (this.mode === "inspect") {
+      return this.umschlagHoverZiel > 0 || this.schwebeVonAussen
+        ? this.selectedIndex
+        : null;
+    }
+    if (this.mode !== "browse") return null;
+    const treffer = this.runtimeBooks.find((book) => book.targetHover > 0);
+    return treffer ? treffer.index : null;
+  }
+
+  /**
+   * Der Schwebezustand, Bild fuer Bild. Nichts hiervon fasst die Farben des
+   * Umschlags an: der Saum sitzt an der Silhouette, der Schwenk bewegt ein
+   * Licht, der Rueckzug dunkelt die **anderen** ab.
+   */
+  private aktualisiereSchwebelicht(delta: number) {
+    const ziel = this.schwebeBand();
+    const schwebt = ziel !== null;
+    const stufe = stufen[this.schwebeStufe()];
+    // Die Schwelle gehoert der Stufe: in der Betrachtung ist der Saum
+    // breiter. Sie steht als Uniform, es schwebt ohnehin immer nur einer.
+    saumSchwelle.value = stufe.saumSchwelle;
+
+    // Ein neues Aufschweben setzt das Glanzband auf Anfang. Nur hier — es
+    // faehrt einmal je Aufschweben, nie in Schleife.
+    const wischErlaubt = HOVER_FX.sheenSweep && stufe.sheen;
+    if (ziel !== this.schwebeVorher) {
+      this.wischZeit = 0;
+      this.schwebeVorher = ziel;
+    }
+    if (schwebt && wischErlaubt) {
+      this.wischZeit = Math.min(this.wischZeit + delta, licht.wischDauer);
+    }
+
+    // A — Kantenlicht. Das Aufblenden darf etwas schneller sein als das
+    // Verloeschen, sonst wirkt es traege; wie schnell genau, sagt die Stufe.
+    this.runtimeBooks.forEach((book) => {
+      const saumZiel =
+        HOVER_FX.rim && book.index === ziel ? stufe.saumFaktor : 0;
+      const naechster = daempfen(
+        book.lichtSaum[0].saum.value,
+        saumZiel,
+        saumZiel > book.lichtSaum[0].saum.value ? stufe.saumAn : stufe.saumAb,
+        delta,
+      );
+      book.lichtSaum.forEach((griff) => {
+        griff.saum.value = naechster;
+      });
+      this.lackSetzen(book, book.index === ziel ? naechster : 0);
+    });
+
+    // Das Streiflicht liegt im Material und rechnet im Blickraum — seine
+    // Richtung haengt also an der Kamera und will jedes Bild nachgefuehrt
+    // sein. Eine Stelle fuer alle Baende.
+    streifRichtungSetzen(this.camera);
+
+    // C — der Raum tritt zurueck. Nur im Stapel: in der Betrachtung ist
+    // ausser dem Band ohnehin nichts zu sehen.
+    const rueckzugZiel =
+      HOVER_FX.recede && schwebt && this.mode === "browse" ? 1 : 0;
+    this.rueckzug = daempfen(
+      this.rueckzug,
+      rueckzugZiel,
+      licht.rueckzugLambda,
+      delta,
+    );
+    this.runtimeBooks.forEach((book) => {
+      const nachbar = book.index !== ziel;
+      const staerke = nachbar ? this.rueckzug * licht.rueckzug : 0;
+      book.lichtAlle.forEach((griff) => {
+        griff.daempfung.value = staerke;
+      });
+    });
+
+    // Das Glanzband — nur auf dem Umschlag des schwebenden Bandes, und nur
+    // wenn es eingeschaltet ist.
+    const wischOrt =
+      wischErlaubt && schwebt
+        ? THREE.MathUtils.lerp(
+            licht.wischVon,
+            licht.wischBis,
+            weichEin(this.wischZeit / licht.wischDauer),
+          )
+        : -9;
+    this.runtimeBooks.forEach((book) => {
+      const an = book.index === ziel ? wischOrt : -9;
+      book.lichtWisch.forEach((griff) => {
+        griff.wisch.value = an;
+      });
+    });
+
+    // B — Lichtschwenk. Das Fuehrungslicht wandert um die Hochachse herum;
+    // der Band selbst dreht sich um kein Grad. Gerechnet wird immer von der
+    // Ruhelage aus, damit sich nichts aufaddiert.
+    if (this.fuehrungslicht) {
+      const schwenkZiel = HOVER_FX.swing && schwebt ? 1 : 0;
+      this.schwenk = daempfen(
+        this.schwenk,
+        schwenkZiel,
+        licht.schwenkLambda,
+        delta,
+      );
+      this.fuehrungslicht.position
+        .copy(this.fuehrungslichtRuhe)
+        .applyAxisAngle(
+          hochachse,
+          THREE.MathUtils.degToRad(stufe.schwenkGrad) * this.schwenk,
+        );
+    }
+
+    this.randSchwaerzeSetzen(ziel, delta);
+    this.schwebeMelden(schwebt);
+  }
+
+  /**
+   * Welche Stufe gilt hier? Im Stapel tragen die Nachbarn den Rueckzug; in
+   * der Betrachtung gibt es keine, dort muss der Raum selbst weichen.
+   */
+  private schwebeStufe(): Stufe {
+    return this.mode === "inspect" || this.mode === "focusing"
+      ? "betrachtung"
+      : "stapel";
+  }
+
+  /**
+   * Die Eskalationsstufe `detailClearcoatBoost`: etwas mehr Lack auf dem
+   * Umschlag, solange der Zeiger in der Betrachtung auf ihm liegt. Lack
+   * aendert nur den Glanz — die Farbe darunter bleibt unberuehrt. Steht der
+   * Schalter aus, wird der Grundwert nie verlassen.
+   */
+  private lackSetzen(book: RuntimeBook, anteil: number) {
+    if (book.data.sheet) return;
+    const zugabe =
+      HOVER_FX.detailClearcoatBoost && this.schwebeStufe() === "betrachtung"
+        ? licht.lackZugabe * clamp(anteil, 0, 1)
+        : 0;
+    const soll = licht.lack + zugabe;
+    if (book.frontSurface.material.clearcoat !== soll) {
+      book.frontSurface.material.clearcoat = soll;
+    }
+  }
+
+  /**
+   * Die Randabdunklung. Sie liegt als Verlauf ueber der Leinwand und hat
+   * ihren hellen Kern dort, wo der schwebende Band steht — so zieht sich
+   * der Raum um **ihn** zusammen und nicht um die Bildmitte. Waere sie fest
+   * zentriert, wuerde sie einen Band am Bildrand mit abdunkeln, und die
+   * Abnahme sagt: die Nachbarn dunkeln ab, nicht das Ziel.
+   */
+  private randSchwaerzeSetzen(ziel: number | null, delta: number) {
+    const wirt = this.canvas.parentElement;
+    if (!wirt) return;
+
+    const stufe = stufen[this.schwebeStufe()];
+    const staerkeZiel = HOVER_FX.recede && ziel !== null ? stufe.randStaerke : 0;
+    this.randSchwaerze = daempfen(
+      this.randSchwaerze,
+      staerkeZiel,
+      licht.randLambda,
+      delta,
+    );
+
+    if (this.randSchwaerze < 0.002) {
+      if (this.randGemeldet !== "") {
+        wirt.style.removeProperty("--schwebe-staerke");
+        this.randGemeldet = "";
+      }
+      return;
+    }
+
+    // Wo der Band im Bild steht. Solange einer schwebt, folgt der Kern ihm;
+    // beim Abklingen bleibt er, wo er zuletzt war.
+    if (ziel !== null) {
+      const band = this.runtimeBooks[ziel];
+      const ort = band.content
+        .getWorldPosition(this.randOrt)
+        .project(this.camera);
+      this.randMitteX = clamp((ort.x * 0.5 + 0.5) * 100, 12, 88);
+      this.randMitteY = clamp((-ort.y * 0.5 + 0.5) * 100, 12, 88);
+    }
+
+    const anteil = this.randSchwaerze / Math.max(stufe.randStaerke, 0.001);
+    const innen = THREE.MathUtils.lerp(
+      licht.randInnenRuhe,
+      stufe.randInnen,
+      clamp(anteil, 0, 1),
+    );
+    const marke = `${this.randSchwaerze.toFixed(3)}|${this.randMitteX.toFixed(1)}|${this.randMitteY.toFixed(1)}|${innen.toFixed(3)}`;
+    if (marke === this.randGemeldet) return;
+    this.randGemeldet = marke;
+    wirt.style.setProperty("--schwebe-staerke", this.randSchwaerze.toFixed(3));
+    wirt.style.setProperty("--schwebe-x", `${this.randMitteX.toFixed(1)}%`);
+    wirt.style.setProperty("--schwebe-y", `${this.randMitteY.toFixed(1)}%`);
+    wirt.style.setProperty("--schwebe-innen", `${(innen * 100).toFixed(1)}%`);
+  }
+
+  /**
+   * Die Grundzusage: solange der Zeiger auf dem Band liegt, steht die Zeile
+   * „Leseprobe — S. xx" auf voller Deckkraft.
+   */
+  private schwebeMelden(schwebt: boolean) {
+    const wirt = this.canvas.parentElement;
+    if (!wirt) return;
+    wirt.classList.toggle("ist-schwebend", schwebt);
   }
 
   /**
@@ -2732,6 +3076,17 @@ export class ShelfEngine {
   }
 
   /**
+   * Die Gegenrichtung der Kopplung: die Zeile „Leseprobe — S. xx" meldet,
+   * dass der Zeiger auf ihr liegt, und der Band geht in denselben
+   * Schwebezustand, als laege der Zeiger auf ihm. Wer den einen Weg in den
+   * Band ansieht, soll den anderen leuchten sehen.
+   */
+  schwebeErzwingen(an: boolean) {
+    if (!this.feinzeiger) return;
+    this.schwebeVonAussen = an;
+  }
+
+  /**
    * Wendet den betrachteten Band. Eine halbe Drehung um die Querachse dreht
    * ihn um *und* stellt ihn auf den Kopf — genau so kommt die zweite,
    * kopfueber gedruckte Vorderseite richtig herum zu stehen.
@@ -3217,6 +3572,30 @@ export class ShelfEngine {
       ),
       activeIndex: this.activeIndex,
       selectedIndex: this.selectedIndex,
+      // Der Schwebezustand, ablesbar: welche Stufe gilt, wie weit der Saum
+      // brennt, wie viel Lack auf dem betrachteten Umschlag liegt. Der Lack
+      // laesst sich sonst nicht pruefen — in der Betrachtung wackelt der
+      // Band von selbst, und ein Bildvergleich ertrinkt darin.
+      schwebe: {
+        stufe: this.schwebeStufe(),
+        band: this.schwebeBand(),
+        saum: Number(
+          (
+            this.runtimeBooks[this.schwebeBand() ?? -1]?.lichtSaum[0].saum
+              .value ?? 0
+          ).toFixed(3),
+        ),
+        lack: Number(
+          (
+            this.runtimeBooks[this.selectedIndex ?? this.activeIndex]
+              ?.frontSurface.material.clearcoat ?? 0
+          ).toFixed(3),
+        ),
+        rand: Number(this.randSchwaerze.toFixed(3)),
+        schwenkGrad: Number(
+          (stufen[this.schwebeStufe()].schwenkGrad * this.schwenk).toFixed(1),
+        ),
+      },
       // Der aufgeschlagene Band, in Zahlen — sonst laesst sich an der
       // Anfahrt nichts einstellen, ohne zu raten.
       aufschlag: {
