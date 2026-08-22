@@ -58,14 +58,24 @@ export const siteConfig = {
    * - `lichtschnitt` — der aeltere Weg: der Deckel klappt auf, die Blaetter
    *   sind starre schwarze Ebenen, die vorbeifliegen. Billiger zu rechnen.
    *
-   * Am Schreibtisch `pages3d`, auf Fingergeraeten `lichtschnitt`: dort
-   * zaehlt jedes Bild, und die Knochenketten sind noch nicht auf schwachen
-   * Telefonen gemessen. Zum Vergleichen laesst sich beides umstellen; der
-   * aeltere Weg bleibt unveraendert liegen.
+   * **Beide Male `pages3d`.** Auf dem Telefon stand hier `lichtschnitt`,
+   * aus Vorsicht vor den Knochenketten — nachgesehen hat das niemand, und
+   * im Bild war es eine Katastrophe: der Raum ist schwarz, und die starren
+   * Ebenen des aelteren Weges sind es auch (`#0a0a0a`). Zu sehen war eine
+   * gute Sekunde lang ein schwarzes Rechteck auf schwarzem Grund — kein
+   * Umschlag, kein Papier, kein Balken. Das las sich nicht als Aufschlagen,
+   * sondern als Fehler.
+   *
+   * `pages3d` kostet, was ein Band aufgeschlagen kostet: sieben Geometrien
+   * und neun Texturen, gemessen, und danach wieder null. Das traegt ein
+   * Telefon.
+   *
+   * Der aeltere Weg bleibt gebaut und umstellbar. Wer ihn wieder anschaltet,
+   * sollte ihm vorher Papier geben — schwarz auf schwarz ist kein Bild.
    */
   oeffnenModus: {
     schreibtisch: 'pages3d',
-    handy: 'lichtschnitt',
+    handy: 'pages3d',
   },
 } as const;
 

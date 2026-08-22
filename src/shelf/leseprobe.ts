@@ -369,8 +369,20 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
 
     if (solo) {
       const seite = folge[stelle];
+      // Eine **echte gesetzte Seite** bringt ihre Raender selbst mit. Der
+      // Rahmen des Telefons hat aber die Masse des Geraets, nicht die des
+      // Buches — und ein Bild, das darin nicht aufgeht, wird eingepasst und
+      // bekommt ringsum Papier. Das las sich als zweiter Rand um die
+      // Raender, die im Scan schon stehen. Traegt die Seite ein Bild,
+      // nimmt der Rahmen deshalb das Format des Buches an.
+      rahmen.classList.toggle(
+        'leseprobe__rahmen--scan',
+        (seite?.art === 'fenster' && Boolean(seite.probe.image)) ||
+          (seite?.art === 'schwarz' && Boolean(seite.bild)),
+      );
       spanne.append(blattBauen(seite, aktuellerTitel, aktuellesBuch, false));
     } else {
+      rahmen.classList.remove('leseprobe__rahmen--scan');
       const links = folge[stelle * 2];
       const rechts = folge[stelle * 2 + 1];
       // Die Schlusstafel nimmt die ganze Spanne: dort stehen keine Balken,

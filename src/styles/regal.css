@@ -1353,13 +1353,14 @@ body {
     width: 100%;
     height: auto;
     /*
-     * Der Abstandhalter, unter dem der Text anfaengt. Er gehoert mit
-     * `fokusVersatz` (`ShelfEngine.ts`) zusammen: der eine sagt, wie hoch
-     * der Band steht, der andere, wo der Text beginnt. Bei 70svh standen
-     * ueber dem Band 55 Bildpunkte und unter ihm 154 — das las sich als
-     * Loch, nicht als Luft.
+     * Der Abstandhalter, unter dem der Text anfaengt.
+     *
+     * Im **Stapel** haelt er die Nummernleiste unter der Bandbeschriftung:
+     * die haengt absolut am unteren Rand, und wird der Halter kuerzer,
+     * schiebt sich die Leiste mit ihrem Papiergrund darueber — dann steht
+     * nur noch der Autorenname unter der Leiste und ist halb angeschnitten.
      */
-    margin-top: 62svh;
+    margin-top: 70svh;
     /* Undurchsichtig: der Text schiebt sich beim Scrollen wie ein Blatt
        ueber den Band, statt sich mit ihm zu ueberlagern. Oben laeuft er
        weich an, damit die Kante nicht als Balken wirkt. */
@@ -1372,6 +1373,18 @@ body {
     pointer-events: auto;
     transform: none;
     transition: none;
+  }
+
+  /*
+   * In der **Betrachtung** darf er kuerzer sein — dort steht keine
+   * Beschriftung mehr, sondern der Band. Er gehoert dann mit
+   * `fokusVersatz` (`ShelfEngine.ts`) zusammen: der eine sagt, wie hoch
+   * der Band steht, der andere, wo der Text beginnt. Bei 70svh standen
+   * ueber dem Band 55 Bildpunkte und unter ihm 154 — das las sich als
+   * Loch, nicht als Luft.
+   */
+  [data-handy-fluss='an'].is-focused .book-details {
+    margin-top: 62svh;
   }
 
   [data-handy-fluss='an'] .book-details__inner {
@@ -1397,20 +1410,21 @@ body {
   }
 
   /*
-   * Die Leseprobe steht **ueber** dem Wenden-Knopf, direkt unter dem Band:
-   * hineinsehen ist die staerkere Handlung als umdrehen. Ohne eigene
-   * Ordnung landete sie im Textblock weit unten — auf einem Telefon heisst
-   * das: erst scrollen, um zu ahnen, dass es sie gibt.
+   * Die Zeile „Leseprobe — S. xx" steht auf dem Telefon **nicht** da.
+   *
+   * Sie war hier einmal der zweite Weg in den Band, gross und mittig unter
+   * ihm. Der erste Weg ist der Umschlag selbst, und den tippt man ohnehin
+   * an — auf einem Schirm, auf dem der Band die halbe Hoehe einnimmt,
+   * braucht es dafuer keine Beschriftung. Uebrig blieb eine Zeile, die
+   * ansagt, was gleich passiert, und dabei den Abstand zwischen Band und
+   * Text auffuellt.
+   *
+   * Am Schreibtisch bleibt sie, wo sie war: dort steht sie klein in den
+   * Angaben, neben Format und Verfuegbarkeit, und dort ist sie Auskunft
+   * (auf welcher Seite das Fenster liegt) und nicht Bedienung.
    */
   [data-handy-fluss='an'] .leseprobe-zeile {
-    order: -2;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    /* Tippziel, nicht Textzeile. */
-    min-height: 44px;
-    margin: 0 0 10px;
-    font-size: 12px;
+    display: none;
   }
 
   [data-handy-fluss='an'] .wenden-knopf {
@@ -1486,8 +1500,20 @@ body {
     display: none;
   }
 
+  /*
+   * Die Beschriftung des Bandes steht **ueber** der Nummernleiste.
+   *
+   * Sie haengt absolut am unteren Rand der Flaeche, die Leiste steht im
+   * Fluss und faengt beim Abstandhalter der Tafel an (70svh). Mit den 106
+   * Bildpunkten aus der alten Handy-Ansicht landete sie dahinter — und weil
+   * die Leiste einen schwarzen Grund hat und hoeher liegt, war von der
+   * Beschriftung nur der Autorenname zu sehen, halb angeschnitten unter der
+   * Leiste. Von unten gerechnet faengt die Leiste bei 30svh an; ein Stueck
+   * darueber gehoert die Beschriftung hin.
+   */
   [data-handy-fluss='an'] .browse-caption {
     z-index: 2;
+    bottom: calc(30svh + 12px);
   }
 
   [data-handy-fluss='an'] .site-header {

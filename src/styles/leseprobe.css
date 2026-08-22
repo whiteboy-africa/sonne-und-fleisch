@@ -216,6 +216,19 @@
   aspect-ratio: auto;
 }
 
+/*
+ * Ausser die Seite ist ein **Bild**. Ein Scan kann nicht umbrechen: er hat
+ * seine Raender im Bild, und passt sein Format nicht zum Rahmen, wird er
+ * eingepasst und bekommt ringsum Papier — ein zweiter Rand um den ersten.
+ * Dann gilt das Format des Buches, und der Rahmen ist genau so gross wie
+ * das Bild darin.
+ */
+.leseprobe__rahmen--einzeln.leseprobe__rahmen--scan {
+  width: min(92vw, calc(78dvh * var(--seitenverhaeltnis, 0.705)));
+  height: auto;
+  aspect-ratio: var(--seitenverhaeltnis, 0.705);
+}
+
 .leseprobe__spanne--einzeln {
   grid-template-columns: 1fr;
   --rand: 12.3cqw;
@@ -758,7 +771,17 @@
     text-align-last: auto;
   }
 
-  .blatt {
+  /*
+   * Auf dem Telefon ist die Polsterung in Bildpunkten gerechnet, nicht in
+   * Container-Einheiten: sonst wird der Satzspiegel auf einem schmalen
+   * Schirm zur Briefmarke.
+   *
+   * **Nicht fuer eine echte gesetzte Seite.** Die hat ihre Raender im Bild.
+   * Diese Regel stand nach `.blatt--bild { padding: 0 }` und hat sie
+   * ueberstimmt — dann sass der Scan in einem Kasten mit zwei Zentimetern
+   * Papier ringsum, ein zweiter Rand um den ersten.
+   */
+  .blatt:not(.blatt--bild) {
     padding: clamp(22px, 6vw, 34px) clamp(20px, 5.5vw, 30px);
   }
 
