@@ -3,7 +3,7 @@
 // nur direkt am DOM statt über einen Framework-Umweg.
 
 import { ShelfEngine, type BookSide, type ShelfMode } from './ShelfEngine';
-import type { CatalogBook } from './katalog';
+import { nachbarIndex, type CatalogBook } from './katalog';
 import { leseprobeAnhaengen } from './leseprobe';
 import { siteConfig } from './verlag-config';
 
@@ -117,15 +117,16 @@ export function regalStarten(wurzel: HTMLElement) {
   function blaetternAnsichtSetzen() {
     const buch = katalog[aktiverIndex];
     const imFokus = modus !== 'browse';
-    el.blaetternZahl.textContent = katalognummer(aktiverIndex + 1);
+    // Das Blatt traegt keine Nummer — dort bleibt die Zeile leer.
+    el.blaetternZahl.textContent = buch.release;
     el.blaetternTitel.textContent = buch.shortTitle;
     el.blaetternAutor.textContent = buch.author;
     // Die Nachbarn stehen namentlich am Rand. Kein Umlauf: vor dem ersten
     // Band ist nichts, nach dem letzten die freie Stelle.
-    const davor = aktiverIndex - 1;
-    const danach = aktiverIndex + 1;
-    const amAnfang = davor < 0;
-    const amEnde = danach > katalog.length - 1;
+    const davor = nachbarIndex(katalog, aktiverIndex, -1);
+    const danach = nachbarIndex(katalog, aktiverIndex, 1);
+    const amAnfang = davor === null;
+    const amEnde = danach === null;
     // Im aufgeschlagenen Band ist wenig Platz: dort wird frueher gekappt,
     // damit der Titel nicht in die Textspalte laeuft.
     const grenze = modus === 'browse' ? 24 : 14;
@@ -143,7 +144,7 @@ export function regalStarten(wurzel: HTMLElement) {
     // Vor dem ersten Band steht nichts — dann faellt die linke Zeile weg.
     el.zurueck.hidden = amAnfang;
     if (!amAnfang) {
-      el.nachbarZahlZurueck.textContent = katalognummer(davor + 1);
+      el.nachbarZahlZurueck.textContent = katalog[davor].release;
       el.nachbarTitelZurueck.textContent = `— ${nachbarTitel(davor)}`;
       el.zurueck.setAttribute(
         'aria-label',
@@ -155,14 +156,15 @@ export function regalStarten(wurzel: HTMLElement) {
     // Blindband selbst in der Reihe.
     el.vor.hidden = amEnde;
     if (!amEnde) {
-      el.nachbarZahlVor.textContent = katalognummer(danach + 1);
+      el.nachbarZahlVor.textContent = katalog[danach].release;
       el.nachbarTitelVor.textContent = `${nachbarTitel(danach)} —`;
       el.vor.setAttribute(
         'aria-label',
         `Nächster Band — ${katalog[danach].title}`,
       );
     }
-    el.ticks.forEach((tick, index) => {
+    el.ticks.forEach((tick) => {
+      const index = Number(tick.dataset.stelle);
       const ist = index === aktiverIndex;
       tick.classList.toggle('is-active', ist);
       tick.classList.toggle('ist-blind', Boolean(katalog[index]?.blind));
@@ -190,7 +192,7 @@ export function regalStarten(wurzel: HTMLElement) {
     const gezeigt = seite === 'hinten' && buch.back ? buch.back : buch;
 
     el.panel.setAttribute('aria-label', `Angaben zu ${gezeigt.title}`);
-    el.panelAugenbraue.textContent = katalognummer(gewaehlterIndex + 1);
+    el.panelAugenbraue.textContent = buch.release;
     el.panelTitel.textContent = gezeigt.title;
     el.panelAutor.textContent = gezeigt.author;
     el.panelKlappentext.textContent = gezeigt.description;
@@ -270,9 +272,9 @@ export function regalStarten(wurzel: HTMLElement) {
   function nachbar(richtung: -1 | 1) {
     // Ein aufgeschlagener Band wechselt nicht den Band.
     if (leseprobe.istBesetzt()) return;
-    const ziel = aktiverIndex + richtung;
-    // Vor dem ersten und nach dem letzten Band ist nichts.
-    if (ziel < 0 || ziel > katalog.length - 1) return;
+    // Am Blatt vorbei — und von ihm aus an die Enden der Reihe.
+    const ziel = nachbarIndex(katalog, aktiverIndex, richtung);
+    if (ziel === null) return;
     if (modus === 'browse') engine?.presentBook(ziel);
     else engine?.inspectOther(ziel, richtung);
   }
@@ -280,7 +282,8 @@ export function regalStarten(wurzel: HTMLElement) {
   el.vor.addEventListener('click', () => nachbar(1));
   // Ein Klick auf die Nummer holt den Band heraus und stellt ihn auf. Die
   // Beschreibung kommt erst, wenn man dann auf den Band selbst klickt.
-  el.ticks.forEach((tick, index) => {
+  el.ticks.forEach((tick) => {
+    const index = Number(tick.dataset.stelle);
     tick.addEventListener('click', () => {
       if (leseprobe.istBesetzt()) return;
       // Im Regal: nur herausholen. Beim aufgeschlagenen Band: direkt zum

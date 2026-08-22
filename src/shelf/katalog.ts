@@ -147,3 +147,38 @@ export type BookBackFace = {
   /** Die zweite Geschichte hat ihre eigene Leseprobe. */
   excerpt?: BookExcerpt;
 };
+
+/**
+ * Der Nachbar in der Reihe — **am Blatt vorbei**.
+ *
+ * Das Blatt liegt im Stapel, steht aber nicht in der Reihe: normales
+ * Blaettern geht daran vorbei, und man kommt an es heran, indem man es
+ * anfasst. Steht man auf ihm, fuehrt der Weg an die Enden der Reihe: nach
+ * rechts zum ersten Band, nach links zum letzten echten — der Blindband
+ * ist die offene Stelle, kein Ziel.
+ *
+ * Gibt `null` zurueck, wo nichts mehr kommt; es wird nicht umgelaufen.
+ */
+export function nachbarIndex(
+  katalog: CatalogBook[],
+  von: number,
+  richtung: 1 | -1,
+): number | null {
+  const echt = (buch: CatalogBook) => !buch.sheet && !buch.blind;
+
+  if (katalog[von]?.sheet) {
+    if (richtung === 1) {
+      const erster = katalog.findIndex((buch) => !buch.sheet);
+      return erster === -1 ? null : erster;
+    }
+    for (let i = katalog.length - 1; i >= 0; i -= 1) {
+      if (echt(katalog[i])) return i;
+    }
+    return null;
+  }
+
+  for (let i = von + richtung; i >= 0 && i < katalog.length; i += richtung) {
+    if (!katalog[i].sheet) return i;
+  }
+  return null;
+}

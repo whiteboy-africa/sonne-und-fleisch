@@ -83,18 +83,24 @@ const gesamt = katalognummer(katalog.length);
   <nav class="shelf-index" aria-label="Platz im Stapel">
     <div class="shelf-index__ticks">
       {
-        katalog.map((buch, index) => (
-          <button
-            type="button"
-            data-tick
-            class={index === 0 ? 'is-active' : ''}
-            aria-label={`Zu ${buch.title} blättern`}
-            aria-current={index === 0 ? 'true' : undefined}
-          >
-            <span></span>
-            <b>{katalognummer(index + 1)}</b>
-          </button>
-        ))
+        /* Das Blatt bekommt keine Marke: es steht nicht in der Reihe. Die
+           Stelle im Katalog steht am Element, weil die Marken sonst nicht
+           mehr mit den Katalogstellen uebereinstimmen. */
+        katalog.map((buch, index) =>
+          buch.release ? (
+            <button
+              type="button"
+              data-tick
+              data-stelle={index}
+              class={index === 0 ? 'is-active' : ''}
+              aria-label={`Zu ${buch.title} blättern`}
+              aria-current={index === 0 ? 'true' : undefined}
+            >
+              <span></span>
+              <b>{buch.release}</b>
+            </button>
+          ) : null,
+        )
       }
       {/* Die Linie hoert nicht am letzten Band auf: sie laeuft weiter und
           wird vom Bildrand angeschnitten. Darauf sitzt eine gedimmte
@@ -102,7 +108,7 @@ const gesamt = katalognummer(katalog.length);
           statt am letzten Eintrag, verspricht von selbst Fortsetzung. */}
       <span class="shelf-index__weiter" aria-hidden="true">
         <span></span>
-        <b>{katalognummer(katalog.length + 1)}</b>
+        <b>{katalognummer(katalog.filter((buch) => buch.release).length + 1)}</b>
       </span>
     </div>
     {/* Kein Bedienhinweis: Pfeile und Leiste zeigen das Blättern von

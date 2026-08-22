@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-import type { CatalogBook } from "./katalog";
+import { nachbarIndex, type CatalogBook } from "./katalog";
 import {
   blaetterRigBauen,
   takt as blaetterTakt,
@@ -1442,10 +1442,12 @@ export class ShelfEngine {
     if (this.mode === "inspect" || this.mode === "focusing") {
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        this.inspectOther(this.activeIndex + 1);
+        const ziel = this.nachbarVon(this.activeIndex, 1);
+        if (ziel !== null) this.inspectOther(ziel);
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
-        this.inspectOther(this.activeIndex - 1);
+        const ziel = this.nachbarVon(this.activeIndex, -1);
+        if (ziel !== null) this.inspectOther(ziel);
       }
       return;
     }
@@ -1454,10 +1456,12 @@ export class ShelfEngine {
     if (event.key === "ArrowRight") {
       event.preventDefault();
       // Im Regal holen die Pfeile den Band gleich heraus, wie die Nummern.
-      this.presentBook(this.activeIndex + 1);
+      const ziel = this.nachbarVon(this.activeIndex, 1);
+      if (ziel !== null) this.presentBook(ziel);
     } else if (event.key === "ArrowLeft") {
       event.preventDefault();
-      this.presentBook(this.activeIndex - 1);
+      const ziel = this.nachbarVon(this.activeIndex, -1);
+      if (ziel !== null) this.presentBook(ziel);
     } else if (event.key === "Home") {
       event.preventDefault();
       this.browseTo(0);
@@ -1855,14 +1859,32 @@ export class ShelfEngine {
       this.camera.lookAt(browseTarget);
       if (this.focusProgress <= 0) {
         if (this.selectedIndex !== null) {
-          this.commitBookPose(
-            this.runtimeBooks[this.selectedIndex],
-            presentedBookPose(
-              this.runtimeBooks[this.selectedIndex].place,
-              this.motionLayout,
-            ),
-          );
-          this.presentedIndex = this.selectedIndex;
+          const zurueck = this.runtimeBooks[this.selectedIndex];
+          if (zurueck.data.sheet) {
+            /*
+             * Ein Bogen Papier stellt sich nicht auf. Ein Band bleibt nach
+             * dem Betrachten vorn stehen — das Blatt legt sich zurueck in
+             * den Stapel, und zwar obenauf, wie man ein Blatt weglegt.
+             *
+             * Ohne das reihte es sich wie ein Band in die Reihe ein: es
+             * stand aufrecht vor dem Stapel, bekam den Platz eines Bandes
+             * und schob beim naechsten Blaettern die Stapel durcheinander.
+             */
+            this.returnToPile(this.selectedIndex);
+            this.commitBookPose(
+              zurueck,
+              stackedBookPose(zurueck.place, this.motionLayout),
+              false,
+            );
+            this.presentedIndex = null;
+            this.atRest = true;
+          } else {
+            this.commitBookPose(
+              zurueck,
+              presentedBookPose(zurueck.place, this.motionLayout),
+            );
+            this.presentedIndex = this.selectedIndex;
+          }
         }
         this.runtimeBooks[this.selectedIndex ?? 0].content.rotation.z = 0;
         this.selectedIndex = null;
@@ -2480,7 +2502,18 @@ export class ShelfEngine {
   browseBy(direction: number) {
     if (this.aufschlagStufe !== "aus") return;
     if (this.mode !== "browse") return;
-    this.browseTo(Math.round(this.targetScrollIndex) + direction);
+    // Am Blatt vorbei: es steht nicht in der Reihe.
+    const ziel = nachbarIndex(
+      this.booksData,
+      Math.round(this.targetScrollIndex),
+      direction > 0 ? 1 : -1,
+    );
+    if (ziel !== null) this.browseTo(ziel);
+  }
+
+  /** Der Nachbar in der Reihe, am Blatt vorbei. */
+  private nachbarVon(index: number, richtung: 1 | -1) {
+    return nachbarIndex(this.booksData, index, richtung);
   }
 
   /**

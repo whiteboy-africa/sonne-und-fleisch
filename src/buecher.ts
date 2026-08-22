@@ -57,6 +57,7 @@ export type ProgrammEintrag = {
  */
 export async function programmListe(): Promise<ProgrammEintrag[]> {
   const buecher = await alleBuecher();
+  const nummern = nummernFolge(buecher);
   return buecher
     .map((buch, position) => {
       const d = buch.data;
@@ -70,7 +71,7 @@ export async function programmListe(): Promise<ProgrammEintrag[]> {
 
       return {
         buch,
-        nummer: releasenummer(position),
+        nummer: nummern[position] ?? '',
         titel: hinten ? `${d.titel} / ${hinten.titel}` : d.titel,
         autor: namen,
         seiten: [
@@ -169,11 +170,16 @@ export function buchPfad(buch: Buch): string {
  * deutschen Feldnamen der Inhalte auf die englischen der uebernommenen
  * Engine treffen.
  */
-export function alsKatalogBuch(buch: Buch, position = 0): CatalogBook {
+export function alsKatalogBuch(
+  buch: Buch,
+  position = 0,
+  nummer?: string,
+): CatalogBook {
   const d = buch.data;
   return {
     id: buch.id,
-    release: releasenummer(position),
+    // Das Blatt bekommt keine — es steht nicht in der Reihe.
+    release: nummer ?? (d.blatt ? '' : releasenummer(position)),
     title: d.titel,
     shortTitle: d.kurztitel ?? d.titel,
     author: d.autor,
@@ -252,9 +258,27 @@ export function releasenummer(position: number): string {
   return String(position + 1).padStart(3, '0');
 }
 
+/**
+ * Die Nummern des ganzen Programms, in Regalordnung.
+ *
+ * **Das Blatt zaehlt nicht mit.** Es ist kein Band: es hat keinen Ruecken,
+ * keine Nummer und keinen Platz in der Reihe — es liegt im Stapel, und man
+ * kommt an es heran, indem man es anfasst. Ohne diese Ausnahme ruecken alle
+ * Baende hinter ihm um eins weiter, und der Blindband, der die offene Stelle
+ * markiert, traegt ploetzlich 010 statt 009.
+ */
+export function nummernFolge(buecher: Buch[]): Array<string | undefined> {
+  let zaehler = 0;
+  return buecher.map((buch) =>
+    buch.data.blatt ? undefined : releasenummer(zaehler++),
+  );
+}
+
 /** Der ganze Katalog, fertig fuer die Engine. */
 export async function katalogFuerRegal(): Promise<CatalogBook[]> {
-  return (await alleBuecher()).map((buch, position) =>
-    alsKatalogBuch(buch, position),
+  const buecher = await alleBuecher();
+  const nummern = nummernFolge(buecher);
+  return buecher.map((buch, position) =>
+    alsKatalogBuch(buch, position, nummern[position]),
   );
 }
