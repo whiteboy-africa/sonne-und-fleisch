@@ -330,8 +330,17 @@ export function regalStarten(wurzel: HTMLElement) {
     wischStart = null;
     // Senkrecht ist Lesen, waagerecht ist Blättern.
     if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
-    if (gewaehlterIndex === null) return;
-    engine?.inspectOther(gewaehlterIndex + (dx > 0 ? 1 : -1));
+    if (gewaehlterIndex === null || heftOffen) return;
+    // Ueber `nachbarIndex`, nicht ueber die rohe Stelle im Katalog. Sonst
+    // laeuft der Wisch mitten durch die Sonderobjekte: erst kam das Blatt,
+    // dann das Heft, beide ohne Nummer und beide nicht in der Reihe. Auf
+    // dem Telefon ist dieser Wisch der **einzige** Weg von Band zu Band —
+    // die Nachbarschaft am Bildrand wird dort gar nicht gebaut —, und
+    // damit war er die einzige Stelle, an der die Regel nicht galt.
+    const richtung: 1 | -1 = dx > 0 ? 1 : -1;
+    const ziel = nachbarIndex(katalog, gewaehlterIndex, richtung);
+    if (ziel === null) return;
+    engine?.inspectOther(ziel, richtung);
   });
   el.panel.addEventListener('pointercancel', () => {
     wischStart = null;

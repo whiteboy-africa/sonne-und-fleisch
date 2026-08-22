@@ -1352,7 +1352,14 @@ body {
     order: 1;
     width: 100%;
     height: auto;
-    margin-top: 70svh;
+    /*
+     * Der Abstandhalter, unter dem der Text anfaengt. Er gehoert mit
+     * `fokusVersatz` (`ShelfEngine.ts`) zusammen: der eine sagt, wie hoch
+     * der Band steht, der andere, wo der Text beginnt. Bei 70svh standen
+     * ueber dem Band 55 Bildpunkte und unter ihm 154 — das las sich als
+     * Loch, nicht als Luft.
+     */
+    margin-top: 62svh;
     /* Undurchsichtig: der Text schiebt sich beim Scrollen wie ein Blatt
        ueber den Band, statt sich mit ihm zu ueberlagern. Oben laeuft er
        weich an, damit die Kante nicht als Balken wirkt. */
@@ -1460,7 +1467,12 @@ body {
        stehenbleiben. */
     position: absolute;
     z-index: 3;
-    top: 22svh;
+    /*
+     * Auf halber Bandhoehe, nicht auf halber Schirmhoehe: die Nummern
+     * gehoeren dem Band, und wenn sie unter seiner Mitte sitzen, sieht es
+     * aus, als haenge er zu hoch. Nachgemessen gegen `bandRahmen`.
+     */
+    top: 18svh;
     bottom: auto;
     height: 34svh;
     width: 52px;

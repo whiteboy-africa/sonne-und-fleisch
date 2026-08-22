@@ -1763,12 +1763,28 @@ export class ShelfEngine {
     this.pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
   }
 
+  /**
+   * Welcher Band liegt unter dem Zeiger?
+   *
+   * Was nicht zu sehen ist, ist auch nicht anzufassen. Das muss hier
+   * ausdruecklich stehen, weil three.js beim Raycast **nicht** nach
+   * `visible` fragt: ein ausgeblendetes Netz faengt den Strahl genauso wie
+   * ein sichtbares. Der Blindband liegt seit dem Umbau in keinem Stapel und
+   * ist dort ausgeblendet — ohne diese Pruefung liesse er sich trotzdem
+   * anklicken, und man landete mit einem Griff ins Leere in der
+   * Betrachtung der offenen Stelle.
+   */
   private raycastBook() {
     this.raycaster.setFromCamera(this.pointer, this.camera);
-    const hit = this.raycaster.intersectObjects(this.pickTargets, false)[0];
-    return typeof hit?.object.userData.bookIndex === "number"
-      ? (hit.object.userData.bookIndex as number)
-      : null;
+    const treffer = this.raycaster.intersectObjects(this.pickTargets, false);
+    for (const hit of treffer) {
+      const index = hit.object.userData.bookIndex;
+      if (typeof index !== "number") continue;
+      const band = this.runtimeBooks[index];
+      if (!band || !band.content.visible) continue;
+      return index;
+    }
+    return null;
   }
 
   private updateHover() {
@@ -2802,8 +2818,13 @@ export class ShelfEngine {
     // Beschriftung und oben bleibt eine leere Flaeche stehen.
     const grundVersatz = isMobile ? height * 0.05 : 0;
     // Hochkant liegt die Tafel unten im Bild. Der Band rueckt so weit nach
-    // oben, dass er ganz in der freien Flaeche darueber steht.
-    const fokusVersatz = isMobile ? height * 0.17 : 0;
+    // oben, dass er ganz in der freien Flaeche darueber steht — aber nicht
+    // weiter: bei 0,17 stand ueber ihm eine Handbreit und unter ihm drei,
+    // und die drei lasen sich als Loch. Die Zahl gehoert mit dem
+    // Abstandhalter der Tafel zusammen (`margin-top` in `regal.css`) und
+    // mit der Hoehe der Nachbarnummern; wer eine davon dreht, misst die
+    // anderen beiden nach (`__PRESS_LIBRARY__.diagnostics().bandRahmen`).
+    const fokusVersatz = isMobile ? height * 0.15 : 0;
     const verticalOffset =
       grundVersatz + (fokusVersatz - grundVersatz) * clampedProgress;
 
@@ -3384,6 +3405,48 @@ export class ShelfEngine {
    * getrennt ausrechnen und hoffen, dass sie sich treffen; hier wird
    * gemessen statt gehofft.
    */
+  /**
+   * Wo der betrachtete Band im Fenster steht — Deckel, nicht Doppelseite.
+   *
+   * Auf dem Telefon haengt daran mehr, als es aussieht: der Band, die
+   * beiden Nachbarnummern an seiner Seite und der Abstandhalter, unter dem
+   * der Text anfaengt, sollen zusammenpassen. Das laesst sich nicht raten —
+   * die Lage kommt aus einem schiefen Blickfeld, einer Skalierung und einer
+   * Kameraentfernung, die alle drei von der Fenstergroesse abhaengen.
+   */
+  bandRahmen() {
+    if (this.selectedIndex === null) return null;
+    const band = this.runtimeBooks[this.selectedIndex];
+    if (!band) return null;
+    const welt = band.content.getWorldPosition(new THREE.Vector3());
+    const halbeBreite = band.width * 0.5 * band.pose.scale;
+    const halbeHoehe = band.data.height * 0.5 * band.pose.scale;
+    const breite = this.canvas.clientWidth;
+    const hoehe = this.canvas.clientHeight;
+    let links = Infinity;
+    let rechts = -Infinity;
+    let oben = Infinity;
+    let unten = -Infinity;
+    for (const x of [welt.x - halbeBreite, welt.x + halbeBreite]) {
+      for (const y of [welt.y - halbeHoehe, welt.y + halbeHoehe]) {
+        const punkt = new THREE.Vector3(x, y, welt.z).project(this.camera);
+        const px = (punkt.x * 0.5 + 0.5) * breite;
+        const py = (-punkt.y * 0.5 + 0.5) * hoehe;
+        links = Math.min(links, px);
+        rechts = Math.max(rechts, px);
+        oben = Math.min(oben, py);
+        unten = Math.max(unten, py);
+      }
+    }
+    return {
+      oben: Number(oben.toFixed(1)),
+      unten: Number(unten.toFixed(1)),
+      mitteY: Number(((oben + unten) * 0.5).toFixed(1)),
+      hoehe: Number((unten - oben).toFixed(1)),
+      anteilMitte: Number((((oben + unten) * 0.5) / hoehe).toFixed(3)),
+    };
+  }
+
   leseprobeRahmen() {
     if (this.aufschlagIndex === null) return null;
     const band = this.runtimeBooks[this.aufschlagIndex];
@@ -4327,6 +4390,7 @@ export class ShelfEngine {
       ),
       activeIndex: this.activeIndex,
       selectedIndex: this.selectedIndex,
+      bandRahmen: this.bandRahmen(),
       // Der Schwebezustand, ablesbar: welche Stufe gilt, wie weit der Saum
       // brennt, wie viel Lack auf dem betrachteten Umschlag liegt. Der Lack
       // laesst sich sonst nicht pruefen — in der Betrachtung wackelt der
