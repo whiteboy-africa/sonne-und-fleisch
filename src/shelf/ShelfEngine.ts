@@ -414,6 +414,13 @@ const heftFuellungEinzeln = 0.9;
 const heftKante = 0.34;
 /** So lange schnappt ein losgelassenes Blatt, statt zu treiben. */
 const heftSchnappen = 0.3;
+/**
+ * Ab so vielen Bildpunkten quer ist eine Bewegung ein Wisch — und nur,
+ * wenn sie mindestens anderthalbmal so weit quer wie hoch gegangen ist.
+ * Sonst zaehlte jedes Danebengreifen als Blaettern.
+ */
+const heftWischWeg = 48;
+const heftWischSchraeg = 1.5;
 
 
 /**
@@ -3950,22 +3957,25 @@ export class ShelfEngine {
       return false;
     }
     if (this.heftEinzeln()) {
-      // Auf dem Telefon wird getippt, nicht gezogen: die beiden Haelften
-      // des Schirms sind die ganze Bedienung.
+      // Auf dem Telefon wird getippt und gewischt, nicht gezogen: eine
+      // Seite fuellt den Schirm, und an ihrer Ecke ist kaum Platz.
       this.heftTippVon = { x, y };
       return true;
     }
     const seite: 1 | -1 = x >= this.heftSchirm.mitteX ? 1 : -1;
     const anteilQuer =
       Math.abs(x - this.heftSchirm.mitteX) / this.heftSchirm.spanneX;
+    // Die Mitte gehoert dem Bund: dort wird kein Blatt angefasst. Der
+    // Druck wird trotzdem gemerkt — ueber dem Bund wird gewischt.
     if (anteilQuer < 1 - heftKante) {
-      // Die Mitte gehoert dem Bund. Dort wird nichts angefasst.
-      this.heftTippVon = null;
+      this.heftTippVon = { x, y };
       return true;
     }
     const blatt = seite === 1 ? this.heftStelle : this.heftStelle - 1;
     if (blatt < 0 || blatt >= this.heftRig.blaetter) {
-      this.heftTippVon = null;
+      // Am Anfang und am Ende ist kein Blatt mehr zu holen. Gewischt wird
+      // trotzdem — der Wisch prallt dann an derselben Grenze ab.
+      this.heftTippVon = { x, y };
       return true;
     }
     this.heftZug = {
@@ -4021,6 +4031,9 @@ export class ShelfEngine {
     const y = event.clientY - kasten.top;
     const zug = this.heftZug;
     const tipp = this.heftTippVon;
+    // Erst pruefen, dann leeren: `heftWisch` fragt, ob eine Ecke in der
+    // Hand lag, und die Antwort steht in `heftZug`.
+    const wisch = this.heftWisch(tipp, x, y);
     this.heftZug = null;
     this.heftTippVon = null;
     if (this.canvas.hasPointerCapture(event.pointerId)) {
@@ -4034,6 +4047,14 @@ export class ShelfEngine {
     // Ein Klick daneben ist der Ausgang.
     if (!this.heftGetroffen(x, y) && kurz) {
       this.heftSchliessen();
+      return;
+    }
+
+    // Wischen — der vierte Weg. Er gilt ueberall dort, wo keine Ecke in
+    // der Hand lag: einzeln immer, in der Doppelseite ueber dem Bund. Nach
+    // links heisst vorwaerts, wie beim Umblaettern mit der Hand.
+    if (wisch) {
+      this.heftBlaettern(wisch);
       return;
     }
 
@@ -4064,6 +4085,27 @@ export class ShelfEngine {
       );
     }
     this.heftSchnappZeit = heftSchnappen;
+  }
+
+  /**
+   * War das ein Wisch? Gibt die Richtung zurueck, sonst null.
+   *
+   * Ein Wisch ist eine Bewegung, bei der niemand ein Blatt in der Hand
+   * hatte — sonst waere sie ein Ziehen, und das hat seine eigene Regel.
+   * Waagerecht muss sie sein: senkrecht wird auf dem Telefon gescrollt,
+   * und wer beim Scrollen blaettert, hat die Gesten vertauscht.
+   */
+  private heftWisch(
+    von: { x: number; y: number } | null,
+    x: number,
+    y: number,
+  ): 1 | -1 | null {
+    if (!von || this.heftZug) return null;
+    const quer = x - von.x;
+    const hoch = Math.abs(y - von.y);
+    if (Math.abs(quer) < heftWischWeg) return null;
+    if (Math.abs(quer) < hoch * heftWischSchraeg) return null;
+    return quer < 0 ? 1 : -1;
   }
 
   /** Eine Seite statt einer Doppelseite: auf dem Telefon. */

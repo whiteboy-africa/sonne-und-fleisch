@@ -394,11 +394,16 @@ Alle vier meinen dasselbe, und mehr Bedienung gibt es nicht:
 - **Auf die Aussenkante klicken.** Derselbe Streifen, nur kurz gedrueckt.
 - **Die Pfeiltasten.** Sie schnappen nicht: eine Taste ist kein Loslassen,
   dort soll man das Blatt umschlagen sehen.
-- **Wischen** — auf dem Telefon tippen, siehe unten.
+- **Wischen.** Ueberall dort, wo keine Ecke in der Hand lag — ueber dem
+  Bund und auf dem Telefon. Nach links heisst vorwaerts, wie beim
+  Umblaettern mit der Hand. Mindestens 48 Bildpunkte quer und anderthalbmal
+  so weit quer wie hoch: senkrecht wird gescrollt, und wer beim Scrollen
+  blaettert, hat die Gesten vertauscht.
 
-In der Mitte liegt der Bund; dort greift niemand nach einer Seite. Ein
-kurzer Klick **daneben** ist der Ausgang, ebenso ESC und der Zurueck-Knopf
-des Browsers (beim Oeffnen wird ein Geschichtsschritt abgelegt).
+In der Mitte liegt der Bund; dort greift niemand nach einer Seite — dort
+wird gewischt. Ein kurzer Klick **daneben** ist der Ausgang, ebenso ESC und
+der Zurueck-Knopf des Browsers (beim Oeffnen wird ein Geschichtsschritt
+abgelegt).
 
 ### Zwei Zeilen, sonst nichts
 
@@ -421,8 +426,8 @@ Randes.
 
 ### Auf dem Telefon
 
-Eine Seite steht allein, und die beiden **Schirmhaelften** blaettern. Nicht
-die Haelften der Doppelseite: einzeln steht der Bund am Rand, mal links,
+Eine Seite steht allein, und die beiden **Schirmhaelften** blaettern —
+oder man wischt. Nicht die Haelften der Doppelseite: einzeln steht der Bund am Rand, mal links,
 mal rechts, je nachdem welche Seite gerade dran ist — wer von ihm aus
 rechnet, blaettert bei jedem zweiten Tippen rueckwaerts. Ein Tipp ueber
 oder unter der Seite schliesst.
