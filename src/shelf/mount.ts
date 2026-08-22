@@ -287,8 +287,14 @@ export function regalStarten(wurzel: HTMLElement) {
     // Am Blatt vorbei — und von ihm aus an die Enden der Reihe.
     const ziel = nachbarIndex(katalog, aktiverIndex, richtung);
     if (ziel === null) return;
-    if (modus === 'browse') engine?.presentBook(ziel);
-    else engine?.inspectOther(ziel, richtung);
+    if (modus !== 'browse') {
+      engine?.inspectOther(ziel, richtung);
+      return;
+    }
+    // Der Blindband liegt in keinem Stapel — es gibt nichts
+    // herauszuziehen. Von hier geht es geradewegs in die Betrachtung.
+    if (katalog[ziel].blind) engine?.blindOeffnen(ziel);
+    else engine?.presentBook(ziel);
   }
   el.zurueck.addEventListener('click', () => nachbar(-1));
   el.vor.addEventListener('click', () => nachbar(1));
@@ -300,8 +306,12 @@ export function regalStarten(wurzel: HTMLElement) {
       if (leseprobe.istBesetzt() || heftOffen) return;
       // Im Regal: nur herausholen. Beim aufgeschlagenen Band: direkt zum
       // naechsten weiterblättern, ohne Umweg über das Regal.
-      if (modus === 'browse') engine?.presentBook(index);
-      else engine?.inspectOther(index);
+      if (modus !== 'browse') {
+        engine?.inspectOther(index);
+        return;
+      }
+      if (katalog[index].blind) engine?.blindOeffnen(index);
+      else engine?.presentBook(index);
     });
   });
   // Geblättert wird unten auf der Tafel. Über dem Band bleibt die Hand

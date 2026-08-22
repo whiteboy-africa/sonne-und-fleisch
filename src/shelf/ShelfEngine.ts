@@ -802,6 +802,7 @@ export class ShelfEngine {
           heftAuf: (index?: number) => void;
           heftZu: () => void;
           heftBlaettern: (richtung: 1 | -1) => void;
+          ohneBewegung: (an: boolean) => void;
           takt: (sekunden?: number) => void;
           intro: () => void;
           hoverFx: typeof HOVER_FX;
@@ -819,6 +820,12 @@ export class ShelfEngine {
       // und der naechste Schwenk holt weiter aus. Zum Einstellen im Bild,
       // ohne die Seite neu zu laden.
       hoverStufen: stufen,
+      // Derselbe Schalter, den `prefers-reduced-motion` umlegt — hier von
+      // Hand. Ohne ihn liesse sich der harte Wechsel nur nachpruefen, indem
+      // man die Systemeinstellung aendert und die Seite neu laedt.
+      ohneBewegung: (an: boolean) => {
+        this.reducedMotion = an;
+      },
       heftAuf: (index?: number) => this.heftOeffnen(index),
       heftZu: () => this.heftSchliessen(),
       heftBlaettern: (richtung: 1 | -1) => this.heftBlaettern(richtung),
@@ -944,7 +951,12 @@ export class ShelfEngine {
       // Stapeln umgedreht, damit 001 obenauf liegt und nicht darunter
       // verschwindet.
       if (!this.pileOrder[pile]) this.pileOrder[pile] = [];
-      this.pileOrder[pile].unshift(index);
+      // Der Blindband liegt in keinem Stapel. Er ist die **offene Stelle**
+      // hinter dem letzten Band, und eine offene Stelle ist nichts, was
+      // herumliegt — ein Rohling zwischen den Baenden waere ein Gegenstand
+      // und behauptete das Gegenteil. Er bleibt trotzdem die letzte
+      // Station: von rechts kommt man zu ihm, und dort steht er allein.
+      if (!book.blind) this.pileOrder[pile].unshift(index);
     });
 
     this.motionLayout = createMotionLayout(
@@ -1004,6 +1016,8 @@ export class ShelfEngine {
    * dadurch mit der Zeit.
    */
   private returnToPile(index: number) {
+    // Der Blindband hat keinen Platz, in den er zurueckkoennte.
+    if (this.runtimeBooks[index]?.data.blind) return;
     const pile = this.pileOrder[this.runtimeBooks[index]?.pile ?? 0];
     if (!pile || pile.includes(index)) return;
     pile.push(index);
@@ -2125,15 +2139,22 @@ export class ShelfEngine {
       if (this.focusProgress <= 0) {
         if (this.selectedIndex !== null) {
           const zurueck = this.runtimeBooks[this.selectedIndex];
-          if (zurueck.data.sheet) {
+          if (zurueck.data.sheet || zurueck.data.blind) {
             /*
-             * Ein Bogen Papier stellt sich nicht auf. Ein Band bleibt nach
-             * dem Betrachten vorn stehen — das Blatt legt sich zurueck in
-             * den Stapel, und zwar obenauf, wie man ein Blatt weglegt.
+             * Zwei bleiben nicht stehen.
              *
-             * Ohne das reihte es sich wie ein Band in die Reihe ein: es
-             * stand aufrecht vor dem Stapel, bekam den Platz eines Bandes
-             * und schob beim naechsten Blaettern die Stapel durcheinander.
+             * Ein **Bogen Papier** stellt sich nicht auf. Ein Band bleibt
+             * nach dem Betrachten vorn stehen — das Blatt legt sich
+             * zurueck in den Stapel, und zwar obenauf, wie man ein Blatt
+             * weglegt. Ohne das reihte es sich wie ein Band in die Reihe
+             * ein: es stand aufrecht vor dem Stapel, bekam den Platz eines
+             * Bandes und schob beim naechsten Blaettern die Stapel
+             * durcheinander.
+             *
+             * Der **Blindband** verschwindet ganz. Er liegt in keinem
+             * Stapel (`returnToPile` laesst ihn deshalb liegen, wo er ist)
+             * und er steht auch nicht davor: er ist die offene Stelle, und
+             * die sieht man nur, wenn man zu ihr geht.
              */
             this.returnToPile(this.selectedIndex);
             this.commitBookPose(
@@ -2424,7 +2445,12 @@ export class ShelfEngine {
       book.hover = damp(book.hover, book.targetHover, 12, delta);
 
       const isSelected = book.index === this.selectedIndex;
-      book.content.visible = !isolated || isSelected;
+      // Im Stapel ist der Blindband nicht zu sehen: dort liegt er nicht.
+      // Sichtbar wird er erst als betrachteter Band — die offene Stelle,
+      // aufgestellt.
+      const alsLeerstelle =
+        Boolean(book.data.blind) && !isSelected && book.index !== this.wipeNach;
+      book.content.visible = (!isolated || isSelected) && !alsLeerstelle;
 
       // Liegt der Band ruhig im Stapel, folgt er der Hoehe, die ihm die
       // Stapelverwaltung zuweist — so rutscht der Stapel nach, wenn unten
@@ -3694,6 +3720,50 @@ export class ShelfEngine {
   // Mehr Bedienung gibt es nicht — kein Zaehler, keine Leiste, keine
   // Werkzeuge.
 
+  /**
+   * Die offene Stelle aufstellen.
+   *
+   * Der Blindband liegt in keinem Stapel, also gibt es nichts, was
+   * herausgezogen werden koennte — der gewohnte Zweischritt („erst
+   * herausholen, dann aufschlagen") hat hier kein erstes Glied. Von der
+   * Nachbarzeile oder der Leiste aus geht es deshalb geradewegs in die
+   * Betrachtung, und dort steht er allein: ein unbedruckter Rohling, hinter
+   * dem letzten Band.
+   */
+  blindOeffnen(index: number) {
+    if (this.aufschlagStufe !== "aus" || this.heftStufe !== "aus") return;
+    if (this.mode !== "browse") return;
+    const band = this.runtimeBooks[index];
+    if (!band?.data.blind) return;
+
+    this.pendingFocusIndex = null;
+    this.swapZu = null;
+    this.atRest = false;
+    this.layDownPending = false;
+    this.browseMotionPhase = "idle";
+    this.presentedIndex = index;
+    this.selectedIndex = index;
+    this.activeIndex = index;
+    this.scrollIndex = index;
+    this.targetScrollIndex = index;
+    this.focusProgress = 0;
+    this.mode = "focusing";
+    this.zielYaw = inspectDefaultYaw;
+    this.zielPitch = inspectDefaultPitch;
+    this.inspectYaw = this.zielYaw;
+    this.inspectPitch = this.zielPitch;
+    if (this.side !== "vorn") {
+      this.side = "vorn";
+      this.callbacks.onSide(this.side);
+    }
+    this.runtimeBooks.forEach((buch) => {
+      buch.targetHover = 0;
+    });
+    this.callbacks.onActiveIndex(index);
+    this.callbacks.onMode(this.mode, index);
+    this.callbacks.onStatus(`${band.data.shortTitle} wird aufgestellt`);
+  }
+
   /** Der erste Eintrag, der ein Heft ist. `/magazin` braucht ihn. */
   heftIndexFinden(): number | null {
     const gefunden = this.runtimeBooks.findIndex((band) => band.data.magazine);
@@ -4069,14 +4139,18 @@ export class ShelfEngine {
   private updateHeft(delta: number) {
     if (this.heftStufe === "aus" || !this.heftRig) return;
 
+    // Ohne Bewegung wird die Anfahrt nicht bloss unsichtbar, sie faellt
+    // aus. Sonst stuende die Leseposition zwar sofort da, waere aber eine
+    // Sekunde lang nicht anzufassen — das Blaettern wartet auf „offen".
     if (this.heftStufe === "auf") {
-      this.heftZeit = Math.min(heftAnfahrt, this.heftZeit + delta);
+      this.heftZeit = this.reducedMotion
+        ? heftAnfahrt
+        : Math.min(heftAnfahrt, this.heftZeit + delta);
       if (this.heftZeit >= heftAnfahrt) this.heftStufe = "offen";
     } else if (this.heftStufe === "zu") {
-      this.heftZeit = Math.max(
-        0,
-        this.heftZeit - delta * (heftAnfahrt / heftZurueck),
-      );
+      this.heftZeit = this.reducedMotion
+        ? 0
+        : Math.max(0, this.heftZeit - delta * (heftAnfahrt / heftZurueck));
       if (this.heftZeit <= 0) {
         this.heftStufe = "aus";
         this.heftIndex = null;

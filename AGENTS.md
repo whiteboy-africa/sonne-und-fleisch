@@ -19,6 +19,16 @@ in `.astro/data-store.json` ab. Kommt ein **neues Feld** ins Schema, steht in
 diesem Speicher noch der Eintrag ohne das Feld — die Seite baut fehlerfrei,
 das Feld ist bloß nirgends. Dann `rm .astro/data-store.json` und neu bauen.
 
+Die Seiten des Heftes kommen nicht von Hand, sondern aus
+
+```
+npm run magazin:build
+```
+
+Das braucht `content/magazin.pdf` — die Druckdatei, 125 MB, absichtlich
+**nicht** im Git. Fehlt sie, sagt der Bau das und bricht ab; die fertigen
+Seiten unter `public/magazin/` bleiben davon unberuehrt.
+
 ## Loeschen und Bauen
 
 **Geloescht wird nur in Cache- und Build-Ordnern:** `.astro/`, `dist/`,
@@ -41,6 +51,8 @@ src/content.config.ts      Das Schema. Einzige Wahrheit über die Felder.
 src/buecher.ts             Übersetzt die deutschen Felder auf die Engine.
 src/shelf/                 Das 3D-Regal (siehe unten).
 public/buecher/<slug>/     Umschlagbilder.
+public/magazin/pages/      Die Seiten des Heftes. Aus dem Bau, nicht von Hand.
+content/magazin.pdf        Die Druckdatei dazu. Nicht im Git (125 MB).
 public/admin/config.yml    Die Redaktionsoberfläche. Muss zum Schema passen.
 ```
 
@@ -52,6 +64,9 @@ siehe `LICENSE-mint-playground`) und in drei Punkten umgebaut:
 1. **Aus React wurde Astro.** `ShelfEngine.ts`, `cover-art.ts` und
    `book-motion.ts` sind reines TypeScript; die Bedienung steht in
    `mount.ts` und hängt direkt am DOM (`components/Regal.astro`).
+   Dazugekommen sind `seiten-rig.ts` (umschlagende Blaetter),
+   `blaetter-rig.ts` (die Leseprobe), `magazin-rig.ts` (das Heft) und
+   `hover-licht.ts` (der Schwebezustand).
 2. **Aus der stehenden Reihe wurden liegende Stapel.** `book-motion.ts` ist
    dafür neu geschrieben: Posen haben jetzt Höhe (`y`) und Kippwinkel
    (`pitch`), die Kollisionsprüfung rechnet in drei Achsen, und die Bände
@@ -103,7 +118,9 @@ Tasten wählen bloß aus, sie holen nichts heraus.
   aus wie ein Buch und stoert nicht. **Zwei Ausnahmen laden immer: was
   obenauf liegt, und das Blatt** (`blatt: true`) — bei dem ist das Bild der
   Gegenstand, ohne es waere es nur ein farbiges Rechteck und saehe nach
-  Fehler aus.
+  Fehler aus. Das Heft laedt seinen Umschlag ohnehin: er ist die erste
+  Seite (`/magazin/pages/0001.webp`), dieselbe Datei, die beim Blaettern
+  zuoberst liegt.
 - **Ohne WebGL zeigt die Seite einen Ausweg** auf `/programm`. Ohne den bliebe
   eine schwarze Fläche stehen.
 
@@ -154,17 +171,30 @@ Seine Nummer ergibt sich wie bei allen anderen aus der Position — heute
 (`drawBlindCover` in `cover-art.ts`): cremefarbener Karton, Papierkorn,
 das Verlagszeichen unten in der Mitte, die Nummer auf dem Ruecken.
 
-Er ist ein Band wie jeder andere: er wird gewendet, abgeblendet,
-angeklickt. Nur drei Stellen wissen von ihm — die Marke in der Leiste
-(`ist-blind`, nur Kontur), die Bestellzeile („Einsenden" ins Postfach) und
-die Programmliste, aus der er herausfaellt.
+**Er liegt in keinem Stapel.** Eine offene Stelle ist nichts, was
+herumliegt; ein Rohling zwischen den Baenden waere ein Gegenstand und
+behauptete das Gegenteil. Im Regal ist er deshalb nicht zu sehen — er
+bekommt keinen Platz im Stapel (`createBooks`), sein Koerper ist ausgeblendet,
+solange er nicht der betrachtete ist, und beim Zurueckgehen bleibt er auch
+nicht davor stehen, wie es ein Band taete.
+
+**Station bleibt er trotzdem, und zwar die letzte.** Vom letzten echten
+Band nach rechts kommt man zu ihm, und dort steht er allein: 009, „Vakant".
+Weil es nichts herauszuziehen gibt, faellt der gewohnte Zweischritt („erst
+herausholen, dann aufschlagen") aus — von der Nachbarzeile und von der
+Leiste aus geht es geradewegs in die Betrachtung (`blindOeffnen`).
+
+Sonst ist er ein Band wie jeder andere: er wird gewendet, abgeblendet,
+angeklickt. Vier Stellen wissen von ihm — die Marke in der Leiste
+(`ist-blind`, nur Kontur), die Bestellzeile („Einsenden" ins Postfach), die
+Programmliste, aus der er herausfaellt, und `blindOeffnen`.
 
 **In der Liste unter `/programm` steht er nicht** — genauso wenig wie das
-Blatt (`blatt: true`). Die Liste ist die Bibliografie der Baende; die offene
-Stelle und ein Aquarell sind keine. Beide bleiben im Stapel, und ihre Seiten
-unter `/programm/<slug>` bleiben erreichbar. Aussortiert wird in
-`programmListe()` (`src/buecher.ts`), erst nach dem Zaehlen — die Nummern der
-uebrigen Baende bleiben also, wie sie sind.
+Blatt (`blatt: true`) und das Heft (`magazin`). Die Liste ist die
+Bibliografie der Baende; die offene Stelle, ein Aquarell und eine
+Zeitschrift sind keine. Aussortiert wird in `programmListe()`
+(`src/buecher.ts`), erst nach dem Zaehlen — die Nummern der uebrigen Baende
+bleiben also, wie sie sind.
 Heissen beide Seiten gleich, sagt der Wenden-Knopf „Seite B" statt eines
 Titels.
 
@@ -301,7 +331,8 @@ kein veraenderter Bildpunkt, keine Klasse, keine Randabdunklung.
 Der naechste ausformulierte Schritt steht unten unter „Offen: die
 Handy-Ansicht des aufgeschlagenen Bandes". `docs/offen/` gibt es nicht
 mehr: beide Auftraege, die dort lagen, sind gebaut — das Blatt ohne Nummer
-und der Schwebezustand als Licht.
+und der Schwebezustand als Licht. Gebaut ist inzwischen auch das Heft
+(siehe „Das Magazin") und der Blindband aus dem Stapel genommen.
 
 ## Offen: die Handy-Ansicht des aufgeschlagenen Bandes
 
@@ -320,6 +351,204 @@ Wischen ueber dem Band blaettert (Winkelschwelle 30 Grad, damit Scrollen
 gewinnt), Doppeltippen auf den Umschlag wendet. `dvh` statt `vh`,
 `env(safe-area-inset-bottom)` am Seitenende, keine waagerechte Ueberlauf,
 Tippziele mindestens 44px.
+
+## Das Magazin: ein Blaetterobjekt, kein Betrachter
+
+Im Stapel liegt ein Heft. Es ist flacher und groesser als die Baende und
+traegt das Format seiner Druckdatei (0,679 statt 0,705) — man sieht schon
+von weitem, dass es nicht dazugehoert. Ein Klick fuehrt geradewegs in eine
+Leseposition: der Umschlag geht unterwegs auf, die erste Doppelseite steht.
+
+Es ist ausdruecklich **kein PDF-Betrachter**. Kein Zoom, keine freie
+Kamera, kein Vollbild, kein Zaehler, keine Werkzeugleiste. Wer ein Heft
+durchblaettert, dreht nicht am Zoom.
+
+### Eine Entfernung
+
+Sie kommt aus dem Fenster und aus nichts sonst (`heftAbstand`): die
+Doppelseite soll darin stehen, ganz und mit etwas Luft — 78 % der Hoehe,
+hoechstens 90 % der Breite. Auf dem Telefon steht eine Seite allein.
+
+**Kein Weg fuehrt daran vorbei.** Rad, Strg-Rad (das Kneifen auf dem
+Trackpad), zwei Finger, Doppelklick: alles laeuft ins Leere, OrbitControls
+ist abgeschaltet. Nachgemessen mit sechsunddreissig Radereignissen, einer
+Kneifgeste und einem Doppelklick — Abstand und Bildgroesse Ziffer fuer
+Ziffer unveraendert.
+
+Das Heft **faehrt dabei nicht zur Kamera**. Es bleibt liegen, wo es lag,
+richtet sich auf und waechst auf seine wahre Groesse; die Kamera kommt zu
+ihm. Deshalb gibt es hier kein Gegenstueck zu `aufschlagFuellung`, das mit
+einer CSS-Zeile uebereinstimmen muesste: es kommt kein Dokument darueber,
+das Heft ist von Anfang bis Ende ein Gegenstand in der Szene.
+
+### Geblaettert wird auf vier Wegen
+
+Alle vier meinen dasselbe, und mehr Bedienung gibt es nicht:
+
+- **Die Ecke ziehen.** Am aeusseren Drittel einer Seite (`heftKante`) nimmt
+  man das Blatt in die Hand. Der Bogen folgt der Hand: der Grundbogen der
+  Bewegung, dazu was die Hand senkrecht daran zieht — wer die Ecke
+  hochzieht, rollt das Blatt staerker ein. Loslassen ueber der Haelfte
+  laesst es durchfallen, darunter zurueck, und beides schnappt
+  (`lambdaSchnapp` 22 statt 13).
+- **Auf die Aussenkante klicken.** Derselbe Streifen, nur kurz gedrueckt.
+- **Die Pfeiltasten.** Sie schnappen nicht: eine Taste ist kein Loslassen,
+  dort soll man das Blatt umschlagen sehen.
+- **Wischen** — auf dem Telefon tippen, siehe unten.
+
+In der Mitte liegt der Bund; dort greift niemand nach einer Seite. Ein
+kurzer Klick **daneben** ist der Ausgang, ebenso ESC und der Zurueck-Knopf
+des Browsers (beim Oeffnen wird ein Geschichtsschritt abgelegt).
+
+### Zwei Zeilen, sonst nichts
+
+Unter dem Heft stehen genau zwei Zeilen: **ZURUECK ZUM STAPEL** und **PDF
+HERUNTERLADEN**. Sie sind keine Werkzeuge — sie blaettern nicht, zaehlen
+nicht, zeigen nichts an. Die eine fuehrt hinaus, die andere zur Datei.
+
+Alles andere geht weg (`styles/magazin.css`): Kopfzeile, Tafel,
+Nachbarschaft, der Weg zurueck, die Parole. Die **Nummernleiste** bleibt
+stehen, gedimmt und **ohne aktive Marke** — das Heft hat keine Nummer, also
+kann keine Marke ihm gehoeren. Die Marke wird dabei nicht ueberschrieben,
+sondern gar nicht erst gesetzt (`blaetternAnsichtSetzen` in `mount.ts`):
+eine ueberschriebene Marke bliebe eine Marke, sie saehe nur anders aus.
+
+Die beiden Zeilen sind `fixed`, nicht `absolute`. Auf dem Telefon fliesst
+die Bedienung des Regals als normale Seite unter der Leinwand her
+(`handyFluss`), und `.press-experience` ist dort viel hoeher als das
+Fenster — absolut gesetzt landeten sie vierhundert Bildpunkte unterhalb des
+Randes.
+
+### Auf dem Telefon
+
+Eine Seite steht allein, und die beiden **Schirmhaelften** blaettern. Nicht
+die Haelften der Doppelseite: einzeln steht der Bund am Rand, mal links,
+mal rechts, je nachdem welche Seite gerade dran ist — wer von ihm aus
+rechnet, blaettert bei jedem zweiten Tippen rueckwaerts. Ein Tipp ueber
+oder unter der Seite schliesst.
+
+### Der Speicher bleibt flach
+
+Ein Heft mit vierundzwanzig Seiten hat zwoelf Blaetter. Alle zwoelf als
+gebeugte Netze mit Knochenkette und je zwei Texturen zu tragen, waere
+Verschwendung — zu sehen sind immer nur die paar um die aufgeschlagene
+Doppelseite herum. Deshalb drei Teile (`shelf/magazin-rig.ts`):
+
+- **Zwei Bloecke**, links und rechts vom Bund, in der Tiefe skaliert. Sie
+  tragen die Dicke und den Papierschnitt und wachsen beim Blaettern
+  ineinander ueber. Zwei Quader, keine Textur.
+- **Ein lebendes Fenster** von fuenf Blaettern: das umschlagende und zwei
+  zu jeder Seite (`magazinForm.fenster`).
+- **Ein Texturvorrat**, der mit dem Fenster wandert. Was herausfaellt, wird
+  freigegeben.
+
+Nachgemessen ueber drei Durchlaeufe von vorn bis hinten und zurueck:
+hoechstens acht Seitenbilder gleichzeitig, Geometrien und Texturen ohne
+Zuwachs, 14 bis 24 Zeichenaufrufe. `__PRESS_LIBRARY__.diagnostics().heft`
+zeigt Stand, Fenster, Vorrat, Entfernung und den gemessenen Schirmrahmen.
+
+### Drei Dinge, die man beim Anfassen wissen muss
+
+- **Der Bund gehoert dem Rig, nicht dem Buchkoerper.** `seitenRigBauen`
+  bekommt ihn als `bund`: beim Band liegt er auf `-breite / 2`, weil der
+  Buchkoerper um seine Mitte gebaut ist; beim Heft auf 0, weil dort der
+  Bund die Mitte der Doppelseite ist und Bloecke wie Kamera daran haengen.
+  Erbt das Heft die Lage des Bandes, steht es um eine halbe Seitenbreite
+  neben der Kamera — und das sieht man erst, wenn die gemessenen Zahlen
+  stimmen und das Bild nicht.
+- **Der Stand gehoert dem Blatt, nicht dem Fensterplatz.** Beim Blaettern
+  wandert das Fenster um eins weiter. Haengt der Stand am Platz, gilt jeder
+  Platz als neu und wird auf sein Ziel gesetzt — das Blatt, das umschlagen
+  sollte, steht im selben Bild schon drueben. Es dreht sich nie, es
+  springt. Die **Knochen** dagegen gehoeren dem Platz: rutscht ein anderes
+  Blatt hinein, werden sie einmal hart gesetzt statt gedaempft.
+- **Die beiden Seiten sind gegenlaeufig gestapelt.** Rechts liegt das
+  naechste Blatt obenauf, links das zuletzt umgeschlagene. Wer beides mit
+  derselben Ordnung bedient, versteckt links das oberste unter seinem
+  Vorgaenger, und die linke Seite steht eine Doppelseite zu frueh. Wer
+  gerade umschlaegt, liegt ueber allem — er gehoert in diesem Augenblick zu
+  keiner von beiden.
+
+### Sonderobjekt-Regeln
+
+Wie beim Blatt: keine Nummer, keine Marke in der Leiste, kein Wenden, keine
+Nachbarschaft, kein Statusblock. Pfeile und Durchlauf gehen daran vorbei
+(`ausserDerReihe` in `katalog.ts`). Nicht im Programm, keine Seite unter
+`/programm/<slug>`, nicht in der Sitemap. `/magazin` oeffnet direkt in die
+Leseposition — einen Zug spaeter als `onReady`, weil `onReady` noch **im**
+Erbauer faellt und `engine` erst danach seinen Wert bekommt.
+
+### Ohne Bewegung
+
+`prefers-reduced-motion` macht aus der Anfahrt einen harten Wechsel: die
+Leseposition steht sofort, das Blatt springt ohne Bogen um. Die Anfahrt
+faellt dabei nicht bloss aus dem Bild, sondern **aus** — sonst stuende die
+Leseposition zwar da, waere aber eine Sekunde lang nicht anzufassen, weil
+das Blaettern auf „offen" wartet.
+
+Nachpruefen laesst sich das ohne Systemeinstellung:
+
+```
+__PRESS_LIBRARY__.ohneBewegung(true)
+```
+
+### Woher die Seiten kommen
+
+`npm run magazin:build` (`scripts/magazin-bauen.mjs`) rastert die ersten
+vierundzwanzig Seiten von `content/magazin.pdf` nach
+`public/magazin/pages/0001.webp` aufwaerts — lange Kante 2048, WebP q80,
+zusammen 4,6 MB. Es warnt ab 25 MB. Keine Vorschaubilder: das Heft laedt im
+Fenster nach, eine zweite Groesse waere ein zweiter Satz Dateien, den nie
+jemand sieht.
+
+Gerastert wird mit **Swift und PDFKit** (`magazin-rendern.swift`), weil auf
+diesem Rechner weder Poppler noch ImageMagick noch Ghostscript liegen.
+Zwei Fallen stecken darin, beide umgangen:
+
+- **Retina.** `NSImage.lockFocus` rastert auf dem Bildschirm, den es findet
+  — an einem Retina-Schirm kommen doppelt so viele Bildpunkte heraus wie
+  bestellt. Hier wird in einen `CGContext` mit ausgerechneter Pixelgroesse
+  gezeichnet: was bestellt ist, kommt heraus, auf jedem Rechner dasselbe.
+- **`/Rotate`.** `PDFPage.draw` wendet es an — aber nur, solange man es
+  nicht selbst auch tut. Damit die Drehung an einer Stelle steht, wird sie
+  von Hand in die Matrix gelegt und der Seite vorher abgenommen. Diese
+  Ausgabe hat ueberall `/Rotate 0`; der Weg steht trotzdem da.
+
+Dabei faellt die Datei ab, auf die „PDF herunterladen" zeigt:
+`public/magazin/magazin.pdf`, dieselben vierundzwanzig Seiten aus denselben
+Rastern, 6,4 MB. **Nicht** die Druckdatei — die hat 125 MB und
+sechsundsiebzig Seiten. Was man herunterlaedt, ist genau das, was man
+geblaettert hat.
+
+Gebaut wird das PDF von Hand (`scripts/pdf-aus-bildern.mjs`), weil ein PDF
+ein JPEG **so wie es ist** tragen kann: der Datenstrom bekommt `/DCTDecode`
+und wird Byte fuer Byte uebernommen. Jeder andere Weg dekodiert das Bild
+und kodiert es neu — dann waere die heruntergeladene Seite nicht mehr
+dieselbe. Nachgemessen: zwei Laeufe, Byte fuer Byte dasselbe Ergebnis, PDF
+wie WebP.
+
+### Ein Rig, zwei Abnehmer
+
+Die Blattmechanik steht in `shelf/seiten-rig.ts` und wird von der
+Leseprobe (`blaetter-rig.ts`) und vom Heft (`magazin-rig.ts`) benutzt:
+Knochenkette laengs der Wendeachse, Drehung im ersten Knochen, Biegung als
+halber Sinus ueber die uebrigen.
+
+Verschieden ist nur, **wann** ein Blatt welche Haltung hat. Die Leseprobe
+faehrt eine Kaskade aus einer einzigen Zahl; das Heft blaettert einzeln und
+auf Zuruf, und dort kommt die Woelbung aus der Hand. Die gemeinsame Sprache
+ist deshalb die **Haltung** und nicht die Zeit: `anteil` sagt, wie weit das
+Blatt herum ist, `bogen`, wie stark es sich woelbt. Eine gemeinsame
+Zeitkurve haette einen von beiden falsch bedient.
+
+Aus demselben Grund wird die Woelbung aus dem **laufenden** Stand gerechnet
+und nicht aus dem Ziel: aus dem Ziel waere sie im selben Bild, in dem der
+Befehl kommt, schon wieder null, und das Blatt drehte sich starr wie eine
+Klappe.
+
+Aus `bandinopla/quick_flipbook` (BSD-2) ist **kein Code** uebernommen
+worden; es liegt nicht in diesem Baum. Deshalb gibt es weiterhin keine
+`THIRD_PARTY_NOTICES.md`.
 
 ## Doppelcover (tête-bêche)
 
@@ -452,7 +681,9 @@ steht sofort da.
 
 Das Blaettern ist nach einer bekannten Vorgehensweise **neu geschrieben**,
 nicht uebernommen: Knochenkette laengs der Wendeachse, gestaffelte
-Verzoegerung je Blatt, Biegung als Kurve ueber die Kette. Aus dem
+Verzoegerung je Blatt, Biegung als Kurve ueber die Kette. Die Mechanik
+selbst liegt seit dem Heft in `seiten-rig.ts` und wird von beiden benutzt
+(siehe „Ein Rig, zwei Abnehmer"). Aus dem
 Wawa-Sensei-Tutorial und seinem Starter-Repo (UNLICENSED) ist kein Code in
 diesen Baum gelangt — auch kein heruntergeladener Text daraus. Deshalb gibt
 es hier keine `THIRD_PARTY_NOTICES.md`; braeuchte man doch einmal Code aus
