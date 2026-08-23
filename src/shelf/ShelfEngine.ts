@@ -420,6 +420,17 @@ const heftFuellungEinzeln = 0.9;
 const heftKante = 0.34;
 /** So lange schnappt ein losgelassenes Blatt, statt zu treiben. */
 const heftSchnappen = 0.3;
+/*
+ * Wie das Heft in der Luft liegt.
+ *
+ * Nicht frontal: ein Gegenstand, der einem die Flaeche zeigt, ist keiner
+ * mehr — er ist eine Tafel. Ein Stueck von oben und ein Stueck von der
+ * Seite, dann sieht man den Bund als Tal, die Dicke der beiden Bloecke und
+ * die Woelbung der Seiten. Zusammen mit `magazinForm.ruheBogen` ist das der
+ * ganze Unterschied zwischen einem Heft und einem Scan.
+ */
+const heftKippen = THREE.MathUtils.degToRad(-15);
+const heftDrehen = THREE.MathUtils.degToRad(9);
 /**
  * Ab so vielen Bildpunkten quer ist eine Bewegung ein Wisch — und nur,
  * wenn sie mindestens anderthalbmal so weit quer wie hoch gegangen ist.
@@ -3921,7 +3932,9 @@ export class ShelfEngine {
     // Gelesen wird dort, wo es liegt. Es kommt nicht zur Kamera, die
     // Kamera kommt zu ihm — deshalb genuegt eine Entfernung.
     this.heftLeseOrt.copy(this.heftStartOrt);
-    this.heftLeseDreh.identity();
+    this.heftLeseDreh.setFromEuler(
+      new THREE.Euler(heftKippen, heftDrehen, 0, "YXZ"),
+    );
 
     this.heftKameraVorher.copy(this.camera.position);
     this.heftZielVorher.copy(this.controls.target);

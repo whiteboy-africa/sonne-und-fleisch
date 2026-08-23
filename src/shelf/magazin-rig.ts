@@ -52,6 +52,22 @@ export const magazinForm = {
   bogen: 0.62,
   /** Wie viel Woelbung eine gezogene Ecke hoechstens dazulegt. */
   bogenZug: 0.55,
+  /**
+   * **Die Woelbung im Stillstand.** Ein aufgeschlagenes Heft liegt nicht
+   * flach da: die Seiten stehen unter Spannung, ihre Aussenkanten heben
+   * sich vom Bund weg. Ohne das ist die Doppelseite ein Scan auf einer
+   * Tafel — der Gegenstand verschwindet, und uebrig bleibt ein Betrachter.
+   *
+   * Sie folgt einem Kosinus ueber den Stand des Blattes: voll auf der einen
+   * Ruhelage, null in der Senkrechten, voll und andersherum auf der
+   * anderen. So kippt sie mitten im Umschlagen nicht um, sondern geht durch
+   * null — genau dort, wo die Woelbung aus der Bewegung ihr Groesstes hat.
+   * Das Vorzeichen ist gegenlaeufig zum Umschlagbogen, und das muss es
+   * sein: die Aussenkanten sollen dem Betrachter entgegenkommen. Andersherum
+   * tauchen sie hinter die Papierbloecke, und dann liegen zwei cremefarbene
+   * Platten ueber der halben Doppelseite.
+   */
+  ruheBogen: -0.22,
   /** Daempfung im Lauf. */
   lambda: 13,
   /** Und beim Schnappen, wenn die Ecke losgelassen wird. */
@@ -147,8 +163,15 @@ export function magazinRigBauen(werte: {
   );
   // Der Quader waechst vom Bund nach aussen und von z = 0 nach hinten;
   // skaliert wird nur in der Tiefe.
-  const blockForm = merken(new THREE.BoxGeometry(breite, hoehe, 1));
-  blockForm.translate(breite * 0.5, 0, -0.5);
+  /*
+   * Etwas kleiner als ein Blatt. Eine gewoelbte Seite hebt sich vom Block
+   * ab, und ein Quader in voller Groesse schaut dann ringsum darunter
+   * hervor — ein cremefarbener Rand um eine Seite, die keinen hat.
+   */
+  const blockForm = merken(
+    new THREE.BoxGeometry(breite * 0.985, hoehe * 0.985, 1),
+  );
+  blockForm.translate(breite * 0.985 * 0.5, 0, -0.5);
 
   const bloecke = [0, 1].map((seite) => {
     // Die Deckflaeche bekommt Papier, die vier Kanten den Schnitt.
@@ -351,11 +374,15 @@ export function magazinRigBauen(werte: {
       }
       staende.set(blatt, anteil);
 
+      // Die Woelbung: was im Stillstand da ist, plus was die Bewegung oder
+      // die Hand dazulegt.
+      const ruhe = magazinForm.ruheBogen * Math.cos(Math.PI * anteil);
       const bogen = stand.ohneBewegung
-        ? 0
-        : gezogen
-          ? gezogen.bogen
-          : rig.bogenAusZeit(anteil, magazinForm.bogen);
+        ? ruhe
+        : ruhe +
+          (gezogen
+            ? gezogen.bogen
+            : rig.bogenAusZeit(anteil, magazinForm.bogen));
 
       // Ist gerade ein anderes Blatt in diesen Platz gerutscht, werden die
       // Knochen hart gesetzt: sie tragen sonst noch die Haltung des
