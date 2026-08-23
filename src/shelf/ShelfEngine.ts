@@ -2935,12 +2935,14 @@ export class ShelfEngine {
     // steht dann links dahinter. Breites Fenster: dazwischen, dann sind
     // beide im Bild.
     const schmal = width < 760;
-    // Auf dem Handy faengt der Blick knapp ein Drittel weiter hinten an —
-    // dann sieht man die Nachbarstapel und hat Luft, sich umzusehen.
+    // Auf dem Handy faengt der Blick weiter hinten an — dann sieht man die
+    // Nachbarstapel und hat Luft, sich umzusehen. Von 1,3 auf 1,1: ein
+    // Siebtel naeher, damit die Umschlaege nicht daumengross anfangen.
+    // Nur der **Start** steht hier; heranholen und wegziehen bleibt frei.
     if (schmal && !this.handyAbstandGesetzt) {
       this.handyAbstandGesetzt = true;
-      this.zoom = 1.3;
-      this.zielZoom = 1.3;
+      this.zoom = 1.1;
+      this.zielZoom = 1.1;
     }
     const blickX = schmal ? pulledSideStep * 0.55 : pulledSideStep * 0.5;
     browseTarget.x = blickX;

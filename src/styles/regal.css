@@ -1003,15 +1003,26 @@ body {
     display: none;
   }
 
+  /*
+   * Nummer, Titel und Autor stehen auf dem Telefon um ein Fuenftel kleiner
+   * als am Schreibtisch. Dort unten links ist die Beschriftung eine Angabe
+   * zum Band, kein Plakat — der Band selbst ist das Grosse im Bild, und auf
+   * einem Schirm von dreihundertfuenfundsiebzig Bildpunkten nahm sie sonst
+   * zu viel davon.
+   */
+  .browse-caption .eyebrow--nummer {
+    font-size: 11px;
+  }
+
   .browse-caption h1 {
     max-width: 100%;
     /* Plakatgroesse ging auf dem Handy nicht auf: „Weine nicht, Artur!"
        brauchte drei Zeilen und schob Knopf und Leiste aus dem Bild. */
-    font-size: clamp(23px, 6.8vw, 32px);
+    font-size: clamp(18px, 5.4vw, 26px);
   }
 
   .browse-caption__author {
-    font-size: 14px;
+    font-size: 11px;
   }
 
         .shelf-index {

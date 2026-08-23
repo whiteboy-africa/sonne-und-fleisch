@@ -29,10 +29,13 @@ akzent_farbe: '#a8352a'
 schrift_farbe: '#e8e4da'
 motiv: fracture
 # Ein Heft: groesser als ein Band (2,0), duenn wie vierundzwanzig Seiten,
-# und im Format der Druckdatei — 450,7 x 663,3 Punkt sind 0,679.
+# und im **beschnittenen** Format der Druckdatei — 433,7 x 646,3 Punkt sind
+# 0,671. Die ungeschnittene Seite misst 450,7 x 663,3; die Differenz ist die
+# Schnittzugabe von 8,5 Punkt ringsum, und die wird nicht mitgerastert
+# (siehe `scripts/magazin-rendern.swift`).
 hoehe: 2.3
 dicke: 0.022
-breite_verhaeltnis: 0.679
+breite_verhaeltnis: 0.671
 magazin:
   seiten: 24
   ordner: /magazin/pages

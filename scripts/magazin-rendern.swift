@@ -24,6 +24,18 @@
 // die naechste Druckdatei ihn braucht, sobald jemand einen Bogen kopfueber
 // ablegt.
 //
+// **Die Schnittzugabe faellt weg.** Eine Druckdatei ist groesser als das
+// fertige Heft: rings um jede Seite liegen ein paar Millimeter Zugabe, in
+// die das Bild hineinlaeuft, damit beim Beschneiden keine Blitzer
+// stehenbleiben. Wer sie mitrastert, bekommt sie im Bild — und bei einem
+// Element, das ueber den Bund laeuft, sieht man es dann **zweimal**: einmal
+// im Anschnitt der linken Seite, einmal im Anschnitt der rechten.
+//
+// Wie viel Zugabe es ist, steht in der Datei und muss nicht geschaetzt
+// werden: die `TrimBox` ist das beschnittene Format, die `CropBox` das
+// ungeschnittene. Hier gilt die TrimBox, sobald sie kleiner ist. Diese
+// Ausgabe hat 8,5 Punkt (3 mm) auf jeder Seite.
+//
 //   swift scripts/magazin-rendern.swift <pdf> <zielordner> <seiten> <kante>
 
 import Foundation
@@ -64,7 +76,13 @@ for stelle in 0..<bis {
   let drehung = ((seite.rotation % 360) + 360) % 360
   seite.rotation = 0
 
-  let kasten = seite.bounds(for: .cropBox)
+  // Das beschnittene Format, wenn es eins gibt — sonst die ganze Seite.
+  let ganz = seite.bounds(for: .cropBox)
+  let beschnitten = seite.bounds(for: .trimBox)
+  let box: PDFDisplayBox =
+    (beschnitten.width < ganz.width || beschnitten.height < ganz.height)
+      ? .trimBox : .cropBox
+  let kasten = seite.bounds(for: box)
   // Nach der Drehung stehen Breite und Hoehe ueber Kreuz.
   let quer = drehung == 90 || drehung == 270
   let breitePt = quer ? kasten.height : kasten.width
@@ -110,7 +128,7 @@ for stelle in 0..<bis {
     break
   }
   stift.translateBy(x: -kasten.origin.x, y: -kasten.origin.y)
-  seite.draw(with: .cropBox, to: stift)
+  seite.draw(with: box, to: stift)
   stift.restoreGState()
 
   guard let bild = stift.makeImage() else {
@@ -132,7 +150,10 @@ for stelle in 0..<bis {
     exit(1)
   }
 
-  print("\(name)\t\(breite)x\(hoehe)\tdreh \(drehung)")
+  let zugabe = box == .trimBox
+    ? String(format: "Zugabe %.1f pt", kasten.origin.x)
+    : "ohne Zugabe"
+  print("\(name)\t\(breite)x\(hoehe)\tdreh \(drehung)\t\(zugabe)")
 }
 
 print("fertig\t\(bis)\t\(dokument.pageCount)")
