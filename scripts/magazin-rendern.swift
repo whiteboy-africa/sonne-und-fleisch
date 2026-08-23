@@ -127,7 +127,12 @@ for stelle in 0..<bis {
   default:
     break
   }
-  stift.translateBy(x: -kasten.origin.x, y: -kasten.origin.y)
+  // **Nicht** noch einmal um den Ursprung des Kastens verschieben:
+  // `draw(with:to:)` legt den gewaehlten Kasten von sich aus in den
+  // Ursprung. Bei der CropBox faellt eine zweite Verschiebung nicht auf —
+  // die faengt bei (0,0) an. Bei der TrimBox faengt sie bei (8,5|8,5) an,
+  // und dann rutscht die Seite um die Schnittzugabe nach links unten:
+  // oben und rechts bleibt weisses Papier stehen, ein Rahmen um die Seite.
   seite.draw(with: box, to: stift)
   stift.restoreGState()
 
