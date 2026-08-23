@@ -144,6 +144,13 @@ export function seitenRigBauen(werte: {
   tiefe?: number;
   kante?: THREE.Material;
   /**
+   * Die Kante **am Bund**. Dort ist ein Heft geheftet, nicht geschnitten:
+   * man sieht keinen Papierschnitt, man sieht einen Falz im Schatten. Mit
+   * derselben hellen Kante wie aussen stand dort ein weisser Streifen
+   * mitten im Bild — zwoelf Blattkanten uebereinander, alle beleuchtet.
+   */
+  bundKante?: THREE.Material;
+  /**
    * Wo der Bund liegt, in Rig-Koordinaten — die Achse, um die sich jedes
    * Blatt dreht.
    *
@@ -201,11 +208,13 @@ export function seitenRigBauen(werte: {
      * Schmalseiten, dann vorn und hinten. Die vier bekommen den
      * Papierschnitt, die letzten beiden die Seiten.
      */
+    // Reihenfolge beim Quader: +x, -x, +y, -y, +z, -z. Die zweite ist die
+    // Kante am Bund — dort liegt der Falz, nicht der Schnitt.
     const stoffe: THREE.Material | THREE.Material[] =
       Array.isArray(stoff) && tiefe > 0 && werte.kante
         ? [
             werte.kante,
-            werte.kante,
+            werte.bundKante ?? werte.kante,
             werte.kante,
             werte.kante,
             stoff[0],

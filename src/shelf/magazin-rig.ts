@@ -83,6 +83,13 @@ export const magazinForm = {
   /** Der Schnitt an den Blattkanten. */
   schnitt: '#cfc9b8',
   /**
+   * Und der Falz am Bund. Dort ist ein Heft geheftet, nicht geschnitten —
+   * man sieht keine Papierkante, man sieht einen Schatten. Mit derselben
+   * hellen Kante wie aussen stand dort ein weisser Streifen mitten im
+   * Bild: zwoelf Blattkanten uebereinander, alle beleuchtet.
+   */
+  falz: '#1a1814',
+  /**
    * Der Glanz des Papiers. Ein Heft ist auf gestrichenem Papier gedruckt,
    * und gestrichenes Papier hat einen Schimmer — genau der macht aus einer
    * gedrehten Flaeche einen Gegenstand: das Licht wandert darueber,
@@ -184,6 +191,13 @@ export function magazinRigBauen(werte: {
       envMapIntensity: magazinForm.umgebung * 0.6,
     }),
   );
+  const falzStoff = merken(
+    new THREE.MeshStandardMaterial({
+      color: magazinForm.falz,
+      roughness: 0.95,
+      metalness: 0,
+    }),
+  );
 
   /** Vorderseiten der Blaetter (ungerade Seiten). */
   const stoffeVorn: THREE.MeshPhysicalMaterial[] = [];
@@ -228,10 +242,17 @@ export function magazinRigBauen(werte: {
     // Ein Blatt hat Dicke, und an seiner Kante sieht man das Papier.
     tiefe: dicke,
     kante: kantenStoff,
+    bundKante: falzStoff,
     form: {
       segmente: magazinForm.segmente,
       lambda: magazinForm.lambda,
-      verteilt: true,
+      /*
+       * Der Knick quer zur Wendeachse ist **aus**. Er haengt an der
+       * Woelbung, und die ist hier auch im Stillstand da — also lief er
+       * staendig mit und legte eine Welle in die Oberkante der Seiten. Eine
+       * Seite, die still liegt, hat eine gerade Kante.
+       */
+      falte: 0,
     },
     stoff: (i) => [stoffeVorn[i], stoffeHinten[i]],
   });
@@ -268,7 +289,15 @@ export function magazinRigBauen(werte: {
 
     const gebraucht = new Set<number>();
     for (let blatt = 0; blatt < blaetter; blatt += 1) {
-      const im = blatt >= von && blatt < von + magazinForm.fenster * 2 + 1;
+      /*
+       * Das erste und das letzte Blatt tragen ihr Bild **immer**: aussen
+       * liegen der Umschlag und die Rueckseite, und die sieht man, sobald
+       * jemand das Heft herumdreht. Ein cremefarbenes Rechteck an dieser
+       * Stelle saehe nach Fehler aus. Zwei Bilder, mehr kostet es nicht.
+       */
+      const aussen = blatt === 0 || blatt === blaetter - 1;
+      const im =
+        aussen || (blatt >= von && blatt < von + magazinForm.fenster * 2 + 1);
       const vorn = blatt * 2 + 1;
       const hinten = blatt * 2 + 2;
       const texturVorn = im ? seitenTextur(vorn) : null;

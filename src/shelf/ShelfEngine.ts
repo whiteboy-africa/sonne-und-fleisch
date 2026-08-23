@@ -444,12 +444,17 @@ const heftSchwebeGier = THREE.MathUtils.degToRad(3.4);
 const heftSchwebeNick = THREE.MathUtils.degToRad(1.9);
 const heftSchwebeHub = 0.055;
 /*
- * Wie weit sich das Heft von Hand drehen laesst. Nicht ohne Anschlag: es
- * ist ein aufgeschlagenes Heft, kein Band in der Betrachtung — wer es auf
- * den Kopf stellt, liest nichts mehr.
+ * Wie weit sich das Heft von Hand drehen laesst: **ganz herum**.
+ *
+ * Hier standen 46 und 32 Grad, damit man beim Lesen nicht hinter die Seite
+ * geraet. Aber es ist ein Gegenstand, und einen Gegenstand dreht man um,
+ * wenn man ihn ansieht — dahinter liegen der Umschlag, die Rueckseite und
+ * die Papierschnitte, und die gehoeren dazu. Nur auf den Kopf stellen
+ * laesst er sich nicht: darueber und darunter bleibt ein Rest, sonst
+ * kippt das Bild.
  */
-const heftDrehGrenzeGier = THREE.MathUtils.degToRad(46);
-const heftDrehGrenzeNick = THREE.MathUtils.degToRad(32);
+const heftDrehGrenzeGier = Math.PI;
+const heftDrehGrenzeNick = THREE.MathUtils.degToRad(78);
 /** Und wie nah und wie weit. 1 ist die ausgerechnete Grundentfernung. */
 const heftZoomNah = 0.48;
 const heftZoomFern = 1.4;
