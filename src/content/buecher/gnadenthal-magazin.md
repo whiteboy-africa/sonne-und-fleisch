@@ -4,8 +4,12 @@
 # nicht dazugehoert. Angeklickt schlaegt es nicht auf wie ein Band, sondern
 # geht in seine eigene Leseposition: eine Entfernung, kein Zoom, nichts auf
 # dem Schirm ausser zwei Zeilen.
-titel: Gnadenthal — Suspiria ex scetis
-kurztitel: Gnadenthal
+# Der Titel gehoert dem Heft allein. „Gnadenthal — Suspiria ex scetis"
+# stand hier einmal und war der Titel eines echten Bandes im Programm —
+# zwei Dinge mit demselben Namen, und beim Lesen der Nachbarzeilen und der
+# Buchseite lief das durcheinander.
+titel: Secret Magazin
+kurztitel: Secret Magazin
 autor: Poetheologische Integralistische Halbjahreszeitschrift
 klappentext: >-
   Die erste Ausgabe der poetheologischen Halbjahreszeitschrift. Im Stapel
@@ -32,7 +36,6 @@ breite_verhaeltnis: 0.679
 magazin:
   seiten: 24
   ordner: /magazin/pages
-  pdf: /magazin/magazin.pdf
 # Vor dem Blindband, hinter allen Baenden und hinter dem Blatt.
 reihenfolge: 950
 ---

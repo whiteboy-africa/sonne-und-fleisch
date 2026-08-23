@@ -159,6 +159,9 @@ const buecher = defineCollection({
      * Die Seiten liegen als WebP unter `ordner` und heissen `0001.webp`
      * aufwaerts; sie kommen aus `npm run magazin:build` und nicht von Hand.
      * `seiten` muss gerade sein — ein Heft hat Doppelseiten.
+     *
+     * Herunterladen gibt es nicht. Das Heft ist zum Blaettern da; wer eine
+     * Datei mitnimmt, hat es nicht gelesen, sondern kopiert.
      */
     magazin: z
       .object({
@@ -167,8 +170,6 @@ const buecher = defineCollection({
           message: 'Ein Heft hat eine gerade Seitenzahl.',
         }),
         ordner: z.string().default('/magazin/pages'),
-        // Wohin die zweite der beiden Zeilen unter dem Heft fuehrt.
-        pdf: z.string().default('/magazin/magazin.pdf'),
       })
       .optional(),
 

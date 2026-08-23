@@ -16,7 +16,6 @@ interface Props {
 }
 
 const { katalog, direkt } = Astro.props;
-const heft = katalog.find((buch) => buch.magazine);
 // Katalognummern: drei Stellen, fuehrende Nullen. 001, 002, 003.
 const katalognummer = (zahl: number) => String(zahl).padStart(3, '0');
 const erstes = katalog[0];
@@ -262,22 +261,16 @@ const gesamt = katalognummer(katalog.length);
       Weg zurueck sind weg, die Nummernleiste steht gedimmt und ohne aktive
       Marke da (`.ist-heft` in `styles/magazin.css`).
 
-      Uebrig bleiben genau zwei Zeilen. Sie sind keine Werkzeuge: sie
-      blaettern nicht, sie zaehlen nicht, sie zeigen nichts an. Die eine
-      fuehrt hinaus, die andere zur Datei.
+      Uebrig bleibt **eine** Zeile, und die ist kein Werkzeug: sie blaettert
+      nicht, sie zaehlt nicht, sie zeigt nichts an. Sie fuehrt hinaus.
+
+      „PDF herunterladen" stand einmal daneben. Das Heft ist zum Blaettern
+      da; wer eine Datei mitnimmt, hat es nicht gelesen, sondern kopiert.
   */}
   <div class="heft-zeilen" data-heft-zeilen hidden>
     <button type="button" class="heft-zeile" data-heft-zu>
       Zurück zum Stapel
     </button>
-    <a
-      class="heft-zeile"
-      data-heft-pdf
-      href={heft?.magazine?.pdf ?? '#'}
-      download
-    >
-      PDF herunterladen <span aria-hidden="true">↗</span>
-    </a>
   </div>
 
   <div class="sr-only" aria-live="polite" data-vorlese></div>

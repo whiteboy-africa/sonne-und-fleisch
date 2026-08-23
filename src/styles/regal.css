@@ -1513,7 +1513,15 @@ body {
    */
   [data-handy-fluss='an'] .browse-caption {
     z-index: 2;
-    bottom: calc(30svh + 12px);
+    /*
+     * Dicht ueber der Leiste, nicht irgendwo darueber. Die Leiste faengt
+     * beim Abstandhalter der Tafel an (70svh) und traegt 54 Bildpunkte
+     * eigenen Abstand — von unten gerechnet steht ihre Oberkante also bei
+     * `30svh - 54px`. Ein Fingerbreit darueber gehoert die Beschriftung
+     * hin; mit `30svh + 12px` klebte sie am Stapel und liess darunter ein
+     * Loch von sechsundsechzig Bildpunkten.
+     */
+    bottom: calc(30svh - 40px);
   }
 
   [data-handy-fluss='an'] .site-header {

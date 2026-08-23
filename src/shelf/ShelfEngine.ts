@@ -145,6 +145,12 @@ function weichEin(wert: number) {
 }
 /** Der Schnitt der Buchbloecke — billiges Werkdruckpapier, leicht vergilbt. */
 const pageColor = new THREE.Color("#cbc3b0");
+/**
+ * So lange wartet der Ladeschirm hoechstens auf die ersten Umschlaege.
+ * Danach geht es auch ohne — ein dunkler Stapel ist besser als ein
+ * Ladeschirm, der stehenbleibt.
+ */
+const coverWartefrist = 3000;
 /** So viele Baende vor und hinter dem aktiven bekommen ihr Cover-Bild. */
 const coverPreloadRange = 2;
 
@@ -576,6 +582,11 @@ export class ShelfEngine {
   private dipGetauscht = false;
   /** Licht des Abblenders: 1 volle Helligkeit, 0 Schwarz. */
   private dipLicht = 1;
+  /**
+   * Wann die ersten Umschlaege wirklich auf den Baenden stehen. Der
+   * Ladeschirm haengt daran.
+   */
+  private coverBereit: Promise<void> = Promise.resolve();
   /** Schwanken des aufgestellten Bandes, aus der Blaettergeschwindigkeit. */
   private schwanken = 0;
   private pendingFocusIndex: number | null = null;
@@ -794,9 +805,32 @@ export class ShelfEngine {
     this.bindEvents();
     this.resizeObserver.observe(canvas);
     this.handleResize();
-    this.callbacks.onReady();
     this.callbacks.onStatus(`${this.booksData.length} Bände im Stapel`);
     this.animate();
+
+    /*
+     * Der Ladeschirm bleibt stehen, bis die ersten Umschlaege da sind.
+     *
+     * `onReady` fiel hier bisher sofort — und damit stand der Stapel im
+     * Bild, bevor ein einziges Cover geladen war. Ein Band ohne sein Bild
+     * traegt seine Einbandfarbe, und die sind alle sehr dunkel (#2e240e,
+     * #0d0c0c, #08070b): auf schwarzem Grund sah man schlicht nichts. Auf
+     * dem Telefon, wo die Bilder ueber das Netz kommen, dauerte das lange
+     * genug, dass es aussah, als sei das Regal leer — bis man etwas tat und
+     * die Bilder inzwischen da waren.
+     *
+     * Mit Wartefrist: laedt ein Bild nicht, geht es trotzdem weiter. Ein
+     * dunkler Stapel ist besser als ein Ladeschirm, der nie verschwindet.
+     */
+    void Promise.race([
+      this.coverBereit,
+      new Promise<void>((fertig) =>
+        window.setTimeout(fertig, coverWartefrist),
+      ),
+    ]).then(() => {
+      if (this.isDisposed) return;
+      this.callbacks.onReady();
+    });
 
     (
       window as unknown as {
@@ -975,7 +1009,7 @@ export class ShelfEngine {
     );
 
     this.updateStackTargets();
-    this.loadCoversNear(0);
+    this.coverBereit = this.loadCoversNear(0);
     // Alle Baende liegen. Aufgestellt wird erst auf Verlangen.
     this.runtimeBooks.forEach((book) => {
       this.commitBookPose(
@@ -2473,7 +2507,18 @@ export class ShelfEngine {
       // aufgestellt.
       const alsLeerstelle =
         Boolean(book.data.blind) && !isSelected && book.index !== this.wipeNach;
-      book.content.visible = (!isolated || isSelected) && !alsLeerstelle;
+      /*
+       * Und das Heft ist waehrend seiner Leseposition **nicht** sein
+       * Koerper: dort steht das Rig an seiner Stelle. Diese Zeile hat es
+       * Bild fuer Bild wieder eingeschaltet — der gewaehlte Band ist immer
+       * sichtbar, und der gewaehlte Band war das Heft. Zu sehen war dann
+       * der geschlossene Umschlag, schraeg und daneben in der Fokuslage,
+       * neben der aufgeschlagenen Doppelseite. `heftRigAufbauen` blendet
+       * ihn einmal aus; hier muss stehen, dass er ausgeblendet bleibt.
+       */
+      const stattdessenDasRig = this.heftVerdeckt === book;
+      book.content.visible =
+        (!isolated || isSelected) && !alsLeerstelle && !stattdessenDasRig;
 
       // Liegt der Band ruhig im Stapel, folgt er der Hoehe, die ihm die
       // Stapelverwaltung zuweist — so rutscht der Stapel nach, wenn unten
@@ -2945,11 +2990,12 @@ export class ShelfEngine {
    * hundert Kilobyte Download und mehrere Megabyte Grafikspeicher; bei einem
    * gewachsenen Programm reicht das, um ein Telefon abzuschiessen.
    */
-  private loadCoversNear(index: number) {
+  private loadCoversNear(index: number): Promise<void> {
+    const warten: Array<Promise<void>> = [];
     // Was obenauf liegt, sieht man — diese Umschlaege immer laden.
     this.pileOrder.forEach((reihe) => {
       const oben = reihe[reihe.length - 1];
-      if (oben !== undefined) this.loadCover(oben);
+      if (oben !== undefined) warten.push(this.loadCover(oben));
     });
 
     // Das Blatt ist die Ausnahme: **sein Bild wird immer geladen.**
@@ -2960,7 +3006,7 @@ export class ShelfEngine {
     // beim Blatt **ist** das Bild der Gegenstand, es hat sonst nichts. Also
     // kostet es die eine Datei, egal wie weit weg es liegt.
     this.runtimeBooks.forEach((band, stelle) => {
-      if (band.data.sheet) this.loadCover(stelle);
+      if (band.data.sheet) warten.push(this.loadCover(stelle));
     });
 
     for (
@@ -2968,22 +3014,25 @@ export class ShelfEngine {
       i <= Math.min(this.runtimeBooks.length - 1, index + coverPreloadRange);
       i += 1
     ) {
-      this.loadCover(i);
+      warten.push(this.loadCover(i));
     }
+    return Promise.all(warten).then(() => undefined);
   }
 
   /** Laedt die Umschlagbilder eines Bandes, einmalig. */
-  private loadCover(index: number) {
+  private loadCover(index: number): Promise<void> {
     const runtime = this.runtimeBooks[index];
-    if (!runtime || runtime.coverRequested) return;
+    if (!runtime || runtime.coverRequested) return Promise.resolve();
     const bild = runtime.data.coverImage;
     const hinten = runtime.data.back?.coverImage;
     const ruecken = runtime.data.spineImage;
-    if (!bild && !hinten && !ruecken) return;
+    if (!bild && !hinten && !ruecken) return Promise.resolve();
     runtime.coverRequested = true;
-    if (bild) void this.loadCustomFace(runtime, bild, "front");
-    if (hinten) void this.loadCustomFace(runtime, hinten, "back");
-    if (ruecken) void this.loadCustomFace(runtime, ruecken, "spine");
+    const warten: Array<Promise<void>> = [];
+    if (bild) warten.push(this.loadCustomFace(runtime, bild, "front"));
+    if (hinten) warten.push(this.loadCustomFace(runtime, hinten, "back"));
+    if (ruecken) warten.push(this.loadCustomFace(runtime, ruecken, "spine"));
+    return Promise.all(warten).then(() => undefined);
   }
 
   /**

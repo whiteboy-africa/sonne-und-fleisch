@@ -17,11 +17,10 @@
 // aufgeschlagene Doppelseite herum und gibt den Rest wieder frei; eine
 // zweite Groesse waere ein zweiter Satz Dateien, den nie jemand sieht.
 //
-// Dazu faellt die Datei ab, auf die die Zeile „PDF herunterladen" zeigt:
-// dieselben 24 Seiten, aus denselben Rastern, als PDF. Nicht die
-// Druckdatei — die hat 125 MB und 76 Seiten, und wer sie anklickt, laedt
-// eine Viertelstunde. Was man herunterlaedt, ist genau das, was man
-// geblaettert hat.
+// **Kein PDF.** Hier fiel einmal eine Datei zum Herunterladen ab. Das Heft
+// ist zum Blaettern da; wer eine Datei mitnimmt, hat es nicht gelesen,
+// sondern kopiert. Der Weg dorthin steht noch in
+// `scripts/pdf-aus-bildern.mjs`, falls er je wieder gebraucht wird.
 
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, rmSync, mkdirSync, readdirSync, existsSync } from 'node:fs';
@@ -30,7 +29,6 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { pdfAusJpegs } from './pdf-aus-bildern.mjs';
 
 const wurzel = path.resolve(fileURLToPath(import.meta.url), '..', '..');
 
@@ -38,8 +36,6 @@ const wurzel = path.resolve(fileURLToPath(import.meta.url), '..', '..');
 const quelle = path.join(wurzel, 'content', 'magazin.pdf');
 /** Wohin die Seiten kommen. Wird vorher geleert. */
 const ziel = path.join(wurzel, 'public', 'magazin', 'pages');
-/** Und die Datei hinter „PDF herunterladen". */
-const zielPdf = path.join(wurzel, 'public', 'magazin', 'magazin.pdf');
 
 /**
  * So viele Seiten. Das Heft im Regal ist eine Leseprobe, kein Archiv —
@@ -50,17 +46,6 @@ const seiten = 24;
 const kante = 2048;
 /** Guete des WebP. */
 const guete = 80;
-/**
- * Guete der JPEG im Download-PDF. Etwas hoeher als beim WebP: JPEG haelt
- * bei gleicher Zahl weniger, und dies ist die Datei, die jemand aufhebt.
- */
-const guetePdf = 84;
-/**
- * Aufloesung, mit der die Seiten im PDF stehen. 1392 Bildpunkte auf 220 dpi
- * ergeben die 6,3 Zoll Breite, die die Seite im Druck hat — wer es
- * ausdruckt, bekommt das Format des Heftes und keine Briefmarke.
- */
-const dpiPdf = 220;
 /** Ab hier wird gewarnt: so viel laedt niemand mehr auf dem Telefon. */
 const warnAb = 25 * 1024 * 1024;
 
@@ -116,30 +101,19 @@ try {
 
   let gesamt = 0;
   let masse = '';
-  const jpegs = [];
   for (const name of pngs) {
-    const roher = await readFile(path.join(roh, name));
     const aus = path.join(ziel, name.replace(/\.png$/, '.webp'));
-    const ergebnis = await sharp(roher)
+    const ergebnis = await sharp(await readFile(path.join(roh, name)))
       .webp({ quality: guete, effort: 6 })
       .toFile(aus);
     gesamt += ergebnis.size;
     masse = `${ergebnis.width}x${ergebnis.height}`;
-    jpegs.push(
-      await sharp(roher).jpeg({ quality: guetePdf, mozjpeg: true }).toBuffer(),
-    );
   }
-
-  const pdfGroesse = await pdfAusJpegs(jpegs, zielPdf, dpiPdf);
 
   const mb = (gesamt / 1048576).toFixed(1);
   console.log(
     `${pngs.length} Seiten von ${imHeft} nach ${path.relative(wurzel, ziel)}/ — ` +
       `${masse}, WebP q${guete}, zusammen ${mb} MB`,
-  );
-  console.log(
-    `${path.relative(wurzel, zielPdf)} — dieselben Seiten, JPEG q${guetePdf} ` +
-      `bei ${dpiPdf} dpi, ${(pdfGroesse / 1048576).toFixed(1)} MB`,
   );
 
   if (gesamt > warnAb) {

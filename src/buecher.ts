@@ -224,7 +224,6 @@ export function alsKatalogBuch(
           magazine: {
             pages: d.magazin.seiten,
             folder: d.magazin.ordner,
-            pdf: d.magazin.pdf,
           },
         }
       : {}),

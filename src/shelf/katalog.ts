@@ -145,8 +145,6 @@ export type MagazineData = {
   pages: number;
   /** Darunter liegen `0001.webp` aufwaerts. */
   folder: string;
-  /** Wohin die zweite der beiden Zeilen unter dem Heft fuehrt. */
-  pdf: string;
 };
 
 export type BookBackFace = {
