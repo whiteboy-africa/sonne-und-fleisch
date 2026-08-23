@@ -1,121 +1,103 @@
-// Das Heft als Gegenstand: zwei Papierbloecke und ein paar lebende
-// Blaetter dazwischen.
+// Das Heft als Gegenstand: zwoelf Blaetter, jedes mit Dicke, alle lebendig.
 //
-// Ein Heft mit vierundzwanzig Seiten hat zwoelf Blaetter. Alle zwoelf als
-// gebeugte Netze mit je einer Knochenkette und zwei Texturen zu tragen,
-// waere Verschwendung: zu sehen sind immer nur die paar um die
-// aufgeschlagene Doppelseite herum. Alles andere ist ein Papierstapel, und
-// ein Papierstapel ist ein Quader.
+// Vorher standen hier zwei Papierbloecke und ein Fenster von fuenf lebenden
+// Blaettern dazwischen. Das war sparsam und sah danach aus: zwei Quader
+// lassen sich nicht faechern, nicht woelben und nicht umblaettern, und wo
+// ein Blatt sich vom Block abhob, schaute cremefarbenes Papier hervor.
 //
-// Deshalb drei Teile:
+// Jetzt lebt jedes Blatt. Ein Heft mit vierundzwanzig Seiten hat zwoelf —
+// das sind zwoelf gebeugte Netze, und die kosten weniger, als sie
+// aussehen: eine Knochenkette ist Rechenarbeit, keine Zeichenarbeit.
 //
-// - **Zwei Bloecke**, links und rechts vom Bund. Sie tragen die Dicke und
-//   den Papierschnitt und wachsen beim Blaettern ineinander ueber. Zwei
-//   Quader, keine Textur, zwei Zeichenaufrufe.
-// - **Ein lebendes Fenster** von fuenf Blaettern um die Doppelseite herum:
-//   das eine, das gerade umschlaegt, und zwei zu jeder Seite. Nur diese
-//   fuenf sind gebeugte Netze, nur sie tragen Bilder.
-// - **Ein Vorrat an Texturen**, der mit dem Fenster wandert. Was aus dem
-//   Fenster faellt, wird freigegeben. Wer das Heft von vorn bis hinten
-//   durchblaettert, haelt am Ende nicht mehr Speicher als am Anfang.
-//
-// Die Blattmechanik selbst kommt aus `seiten-rig.ts` und ist dieselbe wie
-// beim aufgeschlagenen Band. Verschieden ist nur, wer die Haltung vorgibt:
-// dort ein Fahrplan, hier die Hand.
+// **Die Bilder bleiben im Fenster.** Was nicht lebt, ist die Textur, nicht
+// das Blatt: nur die Seiten um die aufgeschlagene Doppelseite herum tragen
+// ihr Bild, alle anderen stehen in Papierfarbe da. Vierundzwanzig Seiten zu
+// je 1374 x 2048 waeren im Speicher eine Viertelmilliarde Byte — das killt
+// Telefone, und zu sehen waeren sie ohnehin nur als Kante.
 //
 // **Seitenzaehlung.** Blatt k traegt vorn die Seite 2k+1 und hinten die
 // Seite 2k+2 — Blatt 0 also den Umschlag und die zweite Seite. Der Stand
 // `stelle` ist die Zahl der umgeschlagenen Blaetter: bei 0 ist das Heft zu
 // und der Umschlag vorn, bei 1 steht die Doppelseite 2|3, bei k die
 // Doppelseite 2k|2k+1.
+//
+// Die Blattmechanik selbst kommt aus `seiten-rig.ts` und ist dieselbe wie
+// beim aufgeschlagenen Band. Verschieden ist nur, wer die Haltung vorgibt:
+// dort ein Fahrplan, hier die Hand.
 
 import * as THREE from 'three';
 import { damp, seitenRigBauen, type SeitenRig } from './seiten-rig';
 
 export const magazinForm = {
   /**
-   * So viele Blaetter leben gleichzeitig: das umschlagende und zwei zu
-   * jeder Seite. Weniger, und beim schnellen Blaettern taucht ein Blatt aus
-   * dem Nichts auf; mehr kostet Texturen, die niemand ansieht.
+   * So viele Blaetter zu jeder Seite tragen ihr Bild. Alle anderen leben
+   * zwar, stehen aber in Papierfarbe — als Kante sieht man ihnen das nicht
+   * an.
    */
-  fenster: 2,
-  /** Segmente laengs der Wendeachse. Etwas feiner als beim Band: das Heft
-   *  steht nah an der Kamera, und dort sieht man jede Kante. */
-  segmente: 30,
+  fenster: 3,
+  /** Segmente laengs der Wendeachse. */
+  segmente: 26,
   /** Dicke eines Blattes in Szeneneinheiten. */
-  blattDicke: 0.0016,
+  blattDicke: 0.0022,
   /**
-   * Wie stark sich ein Blatt in der Mitte der Drehung woelbt, wenn nichts
-   * daran zieht. Etwas weniger als beim Band — Heftpapier ist steifer als
-   * ein Buchblatt und wirft einen flacheren Bogen.
+   * **Wie weit das Heft aufgeht.** Nicht flach.
+   *
+   * Ein aufgeschlagenes Heft, das man in der Hand haelt, liegt nicht in
+   * einer Ebene: die beiden Haelften stehen in einem stumpfen Winkel
+   * zueinander, der Bund ist ein Tal. Bei 180 Grad ist es eine Tafel mit
+   * einem Strich in der Mitte — genau das sah billig aus, und kein Glanz
+   * und keine Woelbung hat es gerettet.
    */
+  oeffnung: THREE.MathUtils.degToRad(19),
+  /**
+   * Wie weit jedes folgende Blatt ueber seine Ruhelage hinaus aufsteht.
+   * Ein Stapel Blaetter liegt nicht deckungsgleich — er faechert.
+   *
+   * Das geht erst, seit jedes Blatt seine eigene Dicke hat und im Stapel
+   * seine eigene Hoehe: solange fuenf Blaetter dicht uebereinander lagen,
+   * hob ein Grad die Aussenkante um ein Vielfaches ihres Abstands, und das
+   * Blatt darunter kam oben durch.
+   */
+  faecher: THREE.MathUtils.degToRad(0.9),
+  /** Wie stark sich ein Blatt in der Mitte der Drehung woelbt. */
   bogen: 0.62,
   /** Wie viel Woelbung eine gezogene Ecke hoechstens dazulegt. */
   bogenZug: 0.55,
   /**
    * **Die Woelbung im Stillstand.** Ein aufgeschlagenes Heft liegt nicht
    * flach da: die Seiten stehen unter Spannung, ihre Aussenkanten heben
-   * sich vom Bund weg. Ohne das ist die Doppelseite ein Scan auf einer
-   * Tafel — der Gegenstand verschwindet, und uebrig bleibt ein Betrachter.
+   * sich vom Bund weg.
    *
    * Sie folgt einem Kosinus ueber den Stand des Blattes: voll auf der einen
    * Ruhelage, null in der Senkrechten, voll und andersherum auf der
    * anderen. So kippt sie mitten im Umschlagen nicht um, sondern geht durch
    * null — genau dort, wo die Woelbung aus der Bewegung ihr Groesstes hat.
-   * Das Vorzeichen ist gegenlaeufig zum Umschlagbogen, und das muss es
-   * sein: die Aussenkanten sollen dem Betrachter entgegenkommen. Andersherum
-   * tauchen sie hinter die Papierbloecke, und dann liegen zwei cremefarbene
-   * Platten ueber der halben Doppelseite.
    */
   ruheBogen: -0.22,
-  /**
-   * Der Faecher — **aus**, und zwar aus einem geometrischen Grund.
-   *
-   * In der Vorlage stehen die Seiten bei plus/minus neunzig Grad, also
-   * aufrecht in einem V; ein Grad mehr oeffnet dort bloss das V ein Stueck
-   * weiter. Hier liegen sie flach uebereinander, und ein Grad hebt die
-   * Aussenkante um `breite * sin(1 Grad)` — das ist das Dreissigfache des
-   * Abstands zweier Blaetter. Das Blatt darunter kommt oben durch.
-   *
-   * Wer den Faecher will, muss vorher die Blaetter weiter auseinanderlegen.
-   */
-  faecher: 0,
   /** Daempfung im Lauf. */
   lambda: 13,
   /** Und beim Schnappen, wenn die Ecke losgelassen wird. */
   lambdaSchnapp: 22,
+  /** Papierton des Heftes — heller als der Buchblock, es ist Neupapier. */
+  papier: '#ded9cc',
+  /** Der Schnitt an den Blattkanten. */
+  schnitt: '#cfc9b8',
   /**
    * Der Glanz des Papiers. Ein Heft ist auf gestrichenem Papier gedruckt,
    * und gestrichenes Papier hat einen Schimmer — genau der macht aus einer
-   * gedrehten Flaeche einen Gegenstand: das Licht wandert darueber, waehrend
-   * das Heft sich bewegt. Mit der matten Rauheit von vorher (0,95) blieb
-   * jede Seite gleich hell, egal wie man sie hielt, und das las sich wie
-   * ein aufgeklebter Scan.
+   * gedrehten Flaeche einen Gegenstand: das Licht wandert darueber,
+   * waehrend das Heft sich bewegt.
    */
   rauheit: 0.58,
   lack: 0.34,
   lackRauheit: 0.3,
   /**
-   * Wie stark das Papier seine Umgebung aufnimmt.
-   *
-   * Ohne Umgebung spiegelt Lack einen schwarzen Raum — also nichts, und
-   * die Seite bleibt eine flache Flaeche mit einem Bild darauf. Das war
-   * der ganze Unterschied zur Vorlage: dort steht das Heft in einem
-   * gelichteten Raum, hier in einem leeren. Das Regal bleibt davon
-   * unberuehrt — die Umgebung haengt in den Materialien des Heftes, nicht
-   * in der Szene.
-   *
-   * Sparsam: eine Umgebung liefert nicht nur Glanz, sondern auch
-   * Grundlicht. Bei 0,85 hob sie die Schwaerzen an, das Papier wurde
-   * milchig und der Satz verlor seinen Kontrast — aus einer gedruckten
-   * Seite wurde eine graue Flaeche. Gebraucht wird hier nur, dass der Lack
-   * etwas zu spiegeln hat.
+   * Wie stark das Papier seine Umgebung aufnimmt. Sparsam: eine Umgebung
+   * liefert nicht nur Glanz, sondern auch Grundlicht, und zu viel davon
+   * hebt die Schwaerzen — aus einer gedruckten Seite wird eine graue
+   * Flaeche.
    */
   umgebung: 0.12,
-  /** Papierton des Heftes — heller als der Buchblock, es ist Neupapier. */
-  papier: '#ded9cc',
-  /** Der Schnitt an den Blockkanten. */
-  schnitt: '#cfc9b8',
 } as const;
 
 /** Der Stand des Heftes, Bild fuer Bild. */
@@ -125,8 +107,7 @@ export type MagazinStand = {
   /**
    * Das Blatt, das gerade in der Hand liegt. `anteil` ist sein Stand
    * zwischen den beiden Ruhelagen, `bogen` die Woelbung, die die Hand ihm
-   * gibt. Ohne Zug ist das `null`, und alle Blaetter liegen in ihrer
-   * Ruhelage.
+   * gibt. Ohne Zug ist das `null`.
    */
   zug: { blatt: number; anteil: number; bogen: number } | null;
   /**
@@ -149,8 +130,8 @@ export type MagazinRig = {
   /** Wie viele Seitenbilder gerade im Speicher liegen. */
   texturen: () => number;
   /**
-   * Der Stand jedes lebenden Blattes, 0 bis 1. Steht in der Diagnose, weil
-   * sich sonst nicht pruefen laesst, **ob** ein Blatt umschlaegt oder bloss
+   * Der Stand jedes Blattes, 0 bis 1. Steht in der Diagnose, weil sich
+   * sonst nicht pruefen laesst, **ob** ein Blatt umschlaegt oder bloss
    * springt — im Bild sieht beides nach einem Bild aus.
    */
   staende: () => Array<{ blatt: number; anteil: number }>;
@@ -167,13 +148,8 @@ export function magazinRigBauen(werte: {
   seiten: number;
   ordner: string;
   anisotropie: number;
-  /**
-   * Die Umgebung, die das Papier spiegelt. Ohne sie glaenzt der Lack ins
-   * Schwarze und man sieht ihn nicht.
-   */
+  /** Die Umgebung, die das Papier spiegelt. */
   umgebung: THREE.Texture | null;
-  /** Wird gerufen, sobald das erste Seitenpaar wirklich da ist. */
-  bereit?: () => void;
 }): MagazinRig {
   const { breite, hoehe, seiten, ordner } = werte;
   const blaetter = Math.ceil(seiten / 2);
@@ -188,20 +164,17 @@ export function magazinRigBauen(werte: {
     return stueck;
   };
 
-  // --- Die beiden Bloecke ---------------------------------------------------
-  //
-  // Sie tragen die Dicke des Heftes und seinen Papierschnitt. Ein Quader je
-  // Seite, in der Tiefe skaliert: das ist der ganze Rest des Heftes.
   /*
-   * Der Papierschnitt. Nicht eine Flaeche in einer Farbe, sondern feine
-   * Linien: ein Buchblock ist ein Stapel Blaetter, und man sieht ihm das
-   * an der Kante an. Eine glatte Flaeche liest sich als Plastik.
+   * Der Papierschnitt an den Blattkanten. Nicht eine Flaeche in einer
+   * Farbe, sondern feine Linien: ein Buchblock ist ein Stapel Blaetter, und
+   * man sieht ihm das an der Kante an. Eine glatte Flaeche liest sich als
+   * Plastik.
    */
   const schnittBild = merken(schnittTextur());
   schnittBild.wrapS = THREE.RepeatWrapping;
   schnittBild.wrapT = THREE.RepeatWrapping;
   schnittBild.anisotropy = werte.anisotropie;
-  const blockStoff = merken(
+  const kantenStoff = merken(
     new THREE.MeshStandardMaterial({
       color: magazinForm.schnitt,
       map: schnittBild,
@@ -211,83 +184,41 @@ export function magazinRigBauen(werte: {
       envMapIntensity: magazinForm.umgebung * 0.6,
     }),
   );
-  const deckStoff = merken(
-    new THREE.MeshStandardMaterial({
-      color: magazinForm.papier,
-      roughness: 0.95,
-      metalness: 0,
-      envMap: werte.umgebung ?? null,
-      envMapIntensity: magazinForm.umgebung * 0.5,
-    }),
-  );
-  // Der Quader waechst vom Bund nach aussen und von z = 0 nach hinten;
-  // skaliert wird nur in der Tiefe.
-  /*
-   * Etwas kleiner als ein Blatt. Eine gewoelbte Seite hebt sich vom Block
-   * ab, und ein Quader in voller Groesse schaut dann ringsum darunter
-   * hervor — ein cremefarbener Rand um eine Seite, die keinen hat.
-   */
-  const blockForm = merken(
-    new THREE.BoxGeometry(breite * 0.985, hoehe * 0.985, 1),
-  );
-  blockForm.translate(breite * 0.985 * 0.5, 0, -0.5);
 
-  const bloecke = [0, 1].map((seite) => {
-    // Die Deckflaeche bekommt Papier, die vier Kanten den Schnitt.
-    const netz = new THREE.Mesh(blockForm, [
-      blockStoff,
-      blockStoff,
-      blockStoff,
-      blockStoff,
-      deckStoff,
-      deckStoff,
-    ]);
-    netz.name = seite === 0 ? 'block-links' : 'block-rechts';
-    // Links wird gespiegelt statt gedreht: so bleibt der Bund bei x = 0.
-    if (seite === 0) netz.scale.x = -1;
-    gruppe.add(netz);
-    return netz;
-  });
-  const [blockLinks, blockRechts] = bloecke;
-
-  // --- Das lebende Fenster --------------------------------------------------
-  const imFenster = magazinForm.fenster * 2 + 1;
-  /** Vorderseiten der Blaetter im Fenster (ungerade Seiten). */
+  /** Vorderseiten der Blaetter (ungerade Seiten). */
   const stoffeVorn: THREE.MeshPhysicalMaterial[] = [];
   /** Rueckseiten (gerade Seiten). */
   const stoffeHinten: THREE.MeshPhysicalMaterial[] = [];
 
-  for (let i = 0; i < imFenster; i += 1) {
-    /*
-     * **Beide Seiten `FrontSide`.** Ein Blatt mit Dicke ist ein Quader, und
-     * bei einem Quader zeigt jede Flaeche nach aussen: die Rueckseite hat
-     * ihre eigene, nach hinten gerichtete Normale. Ein `BackSide`-Material
-     * darauf wird weggeschnitten, sobald das Blatt umgeschlagen ist und
-     * diese Flaeche zur Kamera zeigt — dann steht dort nichts als Papier.
-     * (Ohne Dicke war es umgekehrt richtig: eine Ebene hat nur eine Seite,
-     * und die zweite bekommt man nur ueber `BackSide`.)
-     */
-    const gestrichen = (seite: THREE.Side) =>
-      merken(
-        new THREE.MeshPhysicalMaterial({
-          color: magazinForm.papier,
-          roughness: magazinForm.rauheit,
-          metalness: 0,
-          clearcoat: magazinForm.lack,
-          clearcoatRoughness: magazinForm.lackRauheit,
-          envMap: werte.umgebung ?? null,
-          envMapIntensity: magazinForm.umgebung,
-          side: seite,
-        }),
-      );
-    stoffeVorn.push(gestrichen(THREE.FrontSide));
-    stoffeHinten.push(gestrichen(THREE.FrontSide));
+  /*
+   * **Beide Seiten `FrontSide`.** Ein Blatt mit Dicke ist ein Quader, und
+   * bei einem Quader zeigt jede Flaeche nach aussen: die Rueckseite hat
+   * ihre eigene, nach hinten gerichtete Normale. Ein `BackSide`-Material
+   * darauf wird weggeschnitten, sobald das Blatt umgeschlagen ist und diese
+   * Flaeche zur Kamera zeigt — dann steht dort nichts als Papier.
+   */
+  const gestrichen = () =>
+    merken(
+      new THREE.MeshPhysicalMaterial({
+        color: magazinForm.papier,
+        roughness: magazinForm.rauheit,
+        metalness: 0,
+        clearcoat: magazinForm.lack,
+        clearcoatRoughness: magazinForm.lackRauheit,
+        envMap: werte.umgebung ?? null,
+        envMapIntensity: magazinForm.umgebung,
+        side: THREE.FrontSide,
+      }),
+    );
+  for (let i = 0; i < blaetter; i += 1) {
+    stoffeVorn.push(gestrichen());
+    stoffeHinten.push(gestrichen());
   }
 
   const rig: SeitenRig = seitenRigBauen({
     breite,
     hoehe,
-    blaetter: imFenster,
+    blaetter,
     z: 0,
     blattAbstand: 0,
     // Der Bund liegt im Ursprung: an ihm haengt die ganze Doppelseite, und
@@ -296,11 +227,10 @@ export function magazinRigBauen(werte: {
     seite: 1,
     // Ein Blatt hat Dicke, und an seiner Kante sieht man das Papier.
     tiefe: dicke,
-    kante: blockStoff,
+    kante: kantenStoff,
     form: {
       segmente: magazinForm.segmente,
       lambda: magazinForm.lambda,
-      // Das Heft ist in jeder Lage gewoelbt, nicht nur unterwegs.
       verteilt: true,
     },
     stoff: (i) => [stoffeVorn[i], stoffeHinten[i]],
@@ -310,143 +240,88 @@ export function magazinRigBauen(werte: {
   // --- Der Texturvorrat -----------------------------------------------------
   const lader = new THREE.TextureLoader();
   const vorrat = new Map<number, THREE.Texture>();
-  let ersteGemeldet = false;
 
-  /**
-   * Holt die Textur einer Seite. Gerade Seiten liegen auf der **Rueckseite**
-   * eines Blattes: von hinten gesehen ist eine Ebene seitenverkehrt, also
-   * wird ihre Textur waagerecht gespiegelt. Sonst stuende jede linke Seite
-   * im Spiegel.
-   */
   function seitenTextur(nummer: number): THREE.Texture | null {
     if (nummer < 1 || nummer > seiten) return null;
     const da = vorrat.get(nummer);
     if (da) return da;
     const pfad = `${ordner}/${String(nummer).padStart(4, '0')}.webp`;
-    const textur = lader.load(pfad, () => {
-      if (ersteGemeldet) return;
-      ersteGemeldet = true;
-      werte.bereit?.();
-    });
+    const textur = lader.load(pfad);
     textur.colorSpace = THREE.SRGBColorSpace;
     textur.anisotropy = werte.anisotropie;
     textur.generateMipmaps = true;
     textur.minFilter = THREE.LinearMipmapLinearFilter;
-    // Frueher wurde die Rueckseite hier gespiegelt: eine **Ebene** ist von
-    // hinten gesehen seitenverkehrt. Ein Blatt mit Dicke ist keine Ebene —
-    // der Quader bringt fuer seine Rueckflaeche eigene, schon richtige
-    // Koordinaten mit. Wer hier doch spiegelt, liest die linke Seite im
-    // Spiegel.
     vorrat.set(nummer, textur);
     return textur;
   }
 
-  /** Welches Heftblatt liegt gerade in welchem Fensterplatz? */
   let fensterVon = Number.NaN;
 
   /**
-   * Schiebt das Fenster auf `stelle` und gibt frei, was herausgefallen ist.
-   *
-   * Gebraucht werden die Blaetter `stelle - fenster` bis `stelle + fenster`;
-   * alles darueber hinaus ist Block. Der Vorrat traegt danach hoechstens
-   * zwei Bilder je lebendem Blatt — bei fuenf Blaettern also zehn, egal wie
-   * dick das Heft ist.
+   * Schiebt das Bilderfenster auf `stelle` und gibt frei, was herausgefallen
+   * ist. Die Blaetter selbst bleiben, wo sie sind — nur ihre Bilder wandern.
    */
-  function fensterSetzen(stelle: number): boolean {
+  function fensterSetzen(stelle: number) {
     const von = stelle - magazinForm.fenster;
-    if (von === fensterVon) return false;
+    if (von === fensterVon) return;
     fensterVon = von;
 
     const gebraucht = new Set<number>();
-    for (let platz = 0; platz < imFenster; platz += 1) {
-      const blatt = von + platz;
+    for (let blatt = 0; blatt < blaetter; blatt += 1) {
+      const im = blatt >= von && blatt < von + magazinForm.fenster * 2 + 1;
       const vorn = blatt * 2 + 1;
       const hinten = blatt * 2 + 2;
-      const gueltig = blatt >= 0 && blatt < blaetter;
-      const texturVorn = gueltig ? seitenTextur(vorn) : null;
-      const texturHinten = gueltig ? seitenTextur(hinten) : null;
+      const texturVorn = im ? seitenTextur(vorn) : null;
+      const texturHinten = im ? seitenTextur(hinten) : null;
       if (texturVorn) gebraucht.add(vorn);
       if (texturHinten) gebraucht.add(hinten);
-      stoffeVorn[platz].map = texturVorn;
-      stoffeVorn[platz].needsUpdate = true;
-      stoffeHinten[platz].map = texturHinten;
-      stoffeHinten[platz].needsUpdate = true;
-      rig.blaetter[platz].netz.visible = gueltig;
+      if (stoffeVorn[blatt].map !== texturVorn) {
+        stoffeVorn[blatt].map = texturVorn;
+        stoffeVorn[blatt].needsUpdate = true;
+      }
+      if (stoffeHinten[blatt].map !== texturHinten) {
+        stoffeHinten[blatt].map = texturHinten;
+        stoffeHinten[blatt].needsUpdate = true;
+      }
     }
 
-    // Was aus dem Fenster gefallen ist, wird freigegeben. Das ist die
-    // ganze Zusage „der Speicher bleibt flach": ohne diese vier Zeilen
-    // haelt ein Durchblaettern am Ende alle Seiten.
     for (const [nummer, textur] of vorrat) {
       if (gebraucht.has(nummer)) continue;
       textur.dispose();
       vorrat.delete(nummer);
     }
-    return true;
   }
 
   // --- Der Stand ------------------------------------------------------------
   //
-  // Zwei Dinge muessen hier auseinandergehalten werden, und das Vermischen
-  // war ein Fehler, den man erst im Bild sah: **der Stand gehoert dem
-  // Blatt, nicht dem Fensterplatz.**
-  //
-  // Beim Blaettern wandert das Fenster um eins weiter. Haengt der Stand am
-  // Platz, wechselt in jedem Platz das Blatt, jeder Platz gilt als „neu"
-  // und wird auf sein Ziel gesetzt — das Blatt, das gerade umschlagen
-  // sollte, steht im selben Bild schon drueben. Es dreht sich nie, es
-  // springt. Haengt der Stand am Blatt, laeuft es weiter, waehrend das
-  // Fenster unter ihm durchrutscht.
-  //
-  // Die **Knochen** dagegen gehoeren dem Platz: sie stecken im Netz, und
-  // das Netz bleibt liegen, wo es liegt. Rutscht ein anderes Blatt in einen
-  // Platz, werden sie deshalb einmal hart gesetzt statt gedaempft — sonst
-  // fuehre das neue Blatt aus der Haltung des alten heraus.
-  //
-  // Aus demselben Grund wird die **Woelbung** aus dem laufenden Stand
-  // gerechnet und nicht aus dem Ziel: aus dem Ziel waere sie im selben
-  // Bild, in dem der Befehl kommt, schon wieder null, und das Blatt drehte
-  // sich starr wie eine Klappe.
-  const staende = new Map<number, number>();
-  /** Welches Heftblatt lag zuletzt in welchem Fensterplatz? */
-  const belegt = new Array<number>(imFenster).fill(Number.NaN);
+  // Der Stand gehoert dem Blatt: jedes traegt seinen eigenen, gedaempft.
+  // Daraus wird auch die **Woelbung** gerechnet und nicht aus dem Ziel — aus
+  // dem Ziel waere sie im selben Bild, in dem der Befehl kommt, schon wieder
+  // null, und das Blatt drehte sich starr wie eine Klappe.
+  const staende = new Array<number>(blaetter).fill(0);
+  let ersterLauf = true;
 
   function setzen(stand: MagazinStand, delta: number) {
     const stelle = THREE.MathUtils.clamp(stand.stelle, 0, blaetter);
     fensterSetzen(stelle);
 
-    // Ein harter Wechsel ist ein sehr grosser Zeitschritt: die Daempfung
-    // erreicht ihr Ziel in einem Bild, und die Woelbung faellt weg.
     const schritt = stand.ohneBewegung ? 1 : delta;
     const lambda = stand.schnapp
       ? magazinForm.lambdaSchnapp
       : magazinForm.lambda;
 
-    const von = stelle - magazinForm.fenster;
-    for (let platz = 0; platz < imFenster; platz += 1) {
-      const blatt = von + platz;
-      if (blatt < 0 || blatt >= blaetter) {
-        belegt[platz] = Number.NaN;
-        continue;
-      }
-
+    for (let blatt = 0; blatt < blaetter; blatt += 1) {
       const gezogen = stand.zug?.blatt === blatt ? stand.zug : null;
-      // Ruhelage: alles vor dem Stand ist umgeschlagen, alles ab dem Stand
-      // liegt noch rechts.
       const ziel = gezogen ? gezogen.anteil : blatt < stelle ? 1 : 0;
 
       let anteil: number;
-      if (gezogen || stand.ohneBewegung) {
+      if (gezogen || stand.ohneBewegung || ersterLauf) {
         anteil = ziel;
       } else {
-        const vorher = staende.get(blatt);
-        anteil =
-          vorher === undefined ? ziel : damp(vorher, ziel, lambda, schritt);
+        anteil = damp(staende[blatt], ziel, lambda, schritt);
       }
-      staende.set(blatt, anteil);
+      staende[blatt] = anteil;
 
-      // Die Woelbung: was im Stillstand da ist, plus was die Bewegung oder
-      // die Hand dazulegt.
       const ruhe = magazinForm.ruheBogen * Math.cos(Math.PI * anteil);
       const bogen = stand.ohneBewegung
         ? ruhe
@@ -455,66 +330,33 @@ export function magazinRigBauen(werte: {
             ? gezogen.bogen
             : rig.bogenAusZeit(anteil, magazinForm.bogen));
 
-      // Ist gerade ein anderes Blatt in diesen Platz gerutscht, werden die
-      // Knochen hart gesetzt: sie tragen sonst noch die Haltung des
-      // Vorgaengers und fuehren sichtbar aus ihr heraus.
-      const gewechselt = belegt[platz] !== blatt;
-      belegt[platz] = blatt;
-      // Der Faecher: jedes Blatt steht ein Grad weiter offen als das
-      // darunter. Nach der Seite, auf der es liegt — links andersherum.
-      const abstand = anteil >= 0.5 ? stelle - 1 - blatt : blatt - stelle;
-      const faecher =
-        magazinForm.faecher * Math.max(0, abstand) * (anteil >= 0.5 ? -1 : 1);
+      /*
+       * Die Ruhelage ist nicht flach.
+       *
+       * Ein aufgeschlagenes Heft steht in einem stumpfen Winkel: der Bund
+       * ist ein Tal, die beiden Haelften lehnen sich zurueck. Dazu der
+       * Faecher — jedes Blatt steht ein Stueck weiter offen als das
+       * darunter, sonst sind zwoelf Blaetter eine Platte.
+       */
+      const links = anteil >= 0.5;
+      const rang = Math.max(0, links ? stelle - 1 - blatt : blatt - stelle);
+      const offen = magazinForm.oeffnung + magazinForm.faecher * rang;
+      const faecher = links ? -offen : offen;
 
-      rig.haltungSetzen(
-        platz,
-        { anteil, bogen, faecher },
-        gewechselt ? 1 : schritt,
-      );
+      rig.haltungSetzen(blatt, { anteil, bogen, faecher }, schritt);
 
-      // --- Wer liegt ueber wem -------------------------------------------
-      //
-      // Eine einzige Reihenfolge ueber alle Blaetter geht nicht, denn die
-      // beiden Seiten sind gegenlaeufig gestapelt: **rechts** liegt das
-      // naechste Blatt obenauf und die spaeteren darunter; **links** liegt
-      // das zuletzt umgeschlagene obenauf und die frueheren darunter. Wer
-      // beides mit derselben Ordnung bedient, versteckt links das oberste
-      // Blatt unter seinem Vorgaenger — und dann steht auf der linken Seite
-      // eine Seite zu frueh.
-      //
-      // Also zaehlt jede Seite ihren Abstand von ihrer **eigenen** Spitze,
-      // und wer gerade umschlaegt, liegt ueber allem: er gehoert in diesem
-      // Augenblick zu keiner von beiden.
-      const oben =
-        Math.max(stelle, blaetter - stelle) * dicke + imFenster * dicke;
+      /*
+       * Und die Hoehe im Stapel. Von der aufgeschlagenen Stelle aus
+       * gerechnet: was schon umgeschlagen ist, liegt darueber, was noch
+       * kommt, darunter. Ein Blatt in Bewegung liegt ueber allem — es
+       * gehoert in diesem Augenblick zu keiner von beiden Haelften.
+       */
       const inBewegung = anteil > 0.002 && anteil < 0.998;
-      const rang = Math.max(
-        0,
-        anteil >= 0.5 ? stelle - 1 - blatt : blatt - stelle,
-      );
-      // Anderthalbfache Dicke Abstand: zwei Quader, die sich genau
-      // beruehren, streiten sich um dieselben Bildpunkte, und dann blitzt
-      // die Seite darunter durch die obere.
-      rig.blaetter[platz].netz.position.z = inBewegung
-        ? oben + dicke * 2
-        : oben - rang * dicke * 1.6;
+      rig.blaetter[blatt].netz.position.z = inBewegung
+        ? (stelle + 1.5) * dicke
+        : (stelle - blatt) * dicke;
     }
-
-    // Was aus dem Fenster gefallen ist, braucht keinen Stand mehr.
-    for (const blatt of staende.keys()) {
-      if (blatt < von || blatt >= von + imFenster) staende.delete(blatt);
-    }
-
-    // Die Bloecke: links so dick wie das Geblaetterte, rechts wie der Rest.
-    // Bei zugeschlagenem Heft ist links nichts, und der Quader verschwindet.
-    const linksDick = Math.max(stelle * dicke, 0.0001);
-    const rechtsDick = Math.max((blaetter - stelle) * dicke, 0.0001);
-    blockLinks.visible = stelle > 0;
-    blockRechts.visible = stelle < blaetter;
-    blockLinks.scale.z = linksDick;
-    blockLinks.position.z = linksDick;
-    blockRechts.scale.z = rechtsDick;
-    blockRechts.position.z = rechtsDick;
+    ersterLauf = false;
   }
 
   function entsorgen() {
@@ -522,7 +364,6 @@ export function magazinRigBauen(werte: {
     gruppe.removeFromParent();
     vorrat.forEach((textur) => textur.dispose());
     vorrat.clear();
-    staende.clear();
     muell.forEach((stueck) => stueck.dispose());
     muell.length = 0;
   }
@@ -538,12 +379,10 @@ export function magazinRigBauen(werte: {
     setzen,
     texturen: () => vorrat.size,
     staende: () =>
-      [...staende.entries()]
-        .sort((a, b) => a[0] - b[0])
-        .map(([blatt, anteil]) => ({
-          blatt,
-          anteil: Number(anteil.toFixed(3)),
-        })),
+      staende.map((anteil, blatt) => ({
+        blatt,
+        anteil: Number(anteil.toFixed(3)),
+      })),
     entsorgen,
   };
 }
