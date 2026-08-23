@@ -408,8 +408,8 @@ const heftDeckelAb = 0.42;
  * ueber ihm fuer die Luft, die ein Gegenstand braucht, um ein Gegenstand zu
  * sein. Bei 0,86 lagen die Zeilen auf der Seite.
  */
-const heftFuellungHoehe = 0.78;
-const heftFuellungBreite = 0.9;
+const heftFuellungHoehe = 0.62;
+const heftFuellungBreite = 0.74;
 /** Auf dem Telefon steht eine Seite allein und darf breiter stehen. */
 const heftFuellungEinzeln = 0.9;
 /**
@@ -431,6 +431,27 @@ const heftSchnappen = 0.3;
  */
 const heftKippen = THREE.MathUtils.degToRad(-15);
 const heftDrehen = THREE.MathUtils.degToRad(9);
+/*
+ * Das Schweben. Ein Gegenstand, der vollkommen stillsteht, ist ein Bild
+ * von einem Gegenstand — erst die Bewegung macht ihn zu einem. Zwei
+ * Sinuskurven mit ungleichen Perioden, damit sich das Muster nicht hoerbar
+ * wiederholt, dazu ein Heben und Senken. Klein genug, dass man beim Lesen
+ * nicht seekrank wird.
+ */
+const heftSchwebeTempo = 0.42;
+const heftSchwebeGier = THREE.MathUtils.degToRad(3.4);
+const heftSchwebeNick = THREE.MathUtils.degToRad(1.9);
+const heftSchwebeHub = 0.055;
+/*
+ * Wie weit sich das Heft von Hand drehen laesst. Nicht ohne Anschlag: es
+ * ist ein aufgeschlagenes Heft, kein Band in der Betrachtung — wer es auf
+ * den Kopf stellt, liest nichts mehr.
+ */
+const heftDrehGrenzeGier = THREE.MathUtils.degToRad(46);
+const heftDrehGrenzeNick = THREE.MathUtils.degToRad(32);
+/** Und wie nah und wie weit. 1 ist die ausgerechnete Grundentfernung. */
+const heftZoomNah = 0.48;
+const heftZoomFern = 1.4;
 /**
  * Ab so vielen Bildpunkten quer ist eine Bewegung ein Wisch — und nur,
  * wenn sie mindestens anderthalbmal so weit quer wie hoch gegangen ist.
@@ -721,6 +742,22 @@ export class ShelfEngine {
     gezogen: boolean;
   } | null = null;
   private heftTippVon: { x: number; y: number } | null = null;
+  /** Sekunden in der Leseposition — treibt das Schweben. */
+  private heftSchwebeZeit = 0;
+  /** Was die Hand am Heft gedreht hat, und wohin sie es dreht. */
+  private heftGier = 0;
+  private heftNick = 0;
+  private heftGierZiel = 0;
+  private heftNickZiel = 0;
+  private heftDrehVon: { x: number; y: number } | null = null;
+  /** Naeher und weiter. 1 ist die ausgerechnete Grundentfernung. */
+  private heftZoom = 1;
+  private heftZoomZiel = 1;
+  /** Zwei Finger auf dem Heft: der Abstand zwischen ihnen ist der Zoom. */
+  private heftZeiger = new Map<number, { x: number; y: number }>();
+  private heftKneifAbstand = 0;
+  private heftKneifZoom = 1;
+  private heftEuler = new THREE.Euler(0, 0, 0, "YXZ");
   /** Wo die Doppelseite im Fenster steht — das Ziehen rechnet danach. */
   private heftSchirm = { mitteX: 0, mitteY: 0, spanneX: 1, spanneY: 1 };
   private heftStartOrt = new THREE.Vector3();
@@ -1433,10 +1470,15 @@ export class ShelfEngine {
   private handleWheel = (event: WheelEvent) => {
     // Ein aufgeschlagener Band blaettert selbst; das Regal ruht.
     if (this.aufschlagStufe !== "aus") return;
-    // Und das Heft kennt keinen Zoom — auf keinem Weg, auch nicht ueber
-    // das Rad oder das Kneifen auf dem Trackpad. Es gibt eine Entfernung.
+    // Im Heft faehrt das Rad die Entfernung. Frueher stand hier eine
+    // einzige, feste — inzwischen soll man herangehen koennen.
     if (this.heftStufe !== "aus") {
       event.preventDefault();
+      this.heftZoomZiel = clamp(
+        this.heftZoomZiel * (1 + event.deltaY * 0.0016),
+        heftZoomNah,
+        heftZoomFern,
+      );
       return;
     }
     if (this.mode !== "browse") return;
@@ -1469,9 +1511,21 @@ export class ShelfEngine {
 
   private handlePointerDown = (event: PointerEvent) => {
     if (this.aufschlagStufe !== "aus") return;
-    // Das Heft nimmt die Hand ganz fuer sich: kein Drehen, kein Kneifen,
-    // kein Herausziehen. Nur Blaettern und der Weg hinaus.
+    // Das Heft nimmt die Hand ganz fuer sich: was hier passiert, passiert
+    // am Heft und nicht am Regal.
     if (this.heftStufe !== "aus") {
+      this.heftZeiger.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY,
+      });
+      if (this.heftZeiger.size === 2) {
+        const [a, b] = [...this.heftZeiger.values()];
+        this.heftKneifAbstand = Math.hypot(a.x - b.x, a.y - b.y);
+        this.heftKneifZoom = this.heftZoomZiel;
+        this.heftZug = null;
+        this.heftDrehVon = null;
+        return;
+      }
       this.heftZugStart(event);
       return;
     }
@@ -1518,6 +1572,24 @@ export class ShelfEngine {
   private handlePointerMove = (event: PointerEvent) => {
     if (this.aufschlagStufe !== "aus") return;
     if (this.heftStufe !== "aus") {
+      const gemerkt = this.heftZeiger.get(event.pointerId);
+      if (gemerkt) {
+        gemerkt.x = event.clientX;
+        gemerkt.y = event.clientY;
+      }
+      // Zwei Finger: der Abstand zwischen ihnen ist die Entfernung.
+      if (this.heftZeiger.size >= 2) {
+        const [a, b] = [...this.heftZeiger.values()];
+        const abstand = Math.hypot(a.x - b.x, a.y - b.y);
+        if (this.heftKneifAbstand > 8 && abstand > 8) {
+          this.heftZoomZiel = clamp(
+            this.heftKneifZoom * (this.heftKneifAbstand / abstand),
+            heftZoomNah,
+            heftZoomFern,
+          );
+        }
+        return;
+      }
       this.heftZugBewegen(event);
       return;
     }
@@ -1616,6 +1688,8 @@ export class ShelfEngine {
   private handlePointerUp = (event: PointerEvent) => {
     if (this.aufschlagStufe !== "aus") return;
     if (this.heftStufe !== "aus") {
+      this.heftZeiger.delete(event.pointerId);
+      if (this.heftZeiger.size < 2) this.heftKneifAbstand = 0;
       this.heftZugEnde(event);
       return;
     }
@@ -1677,8 +1751,11 @@ export class ShelfEngine {
 
   private handlePointerCancel = (event: PointerEvent) => {
     if (this.heftStufe !== "aus") {
+      this.heftZeiger.delete(event.pointerId);
+      if (this.heftZeiger.size < 2) this.heftKneifAbstand = 0;
       this.heftZug = null;
       this.heftTippVon = null;
+      this.heftDrehVon = null;
       return;
     }
     this.zeiger.delete(event.pointerId);
@@ -3966,6 +4043,19 @@ export class ShelfEngine {
     this.heftZeit = 0;
     this.heftSchnappZeit = 0;
     this.heftZug = null;
+    // Jedes Aufschlagen faengt in der Ruhelage an: aufrecht wie gedacht,
+    // auf der ausgerechneten Entfernung, ohne was die Hand beim letzten Mal
+    // gedreht hat.
+    this.heftSchwebeZeit = 0;
+    this.heftGier = 0;
+    this.heftNick = 0;
+    this.heftGierZiel = 0;
+    this.heftNickZiel = 0;
+    this.heftDrehVon = null;
+    this.heftZoom = 1;
+    this.heftZoomZiel = 1;
+    this.heftZeiger.clear();
+    this.heftKneifAbstand = 0;
     this.heftStufe = "auf";
     this.heftRigAufbauen(band);
 
@@ -4092,10 +4182,18 @@ export class ShelfEngine {
     const seite: 1 | -1 = x >= this.heftSchirm.mitteX ? 1 : -1;
     const anteilQuer =
       Math.abs(x - this.heftSchirm.mitteX) / this.heftSchirm.spanneX;
-    // Die Mitte gehoert dem Bund: dort wird kein Blatt angefasst. Der
-    // Druck wird trotzdem gemerkt — ueber dem Bund wird gewischt.
+    // Die Mitte gehoert dem Bund: dort wird kein Blatt angefasst.
+    //
+    // Am Schreibtisch faengt dort das **Drehen** an — das Heft ist ein
+    // Gegenstand, und einen Gegenstand dreht man in der Hand. Auf dem
+    // Telefon nicht: dort wird ueber dem Bund gewischt, und beides an
+    // derselben Geste waere nicht auseinanderzuhalten.
     if (anteilQuer < 1 - heftKante) {
       this.heftTippVon = { x, y };
+      if (this.feinzeiger) {
+        this.heftDrehVon = { x, y };
+        this.canvas.setPointerCapture(event.pointerId);
+      }
       return true;
     }
     const blatt = seite === 1 ? this.heftStelle : this.heftStelle - 1;
@@ -4121,6 +4219,26 @@ export class ShelfEngine {
 
   /** Ziehen: die Ecke folgt der Hand, und das Blatt woelbt sich dabei. */
   private heftZugBewegen(event: PointerEvent) {
+    // Drehen geht vor: wer in der Mitte angefasst hat, dreht das Heft.
+    if (this.heftDrehVon) {
+      const kasten = this.canvas.getBoundingClientRect();
+      const x = event.clientX - kasten.left;
+      const y = event.clientY - kasten.top;
+      const proPixel =
+        Math.PI / Math.max(320, this.canvas.clientWidth * 0.75);
+      this.heftGierZiel = clamp(
+        this.heftGierZiel + (x - this.heftDrehVon.x) * proPixel,
+        -heftDrehGrenzeGier,
+        heftDrehGrenzeGier,
+      );
+      this.heftNickZiel = clamp(
+        this.heftNickZiel + (y - this.heftDrehVon.y) * proPixel,
+        -heftDrehGrenzeNick,
+        heftDrehGrenzeNick,
+      );
+      this.heftDrehVon = { x, y };
+      return;
+    }
     const zug = this.heftZug;
     if (!zug || !this.heftRig) return;
     const kasten = this.canvas.getBoundingClientRect();
@@ -4158,11 +4276,13 @@ export class ShelfEngine {
     const y = event.clientY - kasten.top;
     const zug = this.heftZug;
     const tipp = this.heftTippVon;
+    const gedreht = this.heftDrehVon !== null;
     // Erst pruefen, dann leeren: `heftWisch` fragt, ob eine Ecke in der
     // Hand lag, und die Antwort steht in `heftZug`.
     const wisch = this.heftWisch(tipp, x, y);
     this.heftZug = null;
     this.heftTippVon = null;
+    this.heftDrehVon = null;
     if (this.canvas.hasPointerCapture(event.pointerId)) {
       this.canvas.releasePointerCapture(event.pointerId);
     }
@@ -4176,6 +4296,10 @@ export class ShelfEngine {
       this.heftSchliessen();
       return;
     }
+
+    // Wer gedreht hat, hat nicht gewischt: am Schreibtisch gehoert die
+    // Mitte dem Drehen, und ein Zug quer waere sonst beides zugleich.
+    if (gedreht) return;
 
     // Wischen — der vierte Weg. Er gilt ueberall dort, wo keine Ecke in
     // der Hand lag: einzeln immer, in der Doppelseite ueber dem Bund. Nach
@@ -4261,7 +4385,8 @@ export class ShelfEngine {
       this.heftRig.halbeHoehe / (halb * heftFuellungHoehe);
     const nachBreite =
       halbeBreite / (halb * this.camera.aspect * fuellungB);
-    return Math.max(nachHoehe, nachBreite);
+    // Mal dem, was Rad oder Kneifen daraus gemacht haben.
+    return Math.max(nachHoehe, nachBreite) * this.heftZoom;
   }
 
   /**
@@ -4329,6 +4454,34 @@ export class ShelfEngine {
       }
     }
 
+    // Das Schweben laeuft nur, solange das Heft offen ist — waehrend der
+    // Anfahrt hat es genug zu tun.
+    if (this.heftStufe === "offen") this.heftSchwebeZeit += delta;
+    const ruhig = this.reducedMotion;
+    const takt = this.heftSchwebeZeit * heftSchwebeTempo;
+    const schwebeGier = ruhig ? 0 : Math.sin(takt) * heftSchwebeGier;
+    const schwebeNick = ruhig
+      ? 0
+      : Math.sin(takt * 0.73 + 1.1) * heftSchwebeNick;
+    const schwebeHub = ruhig ? 0 : Math.sin(takt * 0.61 + 2.3) * heftSchwebeHub;
+
+    // Was die Hand gedreht hat, laeuft ihr weich hinterher.
+    const drehTempo = ruhig ? 1 : 1 - Math.exp(-11 * delta);
+    this.heftGier += (this.heftGierZiel - this.heftGier) * drehTempo;
+    this.heftNick += (this.heftNickZiel - this.heftNick) * drehTempo;
+    this.heftZoom += (this.heftZoomZiel - this.heftZoom) * drehTempo;
+
+    // Die Leselage: die eingestellte Schraeglage, dazu die Hand und das
+    // Schweben. Sie wird jedes Bild neu gesetzt — der Anflug mischt
+    // ohnehin von der Lage im Stapel hierher.
+    this.heftEuler.set(
+      heftKippen + this.heftNick + schwebeNick,
+      heftDrehen + this.heftGier + schwebeGier,
+      0,
+      "YXZ",
+    );
+    this.heftLeseDreh.setFromEuler(this.heftEuler);
+
     const roh =
       this.heftStufe === "offen" ? 1 : this.heftZeit / heftAnfahrt;
     // Ohne Bewegung steht die Leseposition sofort da.
@@ -4338,6 +4491,9 @@ export class ShelfEngine {
     // liegt, und richtet sich nur auf — die Kamera kommt zu ihm.
     const gruppe = this.heftRig.gruppe;
     gruppe.position.lerpVectors(this.heftStartOrt, this.heftLeseOrt, anflug);
+    // Das Heben und Senken liegt auf dem Heft, nicht auf der Kamera: sonst
+    // steht es im Bild still und der Raum wackelt.
+    gruppe.position.y += schwebeHub * anflug;
     gruppe.quaternion
       .copy(this.heftStartDreh)
       .slerp(this.heftLeseDreh, anflug);
@@ -4489,6 +4645,9 @@ export class ShelfEngine {
         einzeln: this.heftEinzeln(),
         seite: this.heftEinzelSeite,
         abstand: Number(this.heftAbstand().toFixed(3)),
+        zoom: Number(this.heftZoom.toFixed(3)),
+        gierGrad: Number(THREE.MathUtils.radToDeg(this.heftGier).toFixed(1)),
+        nickGrad: Number(THREE.MathUtils.radToDeg(this.heftNick).toFixed(1)),
         zug: this.heftZug
           ? {
               blatt: this.heftZug.blatt,

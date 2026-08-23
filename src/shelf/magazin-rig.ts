@@ -72,6 +72,17 @@ export const magazinForm = {
   lambda: 13,
   /** Und beim Schnappen, wenn die Ecke losgelassen wird. */
   lambdaSchnapp: 22,
+  /**
+   * Der Glanz des Papiers. Ein Heft ist auf gestrichenem Papier gedruckt,
+   * und gestrichenes Papier hat einen Schimmer — genau der macht aus einer
+   * gedrehten Flaeche einen Gegenstand: das Licht wandert darueber, waehrend
+   * das Heft sich bewegt. Mit der matten Rauheit von vorher (0,95) blieb
+   * jede Seite gleich hell, egal wie man sie hielt, und das las sich wie
+   * ein aufgeklebter Scan.
+   */
+  rauheit: 0.58,
+  lack: 0.34,
+  lackRauheit: 0.3,
   /** Papierton des Heftes — heller als der Buchblock, es ist Neupapier. */
   papier: '#ded9cc',
   /** Der Schnitt an den Blockkanten. */
@@ -194,31 +205,24 @@ export function magazinRigBauen(werte: {
   // --- Das lebende Fenster --------------------------------------------------
   const imFenster = magazinForm.fenster * 2 + 1;
   /** Vorderseiten der Blaetter im Fenster (ungerade Seiten). */
-  const stoffeVorn: THREE.MeshStandardMaterial[] = [];
+  const stoffeVorn: THREE.MeshPhysicalMaterial[] = [];
   /** Rueckseiten (gerade Seiten). */
-  const stoffeHinten: THREE.MeshStandardMaterial[] = [];
+  const stoffeHinten: THREE.MeshPhysicalMaterial[] = [];
 
   for (let i = 0; i < imFenster; i += 1) {
-    stoffeVorn.push(
+    const gestrichen = (seite: THREE.Side) =>
       merken(
-        new THREE.MeshStandardMaterial({
+        new THREE.MeshPhysicalMaterial({
           color: magazinForm.papier,
-          roughness: 0.95,
+          roughness: magazinForm.rauheit,
           metalness: 0,
-          side: THREE.FrontSide,
+          clearcoat: magazinForm.lack,
+          clearcoatRoughness: magazinForm.lackRauheit,
+          side: seite,
         }),
-      ),
-    );
-    stoffeHinten.push(
-      merken(
-        new THREE.MeshStandardMaterial({
-          color: magazinForm.papier,
-          roughness: 0.95,
-          metalness: 0,
-          side: THREE.BackSide,
-        }),
-      ),
-    );
+      );
+    stoffeVorn.push(gestrichen(THREE.FrontSide));
+    stoffeHinten.push(gestrichen(THREE.BackSide));
   }
 
   const rig: SeitenRig = seitenRigBauen({
