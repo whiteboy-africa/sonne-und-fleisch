@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { nachbarIndex, type CatalogBook } from "./katalog";
 import {
@@ -726,6 +727,16 @@ export class ShelfEngine {
   private heftRig: MagazinRig | null = null;
   /** Der Band, dessen Koerper das Rig gerade vertritt. */
   private heftVerdeckt: RuntimeBook | null = null;
+  /**
+   * Die Umgebung, die das Papier des Heftes spiegelt.
+   *
+   * Sie haengt **nur** in den Materialien des Heftes, nicht in der Szene:
+   * das Regal steht in einem schwarzen Raum, und dabei bleibt es. Gebaut
+   * wird sie beim Aufschlagen und beim Zuklappen wieder abgeraeumt — ein
+   * gefiltertes Umgebungsbild kostet Speicher, den niemand braucht,
+   * solange kein Heft offen ist.
+   */
+  private heftUmgebung: THREE.Texture | null = null;
   /** Umgeschlagene Blaetter. 1 ist die erste Doppelseite. */
   private heftStelle = 1;
   /** Auf dem Telefon: welche Haelfte der Doppelseite gerade dran ist. */
@@ -4402,12 +4413,22 @@ export class ShelfEngine {
     this.heftRigAbbauen();
     const daten = band.data.magazine;
     if (!daten) return;
+    // Die Umgebung: ein gelichteter Raum, aus dem das Papier seinen Glanz
+    // nimmt. Ohne sie spiegelt der Lack ins Schwarze, und die Seite bleibt
+    // eine Flaeche mit einem Bild darauf.
+    const pmrem = new THREE.PMREMGenerator(this.renderer);
+    const raum = new RoomEnvironment();
+    this.heftUmgebung = pmrem.fromScene(raum, 0.04).texture;
+    raum.dispose?.();
+    pmrem.dispose();
+
     const rig = magazinRigBauen({
       breite: band.width,
       hoehe: band.data.height,
       seiten: daten.pages,
       ordner: daten.folder,
       anisotropie: Math.min(8, this.renderer.capabilities.getMaxAnisotropy()),
+      umgebung: this.heftUmgebung,
     });
     rig.gruppe.position.copy(this.heftStartOrt);
     rig.gruppe.quaternion.copy(this.heftStartDreh);
@@ -4423,6 +4444,8 @@ export class ShelfEngine {
   private heftRigAbbauen() {
     this.heftRig?.entsorgen();
     this.heftRig = null;
+    this.heftUmgebung?.dispose();
+    this.heftUmgebung = null;
     if (this.heftVerdeckt) {
       this.heftVerdeckt.content.visible = true;
       this.heftVerdeckt = null;

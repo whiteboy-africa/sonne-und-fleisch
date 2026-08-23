@@ -68,6 +68,18 @@ export const magazinForm = {
    * Platten ueber der halben Doppelseite.
    */
   ruheBogen: -0.22,
+  /**
+   * Der Faecher — **aus**, und zwar aus einem geometrischen Grund.
+   *
+   * In der Vorlage stehen die Seiten bei plus/minus neunzig Grad, also
+   * aufrecht in einem V; ein Grad mehr oeffnet dort bloss das V ein Stueck
+   * weiter. Hier liegen sie flach uebereinander, und ein Grad hebt die
+   * Aussenkante um `breite * sin(1 Grad)` — das ist das Dreissigfache des
+   * Abstands zweier Blaetter. Das Blatt darunter kommt oben durch.
+   *
+   * Wer den Faecher will, muss vorher die Blaetter weiter auseinanderlegen.
+   */
+  faecher: 0,
   /** Daempfung im Lauf. */
   lambda: 13,
   /** Und beim Schnappen, wenn die Ecke losgelassen wird. */
@@ -83,6 +95,23 @@ export const magazinForm = {
   rauheit: 0.58,
   lack: 0.34,
   lackRauheit: 0.3,
+  /**
+   * Wie stark das Papier seine Umgebung aufnimmt.
+   *
+   * Ohne Umgebung spiegelt Lack einen schwarzen Raum — also nichts, und
+   * die Seite bleibt eine flache Flaeche mit einem Bild darauf. Das war
+   * der ganze Unterschied zur Vorlage: dort steht das Heft in einem
+   * gelichteten Raum, hier in einem leeren. Das Regal bleibt davon
+   * unberuehrt — die Umgebung haengt in den Materialien des Heftes, nicht
+   * in der Szene.
+   *
+   * Sparsam: eine Umgebung liefert nicht nur Glanz, sondern auch
+   * Grundlicht. Bei 0,85 hob sie die Schwaerzen an, das Papier wurde
+   * milchig und der Satz verlor seinen Kontrast — aus einer gedruckten
+   * Seite wurde eine graue Flaeche. Gebraucht wird hier nur, dass der Lack
+   * etwas zu spiegeln hat.
+   */
+  umgebung: 0.12,
   /** Papierton des Heftes — heller als der Buchblock, es ist Neupapier. */
   papier: '#ded9cc',
   /** Der Schnitt an den Blockkanten. */
@@ -138,6 +167,11 @@ export function magazinRigBauen(werte: {
   seiten: number;
   ordner: string;
   anisotropie: number;
+  /**
+   * Die Umgebung, die das Papier spiegelt. Ohne sie glaenzt der Lack ins
+   * Schwarze und man sieht ihn nicht.
+   */
+  umgebung: THREE.Texture | null;
   /** Wird gerufen, sobald das erste Seitenpaar wirklich da ist. */
   bereit?: () => void;
 }): MagazinRig {
@@ -158,11 +192,23 @@ export function magazinRigBauen(werte: {
   //
   // Sie tragen die Dicke des Heftes und seinen Papierschnitt. Ein Quader je
   // Seite, in der Tiefe skaliert: das ist der ganze Rest des Heftes.
+  /*
+   * Der Papierschnitt. Nicht eine Flaeche in einer Farbe, sondern feine
+   * Linien: ein Buchblock ist ein Stapel Blaetter, und man sieht ihm das
+   * an der Kante an. Eine glatte Flaeche liest sich als Plastik.
+   */
+  const schnittBild = merken(schnittTextur());
+  schnittBild.wrapS = THREE.RepeatWrapping;
+  schnittBild.wrapT = THREE.RepeatWrapping;
+  schnittBild.anisotropy = werte.anisotropie;
   const blockStoff = merken(
     new THREE.MeshStandardMaterial({
       color: magazinForm.schnitt,
-      roughness: 0.94,
+      map: schnittBild,
+      roughness: 0.9,
       metalness: 0,
+      envMap: werte.umgebung ?? null,
+      envMapIntensity: magazinForm.umgebung * 0.6,
     }),
   );
   const deckStoff = merken(
@@ -170,6 +216,8 @@ export function magazinRigBauen(werte: {
       color: magazinForm.papier,
       roughness: 0.95,
       metalness: 0,
+      envMap: werte.umgebung ?? null,
+      envMapIntensity: magazinForm.umgebung * 0.5,
     }),
   );
   // Der Quader waechst vom Bund nach aussen und von z = 0 nach hinten;
@@ -210,6 +258,15 @@ export function magazinRigBauen(werte: {
   const stoffeHinten: THREE.MeshPhysicalMaterial[] = [];
 
   for (let i = 0; i < imFenster; i += 1) {
+    /*
+     * **Beide Seiten `FrontSide`.** Ein Blatt mit Dicke ist ein Quader, und
+     * bei einem Quader zeigt jede Flaeche nach aussen: die Rueckseite hat
+     * ihre eigene, nach hinten gerichtete Normale. Ein `BackSide`-Material
+     * darauf wird weggeschnitten, sobald das Blatt umgeschlagen ist und
+     * diese Flaeche zur Kamera zeigt — dann steht dort nichts als Papier.
+     * (Ohne Dicke war es umgekehrt richtig: eine Ebene hat nur eine Seite,
+     * und die zweite bekommt man nur ueber `BackSide`.)
+     */
     const gestrichen = (seite: THREE.Side) =>
       merken(
         new THREE.MeshPhysicalMaterial({
@@ -218,11 +275,13 @@ export function magazinRigBauen(werte: {
           metalness: 0,
           clearcoat: magazinForm.lack,
           clearcoatRoughness: magazinForm.lackRauheit,
+          envMap: werte.umgebung ?? null,
+          envMapIntensity: magazinForm.umgebung,
           side: seite,
         }),
       );
     stoffeVorn.push(gestrichen(THREE.FrontSide));
-    stoffeHinten.push(gestrichen(THREE.BackSide));
+    stoffeHinten.push(gestrichen(THREE.FrontSide));
   }
 
   const rig: SeitenRig = seitenRigBauen({
@@ -235,7 +294,15 @@ export function magazinRigBauen(werte: {
     // die Kamera steht mittig darueber.
     bund: 0,
     seite: 1,
-    form: { segmente: magazinForm.segmente, lambda: magazinForm.lambda },
+    // Ein Blatt hat Dicke, und an seiner Kante sieht man das Papier.
+    tiefe: dicke,
+    kante: blockStoff,
+    form: {
+      segmente: magazinForm.segmente,
+      lambda: magazinForm.lambda,
+      // Das Heft ist in jeder Lage gewoelbt, nicht nur unterwegs.
+      verteilt: true,
+    },
     stoff: (i) => [stoffeVorn[i], stoffeHinten[i]],
   });
   gruppe.add(rig.gruppe);
@@ -265,11 +332,11 @@ export function magazinRigBauen(werte: {
     textur.anisotropy = werte.anisotropie;
     textur.generateMipmaps = true;
     textur.minFilter = THREE.LinearMipmapLinearFilter;
-    if (nummer % 2 === 0) {
-      textur.wrapS = THREE.RepeatWrapping;
-      textur.repeat.x = -1;
-      textur.offset.x = 1;
-    }
+    // Frueher wurde die Rueckseite hier gespiegelt: eine **Ebene** ist von
+    // hinten gesehen seitenverkehrt. Ein Blatt mit Dicke ist keine Ebene —
+    // der Quader bringt fuer seine Rueckflaeche eigene, schon richtige
+    // Koordinaten mit. Wer hier doch spiegelt, liest die linke Seite im
+    // Spiegel.
     vorrat.set(nummer, textur);
     return textur;
   }
@@ -393,9 +460,15 @@ export function magazinRigBauen(werte: {
       // Vorgaengers und fuehren sichtbar aus ihr heraus.
       const gewechselt = belegt[platz] !== blatt;
       belegt[platz] = blatt;
+      // Der Faecher: jedes Blatt steht ein Grad weiter offen als das
+      // darunter. Nach der Seite, auf der es liegt — links andersherum.
+      const abstand = anteil >= 0.5 ? stelle - 1 - blatt : blatt - stelle;
+      const faecher =
+        magazinForm.faecher * Math.max(0, abstand) * (anteil >= 0.5 ? -1 : 1);
+
       rig.haltungSetzen(
         platz,
-        { anteil, bogen },
+        { anteil, bogen, faecher },
         gewechselt ? 1 : schritt,
       );
 
@@ -419,9 +492,12 @@ export function magazinRigBauen(werte: {
         0,
         anteil >= 0.5 ? stelle - 1 - blatt : blatt - stelle,
       );
+      // Anderthalbfache Dicke Abstand: zwei Quader, die sich genau
+      // beruehren, streiten sich um dieselben Bildpunkte, und dann blitzt
+      // die Seite darunter durch die obere.
       rig.blaetter[platz].netz.position.z = inBewegung
-        ? oben + dicke
-        : oben - rang * dicke;
+        ? oben + dicke * 2
+        : oben - rang * dicke * 1.6;
     }
 
     // Was aus dem Fenster gefallen ist, braucht keinen Stand mehr.
@@ -470,4 +546,36 @@ export function magazinRigBauen(werte: {
         })),
     entsorgen,
   };
+}
+
+/**
+ * Der Papierschnitt als Bild: feine, ungleich helle Linien quer zur
+ * Blattrichtung. Aus der Naehe sind es einzelne Blaetter, von weitem ein
+ * Grau mit Struktur — und genau das unterscheidet einen Buchblock von einem
+ * lackierten Klotz.
+ */
+function schnittTextur(): THREE.CanvasTexture {
+  const hoehe = 256;
+  const leinwand = document.createElement('canvas');
+  leinwand.width = 8;
+  leinwand.height = hoehe;
+  const stift = leinwand.getContext('2d');
+  if (stift) {
+    stift.fillStyle = '#ffffff';
+    stift.fillRect(0, 0, 8, hoehe);
+    // Ein fester Wuerfel: derselbe Schnitt bei jedem Aufschlagen.
+    let saat = 7;
+    const wurf = () => {
+      saat = (saat * 9301 + 49297) % 233280;
+      return saat / 233280;
+    };
+    for (let y = 0; y < hoehe; y += 2) {
+      const dunkel = 0.72 + wurf() * 0.28;
+      stift.fillStyle = `rgba(0,0,0,${(1 - dunkel) * 0.9})`;
+      stift.fillRect(0, y, 8, 1);
+    }
+  }
+  const textur = new THREE.CanvasTexture(leinwand);
+  textur.colorSpace = THREE.SRGBColorSpace;
+  return textur;
 }

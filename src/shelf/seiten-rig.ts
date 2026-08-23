@@ -39,11 +39,28 @@ export type SeitenForm = {
   segmente: number;
   /** Daempfung der Knochen. Wie die Kamera im Fokus: lambda 13. */
   lambda: number;
+  /**
+   * Der Knick quer zur Wendeachse gilt nur, wenn hier `true` steht — die
+   * Leseprobe braucht ihn nicht, das Heft schon.
+   */
+  verteilt: boolean;
+  /** Bis zu welchem Knochen die Kruemmung „innen" gilt. */
+  innenBis: number;
+  /** Wie stark sie innen woelbt und wie stark sie aussen zurueckbiegt. */
+  innen: number;
+  aussen: number;
+  /** Der Knick quer zur Wendeachse, waehrend das Blatt umschlaegt. */
+  falte: number;
 };
 
 export const seitenFormVorgabe: SeitenForm = {
   segmente: 26,
   lambda: 13,
+  verteilt: false,
+  innenBis: 8,
+  innen: 0.9,
+  aussen: 0.25,
+  falte: THREE.MathUtils.degToRad(2),
 };
 
 /**
@@ -59,6 +76,14 @@ export type BlattHaltung = {
    * wohin sich der Bogen wirft.
    */
   bogen: number;
+  /**
+   * Wie weit dieses Blatt ueber seine Ruhelage hinaus aufsteht.
+   *
+   * Ein Stapel Blaetter liegt nicht deckungsgleich: jedes folgende steht
+   * ein Grad weiter offen, und dadurch faechert der Block auf. Ohne das
+   * sind zwoelf Blaetter eine Platte.
+   */
+  faecher?: number;
 };
 
 export type SeitenBlatt = {
@@ -107,6 +132,18 @@ export function seitenRigBauen(werte: {
   /** Abstand zweier Blaetter im Stapel. */
   blattAbstand: number;
   /**
+   * Dicke eines Blattes. Null heisst: eine Ebene ohne Dicke — das genuegt,
+   * solange man ein Blatt nur von vorn sieht.
+   *
+   * Ueber null wird daraus ein flacher Quader, und der hat **Kanten**. Das
+   * ist der Unterschied zwischen einem Stapel Papier und einer Platte: was
+   * einen Buchblock ausmacht, sieht man an seiner Schnittkante, nicht an
+   * seiner Flaeche. Wer Dicke bestellt, muss `kante` mitgeben — die vier
+   * Schmalseiten brauchen ihr eigenes Material.
+   */
+  tiefe?: number;
+  kante?: THREE.Material;
+  /**
    * Wo der Bund liegt, in Rig-Koordinaten — die Achse, um die sich jedes
    * Blatt dreht.
    *
@@ -141,19 +178,41 @@ export function seitenRigBauen(werte: {
   const blaetter: SeitenBlatt[] = [];
 
   for (let i = 0; i < werte.blaetter; i += 1) {
+    const tiefe = werte.tiefe ?? 0;
     const form3d = merken(
-      new THREE.PlaneGeometry(breite, hoehe, form.segmente, 1),
+      tiefe > 0
+        ? new THREE.BoxGeometry(breite, hoehe, tiefe, form.segmente, 1)
+        : new THREE.PlaneGeometry(breite, hoehe, form.segmente, 1),
     );
     // Der Bund liegt bei x = 0, das Blatt reicht nach rechts.
     form3d.translate(breite * 0.5, 0, 0);
     kettenGewichteSetzen(form3d, segBreite, form.segmente);
 
     const stoff = werte.stoff(i);
-    // Zwei Materialien heissen: zweimal dieselben Dreiecke zeichnen, einmal
-    // von vorn und einmal von hinten. So traegt ein Blatt aus einem Stueck
-    // zwei verschiedene Seiten — ohne zweites Netz, das beim Biegen von der
-    // Kette abkaeme.
-    if (Array.isArray(stoff)) {
+    /*
+     * Zwei Materialien, zwei Wege dorthin.
+     *
+     * **Ohne Dicke** heisst es: zweimal dieselben Dreiecke zeichnen, einmal
+     * von vorn und einmal von hinten. So traegt ein Blatt aus einem Stueck
+     * zwei verschiedene Seiten — ohne zweites Netz, das beim Biegen von der
+     * Kette abkaeme.
+     *
+     * **Mit Dicke** bringt der Quader seine Gruppen schon mit: vier
+     * Schmalseiten, dann vorn und hinten. Die vier bekommen den
+     * Papierschnitt, die letzten beiden die Seiten.
+     */
+    const stoffe: THREE.Material | THREE.Material[] =
+      Array.isArray(stoff) && tiefe > 0 && werte.kante
+        ? [
+            werte.kante,
+            werte.kante,
+            werte.kante,
+            werte.kante,
+            stoff[0],
+            stoff[1],
+          ]
+        : stoff;
+    if (Array.isArray(stoff) && tiefe <= 0) {
       form3d.clearGroups();
       form3d.addGroup(0, Infinity, 0);
       form3d.addGroup(0, Infinity, 1);
@@ -167,7 +226,7 @@ export function seitenRigBauen(werte: {
       kette.push(knochen);
     }
 
-    const netz = new THREE.SkinnedMesh(form3d, stoff);
+    const netz = new THREE.SkinnedMesh(form3d, stoffe);
     netz.name = `seite-${i}`;
     netz.add(kette[0]);
     const skelett = new THREE.Skeleton(kette);
@@ -209,30 +268,74 @@ export function seitenRigBauen(werte: {
    * meiste. Ein Blatt knickt nicht an der Kante, es woelbt sich in der
    * Flaeche.
    */
+  /*
+   * Das Profil der verteilten Drehung, einmal ausgerechnet.
+   *
+   * Zwei Anteile, und der zweite ist der wichtige: **innen** woelbt sich
+   * das Blatt in die eine Richtung, **aussen** biegt es ein Stueck
+   * zurueck. Erst dieses Zurueckbiegen macht aus einem Bogen ein Blatt
+   * Papier — eine reine Kreisbahn liest sich wie ein Rohr, ein Blatt hat
+   * einen Wendepunkt. Vorher stand hier ein halber Sinus, und genau der
+   * ist die Kreisbahn.
+   *
+   * Normiert auf die Summe eins: die Knochenwinkel addieren sich dann
+   * genau zur verlangten Woelbung, egal wie die beiden Staerken stehen.
+   */
+  const profil = (() => {
+    const n = form.segmente;
+    const roh = new Array<number>(n);
+    let summe = 0;
+    for (let i = 0; i < n; i += 1) {
+      const innen =
+        i < form.innenBis ? Math.sin(i * 0.2 + 0.25) * form.innen : 0;
+      const aussen =
+        i >= form.innenBis ? Math.cos(i * 0.3 + 0.09) * form.aussen : 0;
+      roh[i] = innen - aussen;
+      summe += roh[i];
+    }
+    if (Math.abs(summe) > 1e-6) {
+      for (let i = 0; i < n; i += 1) roh[i] /= summe;
+    }
+    return roh;
+  })();
+
   function haltungSetzen(index: number, haltung: BlattHaltung, delta: number) {
     const blatt = blaetter[index];
     if (!blatt) return;
     const n = blatt.kette.length;
-    const gedreht = richtung * Math.PI * easeInOut(haltung.anteil);
+    const gedreht =
+      richtung * Math.PI * easeInOut(haltung.anteil) + (haltung.faecher ?? 0);
     // Die Woelbung ist der freien Kante entgegengesetzt: das Papier bleibt
     // zurueck, wenn man es am Bund anhebt.
     const bogen = -richtung * haltung.bogen;
 
-    let profilSumme = 0;
-    for (let i = 1; i < n; i += 1) {
-      profilSumme += Math.sin((Math.PI * i) / (n - 1));
-    }
-
     for (let i = 0; i < n; i += 1) {
-      const ziel =
-        i === 0
-          ? gedreht
-          : (bogen * Math.sin((Math.PI * i) / (n - 1))) / (profilSumme || 1);
+      const welle = Math.sin((Math.PI * i) / (n - 1));
+      // Der erste Knochen traegt die Drehung, alle weiteren die Woelbung —
+      // und die folgt dem Profil oben, nicht mehr einem halben Sinus.
+      const ziel = i === 0 ? gedreht : bogen * profil[i];
       const knochen = blatt.kette[i];
       knochen.rotation.y = damp(
         knochen.rotation.y,
         ziel,
         form.lambda * 2,
+        delta,
+      );
+
+      // Der Knick quer dazu. Er greift nur auf der aeusseren Haelfte und
+      // nur, solange sich etwas bewegt: eine Seite, die umschlaegt, faellt
+      // nicht bloss um, sie wellt sich auch.
+      const falteZiel =
+        form.verteilt && i > form.innenBis
+          ? Math.sign(gedreht) *
+            form.falte *
+            Math.sin(welle - 0.5) *
+            Math.min(1, Math.abs(haltung.bogen) * 2)
+          : 0;
+      knochen.rotation.x = damp(
+        knochen.rotation.x,
+        falteZiel,
+        form.lambda * 1.4,
         delta,
       );
     }
