@@ -1517,11 +1517,15 @@ body {
      * Dicht ueber der Leiste, nicht irgendwo darueber. Die Leiste faengt
      * beim Abstandhalter der Tafel an (70svh) und traegt 54 Bildpunkte
      * eigenen Abstand — von unten gerechnet steht ihre Oberkante also bei
-     * `30svh - 54px`. Ein Fingerbreit darueber gehoert die Beschriftung
-     * hin; mit `30svh + 12px` klebte sie am Stapel und liess darunter ein
-     * Loch von sechsundsechzig Bildpunkten.
+     * `30svh - 54px`. Genau darauf gehoert die Beschriftung — nicht
+     * irgendwo dazwischen. Mit `30svh + 12px` klebte sie am Stapel und
+     * liess darunter ein Loch von sechsundsechzig Bildpunkten; mit
+     * `- 40px` hing sie immer noch zu hoch. Jetzt sitzt ihre Unterkante auf
+     * der Oberkante der Leiste, und die Polsterung darunter ist so klein,
+     * dass der Autorenname die Leiste fast beruehrt.
      */
-    bottom: calc(30svh - 40px);
+    bottom: calc(30svh - 54px);
+    padding-bottom: 6px;
   }
 
   [data-handy-fluss='an'] .site-header {
