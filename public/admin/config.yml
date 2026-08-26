@@ -15,7 +15,16 @@ backend:
   branch: main
 
 # Lokales Arbeiten ohne Anmeldung (Chrome/Edge).
-local_backend: true
+#
+# **Aus.** Das ist eine Einstellung fuer den eigenen Rechner, und sie stand
+# im ausgelieferten Stand: dort laesst sie das CMS einen Dienst auf
+# localhost suchen, den es nicht gibt. Schaden richtet das keinen an, aber
+# eine Entwicklereinstellung gehoert nicht in die Auslieferung.
+#
+# Wer lokal ohne Anmeldung arbeiten will, setzt sie voruebergehend auf
+# `true`, startet `npm run dev`, oeffnet /admin/ in Chrome und waehlt
+# „Work with Local Repository" — und nimmt sie danach wieder heraus.
+local_backend: false
 
 # Sprache der Oberfläche.
 locale: de

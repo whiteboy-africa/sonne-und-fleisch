@@ -44,11 +44,63 @@ export type SeitenForm = {
    * Leseprobe braucht ihn nicht, das Heft schon.
    */
   verteilt: boolean;
+  /**
+   * **Wo die Drehung sitzt: im Scharnier oder in der Flaeche.**
+   *
+   * `false` (die Leseprobe): der erste Knochen traegt die ganze Drehung.
+   * Das Blatt ist dann eine ebene Klappe am Bund, und die Woelbung kommt
+   * als kleiner Zuschlag obendrauf. Fuer Blaetter, die vorbeifliegen,
+   * genuegt das.
+   *
+   * `true` (das Heft): die Drehung wird ueber die **ganze Kette** verteilt,
+   * nach demselben Profil wie die Woelbung. Gemessen wird dabei nicht von
+   * der Ruhelage aus, sondern von der **Senkrechten** — das Blatt steht auf
+   * halbem Weg gerade und legt sich nach beiden Seiten spiegelbildlich um.
+   *
+   * Der Unterschied ist der zwischen einer gefalteten Karte und einem
+   * gebundenen Heft: eine Klappe knickt am Bund und ist dahinter eben, ein
+   * Blatt kommt **senkrecht aus dem Bund heraus** und biegt sich erst
+   * daneben in die Flaeche. Nachgemessen ueber den Weg vom Bund nach
+   * aussen, in Seitenbreiten: die Klappe sinkt gleichmaessig durch
+   * (0 → -0,13 an der Aussenkante, ohne Bauch), das gebundene Blatt hebt
+   * sich in den ersten zehn Prozent auf +0,16 und legt sich dann flach.
+   * Genau dieser Bauch am Bund ist es, den man an einem Heft sieht.
+   */
+  drehungVerteilt: boolean;
   /** Bis zu welchem Knochen die Kruemmung „innen" gilt. */
   innenBis: number;
+  /**
+   * **Wie weit die Kurve reicht, in Anteilen der Seite.** Null heisst: so
+   * weit wie `innenBis` Knochen von Haus aus reichen (bei 26 Segmenten und
+   * `innenBis` 8 sind das 31 Prozent).
+   *
+   * Beide Teile des Profils werden dann auf ihren Anteil **umgerechnet**,
+   * nicht bloss verschoben: der woelbende Teil laeuft ueber die ersten so
+   * viel Prozent der Kette ab, der zurueckbiegende ueber den Rest. Damit
+   * wandert der Bauch nach aussen und der Rueckbogen bleibt trotzdem
+   * drin — anders als beim blossen Strecken, bei dem er hinten aus der
+   * Kette faellt und die Seite sich aufrollt.
+   */
+  innenAnteil: number;
   /** Wie stark sie innen woelbt und wie stark sie aussen zurueckbiegt. */
   innen: number;
   aussen: number;
+  /**
+   * **Wie viel von der Drehung in der Flaeche liegt** und wie viel im
+   * Scharnier am Bund. Nur bei `drehungVerteilt` von Belang.
+   *
+   * 1 heisst: alles in der Flaeche — die Seite steht am Bund senkrecht und
+   * legt sich ueber ihre ganze Laenge um. Das ist die staerkste Form und
+   * zugleich die engste: die Seite muss den ganzen Weg in ihrer Flaeche
+   * unterbringen, also faellt der Bauch hoch aus und sitzt dicht am Bund.
+   *
+   * Weniger heisst: das Scharnier nimmt einen Teil vorweg, die Seite
+   * kommt schon schraeg aus dem Bund, und der Rest verteilt sich flacher
+   * ueber mehr Papier. Ort und Hoehe des Bauchs haengen zusammen — wer ihn
+   * nach aussen schieben will, ohne die Seite aufzurollen, muss ihn
+   * zugleich flacher machen. Beide Griffe zusammen tun das.
+   */
+  flaechenAnteil: number;
   /** Der Knick quer zur Wendeachse, waehrend das Blatt umschlaegt. */
   falte: number;
 };
@@ -57,9 +109,12 @@ export const seitenFormVorgabe: SeitenForm = {
   segmente: 26,
   lambda: 13,
   verteilt: false,
+  drehungVerteilt: false,
   innenBis: 8,
+  innenAnteil: 0,
   innen: 0.9,
   aussen: 0.25,
+  flaechenAnteil: 1,
   falte: THREE.MathUtils.degToRad(2),
 };
 
@@ -108,6 +163,22 @@ export type SeitenRig = {
    * niemand zieht.
    */
   bogenAusZeit: (anteil: number, staerke: number) => number;
+  /**
+   * Wie weit ein Blatt in dieser Haltung **wirklich** reicht — vom Bund bis
+   * zur freien Kante, in Szeneneinheiten, aufgeteilt in quer (`x`) und in
+   * die Tiefe (`z`).
+   *
+   * Ein gewoelbtes Blatt ist schmaler als ein flaches: was sich in den
+   * Bauch am Bund legt, fehlt in der Breite. Bei der Ruhelage des Heftes
+   * sind das 16 Prozent. Wer die Kamera auf die Doppelseite einpasst, muss
+   * mit dieser Zahl rechnen und nicht mit der Papierbreite, sonst steht das
+   * Heft zu klein im Fenster.
+   *
+   * Gerechnet, nicht gemessen: die Kette wird einmal abgeschritten, Segment
+   * fuer Segment, mit denselben Winkeln, die auch `haltungSetzen` verteilt.
+   * So stimmt die Zahl von selbst, wenn jemand an der Form dreht.
+   */
+  spanne: (haltung: BlattHaltung) => { x: number; z: number; bauch: number };
   entsorgen: () => void;
 };
 
@@ -294,12 +365,63 @@ export function seitenRigBauen(werte: {
     const n = form.segmente;
     const roh = new Array<number>(n);
     let summe = 0;
+    /*
+     * Wo die Grenze zwischen innen und aussen liegt — von Haus aus dort,
+     * wo `innenBis` Knochen enden. Wird sie verschoben, laeuft jeder der
+     * beiden Teile ueber seinen neuen Abschnitt ab, in derselben Form.
+     */
+    const grenze =
+      form.innenAnteil > 0
+        ? THREE.MathUtils.clamp(form.innenAnteil, 0.1, 0.9) * (n - 1)
+        : form.innenBis;
+
+    /*
+     * **Jeder Teil behaelt sein Gewicht.**
+     *
+     * Der woelbende und der zurueckbiegende Teil werden einzeln auf ihre
+     * urspruengliche Summe gebracht, bevor das Ganze auf eins normiert
+     * wird. Ohne das verschiebt schon das Umrechnen das Verhaeltnis
+     * zwischen ihnen: der Teil, der mehr Knochen bekommt, bekommt dabei
+     * auch mehr Gewicht — die Seite woelbt sich dann frueh und stark und
+     * biegt hinten nicht mehr genug zurueck, also legt sie sich draussen
+     * nicht mehr hin, sondern bleibt oben stehen (Rand +0,29 statt -0,01).
+     *
+     * Dieselbe Kruemmung ueber mehr Papier zu verteilen heisst: die Summe
+     * bleibt, die Strecke waechst. Genau das steht hier.
+     */
+    let sollInnen = 0;
+    let sollAussen = 0;
     for (let i = 0; i < n; i += 1) {
-      const innen =
-        i < form.innenBis ? Math.sin(i * 0.2 + 0.25) * form.innen : 0;
-      const aussen =
-        i >= form.innenBis ? Math.cos(i * 0.3 + 0.09) * form.aussen : 0;
-      roh[i] = innen - aussen;
+      if (i < form.innenBis) sollInnen += Math.sin(i * 0.2 + 0.25) * form.innen;
+      else sollAussen += Math.cos(i * 0.3 + 0.09) * form.aussen;
+    }
+
+    let istInnen = 0;
+    let istAussen = 0;
+    const teil = new Array<boolean>(n);
+    for (let i = 0; i < n; i += 1) {
+      // Die Stelle im urspruenglichen Profil: innen auf [0, innenBis],
+      // aussen auf [innenBis, n-1], jeweils gleichmaessig gedehnt.
+      const drin = i < grenze;
+      teil[i] = drin;
+      const t = drin
+        ? (i / Math.max(1e-6, grenze)) * form.innenBis
+        : form.innenBis +
+          ((i - grenze) / Math.max(1e-6, n - 1 - grenze)) *
+            (n - 1 - form.innenBis);
+      if (drin) {
+        roh[i] = Math.sin(t * 0.2 + 0.25) * form.innen;
+        istInnen += roh[i];
+      } else {
+        roh[i] = -Math.cos(t * 0.3 + 0.09) * form.aussen;
+        istAussen += -roh[i];
+      }
+    }
+
+    const massInnen = Math.abs(istInnen) > 1e-6 ? sollInnen / istInnen : 1;
+    const massAussen = Math.abs(istAussen) > 1e-6 ? sollAussen / istAussen : 1;
+    for (let i = 0; i < n; i += 1) {
+      roh[i] *= teil[i] ? massInnen : massAussen;
       summe += roh[i];
     }
     if (Math.abs(summe) > 1e-6) {
@@ -308,21 +430,94 @@ export function seitenRigBauen(werte: {
     return roh;
   })();
 
+  /*
+   * Die Senkrechte: die Haltung auf halbem Weg, das Blatt steht auf dem
+   * Bund. Von hier aus wird bei verteilter Drehung gerechnet — nach beiden
+   * Seiten gleich weit und deshalb spiegelbildlich gewoelbt. Vom
+   * Ruhepunkt aus gerechnet haette die eine Seite den doppelten Bogen und
+   * die andere gar keinen.
+   */
+  const senkrecht = richtung * Math.PI * 0.5;
+
+  /*
+   * Die Woelbung aus der Bewegung verteilt sich als halber Sinus ueber die
+   * Kette — am Bund und an der freien Kante null, in der Mitte am meisten.
+   * Auf Summe eins gebracht, damit `bogen` weiter ein Winkel bleibt und
+   * nicht bloss eine Zahl ohne Mass.
+   */
+  const welleProfil = (() => {
+    const n = form.segmente;
+    const roh = new Array<number>(n);
+    let summe = 0;
+    for (let i = 0; i < n; i += 1) {
+      roh[i] = Math.sin((Math.PI * i) / (n - 1));
+      summe += roh[i];
+    }
+    if (summe > 1e-6) for (let i = 0; i < n; i += 1) roh[i] /= summe;
+    return roh;
+  })();
+
+  /**
+   * Der Winkel **eines** Knochens. Die eine Stelle, an der steht, wie sich
+   * Drehung und Woelbung auf die Kette verteilen — `haltungSetzen` stellt
+   * danach, `spanne` schreitet danach ab.
+   */
+  function knochenWinkel(i: number, gedreht: number, bogen: number) {
+    if (!form.drehungVerteilt) return i === 0 ? gedreht : bogen * profil[i];
+    const inFlaeche = THREE.MathUtils.clamp(form.flaechenAnteil, 0, 1);
+    const weg = gedreht - senkrecht;
+    return (
+      (i === 0 ? senkrecht + weg * (1 - inFlaeche) : 0) +
+      weg * inFlaeche * profil[i] +
+      bogen * welleProfil[i]
+    );
+  }
+
+  /** Was `haltungSetzen` aus einer Haltung macht, in zwei Zahlen. */
+  function haltungWinkel(haltung: BlattHaltung) {
+    return {
+      gedreht:
+        richtung * Math.PI * easeInOut(haltung.anteil) + (haltung.faecher ?? 0),
+      bogen: -richtung * haltung.bogen,
+    };
+  }
+
+  function spanne(haltung: BlattHaltung) {
+    const { gedreht, bogen } = haltungWinkel(haltung);
+    let phi = 0;
+    let x = 0;
+    let z = 0;
+    // Der Bauch: wie weit sich das Blatt unterwegs am weitesten aus der
+    // Bundebene hebt. Wer eine Kamera darauf einpasst, muss ihn kennen —
+    // die hoechste Stelle steht naeher, und naeher heisst groesser.
+    let bauch = 0;
+    for (let i = 0; i < form.segmente; i += 1) {
+      phi += knochenWinkel(i, gedreht, bogen);
+      x += segBreite * Math.cos(phi);
+      z -= segBreite * Math.sin(phi);
+      bauch = Math.max(bauch, Math.abs(z));
+    }
+    return { x, z, bauch };
+  }
+
   function haltungSetzen(index: number, haltung: BlattHaltung, delta: number) {
     const blatt = blaetter[index];
     if (!blatt) return;
     const n = blatt.kette.length;
-    const gedreht =
-      richtung * Math.PI * easeInOut(haltung.anteil) + (haltung.faecher ?? 0);
     // Die Woelbung ist der freien Kante entgegengesetzt: das Papier bleibt
     // zurueck, wenn man es am Bund anhebt.
-    const bogen = -richtung * haltung.bogen;
+    const { gedreht, bogen } = haltungWinkel(haltung);
 
     for (let i = 0; i < n; i += 1) {
       const welle = Math.sin((Math.PI * i) / (n - 1));
       // Der erste Knochen traegt die Drehung, alle weiteren die Woelbung —
       // und die folgt dem Profil oben, nicht mehr einem halben Sinus.
-      const ziel = i === 0 ? gedreht : bogen * profil[i];
+      //
+      // Bei verteilter Drehung anders: dann steht im ersten Knochen nur
+      // die Senkrechte, und der ganze Weg von dort zur Ruhelage liegt im
+      // Profil. Das Blatt kommt so aus dem Bund heraus und legt sich
+      // daneben hin, statt an einem Scharnier abzuknicken.
+      const ziel = knochenWinkel(i, gedreht, bogen);
       const knochen = blatt.kette[i];
       knochen.rotation.y = damp(
         knochen.rotation.y,
@@ -363,6 +558,7 @@ export function seitenRigBauen(werte: {
     haltungSetzen,
     bogenAusZeit: (anteil, staerke) =>
       staerke * Math.sin(Math.PI * Math.pow(THREE.MathUtils.clamp(anteil, 0, 1), 0.85)),
+    spanne,
     entsorgen,
   };
 }

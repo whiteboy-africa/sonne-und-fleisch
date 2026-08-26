@@ -34,10 +34,17 @@ motiv: fracture
 # Schnittzugabe von 8,5 Punkt ringsum, und die wird nicht mitgerastert
 # (siehe `scripts/magazin-rendern.swift`).
 hoehe: 2.3
-dicke: 0.022
+# Sechsunddreissig Blaetter Papier: rund fuenf Millimeter bei 210 mm
+# Seitenbreite, also 2,4 Prozent davon. Damit bleibt das Heft flacher als
+# jeder Band (0,078) und ist doch kein Blatt mehr. Die Blattdicke in der
+# Leseposition faellt daraus ab (`blattDicke` in `ShelfEngine.ts`).
+dicke: 0.038
 breite_verhaeltnis: 0.671
 magazin:
-  seiten: 24
+  # Die ganze Ausgabe, nicht ihr Anfang. Der kleine Satz fuer Telefone
+  # liegt unter demselben Namen mit `-klein`; beide fallen aus
+  # `npm run magazin:build`.
+  seiten: 76
   ordner: /magazin/pages
 # Vor dem Blindband, hinter allen Baenden und hinter dem Blatt.
 reihenfolge: 950

@@ -1,0 +1,30 @@
+---
+// Die Seite, die es nicht gibt.
+//
+// Sie fehlte, und das war kein Schoenheitsfehler: ohne `404.html` beantwortet
+// Cloudflare Pages **jede** falsche Adresse mit `200` und irgendeinem Inhalt.
+// `/gibtesnicht` und `/magazin/pages/0077.webp` kamen beide als Erfolg
+// zurueck, 35 KB HTML mit dem Bildtyp einer Seite. Wer von aussen prueft, ob
+// eine Datei da ist, bekommt immer ja — und Werkzeuge, die Adressen ablaufen,
+// finden nie ein Ende.
+//
+// Astro legt aus dieser Datei `dist/404.html` an; Cloudflare Pages nimmt sie
+// dann von selbst und antwortet mit dem richtigen Status.
+import Seite from '../layouts/Seite.astro';
+---
+
+<Seite
+  titel="Nicht im Programm"
+  augenbraue="404"
+  untertitel="Diese Adresse führt nirgendwohin."
+  beschreibung="Die aufgerufene Adresse gehört zu keinem Band und zu keiner Seite des Verlags."
+>
+  <div class="fliesstext">
+    <p>
+      Vielleicht ist der Band vergriffen, vielleicht hat sich die Adresse
+      geändert, vielleicht steht hier auch nie etwas. Im <a href="/programm"
+        >Programm</a
+      > steht, was es gibt, und im <a href="/">Regal</a> liegt es.
+    </p>
+  </div>
+</Seite>

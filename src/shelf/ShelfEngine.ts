@@ -454,8 +454,32 @@ const heftSchwebeHub = 0.055;
  * kippt das Bild.
  */
 const heftDrehGrenzeGier = Math.PI;
-const heftDrehGrenzeNick = THREE.MathUtils.degToRad(78);
+/**
+ * **Ueber die Querachse ganz herum.**
+ *
+ * Hier standen 78 Grad. Das reichte, um von schraeg oben hineinzusehen,
+ * und hielt genau davor an, wo es interessant wird: das Heft auf den Kopf
+ * zu stellen und ihm auf die Rueckseite zu sehen. Ein Gegenstand, den man
+ * in der Hand dreht, hat dort keinen Anschlag — man dreht ihn eben um.
+ *
+ * Ueber neunzig Grad steht das Heft ueber Kopf, und ein Zug nach unten
+ * dreht es dann weiter in dieselbe Richtung; das ist dasselbe, was eine
+ * Hand tut. Der Anschlag bleibt bei einer halben Umdrehung stehen, damit
+ * die Lage nicht unbemerkt aufwickelt.
+ */
+const heftDrehGrenzeNick = Math.PI;
 /** Und wie nah und wie weit. 1 ist die ausgerechnete Grundentfernung. */
+/**
+ * Wie viele Blaetter zu jeder Seite auf dem Telefon ihr Bild tragen.
+ * Am Schreibtisch sind es drei (`magazinForm.fenster`).
+ */
+const heftFensterKlein = 1;
+/**
+ * Wieviel Licht das Heft bekommt, gemessen an dem des Regals. Ein Fuenftel
+ * weniger: die Doppelseite ist gross und hell, und volle Belichtung
+ * schiebt das Papier in die Lichter.
+ */
+const heftBelichtung = 0.8;
 const heftZoomNah = 0.48;
 const heftZoomFern = 1.4;
 /**
@@ -766,13 +790,34 @@ export class ShelfEngine {
   private heftGierZiel = 0;
   private heftNickZiel = 0;
   private heftDrehVon: { x: number; y: number } | null = null;
+  /**
+   * Ob dieser Zug schiebt statt dreht. Umschalt entscheidet das **beim
+   * Anfassen** und nicht Bild fuer Bild: wer die Taste mitten im Zug
+   * loslaesst, soll nicht plotzlich das Heft drehen.
+   */
+  private heftSchiebt = false;
   /** Naeher und weiter. 1 ist die ausgerechnete Grundentfernung. */
   private heftZoom = 1;
   private heftZoomZiel = 1;
+  /**
+   * Der seitliche Schub der Ansicht: wohin das Heft geruckt ist, damit
+   * nicht immer die Mitte im Bild steht.
+   *
+   * Ohne ihn zieht jeder Zoom zur Bundmitte, und genau die will niemand
+   * sehen — man geht naeher heran, um eine **Ecke** zu lesen. Der Schub
+   * haelt beim Radeln den Punkt unter dem Zeiger fest; das Heft waechst
+   * dann um diesen Punkt herum und nicht um seine Mitte.
+   */
+  private heftSchubX = 0;
+  private heftSchubY = 0;
+  private heftSchubXZiel = 0;
+  private heftSchubYZiel = 0;
   /** Zwei Finger auf dem Heft: der Abstand zwischen ihnen ist der Zoom. */
   private heftZeiger = new Map<number, { x: number; y: number }>();
   private heftKneifAbstand = 0;
   private heftKneifZoom = 1;
+  /** Die Mitte zwischen zwei Fingern — daran haengt das Schieben. */
+  private heftKneifMitte: { x: number; y: number } | null = null;
   private heftEuler = new THREE.Euler(0, 0, 0, "YXZ");
   /** Wo die Doppelseite im Fenster steht — das Ziehen rechnet danach. */
   private heftSchirm = { mitteX: 0, mitteY: 0, spanneX: 1, spanneY: 1 };
@@ -912,6 +957,7 @@ export class ShelfEngine {
           intro: () => void;
           hoverFx: typeof HOVER_FX;
           hoverStufen: typeof stufen;
+          heftForm: typeof magazinForm;
         };
       }
     ).__PRESS_LIBRARY__ = {
@@ -925,6 +971,17 @@ export class ShelfEngine {
       // und der naechste Schwenk holt weiter aus. Zum Einstellen im Bild,
       // ohne die Seite neu zu laden.
       hoverStufen: stufen,
+      /*
+       * Die Form des Heftes zum Einstellen im Bild:
+       * `__PRESS_LIBRARY__.heftForm.flaechenAnteil = 0.85` schiebt den
+       * Bauch am Bund wieder naeher heran, 0,6 weiter hinaus.
+       *
+       * Anders als die Schwebe-Schalter greift das **nicht** im laufenden
+       * Bild: das Biegeprofil wird einmal beim Bauen des Rigs gerechnet.
+       * Also ESC und das Heft noch einmal aufschlagen — dann steht die neue
+       * Form da.
+       */
+      heftForm: magazinForm,
       // Derselbe Schalter, den `prefers-reduced-motion` umlegt — hier von
       // Hand. Ohne ihn liesse sich der harte Wechsel nur nachpruefen, indem
       // man die Systemeinstellung aendert und die Seite neu laedt.
@@ -1490,11 +1547,13 @@ export class ShelfEngine {
     // einzige, feste — inzwischen soll man herangehen koennen.
     if (this.heftStufe !== "aus") {
       event.preventDefault();
+      const vorher = this.heftZoomZiel;
       this.heftZoomZiel = clamp(
         this.heftZoomZiel * (1 + event.deltaY * 0.0016),
         heftZoomNah,
         heftZoomFern,
       );
+      this.heftAnZeigerHalten(event.clientX, event.clientY, vorher);
       return;
     }
     if (this.mode !== "browse") return;
@@ -1538,8 +1597,10 @@ export class ShelfEngine {
         const [a, b] = [...this.heftZeiger.values()];
         this.heftKneifAbstand = Math.hypot(a.x - b.x, a.y - b.y);
         this.heftKneifZoom = this.heftZoomZiel;
+        this.heftKneifMitte = { x: (a.x + b.x) * 0.5, y: (a.y + b.y) * 0.5 };
         this.heftZug = null;
         this.heftDrehVon = null;
+        this.canvas.classList.remove("is-dragging");
         return;
       }
       this.heftZugStart(event);
@@ -1593,16 +1654,31 @@ export class ShelfEngine {
         gemerkt.x = event.clientX;
         gemerkt.y = event.clientY;
       }
-      // Zwei Finger: der Abstand zwischen ihnen ist die Entfernung.
+      /*
+       * Zwei Finger: ihr Abstand ist die Entfernung, ihre Mitte der Griff.
+       * Beides zugleich, wie ueberall sonst auch — wer mit zwei Fingern
+       * kneift, schiebt dabei; wer nur schiebt, will nur schieben.
+       */
       if (this.heftZeiger.size >= 2) {
         const [a, b] = [...this.heftZeiger.values()];
         const abstand = Math.hypot(a.x - b.x, a.y - b.y);
+        const mitteX = (a.x + b.x) * 0.5;
+        const mitteY = (a.y + b.y) * 0.5;
+        if (this.heftKneifMitte) {
+          this.heftSchieben(
+            mitteX - this.heftKneifMitte.x,
+            mitteY - this.heftKneifMitte.y,
+          );
+        }
+        this.heftKneifMitte = { x: mitteX, y: mitteY };
         if (this.heftKneifAbstand > 8 && abstand > 8) {
+          const vorher = this.heftZoomZiel;
           this.heftZoomZiel = clamp(
             this.heftKneifZoom * (this.heftKneifAbstand / abstand),
             heftZoomNah,
             heftZoomFern,
           );
+          this.heftAnZeigerHalten(mitteX, mitteY, vorher);
         }
         return;
       }
@@ -1705,7 +1781,10 @@ export class ShelfEngine {
     if (this.aufschlagStufe !== "aus") return;
     if (this.heftStufe !== "aus") {
       this.heftZeiger.delete(event.pointerId);
-      if (this.heftZeiger.size < 2) this.heftKneifAbstand = 0;
+      if (this.heftZeiger.size < 2) {
+        this.heftKneifAbstand = 0;
+        this.heftKneifMitte = null;
+      }
       this.heftZugEnde(event);
       return;
     }
@@ -1768,10 +1847,15 @@ export class ShelfEngine {
   private handlePointerCancel = (event: PointerEvent) => {
     if (this.heftStufe !== "aus") {
       this.heftZeiger.delete(event.pointerId);
-      if (this.heftZeiger.size < 2) this.heftKneifAbstand = 0;
+      if (this.heftZeiger.size < 2) {
+        this.heftKneifAbstand = 0;
+        this.heftKneifMitte = null;
+      }
       this.heftZug = null;
       this.heftTippVon = null;
       this.heftDrehVon = null;
+      this.heftSchiebt = false;
+      this.canvas.classList.remove("is-dragging");
       return;
     }
     this.zeiger.delete(event.pointerId);
@@ -2217,8 +2301,16 @@ export class ShelfEngine {
     // am Schreibtisch und im aufgeschlagenen Band bleibt es, wie es war.
     const handy =
       this.mode === "browse" && this.canvas.clientWidth < 760 ? 0.13 : 0;
+    /*
+     * Und im Heft ein Fuenftel weniger. Eine gedruckte Seite ist kein
+     * Umschlag: sie fuellt das Bild fast ganz aus, sie ist ueberwiegend
+     * hell, und was auf einem Umschlag als Glanz sitzt, ist hier eine
+     * ganze Flaeche. Mit der Belichtung des Regals lief das Papier in die
+     * Lichter und der Druck verlor seine Tiefe.
+     */
+    const heft = this.heftStufe !== "aus" ? heftBelichtung : 1;
     this.renderer.toneMappingExposure =
-      grundBelichtung * (1 + weit * 0.34 + handy) * this.dipLicht;
+      grundBelichtung * (1 + weit * 0.34 + handy) * heft * this.dipLicht;
 
     if (this.controls.enabled) this.controls.update();
     this.renderer.render(this.scene, this.camera);
@@ -4070,6 +4162,10 @@ export class ShelfEngine {
     this.heftDrehVon = null;
     this.heftZoom = 1;
     this.heftZoomZiel = 1;
+    this.heftSchubX = 0;
+    this.heftSchubY = 0;
+    this.heftSchubXZiel = 0;
+    this.heftSchubYZiel = 0;
     this.heftZeiger.clear();
     this.heftKneifAbstand = 0;
     this.heftStufe = "auf";
@@ -4183,10 +4279,23 @@ export class ShelfEngine {
     const x = event.clientX - kasten.left;
     const y = event.clientY - kasten.top;
     if (!this.heftGetroffen(x, y)) {
-      // Neben dem Heft wird nichts angefasst — aber der Druck wird gemerkt:
-      // ein kurzer Klick ins Schwarze ist der Ausgang, und ohne diese
-      // Zeile bliebe er wirkungslos.
+      /*
+       * Neben dem Heft liegt kein Blatt — aber der Raum darum gehoert
+       * trotzdem dem Gegenstand: wer ins Schwarze faehrt, dreht ihn.
+       *
+       * Vorher lief ein Zug daneben ins Leere. Gedreht wurde nur, wer den
+       * Bund traf, und das steht nirgends: man zieht am Heft, nichts
+       * passiert, und der Gegenstand ist keiner mehr. Jetzt dreht die Hand
+       * ueberall dort, wo sie kein Blatt in der Hand hat.
+       *
+       * Der kurze Klick bleibt der Ausgang: `heftZugEnde` schliesst nur,
+       * wenn die Hand sich dabei nicht bewegt hat.
+       */
       this.heftTippVon = { x, y };
+      this.heftDrehVon = { x, y };
+      this.heftSchiebt = event.shiftKey;
+      this.canvas.classList.add("is-dragging");
+      this.canvas.setPointerCapture(event.pointerId);
       return false;
     }
     if (this.heftEinzeln()) {
@@ -4208,6 +4317,8 @@ export class ShelfEngine {
       this.heftTippVon = { x, y };
       if (this.feinzeiger) {
         this.heftDrehVon = { x, y };
+        this.heftSchiebt = event.shiftKey;
+        this.canvas.classList.add("is-dragging");
         this.canvas.setPointerCapture(event.pointerId);
       }
       return true;
@@ -4240,6 +4351,13 @@ export class ShelfEngine {
       const kasten = this.canvas.getBoundingClientRect();
       const x = event.clientX - kasten.left;
       const y = event.clientY - kasten.top;
+      // Mit Umschalt wird geschoben statt gedreht — der Weg, um nah
+      // herangegangen in eine Ecke zu kommen, ohne das Heft zu verdrehen.
+      if (this.heftSchiebt) {
+        this.heftSchieben(x - this.heftDrehVon.x, y - this.heftDrehVon.y);
+        this.heftDrehVon = { x, y };
+        return;
+      }
       const proPixel =
         Math.PI / Math.max(320, this.canvas.clientWidth * 0.75);
       this.heftGierZiel = clamp(
@@ -4299,6 +4417,8 @@ export class ShelfEngine {
     this.heftZug = null;
     this.heftTippVon = null;
     this.heftDrehVon = null;
+    this.heftSchiebt = false;
+    this.canvas.classList.remove("is-dragging");
     if (this.canvas.hasPointerCapture(event.pointerId)) {
       this.canvas.releasePointerCapture(event.pointerId);
     }
@@ -4384,10 +4504,14 @@ export class ShelfEngine {
   }
 
   /**
-   * **Die** Entfernung. Sie kommt aus dem Fenster und aus nichts sonst:
-   * die Doppelseite (auf dem Telefon die einzelne Seite) soll darin
-   * stehen, ganz und mit etwas Luft. Kein Zoom greift hier ein — es gibt
-   * keinen.
+   * **Die** Entfernung, aus der das Heft zu stehen kommt: die Doppelseite
+   * (auf dem Telefon die einzelne Seite) soll ins Fenster passen, ganz und
+   * mit etwas Luft. Das ist der Ausgangspunkt; `heftZoom` faehrt von dort
+   * naeher heran oder weiter weg.
+   *
+   * `halbeBreite` ist dabei die **Reichweite** eines ruhenden Blattes und
+   * nicht seine Papierbreite: gewoelbt reicht es nur 84 Prozent so weit,
+   * und mit der Papierbreite gerechnet bliebe rundherum zu viel Luft.
    */
   private heftAbstand() {
     if (!this.heftRig) return 5;
@@ -4401,8 +4525,19 @@ export class ShelfEngine {
       this.heftRig.halbeHoehe / (halb * heftFuellungHoehe);
     const nachBreite =
       halbeBreite / (halb * this.camera.aspect * fuellungB);
-    // Mal dem, was Rad oder Kneifen daraus gemacht haben.
-    return Math.max(nachHoehe, nachBreite) * this.heftZoom;
+    /*
+     * Mal dem, was Rad oder Kneifen daraus gemacht haben — und dann noch
+     * den Bauch dazu.
+     *
+     * Eingepasst wird auf die Bundebene, aber die Seite liegt nicht darin:
+     * sie hebt sich unterwegs um ein Sechstel ihrer Breite heraus, und was
+     * naeher steht, steht groesser im Bild. Ohne diese Zeile lief die
+     * einzelne Seite auf dem Telefon ueber den rechten Rand, wo die Luft
+     * ohnehin nur zehn Prozent betraegt. Der Bauch ist ein fester Abstand
+     * und kein Faktor: er wird nach dem Zoom addiert, damit die vordere
+     * Flaeche in jeder Naehe dort steht, wo sie hingehoert.
+     */
+    return Math.max(nachHoehe, nachBreite) * this.heftZoom + this.heftRig.bauch;
   }
 
   /**
@@ -4412,6 +4547,84 @@ export class ShelfEngine {
   private heftVersatzX() {
     if (!this.heftRig || !this.heftEinzeln()) return 0;
     return (this.heftRig.halbeBreite * 0.5) * this.heftEinzelSeite;
+  }
+
+  /**
+   * Wie weit sich die Ansicht ueberhaupt aus der Mitte schieben laesst.
+   *
+   * Am Anschlag nach aussen (`heftZoom` 1 und weiter) ist es **null**: von
+   * weitem steht das ganze Heft im Bild, da gibt es nichts zu suchen, und
+   * ein Heft, das dabei aus der Mitte haengt, sieht nach Versehen aus. Je
+   * naeher man geht, desto mehr Weg — bei voller Naehe rund eine halbe
+   * Seite in jede Richtung. Der Schub faellt so von selbst wieder in die
+   * Mitte zurueck, wenn man herauszoomt; niemand muss ihn zuruecksetzen.
+   */
+  private heftSchubGrenze() {
+    if (!this.heftRig) return { x: 0, y: 0 };
+    const luft = Math.max(0, 1 - this.heftZoomZiel);
+    return {
+      x: this.heftRig.halbeBreite * luft,
+      y: this.heftRig.halbeHoehe * luft,
+    };
+  }
+
+  /**
+   * Haelt beim Zoomen den Punkt unter dem Zeiger fest.
+   *
+   * Die Doppelseite steht in der Ebene des Blickpunkts; ein Bildpunkt
+   * darauf liegt bei `ziel + n * abstand * tan(fov/2)`, quer noch mal dem
+   * Seitenverhaeltnis. Bleibt der Weltpunkt gleich und aendert sich der
+   * Abstand, muss der Blickpunkt um die Differenz nachziehen — mehr steht
+   * hier nicht.
+   *
+   * Gerechnet wird auf dem **Ziel**-Zoom, nicht auf dem laufenden: die
+   * Daempfung holt beides zusammen ein, und der Punkt sitzt am Ende genau.
+   */
+  private heftAnZeigerHalten(clientX: number, clientY: number, vorher: number) {
+    if (!this.heftRig) return;
+    const kasten = this.canvas.getBoundingClientRect();
+    if (kasten.width < 1 || kasten.height < 1) return;
+    // Von -1 bis 1, Mitte ist null. Y zeigt im Bild nach unten, in der
+    // Szene nach oben.
+    const nx = ((clientX - kasten.left) / kasten.width) * 2 - 1;
+    const ny = -(((clientY - kasten.top) / kasten.height) * 2 - 1);
+    const halb = Math.tan(THREE.MathUtils.degToRad(this.camera.fov) * 0.5);
+    // `heftAbstand` rechnet mit `heftZoom`; hier zaehlt der Ziel-Zoom.
+    const proZoom = this.heftAbstand() / Math.max(1e-6, this.heftZoom);
+    const hVorher = proZoom * vorher * halb;
+    const hNachher = proZoom * this.heftZoomZiel * halb;
+    const grenze = this.heftSchubGrenze();
+    this.heftSchubXZiel = clamp(
+      this.heftSchubXZiel + nx * (hVorher - hNachher) * this.camera.aspect,
+      -grenze.x,
+      grenze.x,
+    );
+    this.heftSchubYZiel = clamp(
+      this.heftSchubYZiel + ny * (hVorher - hNachher),
+      -grenze.y,
+      grenze.y,
+    );
+  }
+
+  /** Die Ansicht von Hand schieben — zwei Finger, oder Umschalt und ziehen. */
+  private heftSchieben(dx: number, dy: number) {
+    if (!this.heftRig) return;
+    const kasten = this.canvas.getBoundingClientRect();
+    if (kasten.width < 1 || kasten.height < 1) return;
+    const halb = Math.tan(THREE.MathUtils.degToRad(this.camera.fov) * 0.5);
+    const hoehe = 2 * this.heftAbstand() * halb;
+    const proPixel = hoehe / kasten.height;
+    const grenze = this.heftSchubGrenze();
+    this.heftSchubXZiel = clamp(
+      this.heftSchubXZiel - dx * proPixel,
+      -grenze.x,
+      grenze.x,
+    );
+    this.heftSchubYZiel = clamp(
+      this.heftSchubYZiel + dy * proPixel,
+      -grenze.y,
+      grenze.y,
+    );
   }
 
   private heftRigAufbauen(band: RuntimeBook) {
@@ -4427,11 +4640,27 @@ export class ShelfEngine {
     raum.dispose?.();
     pmrem.dispose();
 
+    /*
+     * **Auf dem Telefon der kleine Satz Seiten.**
+     *
+     * Der Ordner heisst wie der grosse, mit `-klein` daran; beide fallen
+     * aus demselben Lauf von `npm run magazin:build` und liegen deshalb
+     * immer zusammen (siehe dort). Ein Telefon zeigt eine Seite allein,
+     * hat weniger Speicher und einen kleineren Schirm — 1400 lange Kante
+     * statt 2048, und das Fenster um die aufgeschlagene Stelle wird enger.
+     * Beides zusammen bringt die vierzehn Seitenbilder auf zehn und die
+     * 210 MB Grafikspeicher auf rund 70.
+     */
+    const klein = this.heftEinzeln();
     const rig = magazinRigBauen({
       breite: band.width,
       hoehe: band.data.height,
       seiten: daten.pages,
-      ordner: daten.folder,
+      ordner: klein ? `${daten.folder}-klein` : daten.folder,
+      fenster: klein ? heftFensterKlein : undefined,
+      // Der Block in der Leseposition ist so dick wie der Gegenstand im
+      // Stapel — eine Zahl, aufgeteilt auf die Blaetter.
+      blattDicke: band.data.thickness / Math.max(1, Math.ceil(daten.pages / 2)),
       anisotropie: Math.min(8, this.renderer.capabilities.getMaxAnisotropy()),
       umgebung: this.heftUmgebung,
     });
@@ -4498,6 +4727,25 @@ export class ShelfEngine {
     this.heftGier += (this.heftGierZiel - this.heftGier) * drehTempo;
     this.heftNick += (this.heftNickZiel - this.heftNick) * drehTempo;
     this.heftZoom += (this.heftZoomZiel - this.heftZoom) * drehTempo;
+    /*
+     * Der Schub wird **jedes Bild** neu eingegrenzt, nicht bloss beim
+     * Radeln: die Grenze haengt am Zoom, und wer herauszoomt, verkleinert
+     * sie. Ohne das bliebe das Heft nach dem Herauszoomen aus der Mitte
+     * haengen — mit ihr faehrt es von selbst zurueck.
+     */
+    const schubGrenze = this.heftSchubGrenze();
+    this.heftSchubXZiel = clamp(
+      this.heftSchubXZiel,
+      -schubGrenze.x,
+      schubGrenze.x,
+    );
+    this.heftSchubYZiel = clamp(
+      this.heftSchubYZiel,
+      -schubGrenze.y,
+      schubGrenze.y,
+    );
+    this.heftSchubX += (this.heftSchubXZiel - this.heftSchubX) * drehTempo;
+    this.heftSchubY += (this.heftSchubYZiel - this.heftSchubY) * drehTempo;
 
     // Die Leselage: die eingestellte Schraeglage, dazu die Hand und das
     // Schweben. Sie wird jedes Bild neu gesetzt — der Anflug mischt
@@ -4534,8 +4782,12 @@ export class ShelfEngine {
 
     const abstand = this.heftAbstand();
     const mitte = this.heftLeseOrt;
-    const versatz = this.heftVersatzX() * anflug;
-    this.heftZielOrt.set(mitte.x + versatz, mitte.y, mitte.z);
+    const versatz = (this.heftVersatzX() + this.heftSchubX) * anflug;
+    this.heftZielOrt.set(
+      mitte.x + versatz,
+      mitte.y + this.heftSchubY * anflug,
+      mitte.z,
+    );
     const zielJetzt = this.heftMessZiel
       .copy(this.heftZielVorher)
       .lerp(this.heftZielOrt, anflug);
@@ -4674,6 +4926,10 @@ export class ShelfEngine {
         seite: this.heftEinzelSeite,
         abstand: Number(this.heftAbstand().toFixed(3)),
         zoom: Number(this.heftZoom.toFixed(3)),
+        schub: {
+          x: Number(this.heftSchubX.toFixed(4)),
+          y: Number(this.heftSchubY.toFixed(4)),
+        },
         gierGrad: Number(THREE.MathUtils.radToDeg(this.heftGier).toFixed(1)),
         nickGrad: Number(THREE.MathUtils.radToDeg(this.heftNick).toFixed(1)),
         zug: this.heftZug

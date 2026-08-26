@@ -13,9 +13,17 @@
 // Schreiben wird der Zielordner geleert — sonst blieben Seiten aus einem
 // aelteren, laengeren Heft liegen und stuenden hinten im Blaettern herum.
 //
-// Keine Vorschaubilder. Das Heft laedt seine Seiten im Fenster um die
-// aufgeschlagene Doppelseite herum und gibt den Rest wieder frei; eine
-// zweite Groesse waere ein zweiter Satz Dateien, den nie jemand sieht.
+// **Zwei Groessen, ein Lauf.** Aus denselben Rastern fallen zwei Saetze:
+// `pages/` mit langer Kante 2048 fuer den Schreibtisch, `pages-klein/` mit
+// 1400 fuer Telefone. Beide entstehen immer zusammen — wer nur einen baut,
+// laesst die Haelfte der Geraete auf Dateien zeigen, die es nicht gibt.
+//
+// Der Grund ist der Grafikspeicher, nicht die Leitung. Das Heft haelt
+// vierzehn Seitenbilder gleichzeitig; bei 1374 x 2048 sind das rund
+// 210 MB, und das killt Telefone. Bei 1400 langer Kante ist es die
+// Haelfte. Frueher stand hier, eine zweite Groesse sehe nie jemand — das
+// galt, solange das Heft vierundzwanzig Seiten hatte und niemand
+// heranzoomen konnte.
 //
 // **Kein PDF.** Hier fiel einmal eine Datei zum Herunterladen ab. Das Heft
 // ist zum Blaettern da; wer eine Datei mitnimmt, hat es nicht gelesen,
@@ -36,14 +44,23 @@ const wurzel = path.resolve(fileURLToPath(import.meta.url), '..', '..');
 const quelle = path.join(wurzel, 'content', 'magazin.pdf');
 /** Wohin die Seiten kommen. Wird vorher geleert. */
 const ziel = path.join(wurzel, 'public', 'magazin', 'pages');
+/** Und der kleine Satz daneben, nach derselben Regel benannt. */
+const zielKlein = path.join(wurzel, 'public', 'magazin', 'pages-klein');
 
 /**
- * So viele Seiten. Das Heft im Regal ist eine Leseprobe, kein Archiv —
- * die Ausgabe hat 76 Seiten, gezeigt werden die ersten 24.
+ * So viele Seiten. Die ganze Ausgabe — das Heft im Regal ist die Ausgabe
+ * und nicht ihr Anfang. Mehr als das Heft hat, rastert der Swift-Teil
+ * ohnehin nicht; er meldet die wahre Zahl zurueck.
  */
-const seiten = 24;
-/** Lange Kante in Bildpunkten. */
+const seiten = 76;
+/** Lange Kante in Bildpunkten, am Schreibtisch. */
 const kante = 2048;
+/**
+ * Und auf dem Telefon. Nicht kleiner: bei drei Bildpunkten je CSS-Pixel
+ * will eine ruhende Seite rund 1570 davon, und darunter sieht man dem
+ * Satzspiegel das Rechnen an.
+ */
+const kanteKlein = 1400;
 /** Guete des WebP. */
 const guete = 80;
 /** Ab hier wird gewarnt: so viel laedt niemand mehr auf dem Telefon. */
@@ -96,33 +113,46 @@ try {
 
   // Leeren statt ueberschreiben: ein kuerzeres Heft laesst sonst die Seiten
   // des laengeren stehen.
-  rmSync(ziel, { recursive: true, force: true });
-  mkdirSync(ziel, { recursive: true });
-
-  let gesamt = 0;
-  let masse = '';
-  for (const name of pngs) {
-    const aus = path.join(ziel, name.replace(/\.png$/, '.webp'));
-    const ergebnis = await sharp(await readFile(path.join(roh, name)))
-      .webp({ quality: guete, effort: 6 })
-      .toFile(aus);
-    gesamt += ergebnis.size;
-    masse = `${ergebnis.width}x${ergebnis.height}`;
+  for (const ordner of [ziel, zielKlein]) {
+    rmSync(ordner, { recursive: true, force: true });
+    mkdirSync(ordner, { recursive: true });
   }
 
-  const mb = (gesamt / 1048576).toFixed(1);
-  console.log(
-    `${pngs.length} Seiten von ${imHeft} nach ${path.relative(wurzel, ziel)}/ — ` +
-      `${masse}, WebP q${guete}, zusammen ${mb} MB`,
-  );
+  const saetze = [
+    { ordner: ziel, kante: null, gesamt: 0, masse: '' },
+    { ordner: zielKlein, kante: kanteKlein, gesamt: 0, masse: '' },
+  ];
 
-  if (gesamt > warnAb) {
-    console.warn(
-      `\nWarnung: ${mb} MB ist mehr als die 25 MB, die hier die Grenze sind.\n` +
-        'Das Heft laedt seine Seiten zwar im Fenster nach, aber wer\n' +
-        'cover-to-cover blaettert, holt am Ende alles. Weniger Seiten,\n' +
-        'kuerzere Kante oder geringere Guete.',
+  for (const name of pngs) {
+    // Einmal von der Platte, zweimal verkleinert: das Rastern ist der
+    // teure Teil, und die kleine Groesse faellt aus demselben Bild.
+    const bild = await readFile(path.join(roh, name));
+    for (const satz of saetze) {
+      const aus = path.join(satz.ordner, name.replace(/\.png$/, '.webp'));
+      const stufe = sharp(bild);
+      if (satz.kante) stufe.resize({ height: satz.kante, fit: 'inside' });
+      const ergebnis = await stufe.webp({ quality: guete, effort: 6 }).toFile(aus);
+      satz.gesamt += ergebnis.size;
+      satz.masse = `${ergebnis.width}x${ergebnis.height}`;
+    }
+  }
+
+  for (const satz of saetze) {
+    const mb = (satz.gesamt / 1048576).toFixed(1);
+    console.log(
+      `${pngs.length} Seiten von ${imHeft} nach ` +
+        `${path.relative(wurzel, satz.ordner)}/ — ` +
+        `${satz.masse}, WebP q${guete}, zusammen ${mb} MB`,
     );
+    if (satz.gesamt > warnAb) {
+      console.warn(
+        `\nWarnung: ${mb} MB in ${path.basename(satz.ordner)} ist mehr als\n` +
+          'die 25 MB, die hier die Grenze sind. Das Heft laedt seine Seiten\n' +
+          'zwar im Fenster nach und gibt sie wieder frei, aber wer\n' +
+          'cover-to-cover blaettert, holt am Ende alles. Weniger Seiten,\n' +
+          'kuerzere Kante oder geringere Guete.',
+      );
+    }
   }
 } finally {
   rmSync(roh, { recursive: true, force: true });

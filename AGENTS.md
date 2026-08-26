@@ -354,26 +354,67 @@ Tippziele mindestens 44px.
 
 ## Das Magazin: ein Blaetterobjekt, kein Betrachter
 
-Im Stapel liegt ein Heft. Es ist flacher und groesser als die Baende und
-traegt das Format seiner Druckdatei (0,679 statt 0,705) — man sieht schon
-von weitem, dass es nicht dazugehoert. Ein Klick fuehrt geradewegs in eine
-Leseposition: der Umschlag geht unterwegs auf, die erste Doppelseite steht.
+Im Stapel liegt ein Heft: die ganze Ausgabe, sechsundsiebzig Seiten. Es
+ist flacher und groesser als die Baende und traegt das Format seiner
+Druckdatei (0,671) — man sieht schon von weitem, dass es nicht dazugehoert.
+Ein Klick fuehrt geradewegs in eine Leseposition: der Umschlag geht
+unterwegs auf, die erste Doppelseite steht.
 
-Es ist ausdruecklich **kein PDF-Betrachter**. Kein Zoom, keine freie
-Kamera, kein Vollbild, kein Zaehler, keine Werkzeugleiste. Wer ein Heft
-durchblaettert, dreht nicht am Zoom.
+Es ist ausdruecklich **kein PDF-Betrachter**: kein Vollbild, kein Zaehler,
+keine Werkzeugleiste, keine Seitenauswahl. Anfassen laesst es sich
+trotzdem, denn es ist ein Gegenstand — drehen und heranholen, mehr nicht
+(siehe unten).
 
-### Eine Entfernung
+### Eine Entfernung, und eine Hand daran
 
-Sie kommt aus dem Fenster und aus nichts sonst (`heftAbstand`): die
-Doppelseite soll darin stehen, ganz und mit etwas Luft — 78 % der Hoehe,
-hoechstens 90 % der Breite. Auf dem Telefon steht eine Seite allein.
+Sie kommt aus dem Fenster (`heftAbstand`): die Doppelseite soll darin
+stehen, ganz und mit etwas Luft — 78 % der Hoehe, hoechstens 90 % der
+Breite. Auf dem Telefon steht eine Seite allein.
 
-**Kein Weg fuehrt daran vorbei.** Rad, Strg-Rad (das Kneifen auf dem
-Trackpad), zwei Finger, Doppelklick: alles laeuft ins Leere, OrbitControls
-ist abgeschaltet. Nachgemessen mit sechsunddreissig Radereignissen, einer
-Kneifgeste und einem Doppelklick — Abstand und Bildgroesse Ziffer fuer
-Ziffer unveraendert.
+Zwei Zahlen gehen dabei nicht aus dem Papier hervor, sondern aus der Form:
+**die Reichweite** (`rig.spanne`) statt der Papierbreite — eine gewoelbte
+Seite reicht nur 91 Prozent so weit, und mit der Papierbreite gerechnet
+bliebe rundherum zu viel Luft — und **der Bauch**, der auf die Entfernung
+addiert wird. Eingepasst wird auf die Bundebene, aber die Seite liegt nicht
+darin; was naeher steht, steht groesser. Ohne diesen Zuschlag lief die
+einzelne Seite auf dem Telefon rechts aus dem Bild, wo die Luft ohnehin nur
+zehn Prozent betraegt. Beide Zahlen werden gerechnet und nicht gesetzt: sie
+stimmen von selbst, wenn jemand an der Blattform dreht.
+
+**OrbitControls bleibt abgeschaltet.** Die Kamera kreist nicht, sie steht.
+Was sich bewegt, ist der Gegenstand: das Heft laesst sich **in der Hand
+drehen** — um beide Achsen ganz herum, ±180 Grad (`heftDrehGrenzeGier`,
+`heftDrehGrenzeNick`) — und mit dem Rad heranholen oder wegschieben
+(`heftZoomNah` 0,48 bis `heftZoomFern` 1,4). Ueber die Querachse standen
+hier einmal 78 Grad, und das hielt genau davor an, wo es interessant wird:
+das Heft auf den Kopf zu stellen und ihm auf die Rueckseite zu sehen. Ein
+Gegenstand in der Hand hat dort keinen Anschlag. Der
+Unterschied ist kein Wortspiel: eine kreisende Kamera braucht ein Ziel,
+einen Horizont und einen Boden, das Heft hat nichts davon. Ein Gegenstand,
+den man dreht, braucht nur zwei Winkel.
+
+**Gedreht wird ueberall dort, wo kein Blatt in der Hand liegt** — ueber dem
+Bund und **im Schwarzen daneben**. Das Schwarze war vorher tot: wer daneben
+zog, bekam nichts, und weil das die naheliegende Geste ist, war das Heft
+fuer den, der es probierte, unbeweglich. Der **kurze** Klick daneben bleibt
+der Ausgang; unterschieden wird nach dem Weg der Hand, nicht nach dem Ort
+(`kurz` in `heftZugEnde`, 7 Bildpunkte). Solange gedreht wird, traegt die
+Leinwand `is-dragging` und der Zeiger ist eine geschlossene Hand.
+
+**Und gezoomt wird zum Zeiger, nicht zur Mitte.** Wer naeher herangeht,
+will eine Stelle sehen — eine Ecke, eine Spalte, eine Bildunterschrift —,
+und die liegt fast nie im Bund. Der Punkt unter dem Zeiger bleibt beim
+Radeln stehen, das Heft waechst um ihn herum (`heftAnZeigerHalten`).
+Dasselbe gilt fuer das Kneifen mit zwei Fingern, dort um die Mitte
+zwischen ihnen; zwei Finger schieben dabei zugleich.
+
+Der Weg aus der Mitte heisst `heftSchub` und hat eine Grenze, die **am
+Zoom haengt** (`heftSchubGrenze`): bei voller Entfernung ist sie null, bei
+voller Naehe rund eine halbe Seite in jede Richtung. Damit faehrt das Heft
+beim Herauszoomen von selbst in die Mitte zurueck — es gibt keinen
+Zuruecksetzen-Knopf, weil keiner noetig ist. Von Hand schieben laesst sich
+mit **Umschalt und ziehen**; ob geschoben oder gedreht wird, entscheidet
+sich beim Anfassen und nicht Bild fuer Bild.
 
 Das Heft **faehrt dabei nicht zur Kamera**. Es bleibt liegen, wo es lag,
 richtet sich auf und waechst auf seine wahre Groesse; die Kamera kommt zu
@@ -432,6 +473,133 @@ mal rechts, je nachdem welche Seite gerade dran ist — wer von ihm aus
 rechnet, blaettert bei jedem zweiten Tippen rueckwaerts. Ein Tipp ueber
 oder unter der Seite schliesst.
 
+### Wie ein Blatt liegt: die Drehung sitzt in der Flaeche
+
+Ein Blatt am Bund kann auf zwei Arten umschlagen, und der Unterschied ist
+der zwischen einer Klappkarte und einem Heft.
+
+**Vorher: ein Scharnier.** Der erste Knochen trug die ganze Drehung, alle
+uebrigen nur eine milde Woelbung. Die Seite war dahinter eine ebene Platte,
+die am Bund abknickte. Zwei solche Platten bei 180 Grad sind eine Tafel mit
+einem Strich in der Mitte — deshalb stand das Heft frueher in einem V von
+19 Grad: der Winkel sollte ersetzen, was der Form fehlte. Er ersetzte es
+nicht, er machte eine Klappkarte daraus.
+
+**Jetzt: die Drehung liegt in der Flaeche** (`drehungVerteilt` in
+`seiten-rig.ts`). Der erste Knochen haelt nur die **Senkrechte** — die
+Haltung auf halbem Weg, das Blatt steht auf dem Bund. Der ganze Weg von
+dort in die Ruhelage wird ueber die Kette verteilt, nach demselben Profil
+wie die Woelbung. Das Blatt kommt damit senkrecht aus dem Bund heraus und
+legt sich daneben hin.
+
+Nachgemessen gegen die Vorlage, Hub ueber der Bundebene in Seitenbreiten,
+an 0/10/20/…/100 Prozent der Seite:
+
+```
+Vorlage            0,000  0,163  0,162  0,133  0,070  0,024 -0,007 … -0,021
+vorher (Scharnier) 0,000 -0,035 -0,054 -0,071 -0,082 -0,087 -0,093 … -0,126
+jetzt              0,000  0,182  0,180  0,147  0,094  0,035 -0,008 … -0,014
+```
+
+Das Scharnier sinkt gleichmaessig durch und hat keinen Bauch. Die Vorlage
+und das Heft heben sich in den ersten zehn Prozent um ein Sechstel der
+Seitenbreite und legen sich dann flach — **das** ist die Form, an der man
+ein gebundenes Blatt erkennt.
+
+Von der Senkrechten aus zu rechnen ist kein Umweg, sondern die Bedingung:
+von der Ruhelage aus haette die eine Seite den doppelten Bauch und die
+andere gar keinen.
+
+Zwei weitere Zahlen haengen daran und muessen zusammen gestellt werden:
+die `oeffnung` (jetzt 8 statt 19 Grad) kippt die Haelfte weg, und
+`ruheBogen` (-0,24) holt ihre Aussenkante wieder herunter.
+
+**Wo der Bauch sitzt, haengt daran, wie hoch er ist — und wie stark
+draussen zurueckgebogen wird.** Drei Zahlen spielen zusammen:
+
+- `innenAnteil` (0,5) — ueber welchen Teil der Seite sich die Woelbung
+  erstreckt. Von Haus aus reicht sie nur so weit, wie `innenBis` Knochen
+  reichen: 31 Prozent, und das klebte am Bund.
+- `aussen` (0,75) — wie stark die Seite danach zurueckbiegt. Sie ist die
+  Gegenkraft: wer die Woelbung weiter hinaus zieht, laesst die Seite
+  laenger steigen, und ohne staerkeren Rueckbogen bleibt sie draussen oben
+  stehen statt sich hinzulegen.
+- `flaechenAnteil` (0,6) — wie viel von der Drehung in der Flaeche liegt
+  und wie viel als Schraeglage im Bund. Er stellt die Hoehe des Bauchs.
+
+Gemessen wird an drei Zahlen: **wo** der Gipfel liegt, **wie hoch** er ist,
+und was am **Rand** herauskommt — draussen muss die Seite wieder flach
+liegen, sonst rollt sie sich auf.
+
+```
+                      Gipfel bei   Hoehe    Rand   Reichweite
+Vorlage (Book.jsx)        15 %     0,163   -0,021     —
+vorher (0,31/0,25/0,7)    21 %     0,142   -0,001    0,927
+jetzt  (0,5/0,75/0,6)     36 %     0,196   +0,004    0,879
+```
+
+Zwei Wege dorthin sind gemessen und verworfen. Das Profil bloss zu
+**strecken** schiebt den Rueckbogen hinten aus der Kette: Rand +0,39, die
+Seite rollt sich auf. Und beide Teile des Profils **zusammen** zu normieren
+verschiebt beim Umrechnen ihr Verhaeltnis — der Teil mit mehr Knochen
+bekommt mehr Gewicht, die Seite woelbt sich frueh und stark und biegt
+hinten nicht mehr genug zurueck (Rand +0,29). Deshalb behaelt jeder Teil
+sein Gewicht einzeln, und erst dann wird auf eins normiert.
+
+Zum Ausprobieren im Bild: `__PRESS_LIBRARY__.heftForm.innenAnteil = 0.4`
+(oder `.aussen`, `.flaechenAnteil`, `.faecherGesamt`), dann ESC und das
+Heft noch einmal aufschlagen — das Profil wird beim Bauen des Rigs
+gerechnet, nicht Bild fuer Bild.
+
+### Ein Fuenftel weniger Licht
+
+Im Heft steht die Belichtung auf `heftBelichtung` (0,8) mal der des Regals.
+Eine gedruckte Seite ist kein Umschlag: sie fuellt das Bild fast ganz aus,
+sie ist ueberwiegend hell, und was auf einem Umschlag als Glanzstelle sitzt,
+ist hier eine ganze Flaeche. Mit der Belichtung des Regals lief das Papier
+in die Lichter und der Druck verlor seine Tiefe. Der Faktor greift nur,
+solange das Heft offen ist (`heftStufe !== "aus"`); der Stapel bleibt, wie
+er war.
+
+### Der Faecher gehoert dem Block
+
+Ein Stapel Blaetter liegt nicht deckungsgleich, er faechert. Der Betrag
+dafuer steht als `faecherGesamt` (10 Grad) und meint den **ganzen Block**,
+vom obersten Blatt bis zum untersten; die Blaetter teilen ihn unter sich
+auf.
+
+Hier stand einmal ein Winkel **je Blatt** (0,9 Grad), und das ging, solange
+das Heft zwoelf Blaetter hatte — zusammen knapp zehn Grad. Bei
+achtunddreissig wurden daraus dreiunddreissig: der Block stand auf wie ein
+Kamm, die unteren Blaetter schwangen weit aus der Bundebene, und von der
+Seite sah das Heft aus wie eine aufgeblaetterte Muschel. Ein dickeres Heft
+faechert nicht weiter auf — es faechert feiner.
+
+### Der Ruecken
+
+Zwoelf Blaetter am selben Strich sind noch kein Heft: von hinten sah man
+zwoelf einzelne Kanten und dazwischen den schwarzen Raum. Der Ruecken ist
+eine halbe Roehre — so breit wie der Block dick ist, so hoch wie die
+Seiten, und **nur die hintere Haelfte**; die vordere waere ein Wulst
+zwischen den offenen Seiten. Sein Halbmesser ist die halbe Blockdicke,
+damit die aeussersten Blaetter tangential aus ihm herauskommen statt ihn
+zu durchstossen.
+
+Wie dick er ist, sagt das Heft selbst: die `dicke` aus dem Frontmatter,
+geteilt durch die Zahl der Blaetter, ist die Dicke **eines** Blattes
+(`blattDicke` beim Bauen des Rigs). So koennen Stapel und Leseposition
+nicht auseinanderlaufen, wenn das Heft waechst. Achtunddreissig Blaetter zu
+0,001 sind 2,4 Prozent der Seitenbreite — rund fuenf Millimeter bei einer
+Seite von 210: ein Heft, kein Buch, und flacher als jeder Band im Stapel
+(0,078).
+
+**Dazu wird der Block in der Tiefe gemittelt.** Die Hoehenformeln zaehlen
+von der aufgeschlagenen Stelle aus, und deren Nullpunkt wandert beim
+Blaettern: vorn liegt fast alles rechts, hinten fast alles links. Der Block
+rueckte damit im Lauf des Heftes um seine ganze Dicke auf die Kamera zu.
+Vor dem Ruecken fiel das niemandem auf; seit er feststeht, wanderte der
+Block sichtbar an ihm vorbei.
+
 ### Der Speicher bleibt flach
 
 Ein Heft mit vierundzwanzig Seiten hat zwoelf Blaetter. Alle zwoelf als
@@ -447,10 +615,33 @@ Doppelseite herum. Deshalb drei Teile (`shelf/magazin-rig.ts`):
 - **Ein Texturvorrat**, der mit dem Fenster wandert. Was herausfaellt, wird
   freigegeben.
 
-Nachgemessen ueber drei Durchlaeufe von vorn bis hinten und zurueck:
-hoechstens acht Seitenbilder gleichzeitig, Geometrien und Texturen ohne
-Zuwachs, 14 bis 24 Zeichenaufrufe. `__PRESS_LIBRARY__.diagnostics().heft`
-zeigt Stand, Fenster, Vorrat, Entfernung und den gemessenen Schirmrahmen.
+Nachgemessen ueber einen Durchlauf von vorn bis hinten und zurueck:
+**vierzehn** Seitenbilder gleichzeitig, an jeder Stelle dieselben
+vierzehn — zwei Blaetter zu jeder Seite plus das aufgeschlagene, mal zwei
+Seiten, dazu das erste und das letzte Blatt, die immer geladen bleiben.
+`renderer.info.memory.textures` steht dabei still: was aus dem Fenster
+faellt, wird freigegeben, und Vor- und Zurueckblaettern durch das ganze
+Heft aendert die Zahl um keinen Zaehler.
+
+**Diese Zahl haengt nicht an der Seitenzahl des Heftes, sondern allein am
+Fenster** (`magazinForm.fenster`). Ein Heft mit sechsundsiebzig Seiten
+kostet im Speicher keinen Byte mehr als eines mit vierundzwanzig — nur der
+Vorrat wandert oefter. Was es kostet, ist die Leitung: wer von vorn bis
+hinten blaettert, holt am Ende alle Seiten.
+
+```
+                     Fenster   Bilder   je Bild   zusammen
+Schreibtisch            2        14      15 MB     210 MB
+Telefon (klein)         1        10       7 MB      70 MB
+```
+
+Das Fenster stand einmal auf drei. Das ging, solange das Heft
+vierundzwanzig Seiten hatte und an den Enden anschlug; bei
+sechsundsiebzig steht es immer offen, und aus vierzehn Bildern waeren
+achtzehn geworden.
+
+`__PRESS_LIBRARY__.diagnostics().heft` zeigt Stand, Fenster, Vorrat,
+Entfernung, Schub und den gemessenen Schirmrahmen.
 
 ### Drei Dinge, die man beim Anfassen wissen muss
 
@@ -467,12 +658,23 @@ zeigt Stand, Fenster, Vorrat, Entfernung und den gemessenen Schirmrahmen.
   sollte, steht im selben Bild schon drueben. Es dreht sich nie, es
   springt. Die **Knochen** dagegen gehoeren dem Platz: rutscht ein anderes
   Blatt hinein, werden sie einmal hart gesetzt statt gedaempft.
-- **Die beiden Seiten sind gegenlaeufig gestapelt.** Rechts liegt das
-  naechste Blatt obenauf, links das zuletzt umgeschlagene. Wer beides mit
-  derselben Ordnung bedient, versteckt links das oberste unter seinem
-  Vorgaenger, und die linke Seite steht eine Doppelseite zu frueh. Wer
-  gerade umschlaegt, liegt ueber allem — er gehoert in diesem Augenblick zu
-  keiner von beiden.
+- **Die beiden Seiten sind gegenlaeufig gestapelt, und zwar in der Hoehe.**
+  Rechts liegt das naechste Blatt obenauf (`(stelle - blatt) * dicke`),
+  links das zuletzt umgeschlagene (`(blatt + 1) * dicke`). Wer gerade
+  umschlaegt, liegt ueber allem — er gehoert in diesem Augenblick zu keiner
+  von beiden.
+
+  Links stand einmal dieselbe Formel wie rechts. Der Fehler daran zeigt
+  sich erst ab dem zweiten umgeschlagenen Blatt — vorher liegt links ein
+  einziges, und eines kann sich nicht selbst verdecken. Dann aber:
+  **am Bund** entschied die Hoehe im Stapel und drehte die Ordnung um,
+  **draussen** entschied der Faecher und stellte sie richtig. Irgendwo dazwischen kreuzten sich die
+  Blaetter, und am Bund stand ein langer heller Streifen — durch die linke
+  Seite hindurch sah man das erste Blatt. Nachgemessen bei Stand 4: am Bund
+  lag Blatt 0 mit z = +0,0010 vor Blatt 3 mit z = -0,0045, draussen
+  umgekehrt. Jetzt stimmen beide Enden ueberein (3, 2, 1, 0 von vorn nach
+  hinten, am Bund wie draussen), und der ganze linke Stapel liegt vor dem
+  rechten — am Bund treffen sie sich, und dort muss einer vorn sein.
 
 ### Sonderobjekt-Regeln
 
@@ -499,12 +701,29 @@ __PRESS_LIBRARY__.ohneBewegung(true)
 
 ### Woher die Seiten kommen
 
-`npm run magazin:build` (`scripts/magazin-bauen.mjs`) rastert die ersten
-vierundzwanzig Seiten von `content/magazin.pdf` nach
-`public/magazin/pages/0001.webp` aufwaerts — lange Kante 2048, WebP q80,
-zusammen 4,6 MB. Es warnt ab 25 MB. Keine Vorschaubilder: das Heft laedt im
-Fenster nach, eine zweite Groesse waere ein zweiter Satz Dateien, den nie
-jemand sieht.
+`npm run magazin:build` (`scripts/magazin-bauen.mjs`) rastert alle
+sechsundsiebzig Seiten von `content/magazin.pdf` und schreibt sie
+**zweimal**:
+
+```
+public/magazin/pages/0001.webp        1374 x 2048   16,7 MB   Schreibtisch
+public/magazin/pages-klein/0001.webp   939 x 1400   10,3 MB   Telefon
+```
+
+Beide fallen aus demselben Lauf und aus denselben Rastern; wer nur einen
+baut, laesst die halbe Welt auf Dateien zeigen, die es nicht gibt. Gewarnt
+wird je Satz ab 25 MB.
+
+Welcher Satz gilt, entscheidet sich beim Bauen des Rigs nach derselben
+Frage wie die Einzelseite (`heftEinzeln`): unter 768 Pixeln oder auf einem
+Fingergeraet der kleine, sonst der grosse. Der Name ist die Regel — der
+Ordner aus dem Frontmatter mit `-klein` daran.
+
+Warum nicht kleiner: bei drei Bildpunkten je CSS-Pixel will eine ruhende
+Seite auf dem Telefon rund 1570 davon. Und warum nicht groesser: 2048 ist
+am Schreibtisch schon knapp — bei vollem Zoom (`heftZoomNah` 0,48) steht
+die Seite 1081 CSS-Pixel hoch, auf einem Retina-Schirm also 2163
+Bildpunkte.
 
 Gerastert wird mit **Swift und PDFKit** (`magazin-rendern.swift`), weil auf
 diesem Rechner weder Poppler noch ImageMagick noch Ghostscript liegen.
@@ -767,6 +986,37 @@ Zwei Riegel sorgen dafuer, und beide gehoeren zusammen:
   Sitemap-Verweis im Kopf weg.
 - `public/_headers` schickt `X-Robots-Tag: noindex, nofollow` zu **jeder**
   Datei — auch zu den Umschlaegen (sonst Bildersuche) und zur Sitemap.
+
+### Das Repo bleibt privat
+
+**Das Heft liegt im Git.** Sechsundsiebzig Seitenbilder unter
+`public/magazin/pages/`, dazu der kleine Satz daneben — die ganze Ausgabe.
+Solange das Repo oeffentlich ist, laedt sie jeder ohne Anmeldung herunter:
+
+```
+raw.githubusercontent.com/<konto>/sonne-und-fleisch/main/public/magazin/pages/0001.webp
+```
+
+Das macht die Zeile „PDF herunterladen" zunichte, die genau deshalb von der
+Seite genommen wurde. Auf der Seite ist das Heft zum Blaettern da; wer eine
+Datei mitnimmt, hat es nicht gelesen, sondern kopiert — und ueber ein
+offenes Repo nimmt er sie in einem Zug mit, samt dem Skript, das sie wieder
+zusammensetzt.
+
+Also: **Sichtbarkeit privat.** Cloudflare Pages baut aus privaten Repos
+unveraendert weiter, die Verbindung laeuft ueber die GitHub-App.
+
+Wer die Seiten doch aus dem Git nehmen will, braucht einen anderen Weg zum
+Ausliefern — der Bau kann sie nicht erzeugen, denn `content/magazin.pdf`
+liegt aus gutem Grund auch nicht im Repo.
+
+### Die Seite, die es nicht gibt
+
+`src/pages/404.astro` muss dableiben. Ohne `dist/404.html` beantwortet
+Cloudflare Pages **jede** falsche Adresse mit `200` und irgendeinem Inhalt:
+`/gibtesnicht` und `/magazin/pages/0077.webp` kamen beide als Erfolg
+zurueck, 35 KB HTML mit dem Bildtyp einer Seite. Wer von aussen prueft, ob
+eine Datei da ist, bekommt dann immer ja.
 
 `public/robots.txt` verbietet absichtlich **nichts**. Ein `Disallow: /` wuerde
 die Bots von der noindex-Zeile fernhalten; eine von aussen verlinkte Adresse
