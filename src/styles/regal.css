@@ -1310,6 +1310,29 @@ body {
   opacity: 0.7;
 }
 
+/*
+ * Auf dem Finger bleibt vom Knopf nur das Wort.
+ *
+ * Weg faellt das Kaestchen mit dem F — hier liegt keine Tastatur, auf der
+ * man es druecken koennte — und das Zeichen davor: auf einem Schirm, auf
+ * dem der Knopf ueber die ganze Breite geht und mittig steht, ist es
+ * Verzierung und nicht Auskunft.
+ *
+ * Gefragt wird nach **beidem**, Breite oder Zeiger, und es genuegt eines
+ * davon. Die Breite allein reicht nicht: ein Telefon quer ist 844
+ * Bildpunkte breit und faellt aus jeder Handy-Breite heraus, hat aber
+ * genauso wenig eine Taste F. Der Zeiger allein reicht auch nicht: in der
+ * Geraete-Nachstellung eines Schreibtisch-Browsers meldet
+ * `(pointer: coarse)` je nach Werkzeug gar nichts, und dann stuende der
+ * Hinweis genau dort, wo man ihn nachsieht.
+ */
+@media (max-width: 767px), (pointer: coarse) {
+  .wenden-knopf kbd,
+  .wenden-knopf > span[aria-hidden='true'] {
+    display: none;
+  }
+}
+
 /* --- Handy-Fluss ---------------------------------------------------------
  *
  * Auf schmalen Schirmen verlaesst die Bedienung die feste Lage: die

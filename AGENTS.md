@@ -123,6 +123,13 @@ Tasten wählen bloß aus, sie holen nichts heraus.
   zuoberst liegt.
 - **Ohne WebGL zeigt die Seite einen Ausweg** auf `/programm`. Ohne den bliebe
   eine schwarze Fläche stehen.
+- **Der Tastenhinweis [F] steht nur da, wo eine Taste ist**, und das
+  Zeichen davor auch nicht. Beides faellt weg unter
+  `(max-width: 767px), (pointer: coarse)` (`.wenden-knopf kbd` in
+  `regal.css`). Zwei Bedingungen, weil eine allein nicht reicht: ein
+  Telefon quer ist 844 Bildpunkte breit und faellt aus jeder Handy-Breite
+  heraus, und in mancher Geraete-Nachstellung meldet `(pointer: coarse)`
+  gar nichts. Gewendet wird dort mit dem Knopf.
 
 ## Schriften
 
@@ -149,6 +156,38 @@ diesem einen Wert. Die Zeiten stehen als `abblendAb`, `abblendHalten` und
 Davor gab es eine seitliche Fahrt („Wipe"). Sie zerfiel optisch in zwei
 Haelften, weil der Grund der Tafel den Band rechts verdeckte. Zurueckholen:
 `git revert 448adbe`.
+
+### Der Wechsel muss zu Ende gehen, bevor man zurueckgeht
+
+Der Wechsel legt den hinausgefahrenen Band **erst am Ende** wieder flach in
+den Stapel; bis dahin steht seine Lage weiter auf Betrachtung — vorn,
+gross, aufrecht. Im Betrachten faellt das nicht auf, dort ist ausser dem
+einen Band alles ausgeblendet.
+
+Wer aber mitten im Wechsel „Zurueck zum Stapel" drueckt, hatte zwei
+Fehler auf einmal:
+
+- Der Weg zurueck wurde **ueberfahren**: `updateWipe` laeuft in jedem Bild,
+  auch in `returning`, und setzte am Ende wieder `mode = "inspect"`. Man
+  drueckte zurueck und landete beim naechsten Band.
+- Der hinausgefahrene Band blieb in seiner Betrachtungslage stehen,
+  obwohl die Buchhaltung ihn laengst zurueckgelegt hatte. Er stand dann
+  aufrecht mitten in einer liegenden Reihe — und **im Weg**: die
+  Kollisionspruefung lehnt dort jede Pose ab, und das Blaettern haengt bis
+  zur Notbremse (`motionStallLimit`). Nach ein paar Malen standen mehrere
+  so herum, und es ruckelte.
+
+Deshalb bringt `returnToShelf` einen laufenden Wechsel zuerst in einem Zug
+zu Ende (`wipeFortschritt = 1`, dann `updateWipe(0)`) — dieselbe
+Buchhaltung, derselbe Weg, nur ohne die Zeit dazwischen. Und die Lage folgt
+der Buchhaltung: wer im Stapel liegt, bekommt die Lage des Stapels
+(`imStapel`), auch wenn er der zuletzt betrachtete war.
+
+Nachgemessen mit `diagnostics().verirrt` — Baende, die in einem Stapel
+liegen und trotzdem nicht in dessen Lage stehen. Erlaubt ist genau einer,
+der gerade faehrt. Dieselbe Folge (Band aufschlagen, Nachbarn anklicken,
+sofort zurueck): vorher `mode: "inspect"` und `verirrt: 4`, danach
+`mode: "browse"` und `verirrt: 0`.
 
 ## Nachbarschaft am Bildrand
 
@@ -675,6 +714,32 @@ Entfernung, Schub und den gemessenen Schirmrahmen.
   umgekehrt. Jetzt stimmen beide Enden ueberein (3, 2, 1, 0 von vorn nach
   hinten, am Bund wie draussen), und der ganze linke Stapel liegt vor dem
   rechten — am Bund treffen sie sich, und dort muss einer vorn sein.
+
+### Auf dem Telefon faellt die Nummernleiste weg
+
+Am Schreibtisch steht sie unten am Rand und nimmt dem Heft nichts. Im
+Handy-Fluss ist sie ein Element im Dokumentfluss: sie stand **ueber** dem
+Heft, zwischen zwei schwarzen Baendern, und schob es aus dem Bild — man sah
+nie die ganze Seite. Gedimmt half nicht, denn der Platz ging trotzdem
+verloren. Also `display: none` unter `(max-width: 767px), (pointer:
+coarse)`; sie fehlt auch nicht, denn waehrend das Heft offen ist, fuehrt
+von ihr ohnehin kein Weg irgendwohin. Uebrig bleibt, was der Auftrag
+verlangt: das Heft und eine Zeile. Nachgemessen: Dokumenthoehe gleich
+Fensterhoehe, kein Ueberlauf mehr.
+
+### Und der Weg zurueck legt es hin, nicht auf
+
+Ein Band bleibt nach dem Betrachten vorn stehen. Das Heft nicht — wie das
+Blatt legt es sich zurueck in den Stapel. Aufrecht davor stehend
+behauptete es einen Platz in der Reihe, den es nicht hat.
+
+Dazu wandert die Auswahl auf einen Band **mit Nummer**
+(`naechsterInDerReihe`). Blatt, Heft und Blindband haben keine Marke in der
+Leiste; blieb die Auswahl auf ihnen stehen, zeigte die Leiste weiter die
+zuletzt gesetzte Marke und die Beschriftung den dazugehoerigen Band — man
+kam aus dem Heft und las darunter „001 Weine nicht, Artur!", waehrend die
+Engine bei 009 stand. Zwei Angaben, die einander widersprachen, und keine
+davon stimmte. Danach: Beschriftung 008, Marke 008, Nachbarn 007 und 009.
 
 ### Sonderobjekt-Regeln
 

@@ -1163,6 +1163,39 @@ export class ShelfEngine {
     });
   }
 
+  /**
+   * Steht dieser Gegenstand ausser der Reihe — Blatt, Heft, Blindband?
+   * Sie tragen keine Nummer und haben keine Marke in der Leiste.
+   */
+  private ausserDerReihe(index: number) {
+    const daten = this.runtimeBooks[index]?.data;
+    if (!daten) return false;
+    return Boolean(daten.sheet || daten.blind || daten.magazine);
+  }
+
+  /** Der naechstgelegene Band, der eine Nummer hat. */
+  private naechsterInDerReihe(index: number) {
+    for (let weite = 1; weite < this.runtimeBooks.length; weite += 1) {
+      for (const stelle of [index - weite, index + weite]) {
+        if (stelle < 0 || stelle >= this.runtimeBooks.length) continue;
+        if (!this.ausserDerReihe(stelle)) return stelle;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Liegt dieser Band in seinem Stapel — oder ist er heraussen?
+   *
+   * Die Frage entscheidet, welche Lage ihm zusteht: wer im Stapel liegt,
+   * liegt flach, wer heraussen ist, steht vorn. Beides zugleich gibt es
+   * nicht, und genau das war einmal moeglich (siehe `returnToShelf`).
+   */
+  private imStapel(index: number) {
+    const pile = this.pileOrder[this.runtimeBooks[index]?.pile ?? 0];
+    return Boolean(pile?.includes(index));
+  }
+
   /** Der Band verlaesst seinen Stapel; die darueber rutschen nach. */
   private takeFromPile(index: number) {
     const pile = this.pileOrder[this.runtimeBooks[index]?.pile ?? 0];
@@ -2392,7 +2425,26 @@ export class ShelfEngine {
       if (this.focusProgress <= 0) {
         if (this.selectedIndex !== null) {
           const zurueck = this.runtimeBooks[this.selectedIndex];
-          if (zurueck.data.sheet || zurueck.data.blind) {
+          /*
+           * **Wer im Stapel liegt, bekommt die Lage des Stapels.**
+           *
+           * Der Zweig darunter stellt den betrachteten Band vorn auf. Das
+           * gilt nur, solange er heraussen ist. Liegt er schon wieder im
+           * Stapel — weil ein Wechsel ihn zurueckgelegt hat —, dann ist
+           * „aufstellen" eine Behauptung gegen die Buchhaltung: der Band
+           * steht aufrecht mitten in einer Reihe liegender Baende und
+           * nimmt einen Platz ein, den ein anderer schon hat.
+           */
+          if (
+            zurueck.data.sheet ||
+            zurueck.data.blind ||
+            // Ein Heft stellt sich so wenig auf wie ein Bogen Papier. Es
+            // hat keine Nummer und keinen Platz in der Reihe; aufrecht vor
+            // dem Stapel stehend behauptete es beides, und die Leiste
+            // zeigte daneben die Nummer eines fremden Bandes.
+            zurueck.data.magazine !== undefined ||
+            this.imStapel(this.selectedIndex)
+          ) {
             /*
              * Zwei bleiben nicht stehen.
              *
@@ -2417,6 +2469,27 @@ export class ShelfEngine {
             );
             this.presentedIndex = null;
             this.atRest = true;
+            /*
+             * **Und die Auswahl geht auf einen Band mit Nummer.**
+             *
+             * Blatt, Heft und Blindband stehen ausser der Reihe: sie haben
+             * keine Nummer, also auch keine Marke in der Leiste. Bleibt die
+             * Auswahl nach dem Zurueckgehen auf ihnen stehen, zeigt die
+             * Leiste weiter die zuletzt gesetzte Marke und die Beschriftung
+             * den dazugehoerigen Band — man kam aus dem Heft und las
+             * darunter „001 Weine nicht, Artur!". Zwei Angaben, die einander
+             * widersprechen, und keine davon stimmte.
+             */
+            if (this.ausserDerReihe(this.selectedIndex)) {
+              const naechster = this.naechsterInDerReihe(this.selectedIndex);
+              if (naechster !== null) {
+                this.activeIndex = naechster;
+                this.scrollIndex = naechster;
+                this.targetScrollIndex = naechster;
+                this.loadCoversNear(naechster);
+                this.callbacks.onActiveIndex(naechster);
+              }
+            }
           } else {
             this.commitBookPose(
               zurueck,
@@ -3535,6 +3608,27 @@ export class ShelfEngine {
       return;
     }
     if (this.mode === "browse" || this.mode === "returning") return;
+    /*
+     * **Ein laufender Bandwechsel wird zuerst zu Ende gebracht.**
+     *
+     * Der Wechsel legt den hinausgefahrenen Band erst am Ende wieder in
+     * den Stapel — bis dahin steht seine Lage weiter auf Betrachtung:
+     * vorn, gross, aufrecht. Wer mittendrin zum Stapel zurueckgeht, laesst
+     * ihn dort stehen; der naechste Wechsel tut dasselbe, und nach ein
+     * paar Malen stehen mehrere Baende quer im Regal herum. Sie stehen
+     * dann auch im Weg: die Kollisionspruefung lehnt jede Pose ab, die
+     * sie trifft, und das Blaettern haengt bis zur Notbremse
+     * (`motionStallLimit`) — genau das Ruckeln.
+     *
+     * `updateWipe` mit `delta` 0 und vollem Fortschritt fuehrt den Wechsel
+     * in einem Zug zu Ende: dieselbe Buchhaltung, derselbe Weg, nur ohne
+     * die Zeit dazwischen. Das Bild springt dabei nicht — der Abblender
+     * ist ohnehin dunkel.
+     */
+    if (this.wipeVon !== null) {
+      this.wipeFortschritt = 1;
+      this.updateWipe(0);
+    }
     this.controls.enabled = false;
     this.mode = "returning";
     this.callbacks.onMode(this.mode, this.selectedIndex);
@@ -4995,6 +5089,28 @@ export class ShelfEngine {
         rahmen: this.leseprobeRahmen(),
       },
       books: this.runtimeBooks.length,
+      /*
+       * **Die Probe auf die Buchhaltung.** Wie viele Baende liegen in
+       * einem Stapel und stehen trotzdem nicht in dessen Lage.
+       *
+       * Das darf nur der eine sein, der gerade faehrt. Alles darueber ist
+       * ein Band, der aufrecht mitten in einer liegenden Reihe steht: er
+       * nimmt einen Platz doppelt, die Kollisionspruefung lehnt dort jede
+       * Pose ab, und das Blaettern haengt bis zur Notbremse. Im Bild sieht
+       * man „viele Buecher stehen herum", im Betrieb merkt man es als
+       * Ruckeln.
+       */
+      verirrt: this.runtimeBooks.filter((band, i) => {
+        if (i === this.motionBookIndex) return false;
+        if (!this.imStapel(i)) return false;
+        const soll = stackedBookPose(band.place, this.motionLayout);
+        return (
+          Math.abs(band.pose.y - soll.y) > 0.02 ||
+          Math.abs(band.pose.z - soll.z) > 0.02 ||
+          Math.abs(band.pose.pitch - soll.pitch) > 0.05 ||
+          Math.abs(band.pose.scale - soll.scale) > 0.02
+        );
+      }).length,
       drawCalls: info.render.calls,
       triangles: info.render.triangles,
       geometries: info.memory.geometries,

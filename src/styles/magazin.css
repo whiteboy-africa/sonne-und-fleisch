@@ -46,6 +46,25 @@
 }
 
 /*
+ * **Auf dem Telefon faellt sie ganz weg.**
+ *
+ * Am Schreibtisch steht die Leiste unten am Rand und nimmt dem Heft nichts
+ * weg. Im Handy-Fluss ist sie ein Element im Dokumentfluss: sie stand
+ * ueber dem Heft, zwischen zwei schwarzen Baendern, und schob es aus dem
+ * Bild — man sah nie die ganze Seite. Gedimmt half das nicht, denn der
+ * Platz ging trotzdem verloren.
+ *
+ * Und sie fehlt auch nicht: waehrend das Heft offen ist, fuehrt von ihr
+ * ohnehin kein Weg irgendwohin (`pointer-events: none` oben). Uebrig
+ * bleibt, was der Auftrag verlangt — das Heft und eine Zeile.
+ */
+@media (max-width: 767px), (pointer: coarse) {
+  .press-experience.ist-heft .shelf-index {
+    display: none;
+  }
+}
+
+/*
  * Kein aktiver Punkt: die Marke wird nicht ueberschrieben, sondern gar
  * nicht erst gesetzt (`blaetternAnsichtSetzen` in `mount.ts`). Eine
  * ueberschriebene Marke bliebe eine Marke — sie saehe nur anders aus.
