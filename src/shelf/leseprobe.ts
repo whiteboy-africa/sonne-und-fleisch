@@ -30,13 +30,15 @@ export type Seitendaten = {
 };
 
 /*
- * Wie viele geschwaerzte Seiten hinter dem Fenster liegen. Drei: die rechte
- * Seite der Fenster-Doppelseite, dann eine ganz geschwaerzte Doppelseite,
- * dann die Schlusstafel. Mehr waren es einmal, und dann sah man beim
+ * Wie viele geschwaerzte Seiten hinter dem Fenster liegen. Vier, und daraus
+ * werden mit dem Fenster und der Schlussseite genau **drei Doppelseiten**:
+ * das Fenster (links die Probe, rechts geschwaerzt), eine ganz geschwaerzte
+ * Doppelseite, und die Schlussdoppelseite (links geschwaerzt, rechts die
+ * Seite mit der ausgestanzten Zeile). Mehr waren es einmal, und dann sah man beim
  * Blaettern fast nur noch Schwarz — der Entzug wirkt, wenn er einmal
  * dasteht, nicht wenn man sich durch ihn hindurchklickt.
  */
-const schwarzeSeiten = 3;
+const schwarzeSeiten = 4;
 
 /** Ab hier wird einzeln geblaettert statt in Doppelseiten. */
 const handyBreite = 768;
@@ -112,7 +114,7 @@ export type LeseprobeHaken = {
 type Seitenart =
   | { art: 'fenster'; nummer: number; probe: BookExcerpt }
   | { art: 'schwarz'; nummer: number; bild?: string }
-  | { art: 'schluss' };
+  | { art: 'schluss'; nummer: number };
 
 /**
  * Eine Seite ist entweder das Fenster, eine geschwaerzte Seite oder die
@@ -132,7 +134,7 @@ function seitenFolge(probe: BookExcerpt): Seitenart[] {
       ...(echt ? { bild: echt } : {}),
     });
   }
-  folge.push({ art: 'schluss' });
+  folge.push({ art: 'schluss', nummer: probe.page + schwarzeSeiten + 1 });
   return folge;
 }
 
@@ -314,12 +316,60 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     return blatt;
   }
 
-  function schlussBlatt(buch: CatalogBook) {
+  /**
+   * Die letzte Seite ist keine Tafel, sondern **eine Seite des Buches**.
+   *
+   * Hier stand einmal eine leere, cremefarbene Flaeche mit zwei Zeilen in
+   * der Mitte — und damit brach das Buch an seiner wichtigsten Stelle die
+   * eigene Regel: alles davor war Satz, Kolumne, Schwaerzung. Jetzt laufen
+   * Kolumne, Seitenzahl und Balken weiter, und in den Balkenblock ist ein
+   * sauberes Rechteck gestanzt: die Balken hoeren darueber auf und fangen
+   * darunter wieder an. In der Stanze stehen die zwei Zeilen.
+   *
+   * Das ist der Stempel des Zensors auf der geschwaerzten Seite — nicht
+   * ein Werbeschild, das man dahinter geklebt hat.
+   */
+  function schlussBlatt(
+    buch: CatalogBook,
+    seite: Seitenart & { art: 'schluss' },
+    rechts: boolean,
+  ) {
     const blatt = document.createElement('article');
-    blatt.className = 'blatt blatt--schluss';
+    blatt.className = 'blatt blatt--schwarz blatt--schluss';
+    blatt.append(kolumne(seite.nummer, rechts));
 
-    const tafel = document.createElement('div');
-    tafel.className = 'blatt__tafel';
+    const satz = document.createElement('div');
+    satz.className = 'blatt__satz blatt__satz--voll';
+
+    /*
+     * Wo die Stanze sitzt: nach gut einem Drittel der Zeilen. Der Block
+     * darueber traegt genug Balken, dass die Seite als geschwaerzte Seite
+     * gelesen wird, bevor das Loch kommt.
+     */
+    const stanzeNach = Math.round(balkenZeilen * 0.38);
+    const zeilen = balkenMuster(seite.nummer, balkenZeilen);
+    zeilen.forEach((muster, index) => {
+      const zeile = document.createElement('span');
+      zeile.className = `balken-zeile${muster.einzug ? ' balken-zeile--einzug' : ''}`;
+      zeile.setAttribute('aria-hidden', 'true');
+      zeile.style.setProperty('--breite', `${(muster.breite * 100).toFixed(1)}%`);
+      muster.stuecke.forEach((gewicht, stelle) => {
+        const lage = balkenLage(seite.nummer * 97 + index * 5 + stelle);
+        const stueck = document.createElement('span');
+        stueck.className = 'balken balken--stueck';
+        stueck.style.setProperty('--gewicht', gewicht.toFixed(3));
+        stueck.style.setProperty('--dreh', `${lage.dreh.toFixed(3)}deg`);
+        zeile.append(stueck);
+      });
+      satz.append(zeile);
+      if (index === stanzeNach - 1) satz.append(stanze());
+    });
+    blatt.append(satz);
+    return blatt;
+
+    function stanze() {
+      const tafel = document.createElement('div');
+      tafel.className = 'blatt__stanze';
 
     const erste = document.createElement('p');
     erste.className = 'blatt__schlusszeile';
@@ -343,15 +393,15 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     pfeil.textContent = '↗';
     ziel.append(' ', pfeil);
 
-    tafel.append(erste, ziel);
-    blatt.append(tafel);
-    return blatt;
+      tafel.append(erste, ziel);
+      return tafel;
+    }
   }
 
   function blattBauen(seite: Seitenart, titel: string, buch: CatalogBook, rechts: boolean) {
     if (seite.art === 'fenster') return fensterBlatt(titel, seite, rechts);
     if (seite.art === 'schwarz') return schwarzBlatt(titel, seite, rechts);
-    return schlussBlatt(buch);
+    return schlussBlatt(buch, seite, rechts);
   }
 
   // -------------------------------------------------------------- Blaettern
@@ -385,18 +435,16 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
       rahmen.classList.remove('leseprobe__rahmen--scan');
       const links = folge[stelle * 2];
       const rechts = folge[stelle * 2 + 1];
-      // Die Schlusstafel nimmt die ganze Spanne: dort stehen keine Balken,
-      // nur zwei Zeilen in der Mitte des Satzspiegels.
-      if (links?.art === 'schluss') {
-        spanne.classList.add('leseprobe__spanne--tafel');
-        rahmen.classList.add('leseprobe__rahmen--tafel');
-        spanne.append(blattBauen(links, aktuellerTitel, aktuellesBuch, false));
-      } else {
-        spanne.classList.remove('leseprobe__spanne--tafel');
-        rahmen.classList.remove('leseprobe__rahmen--tafel');
-        if (links) spanne.append(blattBauen(links, aktuellerTitel, aktuellesBuch, false));
-        if (rechts) spanne.append(blattBauen(rechts, aktuellerTitel, aktuellesBuch, true));
-      }
+      /*
+       * Kein Sonderfall mehr: die Schlussdoppelseite ist eine Doppelseite
+       * wie die anderen — links geschwaerzt, rechts die Seite mit der
+       * Stanze. Frueher nahm die Tafel die ganze Spanne und war das
+       * einzige, was im ganzen Band nicht nach Buch aussah.
+       */
+      spanne.classList.remove('leseprobe__spanne--tafel');
+      rahmen.classList.remove('leseprobe__rahmen--tafel');
+      if (links) spanne.append(blattBauen(links, aktuellerTitel, aktuellesBuch, false));
+      if (rechts) spanne.append(blattBauen(rechts, aktuellerTitel, aktuellesBuch, true));
     }
     zeilenKuerzen();
     schale.classList.toggle('ist-am-anfang', stelle === 0);

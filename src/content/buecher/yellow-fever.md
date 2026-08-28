@@ -10,15 +10,11 @@ kurztitel: Yellow Fever
 autor: C. T. Selters
 klappentext: >-
   Ein österreichischer Schriftsteller fährt mit einem Reisestipendium nach
-  Bangkok, um ein Buch zu beenden, und schreibt stattdessen dieses. Soi 11,
-  zwei Packungen Mentholzigaretten am Tag, siebenhundert Matches, eine
-  kleine Pfeife vor jeder Verabredung — und dazwischen die Frage, wann aus
-  dem Reisenden ein Einwohner geworden ist. „A Single Man's Guide to
-  Thailand, Laos and Despair" steht als Untertitel darüber.
+  Bangkok, um ein Buch zu beenden, und schreibt stattdessen dieses. Im
+  Untertitel: A Single Man's Guide to Thailand, Laos and Despair.
 zitat: >-
   Ich bin kein Tourist mehr, kein Reisender und schon lange kein
-  Schriftsteller, ich bin ein Teil geworden dieser Stadt, die mich
-  verschluckt hat, und ich kenne alle ihre Straßen.
+  Schriftsteller …
 zitat_von: Kapitel IX
 format: Broschur
 verfuegbarkeit: In Vorbereitung
@@ -58,15 +54,11 @@ rueckseite:
   autor: C. T. Selters
   klappentext: >-
     Ein Wort, auf der Straße aufgeschnappt: götveren, türkisch, ein
-    Schimpfwort für die Verstoßenen. Der Erzähler probiert es im Stillen
-    aus, verliebt sich in seinen Klang — das G am Gaumen, das V an den
-    Lippen, das R am Zäpfchen — und trägt es durch Wien, Havanna und
-    zuletzt in den Lesesaal der Universitätsbibliothek, wo er endlich
-    weiß, wozu er es braucht.
-  zitat: >-
-    … wir sind von Familie und Gesellschaft verstoßen, aber jetzt haben wir
-    uns, und gemeinsam ist nichts verboten.
-  zitat_von: Kapitel I
+    Schimpfwort für die Verstoßenen. Der Erzähler verliebt sich in seinen
+    Klang und trägt ihn durch Wien, Havanna und den Lesesaal, bis er weiß,
+    wozu er ihn braucht.
+  zitat: Man müsste schreiben, sagte ich mir und begann zu schreiben.
+  zitat_von: Letzter Satz
   cover_bild: /buecher/yellow-fever/rueckseite.webp
   # Die Wende sitzt im Druck bei Blatt 47; Buchseite 37 des Goetveren.
   leseprobe:

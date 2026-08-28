@@ -3,13 +3,17 @@ titel: Tokio Burning
 kurztitel: Tokio Burning
 autor: Christoph Laible
 klappentext: >-
-  Platzhalter: zwei bis vier Sätze zur ersten Geschichte. Sie erscheinen im
-  Regal, wenn der Band herausgezogen ist.
-zitat: Platzhalter für einen Satz aus dem Buch.
-zitat_von: Verlagsnotiz
+  Ein Verhandlungsführer feiert in Tokio seinen Sieg, fängt sich in der Bar
+  im 52. Stock ein blaues Auge und bleibt in der Stadt. Zimmer nordseitig,
+  Blick auf den Innenhof der Sumohalle, Training ab sechs: man muss seinen
+  Feind studieren, um ihn zu bezwingen.
+zitat: >-
+  Früher hätten Männer wie ich Kriege gewonnen. Heute gewinnen wir
+  Verhandlungsgespräche.
+zitat_von: Erster Satz
 format: Broschur
-# Platzhalter, bis die Druckdatei da ist.
-seiten_zahl: 192
+# GESCHAETZT aus der Zeichenzahl der beiden Erzaehlungen.
+seiten_zahl: 40
 verfuegbarkeit: In Vorbereitung
 cover_bild: /buecher/tokio-burning/cover.webp
 cover_farbe: '#25281a'
@@ -20,38 +24,38 @@ hoehe: 2.0
 dicke: 0.078
 reihenfolge: 7
 # Doppelcover: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
-# Platzhalter-Leseprobe. Was in doppelten Klammern steht, wird beim Bauen
-# herausgeschnitten und als Balken gedruckt — es steht in keinem HTML.
+# Aus dem Manuskript, im Wortlaut: der Gang in die Empfangshalle.
 leseprobe:
-  seite: 35
+  # GESCHAETZT: der Anfang.
+  seite: 5
   text: >-
-    In der Nacht des neunten März brannte die Stadt, und es brannte nicht
-    wie ein Feuer, sondern wie ein Wetter. Wer es überlebte, spricht nicht
-    von Flammen, sondern vom Wind, und wer davon spricht, hört mitten im
-    Satz auf.
+    Früher hätten Männer wie ich Kriege gewonnen. Heute gewinnen wir
+    Verhandlungsgespräche. Es ist, wie es ist. Mein Assistent Xi öffnet mir
+    die Eingangstür des XXXCORP-Firmengebäudes im Tokioter Stadtteil
+    Sumida. Dabei neigt er respektvoll den Kopf. Ich gehe voraus in die
+    Empfangshalle. Unsere Ledersohlen klacken im Gleichschritt über den
+    Marmorboden. Unsere Anzüge sitzen perfekt. Der Marmor glänzt unter dem
+    Licht, das durch die deckenhohe Glasfront fällt. In der Mitte der Halle
+    steht ein Springbrunnen aus dunklem Basalt. Ein Karpfen zieht unter der
+    Wasseroberfläche seine Bahn.
 
 
-    Laible hat vierzig Jahre später mit elf Leuten gesprochen. Zwei
-    brachen ab, einer log, und die übrigen acht erzählten dasselbe in
-    einer Reihenfolge, die sich nicht abgesprochen haben kann. Sie
-    begannen alle [[mit demselben Geräusch]].
+    Die Japaner haben diese Folklore arrangiert, um eine bestimmte Wirkung
+    bei ihren Gästen zu erzielen, denke ich. Sie wollen, dass sie sich
+    willkommen fühlen, sie einlullen und [[weich machen]]. Ich betrachte
+    das Ganze intensiv, achte darauf, ob es etwas in mir auslöst. Aber da
+    ist nichts.
 
 
-    Das Buch verzichtet auf Zahlen. Es gibt sie, sie stehen in jedem
-    Nachschlagewerk, und sie helfen nicht. Stattdessen: die Farbe des
-    Flusses, die Temperatur der Steine am Morgen danach, der Umstand, dass
-    die Straßenbahn drei Tage später wieder fuhr.
-
-
-    Ein Kapitel handelt allein von den Listen, die danach angelegt wurden.
-    Wer sie schrieb, wer sie las, wer nicht darin vorkam. Eine Frau suchte
-    ihren Bruder achtundzwanzig Jahre lang in Listen und fand ihn [[in
-    einer, die es gar nicht geben durfte]].
-
-
-    Am Ende steht kein Schluss. Laible hat das verteidigt: ein Schluss
-    hätte behauptet, dass die Sache abgeschlossen sei, und sie ist es
-    nicht. Die letzte Seite besteht aus einem Datum und dem Satz, dass [[|26]]
+    Xi scheint es anders zu gehen, jedenfalls ist er gestolpert und hat
+    seine Unterlagen über die Fliesen verteilt. Auf Knien sammelt er sie
+    ein. Ich reiche ihm die Hand und helfe ihm hoch. Seine Wangen sind rot
+    bis zu den Ohren und er sieht mir nicht ins Gesicht. Nachdem er sich
+    wieder gefangen hat, weisen wir uns bei der Empfangsdame aus. Sie
+    reicht uns die Sicherheitskarten mit beiden Händen, ein Lächeln, eine
+    Verbeugung. Wir nehmen die Karten entgegen und passieren die
+    Drehkreuze hin zu den Aufzügen. Biep, biep. Dort hängt ein Flatscreen
+    an der Wand. Er zeigt ein Video, in dem [[|17]]
 rueckseite:
   titel: The Melancholy of Quidam
   kurztitel: Melancholy of Quidam

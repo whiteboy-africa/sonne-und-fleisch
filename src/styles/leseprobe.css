@@ -580,19 +580,30 @@
   transform: rotate(var(--dreh, 0deg));
 }
 
-/* -------------------------------------------------------- Die Schlusstafel */
+/* ------------------------------------------------------ Die letzte Seite */
 
-.blatt--schluss {
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.blatt__tafel {
+/*
+ * **Die Stanze.**
+ *
+ * Die letzte Seite ist eine geschwaerzte Seite wie die davor — Kolumne,
+ * Seitenzahl, Balken in Registerhaltung. Nur ist in den Balkenblock ein
+ * sauberes Rechteck geschnitten: die Balken hoeren darueber auf, fangen
+ * darunter wieder an, und in der Luecke stehen die zwei Zeilen.
+ *
+ * Kein eigener Grund, kein Rahmen, kein Kasten: die Stanze ist das
+ * **Fehlen** von Balken, nicht ein Aufkleber darauf. Deshalb steht hier
+ * auch keine Hintergrundfarbe — es scheint das Papier durch, wie an jeder
+ * anderen Stelle der Seite auch.
+ */
+.blatt__stanze {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
   align-items: center;
+  /* Der Abstand nach oben und unten ist die Luecke selbst: er ersetzt die
+     zwei bis drei Balkenzeilen, die hier nicht stehen. */
+  margin: 26px 0 30px;
+  text-align: center;
 }
 
 .blatt__schlusszeile {

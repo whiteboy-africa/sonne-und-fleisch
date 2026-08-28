@@ -508,6 +508,16 @@ body {
   overflow: hidden;
 }
 
+/*
+ * **Die Unterkante blendet aus.**
+ *
+ * Der Block scrollt, wenn Titel, Klappentext und Zitat zusammen hoeher
+ * werden als das Fenster hergibt — bei einem langen Klappentext und einem
+ * kurzen Schirm passiert das. Ohne Verlauf endet der Text dann mitten in
+ * einer Zeile, und das liest sich als Fehler, nicht als „hier geht es
+ * weiter". Die Maske nimmt die letzten 26 Bildpunkte zurueck; passt alles
+ * hinein, faellt sie nicht auf, denn dann steht dort ohnehin nichts.
+ */
 .book-details__oben {
   display: flex;
   flex: 1;
@@ -518,6 +528,11 @@ body {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--hairline) transparent;
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(100% - 26px),
+    transparent 100%
+  );
 }
 
 .book-details__unten {
@@ -725,11 +740,18 @@ body {
   line-height: 1.5;
 }
 
+/*
+ * Das Zitat. Es stand einmal kurz nicht hier — ohne es liest sich die
+ * Tafel blank, also ist es wieder da und der Platz kommt woanders her:
+ * das Zitat sitzt in einem Grad, der mit dem Fenster mitgeht (wie der
+ * Klappentext), die Abstaende sind enger, und der Block darunter blendet
+ * an seiner Unterkante aus statt hart zu schneiden.
+ */
 .book-details blockquote {
   position: relative;
   max-width: 475px;
-  margin: 33px 0 0;
-  padding: 0 0 0 23px;
+  margin: 24px 0 0;
+  padding: 0 0 0 20px;
   border-left: 1px solid currentColor;
 }
 
@@ -738,17 +760,17 @@ body {
 .book-details blockquote p {
   margin: 0;
   font-family: var(--schrift-buch);
-  font-size: 17px;
+  font-size: clamp(14px, 1.15vw, 17px);
   font-style: normal;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .book-details blockquote cite {
   display: block;
-  margin-top: 10px;
+  margin-top: 7px;
   color: var(--ink-soft);
   font-family: var(--schrift);
-  font-size: 12px;
+  font-size: 11px;
   font-style: normal;
   font-weight: 500;
   letter-spacing: 0.01em;
@@ -1152,7 +1174,7 @@ body {
   }
 
   .book-details blockquote {
-    margin-top: 16px;
+    margin-top: 14px;
   }
 
   .book-details dl {
@@ -1192,7 +1214,6 @@ body {
     margin-top: 20px;
   }
 
-  .book-details blockquote,
   .book-details dl {
     margin-top: 20px;
   }

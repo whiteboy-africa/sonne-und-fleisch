@@ -1,16 +1,21 @@
 ---
-# Angelegt aus dem Beispielcover. Nur Titel und Umschlag stehen fest.
+# Aus den beiden Buchsatz-Dateien gelesen: „Eine mittelmaessige Idee"
+# (5.932 Woerter) und „Mountains of Sadness" (4.843). Klappentexte, Zitate
+# und Leseproben stehen im Wortlaut. Seitenzahlen sind geschaetzt.
 titel: The Life and Times of Robert Duval
 kurztitel: Robert Duval
 autor: Aleksandar Vadim
 klappentext: >-
-  Platzhalter: zwei bis vier Sätze, die im Regal erscheinen, wenn der Band
-  herausgezogen ist.
-zitat: Platzhalter für einen Satz aus dem Buch.
-zitat_von: Verlagsnotiz
+  Robert Duval, der eigenen Zeit fremd, findet nur in den Büchern kolonialer
+  britischer Autoren eine Befreiung von der Erdenschwere. Ein Leben in acht
+  Kapiteln — England, Studien, Kowloon — und ein Sohn, dem er die
+  Melancholie beibringt wie ein Handwerk.
+zitat: Robert ist allen fremd.
+zitat_von: Erstes Kapitel
 format: Broschur
-# Platzhalter, bis die Druckdatei da ist.
-seiten_zahl: 208
+# GESCHAETZT: beide Erzaehlungen zusammen rund 70.000 Zeichen, also etwa
+# vierzig Seiten Text. Aus dem Umbruch nachtragen.
+seiten_zahl: 48
 verfuegbarkeit: In Vorbereitung
 cover_bild: /buecher/robert-duval/cover.webp
 # Farben für Rücken, Kanten und Blockrand — aus dem Umschlag genommen.
@@ -22,81 +27,91 @@ hoehe: 2.0
 dicke: 0.078
 reihenfolge: 2
 # Doppelcover: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
-# Platzhalter-Leseprobe. Was in doppelten Klammern steht, wird beim Bauen
-# herausgeschnitten und als Balken gedruckt — es steht in keinem HTML.
+# Aus dem Manuskript, im Wortlaut. Der Text ist als Exposee gesetzt —
+# Kapitelzeilen und Gedankenstriche gehoeren zur Form, nicht zur Kuerzung.
+# Was in doppelten Klammern steht, wird beim Bauen herausgeschnitten und
+# als Balken gedruckt — es steht in keinem HTML.
 leseprobe:
-  seite: 23
+  # GESCHAETZT: das erste Kapitel.
+  seite: 5
   text: >-
-    Duval kam im Februar an und behauptete, er sei nie fort gewesen. Die
-    Wirtin glaubte ihm nicht und trug es trotzdem ins Buch ein, mit einem
-    Datum, das um zwei Tage danebenlag. Sie hatte ihre Gründe, und wir
-    haben sie nie erfahren.
+    Robert Duval, der eigenen Zeit fremd und ohne bedeutenden Namen oder
+    Vermögen in das geheimnislose Frankreich des 20. Jahrhunderts geboren,
+    findet nur in den Büchern kolonialer britischer Autoren eine Befreiung
+    von der Erdenschwere. Beschreibung seiner Fremdheit vom Rest der Welt —
+    Beschreibung seiner Familie: Vater Aloïs weiß einen mit
+    Wildleberpasteten gedeckten Tisch mehr zu schätzen als
+    [[ein gutes Buch]]. (Die Eltern heißen durch einen bemerkenswerten
+    Zufall Aloïs und Aloïse — er nennt sie He-Aloïs und She-Aloïs).
+    Beschreibung von Roberts idiosynkratischen Studien in öffentlichen
+    Bibliotheken — Exkurs Rudyard Kipling und das British Raj — Exkurs
+    Literatur: Romane von Paul Scott und deren Verfilmungen, The Jewel in
+    the Crown — er ist von BBC-Dokumentationen fasziniert, später besonders
+    von denen über [[englische Privatschulen]] — wünscht sich selbst eine
+    solche zu besuchen — Familie ist überrascht von der Veränderung im
+    jungen Mann, jetzt fünfzehnjährig zeigt er einen bisher ungesehenen
+    Tatendrang in Bezug auf den Aufenthalt in einem britischen boarding
+    house.
 
 
-    In seinem Koffer lagen: vier Hemden, ein Bündel Briefe, deren Umschläge
-    nie geöffnet worden waren, und [[eine Photographie ohne Rückseite]]. Er
-    packte langsam aus, so als rechne er damit, dass ihm jemand dabei
-    zusieht, und ordnete alles auf dem Bett an, bevor er es wegräumte.
+    Aufenthalt in England
 
 
-    Am Abend saß er unten und trank nichts. Die Männer am Nebentisch
-    sprachen von der Schließung der Fabrik, und er hörte zu, wie man einer
-    Musik zuhört, die man aus einem anderen Zusammenhang kennt. Als sie
-    gingen, blieb er sitzen. Die Wirtin räumte um ihn herum ab.
-
-
-    Später fragte sie ihn, ob er lange bleibe. Er sagte, das hänge davon
-    ab, und sie fragte nicht, wovon. In dieser Nacht hörte man ihn oben auf
-    und ab gehen, immer dieselben elf Schritte, und einmal, gegen drei,
-    [[das Geräusch von etwas, das zu Boden fiel und nicht aufgehoben
-    wurde]].
-
-
-    Am Morgen war er da und tat, als sei nichts, und wir taten es auch. So
-    ging es dreiundzwanzig Tage lang, und am vierundzwanzigsten [[|26]]
+    Robert reist nach Gloucestershire und bezieht sein Zimmer im Cheltenham
+    College. Beschreibung des Schulalltags, Beschreibung von
+    internationalen Freundschaften, Gespräche mit einem Asiaten —
+    Freundschaft zwischen den Rassen, findet Gefallen an Cricket und Rugby,
+    erster Wunsch, erwachsen zu sein, und erste liebevolle Gefühle den
+    Eltern gegenüber (sobald sie [[|17]]
 rueckseite:
   titel: Mountains of Sadness
   kurztitel: Mountains of Sadness
   autor: Christoph Laible
   klappentext: >-
-    Platzhalter: die Einführung in die zweite Geschichte des Bandes.
+    Ein Mann steigt die tausend Stufen auf den Mount Huangshan, um sich
+    oben zu töten. Über dem Kragen, den er dabei tragen soll, ist er sich
+    seit Jahren nicht einig geworden — in Wanderkleidung stellt sich die
+    Frage nicht mehr. Oben ist Nebel, und einer trägt Wasser hinauf.
+  zitat: >-
+    Ich habe mich nie entscheiden können, ob ich bei meinem Selbstmord
+    einen Kent- oder Windsorkragen tragen möchte.
+  zitat_von: Erster Satz
   cover_bild: /buecher/robert-duval/rueckseite.webp
   cover_farbe: '#303620'
   akzent_farbe: '#da791a'
   schrift_farbe: '#b9a159'
   motiv: wave
+  # Aus dem Manuskript, im Wortlaut: der Aufstieg auf den Mount Huangshan.
   leseprobe:
-    seite: 17
+    # GESCHAETZT: der Anfang.
+    seite: 5
     text: >-
-      Laible hat die Berge nie gesehen, über die er schrieb, und darauf
-      bestand er, wann immer man ihn danach fragte. Es sei ihm um die
-      Traurigkeit gegangen, sagte er, nicht um die Geographie, und Berge
-      seien nur die Form, die sie annimmt, wenn man sie stehen lässt.
+      Ich habe mich nie entscheiden können, ob ich bei meinem Selbstmord
+      einen Kent- oder Windsorkragen tragen möchte. Nur deshalb lebe ich
+      noch. Die Yellow Mountains in der chinesischen Provinz Anhui nehmen
+      mir diese Entscheidung ab. Hier ist man nur in Wanderklamotten
+      adäquat gekleidet und die sehen so oder so schrecklich aus. Einer der
+      Gründe, warum ich mich von Shanghai aufgemacht habe und jetzt die
+      tausenden Stufen auf den Mount Huangshan erklimme. Ein weiterer Grund
+      ist, dass James Cameron hier [[Avatar]] gedreht hat. Ich mochte den
+      Film sehr. Mir gefiel der Gedanke, ein anderer werden zu können.
+      Schließlich schlüpft der querschnittgelähmte Protagonist in den
+      Körper eines dieser anmutigen blauhäutigen Außerirdischen. Fortan
+      lebt er mit ihnen auf ihrem Heimatplaneten. Dabei hat mich vor allem
+      [[die Entschlossenheit des Protagonisten]] beeindruckt, das
+      durchzuziehen. No second thoughts.
 
 
-      Der erste Teil entstand in einem Sommer, in dem es nicht regnete. Er
-      schrieb morgens, ging mittags zum Fluss, und was er nachmittags
-      aufschrieb, strich er abends wieder durch. Von diesen Nachmittagen ist
-      [[nichts erhalten]], und er hat das als Ordnung empfunden, nicht als
-      Verlust.
-
-
-      In den Briefen an seinen Bruder kommt das Wort Melancholie nicht vor.
-      Es kommen vor: das Wetter, die Preise, ein Hund, der nicht ihm gehörte,
-      und zweimal eine Frau, die er nicht benennt. Der Bruder antwortete
-      selten und immer knapp.
-
-
-      Was den Ton angeht, so hat er ihn später einmal beschrieben als [[das,
-      was übrig bleibt, wenn man aufhört, sich zu verteidigen]]. Er war
-      einundvierzig, als er das sagte, und es klang nicht nach einem
-      Programm, sondern nach einer Feststellung, die ihn selbst überrascht
-      hatte.
-
-
-      Die Fassung, die hier steht, ist die dritte. Die erste ist verbrannt,
-      die zweite liegt in einem Archiv, das keine Auskunft gibt, und wer sie
-      einmal gesehen hat, sagt, dass [[|26]]
+      All das denke ich, während ich eine Stufe nach der anderen nehme —
+      der Weg auf den Mount Huangshan ist hervorragend ausgebaut — und in
+      mein Patagonia-Shirt schwitze. In regelmäßigen Abständen schieben
+      sich Chinesen an mir vorbei und ich muss an den Wegrand ausweichen,
+      was ich für Pausen nutze. Unter ihrer sonnengebräunten Haut zeichnen
+      sich Sehnen und Muskeln ab und sie scheinen kein Gramm Fett an sich
+      zu haben. Sie haben Bambusstöcke geschultert, an denen Bündel mit
+      Lebensmitteln für das Xihai Hotel hängen. Es ist das einzige Hotel
+      dort oben, wie ich aus dem Panda-Reiseführer weiß, und hat einen
+      Hunger, [[|17]]
 ---
 
 Platzhalter für die lange Beschreibung.

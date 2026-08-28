@@ -171,14 +171,22 @@ const gesamt = katalognummer(katalog.length);
           </div>
         </dl>
 
-        {/* Der zweite Weg in den Band — der erste ist der Umschlag selbst.
-            Eine Zeile, kein Knopfrahmen. Sie ist zugleich der Weg fuer die
-            Tastatur: anwaehlbar, Eingabetaste schlaegt auf. Ohne Leseprobe
-            steht sie nicht da. */}
-        <button type="button" class="leseprobe-zeile" data-leseprobe-zeile hidden>
-          <span>Leseprobe</span>
-          <span aria-hidden="true">—</span>
-          <span>S.&nbsp;<span data-leseprobe-seite></span></span>
+        {/* Der zweite Weg in den Band. Er stand einmal als Zeile in den
+            Angaben („Leseprobe — S. 47") und ist jetzt **unsichtbar**: die
+            Seitenzahl sagte niemandem etwas, und die Zeile nahm Platz weg,
+            den die Tafel nicht hat.
+
+            Der Knopf bleibt trotzdem stehen, denn er ist der Weg fuer die
+            Tastatur: mit Tabulator anwaehlbar, Eingabetaste schlaegt auf.
+            Wer mit der Maus kommt, klickt auf den Umschlag — das war
+            ohnehin der erste Weg. */}
+        <button
+          type="button"
+          class="leseprobe-zeile sr-only"
+          data-leseprobe-zeile
+          hidden
+        >
+          <span>Leseprobe aufschlagen</span>
         </button>
 
         {/* Wenden: dreht den Band um und auf den Kopf. Bei Doppelbänden

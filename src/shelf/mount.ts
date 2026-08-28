@@ -55,7 +55,6 @@ export function regalStarten(wurzel: HTMLElement) {
     status: pflicht(wurzel, '[data-status-text]'),
     vorlese: pflicht(wurzel, '[data-vorlese]'),
     leseprobeZeile: pflicht<HTMLButtonElement>(wurzel, '[data-leseprobe-zeile]'),
-    leseprobeSeite: pflicht(wurzel, '[data-leseprobe-seite]'),
     heftZeilen: pflicht<HTMLElement>(wurzel, '[data-heft-zeilen]'),
     heftZu: pflicht<HTMLButtonElement>(wurzel, '[data-heft-zu]'),
   };
@@ -248,7 +247,8 @@ export function regalStarten(wurzel: HTMLElement) {
     const probe = siteConfig.leseprobe ? gezeigt.excerpt : undefined;
     el.leseprobeZeile.hidden = !probe;
     if (probe) {
-      el.leseprobeSeite.textContent = String(probe.page);
+      // Die Seitenzahl steht nirgends mehr im Bild — im Vorlesetext bleibt
+      // sie, dort kostet sie keinen Platz und sagt, wo man landet.
       el.leseprobeZeile.setAttribute(
         'aria-label',
         `Leseprobe aus ${gezeigt.title}, Seite ${probe.page}, aufschlagen`,

@@ -7,14 +7,10 @@ kurztitel: Weine nicht, Artur!
 autor: Denial Bahtijaragic
 klappentext: >-
   Ein Wiener erklärt einem Jungen, der seine Sprache kaum versteht, warum er
-  nicht weinen soll. Zwischen den Straßen der südlichen Peripherie, den
-  Sternbildern, die der Vater ihm einst gezeigt hat, und den Nachrichten
-  eines Donnerstagmorgens setzt die Rede immer wieder von vorn an. Eine
-  Litanei über ein verwünschtes Weltall, in dem sich jeder Wunsch ins
-  Gegenteil verkehrt und die schlimmste Angst immer wahr wird.
-zitat: >-
-  Wir sind alle tot, auch wenn noch nicht alle begraben sind. Wir sind alle
-  im Krieg, auch wenn noch nicht jeder eine Uniform trägt.
+  nicht weinen soll. Zwischen den Straßen der Peripherie, den Sternbildern
+  des Vaters und den Nachrichten eines Donnerstagmorgens setzt die Rede
+  immer wieder von vorn an.
+zitat: Wir sind alle tot, auch wenn noch nicht alle begraben sind.
 zitat_von: Der Erzähler
 format: Broschur
 verfuegbarkeit: In Vorbereitung
@@ -58,8 +54,20 @@ leseprobe:
 
     Mich erheiterte dies und ich zeigte zum Nachthimmel. „Alnitak. Alnilam.
     Mintaka", sagte ich leise, blickte zu der Sternennacht und sah das
-    Dreigestirn in einer Linie, gesäumt von den anderen Nachtsternen. Wenn der
-    Junge Deutsch verstanden hätte, so hätte ich zu ihm gesagt: [[|17]]
+    Dreigestirn in einer Linie, gesäumt von den anderen Nachtsternen. Die
+    kalte Luft flutete angenehm meine Nasenflügel und in meinen Ohren
+    ertönte jäh die Durchsage aus den Lautsprechern des Bahnhofs
+    Hetzendorf, worauf ein Zug mit gewaltigem Brausen vorbeirauschte. Wenn
+    der Junge Deutsch verstanden hätte, so hätte ich zu ihm gesagt:
+    [[es ist ein verwünschtes Weltall]].
+
+
+    Artur schaute mich an, so als wolle er etwas sagen, aber immer wenn er
+    sich anschickte den Mund zu öffnen, pressten sich seine Lippen wieder
+    zusammen und seine Blicke irrten durch das Dunkel der Winternacht.
+    Zuerst hatte ich vor, mich abzuwenden und zu gehen, aber dann schaute
+    ich Artur abermals an, schloss meine Augen und wähnte wieder müde das
+    Licht des Sternenhimmels zu sehen, die Ewigkeit und glaubte [[|17]]
 # Farben für Rücken, Rückseite und Kanten — aus dem Umschlag genommen:
 # das Nachtblau des Himmels, das Gold der Schrift.
 cover_farbe: '#2e240e'
@@ -79,15 +87,11 @@ rueckseite:
   kurztitel: Lichas
   autor: Aleksandar Vadim
   klappentext: >-
-    Ein Fischersohn aus Tarent strandet auf einer Insel bei Korfu, findet
-    dort die Bienen und wird mit ihrem Honig ein großer Mann in Rom. Vier
-    Stimmen erzählen dieselbe Geschichte in der zweiten Person: er selbst,
-    die Frau, die ihn eingeführt hat, die Frau, für die er sie verließ, und
-    der Kaiser, der zusieht. Zwischen ihren Fersen läuft ein roter Faden,
-    und er reißt erst ganz am Ende.
-  zitat: >-
-    Süßer Honigduft, wie du den Fischgeruch überdeckst, das Fischwasser in
-    den Körben und in den Körpern.
+    Ein Fischersohn aus Tarent strandet bei Korfu, findet die Bienen und
+    wird mit ihrem Honig ein großer Mann in Rom. Vier Kapitel, vier
+    Anreden: er, die Frau, die ihn einführte, die Frau, für die er sie
+    verließ, und der Kaiser.
+  zitat: Du bist Lichas von Othoni, haben sie dir gesagt.
   zitat_von: Aus dem Kapitel Lichas
   cover_bild: /buecher/weine-nicht-artur/lichas.webp
   # Die zweite Geschichte hat ihre eigene Probe, an ihrer eigenen Stelle:
