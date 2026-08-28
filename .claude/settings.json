@@ -23,7 +23,11 @@
     "allow": [
       "Read(~/Documents/Projekte/sonne-und-fleisch/**)",
       "Edit(~/Documents/Projekte/sonne-und-fleisch/**)",
-      "Read(~/Downloads/**)"
+      "Read(~/Downloads/**)",
+      "Bash(git commit:*)",
+      "Bash(git commit *)",
+      "Bash(git push:*)",
+      "Bash(git push *)"
     ]
   }
 }
