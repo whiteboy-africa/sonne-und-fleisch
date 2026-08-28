@@ -682,42 +682,11 @@
 /* ------------------------------------------------- Die Zeile in den Angaben */
 
 /*
- * Der zweite Weg in den Band: eine Zeile, kein Knopf. Sie steht in der
- * Bedienschrift zwischen den Angaben und faerbt sich beim Darueberfahren
- * in die Giftfarbe — mehr Aufhebens macht sie nicht.
+ * Hier standen die Zeile „Leseprobe — S. xx" und ihre Kopplung an den
+ * Umschlag: beide leuchteten gemeinsam, weil beide in denselben Band
+ * fuehrten. Die Zeile ist weg — es gibt nur noch einen Weg, und der
+ * braucht kein Gegenstueck.
  */
-.leseprobe-zeile {
-  /* Eigene Zeile, nicht neben dem Wenden-Schalter: `inline-flex` legte sich
-     dem Knopf an die Seite und die beiden lasen sich als ein Ding. */
-  display: flex;
-  gap: 8px;
-  align-items: baseline;
-  width: fit-content;
-  margin: 14px 0 2px;
-  padding: 0;
-  color: var(--ink-soft);
-  font-family: var(--schrift);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  transition: color 160ms ease;
-}
-
-/*
- * Die Kopplung, Richtung Band → Zeile: liegt der Zeiger auf dem Umschlag,
- * faerbt sich die Zeile in die Giftfarbe — dieselbe Farbe, die sie
- * annimmt, wenn man sie selbst anfaehrt. Beides ist derselbe Weg in
- * dasselbe Buch, also sieht beides gleich aus.
- *
- * (Die Gegenrichtung — Zeile → Band — liegt in `mount.ts`: die Zeile
- * meldet ihren Schwebezustand an die Engine, und der Band leuchtet.)
- */
-.ist-schwebend .leseprobe-zeile,
-.leseprobe-zeile:hover,
-.leseprobe-zeile:focus-visible {
-  color: var(--accent);
-}
 
 /*
  * Solange der Band aufschlaegt, raeumt das Regal das Bild.

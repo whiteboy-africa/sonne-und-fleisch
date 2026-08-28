@@ -1464,23 +1464,6 @@ body {
     display: contents;
   }
 
-  /*
-   * Die Zeile „Leseprobe — S. xx" steht auf dem Telefon **nicht** da.
-   *
-   * Sie war hier einmal der zweite Weg in den Band, gross und mittig unter
-   * ihm. Der erste Weg ist der Umschlag selbst, und den tippt man ohnehin
-   * an — auf einem Schirm, auf dem der Band die halbe Hoehe einnimmt,
-   * braucht es dafuer keine Beschriftung. Uebrig blieb eine Zeile, die
-   * ansagt, was gleich passiert, und dabei den Abstand zwischen Band und
-   * Text auffuellt.
-   *
-   * Am Schreibtisch bleibt sie, wo sie war: dort steht sie klein in den
-   * Angaben, neben Format und Verfuegbarkeit, und dort ist sie Auskunft
-   * (auf welcher Seite das Fenster liegt) und nicht Bedienung.
-   */
-  [data-handy-fluss='an'] .leseprobe-zeile {
-    display: none;
-  }
 
   [data-handy-fluss='an'] .wenden-knopf {
     order: -1;

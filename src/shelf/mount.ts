@@ -54,7 +54,6 @@ export function regalStarten(wurzel: HTMLElement) {
     ),
     status: pflicht(wurzel, '[data-status-text]'),
     vorlese: pflicht(wurzel, '[data-vorlese]'),
-    leseprobeZeile: pflicht<HTMLButtonElement>(wurzel, '[data-leseprobe-zeile]'),
     heftZeilen: pflicht<HTMLElement>(wurzel, '[data-heft-zeilen]'),
     heftZu: pflicht<HTMLButtonElement>(wurzel, '[data-heft-zu]'),
   };
@@ -241,19 +240,6 @@ export function regalStarten(wurzel: HTMLElement) {
         marke.textContent = seite === 'vorn' ? 'Seite A' : 'Seite B';
       });
     }
-    // Die Leseprobe gehoert der Seite, die vorn liegt. Hat sie keine,
-    // steht die Zeile nicht da — und der Band laesst sich dort auch nicht
-    // aufschlagen.
-    const probe = siteConfig.leseprobe ? gezeigt.excerpt : undefined;
-    el.leseprobeZeile.hidden = !probe;
-    if (probe) {
-      // Die Seitenzahl steht nirgends mehr im Bild — im Vorlesetext bleibt
-      // sie, dort kostet sie keinen Platz und sagt, wo man landet.
-      el.leseprobeZeile.setAttribute(
-        'aria-label',
-        `Leseprobe aus ${gezeigt.title}, Seite ${probe.page}, aufschlagen`,
-      );
-    }
     el.panelFormat.textContent = buch.format;
     el.panelVerfuegbarkeit.textContent = buch.availability;
     el.panelLink.href = buch.url;
@@ -358,19 +344,12 @@ export function regalStarten(wurzel: HTMLElement) {
   // Die erste der beiden Zeilen unter dem Heft. Die zweite ist ein
   // gewoehnlicher Verweis auf die Datei und braucht kein Skript.
   el.heftZu.addEventListener('click', () => engine?.heftSchliessen());
-  el.leseprobeZeile.addEventListener('click', () =>
-    leseprobeOeffnen(el.leseprobeZeile),
-  );
-  // Beide Wege in den Band gehoeren zusammen: liegt der Zeiger auf der
-  // Zeile, geht der Band in denselben Schwebezustand, als laege er auf dem
-  // Umschlag. Der Tastenfokus zaehlt mit — wer sich mit der Tabulatortaste
-  // hierher bewegt, sieht dasselbe.
-  (['pointerenter', 'focus'] as const).forEach((art) =>
-    el.leseprobeZeile.addEventListener(art, () => engine?.schwebeErzwingen(true)),
-  );
-  (['pointerleave', 'blur'] as const).forEach((art) =>
-    el.leseprobeZeile.addEventListener(art, () => engine?.schwebeErzwingen(false)),
-  );
+  /*
+   * Hier hing die Zeile „Leseprobe — S. xx" am Klick und am Schweben. Sie
+   * ist aus der Tafel genommen, und mit ihr die Kopplung: es gibt nur noch
+   * **einen** Weg in den Band, den Umschlag. Der leuchtet von selbst, wenn
+   * der Zeiger auf ihm liegt — dafuer braucht es kein Gegenstueck mehr.
+   */
 
   wurzel.querySelectorAll('[data-gesamt]').forEach((element) => {
     element.textContent = gesamt;
