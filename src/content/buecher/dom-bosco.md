@@ -3,9 +3,10 @@
 # „La Chine hermetique" (85.254 Zeichen). Klappentexte, Zitate und
 # Leseproben stehen im Wortlaut der Uebersetzungen.
 #
-# OFFEN: der Umschlag. Solange kein `cover_bild` da ist, zeigt das
-# Programm die cremefarbene Blindflaeche und das Regal malt den Band aus
-# den Farben unten.
+# OFFEN: der Umschlag der Vorderseite (Dom Bosco). Solange kein
+# `cover_bild` da ist, zeigt das Programm die cremefarbene Blindflaeche
+# und das Regal malt den Band aus den Farben unten. Die Rueckseite hat
+# ihren.
 #
 # OFFEN: `seiten_zahl`. Aus dem Umbruch nachtragen.
 titel: Biographische Skizze über Dom Bosco
@@ -72,11 +73,12 @@ rueckseite:
     man ein Protokoll schreibt.
   zitat: Das Leben wird mit dem Leben bezahlt.
   zitat_von: Chinesisches Sprichwort, bei Matignon
-  # OFFEN: der Umschlag. Vorlaeufig das Zinnober der Lacke, Messing,
-  # Knochenweiss.
-  cover_farbe: '#3a1512'
-  akzent_farbe: '#b8892f'
-  schrift_farbe: '#e8ded0'
+  cover_bild: /buecher/dom-bosco/la-chine-hermetique.webp
+  # Aus dem Umschlag genommen: das Schwarz der Fotografien, das
+  # Papierweiss der Ausschnitte.
+  cover_farbe: '#14100f'
+  akzent_farbe: '#8a8378'
+  schrift_farbe: '#e8e4da'
   motiv: maze
   leseprobe:
     # GESCHAETZT: die Stelle liegt im Kapitel ueber den Selbstmord. Aus
