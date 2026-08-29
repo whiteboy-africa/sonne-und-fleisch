@@ -69,12 +69,14 @@ rueckseite:
     man ein Protokoll schreibt.
   zitat: Das Leben wird mit dem Leben bezahlt.
   zitat_von: Chinesisches Sprichwort, bei Matignon
-  cover_bild: /buecher/dom-bosco/la-chine-hermetique.webp
-  # Aus dem Umschlag genommen: das Schwarz der Fotografien, das
-  # Papierweiss der Ausschnitte.
-  cover_farbe: '#14100f'
-  akzent_farbe: '#8a8378'
-  schrift_farbe: '#e8e4da'
+  # Neuer Umschlag, neuer Dateiname — ein Bild nie unter demselben
+  # austauschen, sonst zeigt der Cache weiter das alte.
+  cover_bild: /buecher/dom-bosco/la-chine-hermetique-2.webp
+  # Aus dem Umschlag genommen: das Nachtblau der Gasse, das Orange des
+  # brennenden Himmels, das Elfenbein der Schrift.
+  cover_farbe: '#151a20'
+  akzent_farbe: '#c2621f'
+  schrift_farbe: '#ece2cb'
   motiv: maze
   leseprobe:
     # GESCHAETZT: die Stelle liegt im Kapitel ueber den Selbstmord. Aus

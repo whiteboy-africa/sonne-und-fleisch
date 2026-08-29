@@ -63,11 +63,18 @@ rueckseite:
   titel: Corporal Curses
   kurztitel: Corporal Curses
   autor: Marlies van Addak
+  # Aus dem Entwurf „Corporal Curses 4.docx". Die Heldin heisst hier
+  # durchgehend Helena; im Manuskript steht an sechzehn Stellen noch
+  # „Aya".
   klappentext: >-
-    Platzhalter: die Einführung in die zweite Geschichte des Bandes. Sie
-    erscheint, sobald man das Buch wendet.
-  zitat: Platzhalter für einen Satz aus Corporal Curses.
-  zitat_von: Verlagsnotiz
+    Ein Mädchen wächst unter einem Rentierfell auf, gerät unter Räuber
+    und zieht durch die Jahrhunderte der europäischen Verfolgungslegenden.
+    Man kennt sie unter vielen Namen: Apostelin des Mitleids, Seraph der
+    Schwerkraft und der Gnade.
+  zitat: >-
+    Helena war ein lebendiger Schlachtaltar, ein Becken aus Dross und
+    Rosenöl.
+  zitat_von: Der Erzähler
   cover_bild: /buecher/selbstkreuzigung/corporal-curses.webp
   cover_farbe: '#0f0d0c'
   akzent_farbe: '#c9c1ad'
