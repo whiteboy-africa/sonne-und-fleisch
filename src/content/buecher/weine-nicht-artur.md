@@ -98,6 +98,11 @@ rueckseite:
   cover_bild: /buecher/weine-nicht-artur/lichas.webp
   # Die zweite Geschichte hat ihre eigene Probe, an ihrer eigenen Stelle:
   # der Schiffbruch und die Bienen, mit denen alles anfaengt.
+  #
+  # Aus „Lichas – Buchsatz.docx", im Wortlaut. Sie reichte bis an den
+  # Fuss der Seite nicht heran — 1.283 Zeichen, wo die Doppelseite rund
+  # 1.640 traegt. Dazugekommen sind der Satz vom Honigduft, der beim
+  # ersten Setzen uebersprungen worden war, und der Weg weiter bis Hedyle.
   leseprobe:
     # GESCHAETZT wie vorn — die Stelle liegt am Anfang der zweiten
     # Erzaehlung, die von hinten her eigene Seitenzahlen hat.
@@ -120,12 +125,20 @@ rueckseite:
       Und dann haben sie verstanden, [[du hast sie bezwungen]].
 
 
+      Süßer Honigduft, wie du den Fischgeruch überdeckst, das Fischwasser
+      in den Körben und in den [[Körpern]].
+
+
       Die Bienen, dein Schatz aus ihrer Honigblase und die ältesten Formen
       menschlichen Handelns: die Zucht und der Verkauf, und du liebst deinen
       Honig. Du trägst ihn in die Dörfer, trägst ihn an den Straßen und
       trägst ihn nach Rom, doch niemand will ihn kaufen. Du schläfst auf den
       Straßen, die Honigwaben deine Pölster und aus Bienenhaar deine Decke:
-      Und dann triffst du [[|17]]
+      Und dann triffst du [[Hedyle aus gutem Hause]]. Ihr liebt euch im
+      Forum Romanum und im Forum Iulium, ihr liebt euch bis ans Ende der Via
+      Latina und Hedyles Verbindungen ermöglichen dir alles – jetzt bist du
+      einer der großen Männer, ganz Rom liebt deine Waben aus [[Othoni und
+      du gehst mit den feinen Herren. |40]]
   akzent_farbe: '#c8912f'
   schrift_farbe: '#e8ddc0'
   motiv: wave
