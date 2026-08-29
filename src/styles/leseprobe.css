@@ -824,6 +824,12 @@
 
 /* ------------------------------------------------------------------ Handy */
 
+/*
+ * Der Telefonblock — er greift nur noch, wenn die Einzelseite wieder
+ * eingeschaltet wird (`einzeln()` in `shelf/leseprobe.ts`). Auf der
+ * Doppelseite waere er falsch: 16 Pixel Schrift auf einer Seite von 260
+ * Pixeln Hoehe sind keine Seite mehr, sondern vier Zeilen.
+ */
 @media (max-width: 767px), (pointer: coarse) {
 
   /*
@@ -832,7 +838,7 @@
    * Bogens (1,85 % der Seitenhoehe waeren keine 12 Pixel), sondern eine
    * Groesse, die man in der Hand lesen kann.
    */
-  .blatt__satz {
+  .leseprobe__spanne--einzeln .blatt__satz {
     font-size: clamp(16px, 4.3vw, 19px);
     line-height: 1.62;
     /*
@@ -850,14 +856,14 @@
    * abgebrochenen Satz. Ohne Blocksatz gibt es keine Zeilenkante mehr,
    * an der er enden koennte — so ist der Abbruch deutlicher als je.
    */
-  .balken--schluss {
+  .leseprobe__spanne--einzeln .balken--schluss {
     display: block;
     width: 100%;
     max-width: none;
     margin: 0.2em 0 0;
   }
 
-  .blatt__absatz--abbruch {
+  .leseprobe__spanne--einzeln .blatt__absatz--abbruch {
     text-align-last: auto;
   }
 
@@ -871,16 +877,16 @@
    * ueberstimmt — dann sass der Scan in einem Kasten mit zwei Zentimetern
    * Papier ringsum, ein zweiter Rand um den ersten.
    */
-  .blatt:not(.blatt--bild) {
+  .leseprobe__spanne--einzeln .blatt:not(.blatt--bild) {
     padding: clamp(22px, 6vw, 34px) clamp(20px, 5.5vw, 30px);
   }
 
-  .blatt__kolumne {
+  .leseprobe__spanne--einzeln .blatt__kolumne {
     padding-bottom: 10px;
     font-size: 10px;
   }
 
-  .blatt__satz {
+  .leseprobe__spanne--einzeln .blatt__satz {
     margin-top: 14px;
   }
 }

@@ -583,14 +583,33 @@ steht allein ueber dem Fuss — dann sieht der Entzug nicht nach Entzug aus,
 sondern nach unfertig. **Der Abbruch mitten im Satz gehoert dazu, das
 leere Drittel darunter nicht.**
 
-**Die gerechnete Zahl ist nicht nachgemessen, und sie ist zu klein.** Bei
-1.775 Zeichen bleibt die Seite sichtbar leer. Gerechnet wurde mit rund 58
-Zeichen je Zeile; die Serife setzt offenbar enger. **Wer das naechste Mal
-eine Probe anfasst, misst es einmal wirklich:** Band aufschlagen und im
-Bild `document.querySelector('.blatt__satz')` nach `scrollHeight` gegen
-`clientHeight` fragen, dann steht die Zahl. Zum Vergleich: heute liegen
-alle Proben im Repo zwischen 1.038 und 1.775 — **keine einzige fuellt
-ihre Seite.** Wer eine Probe einstellt, zaehlt die
+**Nachgemessen im Bild — und die Rechnung war in beide Richtungen
+falsch.** `scrollHeight` gegen `clientHeight` am `.blatt__satz`, Band 009
+Seite B (1.644 sichtbare Zeichen):
+
+| | Zeilen Platz | Zeilen Text | |
+| --- | --- | --- | --- |
+| Schreibtisch (1280x720) | 27,8 | 31,9 | **115 %** |
+| Telefon (390x844) | 21,0 | 48,8 | **232 %** |
+
+Eine Seite haelt also rund **1.420 Zeichen am Schreibtisch und nur 715
+auf dem Telefon**. Nicht zu wenig Text war das Problem, sondern zu viel:
+auf dem Telefon faellt mehr als die Haelfte unter den Beschnitt.
+
+**Und ein Text kann beide Seiten nicht fuellen.** Der Grund steht in
+`leseprobe.css`: am Schreibtisch haengt der Schriftgrad an der
+Seitenhoehe (`1.85cqh`), auf dem Telefon steht er absolut
+(`clamp(16px, 4.3vw, 19px)`). Dort waechst die Schrift also nicht mit der
+Seite mit, und dieselbe Zahl Zeichen braucht die doppelte Hoehe. Wer das
+aufloesen will, hat zwei Wege: den Text auf die **kleinere** Seite
+einstellen (rund 700 Zeichen, dann bleibt am Schreibtisch die Haelfte
+leer), oder die Telefonschrift ebenfalls an die Seitenhoehe haengen —
+dann passt eine Fassung auf beide, nur wird die Schrift auf kleinen
+Geraeten kleiner.
+
+**Bis das entschieden ist, ist keine Zahl richtig.** Heute liegen alle
+Proben im Repo zwischen 1.038 und 1.775 Zeichen; **jede einzelne laeuft
+auf dem Telefon ueber.** Wer eine Probe einstellt, zaehlt die
 Zeichen nach; der Buchsatz gibt genug Text her, um bis an den Fuss zu
 reichen. Das ist mehrfach angemahnt worden — es ist keine Feinheit,
 sondern die Seite.
@@ -699,10 +718,22 @@ Zeile nicht **ein** Balken, sondern zwei bis vier mit Wortabstaenden
 dazwischen, in Absaetzen mit Einzug: man soll sehen, dass hier Satz stand,
 und nicht ein schwarzes Rechteck.
 
-Auf dem Telefon (unter 768 px oder Fingergeraet) wird einzeln geblaettert,
-und die Seite ist so hoch wie das Geraet, nicht so hoch wie A5 — an A5
-festzuhalten machte sie kurz und breit, und der Text passte nicht mehr
-darauf.
+**Auf dem Telefon steht dieselbe Doppelseite wie am Schreibtisch.** Der
+ganze aufgeschlagene Band liegt in der Hand — beide Seiten, klein —, und
+man zieht sich heran, was man lesen will.
+
+Hier wurde einmal einzeln geblaettert: eine Seite so hoch wie das Geraet,
+getippt auf die linke oder rechte Haelfte. Das war als Zugestaendnis an
+den kleinen Schirm gedacht und nahm ihm das Buch. Man stand mitten in
+einer Seite, ohne den Band je gesehen zu haben, und der Satz war
+vorgezoomt, statt dass man selbst hineingeht — und weil die Telefonseite
+nur einundzwanzig Zeilen haelt, wo die Doppelseite achtundzwanzig traegt,
+fiel von jeder Probe mehr als die Haelfte unter den Beschnitt.
+
+Der Weg zurueck steht: `einzeln()` in `shelf/leseprobe.ts` gibt heute
+`false` zurueck, `handyBreite` und alles an `--einzeln` ist unangetastet,
+und der Telefonblock in `leseprobe.css` ist auf
+`.leseprobe__spanne--einzeln` eingerueckt statt geloescht.
 
 ### Die Lupe
 

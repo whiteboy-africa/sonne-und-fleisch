@@ -224,9 +224,26 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
   /** Das Blatt, das gerade umschlaegt — hoechstens eines. */
   let wender: HTMLElement | null = null;
 
-  const einzeln = () =>
-    window.matchMedia(`(max-width: ${handyBreite - 1}px), (pointer: coarse)`)
-      .matches;
+  /*
+   * **Auf dem Telefon steht dieselbe Doppelseite wie am Schreibtisch.**
+   *
+   * Hier stand die Abfrage nach Schirmbreite und Fingergeraet, und darunter
+   * wurde einzeln geblaettert: eine Seite so hoch wie das Geraet, getippt
+   * auf die linke oder rechte Haelfte. Das war als Zugestaendnis an den
+   * kleinen Schirm gedacht und nahm ihm das Buch: man stand mitten in
+   * einer Seite, ohne je den Band gesehen zu haben, und der Satz war
+   * vorgezoomt, statt dass man selbst hineingeht.
+   *
+   * Jetzt liegt der Band auch in der Hand aufgeschlagen da — beide Seiten,
+   * klein, und man zieht sich heran, was man lesen will. Dafuer ist die
+   * Lupe da (Kneifen, Doppeltipp in der Mitte, Schieben mit einem Finger).
+   *
+   * Der Weg zurueck steht noch: `handyBreite` und alles, was an
+   * `--einzeln` haengt, ist unangetastet. Wer die Einzelseite wieder will,
+   * gibt hier die Medienabfrage zurueck und nimmt in `leseprobe.css` die
+   * Einrueckung des Telefonblocks wieder heraus.
+   */
+  const einzeln = () => false;
 
   const wenigerBewegung = () =>
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
