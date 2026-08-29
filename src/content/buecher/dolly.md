@@ -26,7 +26,6 @@ motiv: branches
 hoehe: 2.0
 dicke: 0.078
 reihenfolge: 2
-# Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Was in doppelten Klammern steht, wird beim Bauen herausgeschnitten und
 # als Balken gedruckt — es steht in keinem HTML.
 leseprobe:
@@ -54,6 +53,7 @@ leseprobe:
     diese Zeit und dieser Garten gehörten jetzt ihr. Sie hätte nicht mit
     diesen beiden menschlichen Partyüberbleibseln gerechnet, die hier im
     Gras ihren Rausch ausdösen. Tja, [[falsch gerechnet. |18]]
+# Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 rueckseite:
   titel: The Rise of Damascus Goat
   kurztitel: Damascus Goat
