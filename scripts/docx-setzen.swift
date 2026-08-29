@@ -10,6 +10,13 @@
 // Seitenzahl einer Leseprobe ist das nah genug; wer die gedruckte Seite
 // braucht, exportiert das PDF aus Word.
 //
+// **Die Kolumne wird nachgezogen.** Kopf- und Fusszeilen ueberleben die
+// Konvertierung nicht, also werden sie hier neu gesetzt — aus
+// `word/header*.xml`, wo Autor und Titel schon stehen. Gerade Seiten
+// tragen den Autor und die Zahl aussen links, ungerade den Titel und die
+// Zahl aussen rechts; so steht es in den Kopfzeilen des Dokuments und so
+// haelt es die Leseprobe im Regal.
+//
 //   swift scripts/docx-setzen.swift <quelle.docx> <ziel.pdf>
 
 import AppKit
@@ -46,6 +53,32 @@ let oben     = (twips(xml, "pgMar", "top") ?? 1440) / 20.0
 let unten    = (twips(xml, "pgMar", "bottom") ?? 1440) / 20.0
 let links    = (twips(xml, "pgMar", "left") ?? 1440) / 20.0
 let rechts   = (twips(xml, "pgMar", "right") ?? 1440) / 20.0
+
+// Die Kolumne aus den Kopfzeilen des Dokuments: gerade Seiten der Autor,
+// ungerade der Titel. Die Ziffer im Text ist der Vorgabewert des
+// PAGE-Feldes und faellt weg.
+func kopfzeile(_ datei: String) -> String? {
+  guard let x = try? String(contentsOf: auspack.appendingPathComponent("word/\(datei)"),
+                            encoding: .utf8) else { return nil }
+  var stuecke: [String] = []
+  for teil in x.components(separatedBy: "<w:t").dropFirst() {
+    guard let auf = teil.firstIndex(of: ">"),
+          let zu = teil.range(of: "</w:t>") else { continue }
+    let inhalt = String(teil[teil.index(after: auf)..<zu.lowerBound])
+    if !inhalt.isEmpty { stuecke.append(inhalt) }
+  }
+  let text = stuecke.joined(separator: " ")
+    .replacingOccurrences(of: "^[0-9]+\\s*", with: "", options: String.CompareOptions.regularExpression)
+    .trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+  return text.isEmpty ? nil : text
+}
+var kolumnen: [String] = []
+for i in 1...12 {
+  if let k = kopfzeile("header\(i).xml"), !kolumnen.contains(k) { kolumnen.append(k) }
+}
+// Der laengere ist der Autor (Vor- und Zuname), der andere der Titel.
+let kolumneGerade = kolumnen.max(by: { $0.count < $1.count })
+let kolumneUngerade = kolumnen.first(where: { $0 != kolumneGerade })
 
 guard let text = try? NSAttributedString(
   url: quelle,
@@ -88,6 +121,25 @@ while gesetzt < setzer.numberOfGlyphs || seiten == 0 {
   ctx.setFillColor(CGColor(red: 1, green: 1, blue: 1, alpha: 1))
   ctx.fill(CGRect(origin: .zero, size: seitenGroesse))
   setzer.drawGlyphs(forGlyphRange: bereich, at: NSPoint(x: links, y: oben))
+
+  // Die Kolumne. Die erste Seite eines Abschnitts traegt sie nicht — wie
+  // im Buch, wo ueber einem Kapitelanfang nichts steht.
+  let nummer = seiten + 1
+  if nummer > 6, let lauf = (nummer % 2 == 0 ? kolumneGerade : kolumneUngerade) {
+    let grad = NSFont.systemFontSize * 0.62
+    let stil = NSMutableParagraphStyle()
+    stil.alignment = nummer % 2 == 0 ? .left : .right
+    let attr: [NSAttributedString.Key: Any] = [
+      .font: NSFont(name: "Garamond", size: grad) ?? NSFont.systemFont(ofSize: grad),
+      .foregroundColor: NSColor(white: 0.35, alpha: 1),
+      .kern: grad * 0.16,
+      .paragraphStyle: stil,
+    ]
+    let zeile = nummer % 2 == 0 ? "\(nummer)   \(lauf)" : "\(lauf)   \(nummer)"
+    NSAttributedString(string: zeile, attributes: attr).draw(
+      in: NSRect(x: links, y: oben - grad * 2.6,
+                 width: satzspiegel.width, height: grad * 2))
+  }
   ctx.restoreGState()
   NSGraphicsContext.current = alt
   ctx.endPage()

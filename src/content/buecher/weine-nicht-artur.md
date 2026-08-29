@@ -24,6 +24,10 @@ leseprobe_schrift: "'Times New Roman', Times, serif"
 # steht am Ende der Leseprobe („Weiter nur im Band").
 seiten_zahl: 48
 cover_bild: /buecher/weine-nicht-artur/cover.webp
+# Gekuerzt, als der Band sein wirkliches Format bekam (0,648 statt A5):
+# die schmalere Seite haelt zwei Zeilen weniger, und der Satz lief unten
+# ueber. Der Balken schliesst jetzt frueher.
+#
 # Aus dem Manuskript, im Wortlaut. Was in [[doppelten Klammern]] steht, wird
 # beim Bauen herausgeschnitten und als Balken gedruckt — es steht in keinem
 # HTML. Die Stelle ist die Begegnung am Bahnhof Hetzendorf; der Satz, der
@@ -67,9 +71,8 @@ leseprobe:
     Artur schaute mich an, so als wolle er etwas sagen, aber immer wenn er
     sich anschickte den Mund zu öffnen, pressten sich seine Lippen wieder
     zusammen und seine Blicke irrten durch das Dunkel der Winternacht.
-    Zuerst hatte ich vor, mich abzuwenden und zu gehen, aber dann schaute
-    ich Artur abermals an, schloss meine Augen und wähnte wieder müde das
-    Licht des Sternenhimmels zu sehen, die Ewigkeit und glaubte [[|17]]
+    Zuerst hatte ich vor, mich abzuwenden und zu gehen, aber
+    [[dann schaute ich Artur |20]]
 # Farben für Rücken, Rückseite und Kanten — aus dem Umschlag genommen:
 # das Nachtblau des Himmels, das Gold der Schrift.
 cover_farbe: '#2e240e'
@@ -78,6 +81,10 @@ schrift_farbe: '#c0b292'
 motiv: orbit
 hoehe: 2.0
 dicke: 0.078
+# Das wirkliche Druckformat, aus dem Buchsatz: 7286 x 11246 Twips, also
+# 5,06 x 7,81 Zoll. Ohne die Angabe stuende die echte Seite in einem
+# A5-Rahmen und bekaeme ringsum Papier, das im Scan schon steht.
+breite_verhaeltnis: 0.648
 reihenfolge: 0
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Farben aus dem Umschlag: das Olivgrün des Gewitterhimmels, das Gold der
@@ -104,9 +111,27 @@ rueckseite:
   # 1.640 traegt. Dazugekommen sind der Satz vom Honigduft, der beim
   # ersten Setzen uebersprungen worden war, und der Weg weiter bis Hedyle.
   leseprobe:
-    # GESCHAETZT wie vorn — die Stelle liegt am Anfang der zweiten
-    # Erzaehlung, die von hinten her eigene Seitenzahlen hat.
-    seite: 7
+    # Echte Seiten, wie bei Yellow Fever. Gesetzt aus „Lichas –
+    # Buchsatz.docx" mit `scripts/docx-setzen.swift` (5,06 x 7,81 Zoll,
+    # Format und Raender aus dem Dokument, Kolumne aus seinen
+    # Kopfzeilen), gerastert mit `magazin-rendern.swift`, geschwaerzt mit
+    # `seite-schwaerzen.mjs` — die Balken liegen registerhaltig auf dem
+    # Satz, der dasteht, und sind ins Bild gerechnet.
+    #
+    # **Der Umbruch ist TextKits, nicht Words.** Die Seitenzahl stimmt
+    # damit fuer diesen Satz, nicht zwingend fuer den gedruckten Band.
+    # Kommt das PDF aus Word, laufen dieselben drei Schritte darueber.
+    seite: 8
+    bild: /buecher/weine-nicht-artur/leseprobe-lichas-s8.webp
+    geschwaerzt:
+      - /buecher/weine-nicht-artur/leseprobe-lichas-s9-schwarz.webp
+      - /buecher/weine-nicht-artur/leseprobe-lichas-s10-schwarz.webp
+      - /buecher/weine-nicht-artur/leseprobe-lichas-s11-schwarz.webp
+      - /buecher/weine-nicht-artur/leseprobe-lichas-s12-schwarz.webp
+    schluss: /buecher/weine-nicht-artur/leseprobe-lichas-s13-stanze.webp
+    # Der Wortlaut bleibt stehen, obwohl ihn niemand mehr setzt: liegt ein
+    # `bild` vor, zeichnet die Seite nicht mehr. Faellt das Bild einmal
+    # weg, ist der Text noch da.
     text: >-
       Lichas, Unglücklicher, am dritten Tag ist Sturm und es wird euch allen
       bang, die gleichgültigen Wellen treiben euch aufs Meer, sie bringen
