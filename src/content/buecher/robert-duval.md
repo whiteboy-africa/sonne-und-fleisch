@@ -10,6 +10,8 @@ klappentext: >-
   britischer Autoren eine Befreiung von der Erdenschwere. Ein Leben in acht
   Kapiteln — England, Studien, Kowloon — und ein Sohn, dem er die
   Melancholie beibringt wie ein Handwerk.
+klammer: >-
+  Robert Duval liest sich ins Empire, sein Sohn springt in Causeway Bay. Dazwischen die Berge, in die man die Traurigkeit trägt.
 zitat: Robert ist allen fremd.
 zitat_von: Erstes Kapitel
 format: Broschur
@@ -25,8 +27,8 @@ schrift_farbe: '#bea378'
 motiv: schematic
 hoehe: 2.0
 dicke: 0.078
-reihenfolge: 2
-# Doppelcover: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
+reihenfolge: 3
+# Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Aus dem Manuskript, im Wortlaut. Der Text ist als Exposee gesetzt —
 # Kapitelzeilen und Gedankenstriche gehoeren zur Form, nicht zur Kuerzung.
 # Was in doppelten Klammern steht, wird beim Bauen herausgeschnitten und

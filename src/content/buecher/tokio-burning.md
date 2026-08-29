@@ -22,8 +22,8 @@ schrift_farbe: '#d67016'
 motiv: boom
 hoehe: 2.0
 dicke: 0.078
-reihenfolge: 7
-# Doppelcover: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
+reihenfolge: 8
+# Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Aus dem Manuskript, im Wortlaut: der Gang in die Empfangshalle.
 leseprobe:
   # GESCHAETZT: der Anfang.

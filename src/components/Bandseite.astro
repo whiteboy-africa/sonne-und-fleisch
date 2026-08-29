@@ -1,0 +1,319 @@
+---
+/*
+ * Eine Seite pro Band — und auf ihr stehen beide Geschichten. Ein
+ * Wendeband hat zwei Vorderseiten; die Seite behauptet das gleich im
+ * Titel und zeigt danach beide Umschlaege, spiegelbildlich gesetzt: erst
+ * Seite A (Text links, Umschlag rechts), dann Seite B (Umschlag links,
+ * Text rechts). Das ist die stille Uebersetzung des Wendens im Regal.
+ *
+ * **Das hier ist der ganze Band.** Es gibt keine zweite Vorlage: die
+ * Adresse `/band-{nn}` und ihre beiden Tiefverweise `/band-{nn}/a` und
+ * `/band-{nn}/b` sind duenne Huellen um dieses Bauteil. Frueher stand
+ * dasselbe unter `/programm/{slug}`; diese Adressen leiten jetzt hierher
+ * (siehe `pages/_redirects.ts`).
+ *
+ * **Kein 3D.** Die Seite ist ein Dokument und bleibt eines. Gewendet wird
+ * hier mit dem Trenner in der Mitte, der zur anderen Seite rollt; wer die
+ * Szene will, geht ueber die Zeile darunter nach `/?band={nn}`. Das Regal
+ * ist das Regal, und die Bandseite ist das, was auch ohne WebGL und ohne
+ * Bewegung vollstaendig dasteht.
+ *
+ * **Keine lange Beschreibung.** Der Textbestand eines Bandes ist
+ * Klappentext, Zitat und Leseprobe — mehr gibt es nicht. Der Rumpf der
+ * Markdown-Datei wird deshalb nicht mehr gerendert; auf den meisten
+ * Baenden stand dort zweimal „Platzhalter fuer die lange Beschreibung".
+ */
+import Seite from '../layouts/Seite.astro';
+import Umschlag from './Umschlag.astro';
+import { type Buch } from '../buecher';
+import { siteConfig } from '../shelf/verlag-config';
+
+interface Props {
+  buch: Buch;
+  nummer: string;
+  /**
+   * Tiefverweis: `/band-{nn}/a` oder `/band-{nn}/b`. Steht hier nur der
+   * Vollstaendigkeit halber — gesprungen wird nach der Adresse, siehe
+   * das Skript unten.
+   */
+  start?: 'a' | 'b';
+}
+
+const { buch, nummer } = Astro.props;
+const d = buch.data;
+const hinten = d.rueckseite;
+
+const datum = d.erscheinungsdatum
+  ? new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' }).format(
+      d.erscheinungsdatum,
+    )
+  : undefined;
+
+// Titel und Namen als Paar. Bei einem gewoehnlichen Band bleibt es beim
+// einen; schreibt eine Person beide Geschichten, steht sie nur einmal da.
+const paarTitel = hinten ? `${d.titel} / ${hinten.titel}` : d.titel;
+const autorHinten = hinten?.autor ?? d.autor;
+const paarAutor =
+  hinten && autorHinten !== d.autor ? `${d.autor} / ${autorHinten}` : d.autor;
+
+/*
+ * **Platzhalter kommen nicht in die Kopfdaten.** Die Beschreibung einer
+ * Seite ist das, was in der Vorschau eines Messengers steht und was eine
+ * Suchmaschine zitiert — „Platzhalter fuer die lange Beschreibung" waere
+ * dort kein Schoenheitsfehler, sondern eine falsche Auskunft ueber den
+ * Verlag. Steht noch einer im Klappentext, tritt der Satz ein, der immer
+ * stimmt.
+ *
+ * Der Bau prueft das zusaetzlich (`npm run pruefen:platzhalter`), damit
+ * es nicht an dieser einen Zeile haengt.
+ */
+const platzhalterSatz =
+  'Zwei Geschichten, zwei Vorderseiten, keine Rückseite. Sonne und Fleisch, Wien.';
+const beschreibung = /platzhalter/i.test(d.klappentext)
+  ? platzhalterSatz
+  : d.klappentext;
+
+const seiten = [
+  {
+    schluessel: 'a' as const,
+    marke: 'Seite A',
+    titel: d.titel,
+    autor: d.autor,
+    klappentext: d.klappentext,
+    zitat: d.zitat,
+    zitat_von: d.zitat_von,
+    cover_bild: d.cover_bild,
+    cover_farbe: d.cover_farbe,
+    akzent_farbe: d.akzent_farbe,
+  },
+  ...(hinten
+    ? [
+        {
+          schluessel: 'b' as const,
+          marke: 'Seite B',
+          titel: hinten.titel,
+          autor: autorHinten,
+          klappentext: hinten.klappentext,
+          zitat: hinten.zitat ?? d.zitat,
+          zitat_von: hinten.zitat_von ?? d.zitat_von,
+          cover_bild: hinten.cover_bild,
+          cover_farbe: hinten.cover_farbe ?? d.cover_farbe,
+          akzent_farbe: hinten.akzent_farbe ?? d.akzent_farbe,
+        },
+      ]
+    : []),
+];
+
+// Angaben gelten fuer den ganzen Band: ein Buchblock, ein Ruecken. Zeilen
+// ohne Wert stehen nicht da — eine leere Zeile in einer Tabelle behauptet,
+// die Auskunft fehle, statt dass es sie nicht gibt.
+const angaben: Array<[string, string]> = [
+  ['Format', d.format],
+  ['Verfügbarkeit', d.verfuegbarkeit],
+  ...(d.seiten_zahl
+    ? ([['Seiten', String(d.seiten_zahl)]] as Array<[string, string]>)
+    : []),
+  ...(d.preis ? ([['Preis', d.preis]] as Array<[string, string]>) : []),
+  ...(d.isbn ? ([['ISBN', d.isbn]] as Array<[string, string]>) : []),
+  ...(datum ? ([['Erscheint', datum]] as Array<[string, string]>) : []),
+  ...(d.uebersetzung_aus
+    ? ([['Übersetzt aus', d.uebersetzung_aus]] as Array<[string, string]>)
+    : []),
+  ...(d.reihe ? ([['Reihe', d.reihe]] as Array<[string, string]>) : []),
+];
+
+/*
+ * **Die Bestellzeile richtet sich nach dem Zustand** — kein Knopf, eine
+ * Zeile.
+ *
+ * „Vormerken" war tote Schrift: es haengte an `bestell_link`, und den
+ * traegt ein Band, der noch nicht lieferbar ist, naturgemaess nicht.
+ * Dastehen und nichts tun ist schlechter als gar nicht dastehen. Ohne
+ * Bestell-Link fuehrt Vormerken deshalb ins Postfach — derselbe Weg wie
+ * am Ende der Leseprobe, damit beide Stellen dasselbe versprechen.
+ *
+ * „Vergriffen" bleibt Text ohne Weg. Da gibt es nichts zu holen, und ein
+ * Verweis, der das Gegenteil andeutet, waere eine Luege.
+ */
+const postfach = (betreff: string) =>
+  `mailto:${siteConfig.vormerkenAdresse}?subject=${encodeURIComponent(betreff)}`;
+
+/*
+ * **Beim vakanten Band steht die Adresse selbst da.**
+ *
+ * Hier stand „Einsenden" — ein Wort, hinter dem sich ein `mailto:`
+ * versteckte. Das ist bei einem Band, der es noch nicht gibt, die
+ * falsche Reihenfolge: die Seite bittet um einen Text, und wer einen
+ * hat, muss **sehen**, wohin damit. Eine Adresse, die man abschreiben
+ * kann, steht auch dann noch da, wenn kein Mailprogramm aufgeht.
+ *
+ * „Vergriffen" bleibt Text ohne Weg. Da gibt es nichts zu holen, und
+ * ein Verweis, der das Gegenteil andeutet, wäre eine Lüge.
+ */
+const bestellung =
+  d.verfuegbarkeit === 'Vergriffen'
+    ? { text: 'Vergriffen', link: undefined }
+    : d.verfuegbarkeit === 'Vakant'
+      ? {
+          text: siteConfig.vormerkenAdresse,
+          link: postfach('Einsendung'),
+          davor: 'Ganzen Text einsenden an',
+        }
+      : d.verfuegbarkeit === 'Verfügbar'
+        ? { text: 'Bestellen', link: d.bestell_link ?? postfach(`Bestellung — ${paarTitel}`) }
+        : { text: 'Vormerken', link: d.bestell_link ?? postfach(`Vormerken — ${paarTitel}`) };
+---
+
+<Seite
+  titel={paarTitel}
+  untertitel={paarAutor}
+  augenbraue={nummer ? `Aus dem Programm · ${nummer}` : 'Aus dem Programm'}
+  beschreibung={beschreibung}
+  weit
+>
+  {
+    /*
+     * Die Klammer: eine Zeile fuer den ganzen Band, bevor die beiden
+     * Geschichten einzeln anfangen. Sie steht im Mono — sie ist
+     * Auskunft ueber das Buch, nicht Text aus dem Buch. Fehlt sie,
+     * steht hier nichts; der Notbehelf aus dem Klappentext gilt nur
+     * fuer die Liste, wo eine Zeile stehen **muss**.
+     */
+    d.klammer && <p class="bandklammer">{d.klammer}</p>
+  }
+
+  {
+    seiten.map((seite, index) => (
+      <>
+        {index > 0 && (
+          /*
+           * Der Trenner ist der Wendepunkt der Seite und deshalb
+           * anfassbar: ein Klick rollt zur anderen Haelfte. Ein Knopf,
+           * kein Link — es geht nirgendwohin, es rueckt nur.
+           */
+          <button class="wende-trenner" type="button" data-wende={seite.schluessel}>
+            <span>A · B</span>
+            <span class="sr-only">Zu Seite B</span>
+          </button>
+        )}
+        <article
+          class:list={['bandblock', index > 0 && 'bandblock--gewendet']}
+          id={`seite-${seite.schluessel}`}
+        >
+          <div class="bandblock__text">
+            <p class="bandblock__marke">{hinten ? seite.marke : 'Der Band'}</p>
+            <h2>{seite.titel}</h2>
+            <p class="bandblock__autor">{seite.autor}</p>
+            <p class="fliesstext">{seite.klappentext}</p>
+            <blockquote class="buchkopf__zitat">
+              „{seite.zitat}“
+              <cite>{seite.zitat_von}</cite>
+            </blockquote>
+          </div>
+          <Umschlag
+            klasse="bandblock__cover"
+            bild={seite.cover_bild}
+            titel={seite.titel}
+            blind={d.blind}
+          />
+        </article>
+      </>
+    ))
+  }
+
+  <dl class="angaben">
+    {
+      angaben.map(([bezeichnung, wert]) => (
+        <div>
+          <dt>{bezeichnung}</dt>
+          <dd>{wert}</dd>
+        </div>
+      ))
+    }
+  </dl>
+
+  {'davor' in bestellung && bestellung.davor && (
+    <p class="bestellzeile__davor">{bestellung.davor}</p>
+  )}
+
+  <p class="bestellzeile">
+    {
+      bestellung.link ? (
+        <a href={bestellung.link}>
+          {bestellung.text} <span aria-hidden="true">↗</span>
+        </a>
+      ) : (
+        <span>{bestellung.text}</span>
+      )
+    }
+  </p>
+
+  {d.verfuegbarkeit === 'Vakant' && (
+    <p class="bestellzeile__notiz">
+      Erzählende Prosa, 40.000 bis 50.000 Zeichen. Ganzer Text, keine Exposés.
+      Antwort kommt. Vielleicht.
+    </p>
+  )}
+
+  {
+    /* Der Weg in die Szene. Hier steht das Buch als Text; dort liegt es
+       im Stapel und laesst sich anfassen. */
+    nummer && (
+      <p class="bandblock__regalweg">
+        <a href={`/?band=${nummer}`}>Im Regal ansehen <span aria-hidden="true">↗</span></a>
+      </p>
+    )
+  }
+</Seite>
+
+<script>
+  /*
+   * Zwei kleine Dinge, beide entbehrlich: der Trenner rollt zur anderen
+   * Haelfte, und ein Tiefverweis (`/band-001/b`) faehrt beim Ankommen
+   * dorthin. Ohne dieses Skript steht die Seite vollstaendig da — der
+   * Trenner ist dann ein Knopf, der nichts tut, und der Tiefverweis
+   * landet oben. Deshalb faerbt der Knopf sich erst hier ein.
+   */
+  const rollen = (ziel: Element | null) => {
+    if (!ziel) return;
+    const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    ziel.scrollIntoView({ behavior: ruhig ? 'auto' : 'smooth', block: 'start' });
+  };
+
+  // Nur in der Entwicklung: dieselbe Wache wie ueber der Tafel im Regal.
+  if (import.meta.env.DEV) {
+    const { taktPruefen } = await import('../shelf/takt-wache');
+    document.querySelectorAll('.bandblock').forEach((block, i) =>
+      taktPruefen({
+        ansicht: `Bandseite, Block ${i ? 'B' : 'A'}`,
+        titel: block.querySelector('h2'),
+        autor: block.querySelector('.bandblock__autor'),
+        klappentext: block.querySelector('.fliesstext'),
+        zitat: block.querySelector('.buchkopf__zitat'),
+        danach: document.querySelector('.wende-trenner'),
+        spalte: block.querySelector('.bandblock__text'),
+      }),
+    );
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('.wende-trenner[data-wende]').forEach((knopf) => {
+    knopf.classList.add('wende-trenner--anfassbar');
+    knopf.addEventListener('click', () => {
+      rollen(document.getElementById(`seite-${knopf.dataset.wende}`));
+    });
+  });
+
+  /*
+   * `/band-001/b` ist dieselbe Seite, nur weiter unten. Beim Ankommen
+   * ohne Bewegung springen: es ist kein Wenden, sondern der Anfang.
+   *
+   * Gelesen wird die **Adresse**, nicht ein Attribut im Markup. Hier
+   * stand einmal `document.body.dataset.bandStart` — das Attribut haette
+   * aber jemand am `<body>` setzen muessen, und der `<body>` gehoert dem
+   * Layout, nicht dieser Seite. Es stand nie da, und der Tiefverweis
+   * landete stumm oben.
+   */
+  if (/\/b\/?$/.test(window.location.pathname)) {
+    document.getElementById('seite-b')?.scrollIntoView({ block: 'start' });
+  }
+</script>

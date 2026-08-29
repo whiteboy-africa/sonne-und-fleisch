@@ -14,7 +14,25 @@
 // ausgeliefert wird. Was darunter stand, ist danach weg — kein Overlay,
 // unter dem sich der Text wieder hervorholen liesse.
 //
-//   node scripts/seite-schwaerzen.mjs <roh.png> <ziel.webp> [--kopf 0.11]
+// **`--klar` schwaerzt nicht.** Dieselbe Seite, derselbe Papierton,
+// dieselbe Breite und Guete — nur ohne Balken. Das ist die Fensterseite:
+// die eine offene Stelle, um die herum alles geschwaerzt ist. Sie muss
+// durch dieselbe Muehle laufen wie ihre Nachbarn, sonst liegt sie im
+// Blaettern in einem anderen Papierton und einer anderen Schaerfe
+// daneben — und dann sieht man, dass sie aus einer anderen Quelle kommt.
+//
+// **`--stanze <von> <bis>`** laesst ein Band der Seite frei — Anteile
+// der Seitenhoehe, etwa `--stanze 0.42 0.68`. Dort kommt kein Balken hin,
+// und der Satz darunter wird mit Papier zugedeckt: es entsteht eine
+// saubere Luecke im geschwaerzten Block. Das ist die Stanze der
+// Schlussseite, in der der Stempel sitzt.
+//
+// Die Luecke muss **im Bild** entstehen und nicht als weisses Rechteck
+// darueber: sonst stuende unter dem Stempel noch der Satz des Buches,
+// nur verdeckt — und was geschwaerzt ist, soll weg sein, nicht zugedeckt.
+//
+//   node scripts/seite-schwaerzen.mjs <roh.png> <ziel.webp> [--kopf 0.11] [--klar]
+//                                     [--stanze 0.42 0.68]
 
 import sharp from 'sharp';
 
@@ -24,12 +42,28 @@ if (!quelle || !ziel) {
   process.exit(1);
 }
 
+/** Ohne Balken ausspielen — die Fensterseite. */
+const klar = rest.includes('--klar');
+/** Das freigelassene Band: [von, bis] als Anteil der Seitenhoehe. */
+const stanze = rest.includes('--stanze')
+  ? [Number(rest[rest.indexOf('--stanze') + 1]), Number(rest[rest.indexOf('--stanze') + 2])]
+  : null;
 /** Anteil der Seitenhoehe, der oben ungeschwaerzt bleibt (Kolumne). */
 const kopfAnteil = Number(rest[rest.indexOf('--kopf') + 1]) || 0.11;
 /** Ab wieviel Druckfarbe eine Bildzeile als Textzeile gilt. */
 const tinteSchwelle = 0.012;
-/** Papierton, auf den der Bogen multipliziert wird. */
-const papier = '#ece8dd';
+/*
+ * **Der Bogen wird schwarz auf weiss ausgespielt, nicht auf Papierton.**
+ *
+ * Hier stand `#ece8dd` und wurde in die Datei hineinmultipliziert. Im
+ * Dokument liegt dieselbe Seite aber noch einmal mit
+ * `mix-blend-mode: multiply` auf der cremefarbenen Buehne — der Ton kam
+ * also **zweimal** drauf. Papier hoch zwei: aus (236, 232, 221) wurde
+ * rund (218, 211, 192), spuerbar dunkler und braeunlicher als die Seiten
+ * ringsum. Genau das sah man der Leseprobe an.
+ *
+ * Den Ton gibt jetzt die Buehne, und zwar einmal. Die Datei bleibt neutral.
+ */
 /** Breite der ausgelieferten Seite. */
 const zielBreite = 1150;
 
@@ -80,6 +114,11 @@ for (let y = kopfBis; y < info.height; y += 1) {
 }
 if (laufend) zeilen.push(laufend);
 
+const inStanze = (y, h) =>
+  stanze !== null &&
+  y + h > info.height * stanze[0] &&
+  y < info.height * stanze[1];
+
 const balken = [];
 for (const zeile of zeilen) {
   const hoehe = zeile.bis - zeile.von + 1;
@@ -88,6 +127,8 @@ for (const zeile of zeilen) {
   const y = Math.max(0, zeile.von - Math.round(hoehe * 0.16));
   const h = Math.round(hoehe * 1.22);
   const breite = zeile.rechts - zeile.links + 1;
+  // In der Stanze steht kein Balken — dort ist Papier.
+  if (inStanze(y, h)) continue;
   balken.push({
     left: zeile.links,
     top: y,
@@ -146,7 +187,7 @@ auflagen.push(...balken.map((b) => ({
 })));
 
 const gefuellt = await sharp(quelle)
-  .composite(auflagen)
+  .composite(klar ? [] : auflagen)
   .png()
   .toBuffer();
 
@@ -154,24 +195,11 @@ const skaliert = await sharp(gefuellt)
   .resize({ width: zielBreite })
   .toBuffer({ resolveWithObject: true });
 
-const ergebnis = await sharp(skaliert.data)
-  .composite([
-    {
-      input: {
-        create: {
-          width: skaliert.info.width,
-          height: skaliert.info.height,
-          channels: 3,
-          background: papier,
-        },
-      },
-      blend: 'multiply',
-    },
-  ])
-  .webp({ quality: 86 })
-  .toFile(ziel);
+const ergebnis = await sharp(skaliert.data).webp({ quality: 86 }).toFile(ziel);
 
 console.log(
   `${ziel}: ${ergebnis.width}x${ergebnis.height}, ${Math.round(ergebnis.size / 1024)} KB — ` +
-    `${zeilen.length} Zeilen erkannt, ${balken.length} Balken`,
+    (klar
+      ? `klar, ${zeilen.length} Zeilen erkannt (nicht geschwaerzt)`
+      : `${zeilen.length} Zeilen erkannt, ${balken.length} Balken`),
 );

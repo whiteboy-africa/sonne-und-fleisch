@@ -13,10 +13,16 @@
 
 import type { BookExcerpt, CatalogBook, ExcerptPart } from './katalog';
 import { balkenLage, balkenMuster } from './schwaerzung';
+import {
+  abdruckBild,
+  abdruckVerhaeltnis,
+  stempelAbdruck,
+  stempelSaat,
+} from './stempel';
 import { siteConfig } from './verlag-config';
 
 /**
- * Was von der Seite gebraucht wird, die gerade vorn liegt. Ein Doppelband
+ * Was von der Seite gebraucht wird, die gerade vorn liegt. Ein Wendeband
  * hat zwei davon; ein gewoehnlicher Band ist selbst seine erste Seite.
  */
 export type Seitendaten = {
@@ -114,7 +120,7 @@ export type LeseprobeHaken = {
 type Seitenart =
   | { art: 'fenster'; nummer: number; probe: BookExcerpt }
   | { art: 'schwarz'; nummer: number; bild?: string }
-  | { art: 'schluss'; nummer: number };
+  | { art: 'schluss'; nummer: number; bild?: string };
 
 /**
  * Eine Seite ist entweder das Fenster, eine geschwaerzte Seite oder die
@@ -134,7 +140,11 @@ function seitenFolge(probe: BookExcerpt): Seitenart[] {
       ...(echt ? { bild: echt } : {}),
     });
   }
-  folge.push({ art: 'schluss', nummer: probe.page + schwarzeSeiten + 1 });
+  folge.push({
+    art: 'schluss',
+    nummer: probe.page + schwarzeSeiten + 1,
+    ...(probe.closingImage ? { bild: probe.closingImage } : {}),
+  });
   return folge;
 }
 
@@ -324,7 +334,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
    * eigene Regel: alles davor war Satz, Kolumne, Schwaerzung. Jetzt laufen
    * Kolumne, Seitenzahl und Balken weiter, und in den Balkenblock ist ein
    * sauberes Rechteck gestanzt: die Balken hoeren darueber auf und fangen
-   * darunter wieder an. In der Stanze stehen die zwei Zeilen.
+   * darunter wieder an. In der Stanze steht der Abdruck.
    *
    * Das ist der Stempel des Zensors auf der geschwaerzten Seite — nicht
    * ein Werbeschild, das man dahinter geklebt hat.
@@ -336,6 +346,30 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
   ) {
     const blatt = document.createElement('article');
     blatt.className = 'blatt blatt--schwarz blatt--schluss';
+
+    /*
+     * **Die echte Schlussseite.**
+     *
+     * Liegt sie vor, wird nichts gezeichnet: das Bild ist die Seite, samt
+     * Kolumne, Zeilenfall und Schwaerzung aus dem Druck. In seiner Mitte
+     * ist beim Ausspielen eine Zone ausgespart (`--stanze`), und genau
+     * darueber legt sich der Stempel.
+     *
+     * Ohne sie faellt die Seite auf den Nachbau zurueck. Das faellt auf,
+     * sobald die Seiten davor echt sind — andere Schrift, anderes Papier,
+     * anderer Zeilenfall.
+     */
+    if (seite.bild) {
+      blatt.classList.add('blatt--bild');
+      const bild = document.createElement('img');
+      bild.className = 'blatt__bild';
+      bild.src = seite.bild;
+      bild.alt = '';
+      bild.decoding = 'async';
+      blatt.append(bild, stanze());
+      return blatt;
+    }
+
     blatt.append(kolumne(seite.nummer, rechts));
 
     const satz = document.createElement('div');
@@ -367,33 +401,65 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     blatt.append(satz);
     return blatt;
 
+    /**
+     * In der Stanze stehen zwei Dinge, und beide fuehren an dieselbe
+     * Stelle: **ein Abdruck** und **eine Zeile**.
+     *
+     * Der Abdruck ist der Gegenstand — Gummi auf Papier, schief
+     * aufgesetzt, mit Aussetzern (`stempel.ts`). Er sagt, was mit dem
+     * Buch ist: weiter nur auf Papier. Die Zeile darunter ist die
+     * Bedienung und traegt keinen Ton: klein, grau, einzeilig.
+     *
+     * **Keine Ziffern.** Hier stand einmal „Weiter nur im Band — 224
+     * Seiten"; eine Zahl an dieser Stelle ist eine Auskunft, und
+     * Auskuenfte gibt diese Seite nicht. Gezaehlt wird auf dieser Seite
+     * nur, was zur Buchhaltung gehoert: die Seitenzahl in der Kolumne.
+     */
     function stanze() {
       const tafel = document.createElement('div');
-      tafel.className = 'blatt__stanze';
+      // Ueber einem echten Blatt schwebt sie in der ausgesparten Zone,
+      // im Nachbau ersetzt sie zwei bis drei Balkenzeilen.
+      tafel.className = seite.bild
+        ? 'blatt__stanze blatt__stanze--auf-bild'
+        : 'blatt__stanze';
 
-    const erste = document.createElement('p');
-    erste.className = 'blatt__schlusszeile';
-    erste.textContent = buch.pages
-      ? `Weiter nur im Band — ${buch.pages} Seiten`
-      : 'Weiter nur im Band';
+      // Lieferbar heisst: es gibt etwas zu kaufen. Sonst wird vorgemerkt —
+      // ein Postfach ist der einzige Weg, der von hier aus offen steht.
+      const lieferbar = buch.availability === 'Verfügbar' && Boolean(buch.orderUrl);
+      const adresse = lieferbar
+        ? (buch.orderUrl as string)
+        : `mailto:${siteConfig.vormerkenAdresse}?subject=${encodeURIComponent(
+            `Vormerken — ${buch.title}`,
+          )}`;
 
-    // Lieferbar heisst: es gibt etwas zu kaufen. Sonst wird vorgemerkt —
-    // ein Postfach ist der einzige Weg, der von hier aus offen steht.
-    const lieferbar = buch.availability === 'Verfügbar' && Boolean(buch.orderUrl);
-    const ziel = document.createElement('a');
-    ziel.className = 'blatt__vormerken';
-    ziel.href = lieferbar
-      ? (buch.orderUrl as string)
-      : `mailto:${siteConfig.vormerkenAdresse}?subject=${encodeURIComponent(
-          `Vormerken — ${buch.title}`,
-        )}`;
-    ziel.textContent = lieferbar ? 'Bestellen' : 'Vormerken';
-    const pfeil = document.createElement('span');
-    pfeil.setAttribute('aria-hidden', 'true');
-    pfeil.textContent = '↗';
-    ziel.append(' ', pfeil);
+      const abdruck = stempelAbdruck(stempelSaat(buch.title));
+      const stempel = document.createElement('a');
+      stempel.className = 'blatt__stempel';
+      stempel.href = adresse;
+      // Der Abdruck ist ein Gegenstand, keine zweite Schaltflaeche: die
+      // Zeile darunter fuehrt an dieselbe Stelle und steht in der
+      // Tastenfolge. Zweimal hintereinander dasselbe Ziel anzuspringen
+      // waere ein Weg zu viel — dieselbe Regel wie beim Umschlag.
+      stempel.tabIndex = -1;
+      // Gelesen wird der Wortlaut aus dem Bild — fuer Vorlesegeraete
+      // muss er trotzdem irgendwo stehen.
+      stempel.setAttribute('aria-label', 'Nur auf Papier');
+      stempel.style.setProperty('--dreh', `${abdruck.dreh.toFixed(2)}deg`);
+      stempel.style.setProperty('--tinte', abdruck.tinte);
+      stempel.style.setProperty('--tinte-druck', abdruck.tinteGedrueckt);
+      stempel.style.setProperty('--abdruck', `url("${abdruckBild}")`);
+      stempel.style.setProperty('--abdruck-verhaeltnis', abdruckVerhaeltnis.toFixed(4));
 
-      tafel.append(erste, ziel);
+      const ziel = document.createElement('a');
+      ziel.className = 'blatt__vormerken';
+      ziel.href = adresse;
+      ziel.textContent = lieferbar ? 'Bestellen' : 'Vormerken';
+      const pfeil = document.createElement('span');
+      pfeil.setAttribute('aria-hidden', 'true');
+      pfeil.textContent = '↗';
+      ziel.append(' ', pfeil);
+
+      tafel.append(stempel, ziel);
       return tafel;
     }
   }

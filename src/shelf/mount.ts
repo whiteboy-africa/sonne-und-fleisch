@@ -6,6 +6,7 @@ import { ShelfEngine, type BookSide, type ShelfMode } from './ShelfEngine';
 import { nachbarIndex, type CatalogBook } from './katalog';
 import { leseprobeAnhaengen } from './leseprobe';
 import { siteConfig } from './verlag-config';
+import { taktPruefen } from './takt-wache';
 
 // Katalognummern: drei Stellen, fuehrende Nullen. 001, 002, 003.
 const katalognummer = (zahl: number) => String(zahl).padStart(3, '0');
@@ -45,6 +46,8 @@ export function regalStarten(wurzel: HTMLElement) {
     panelFormat: pflicht(wurzel, '[data-panel-format]'),
     panelVerfuegbarkeit: pflicht(wurzel, '[data-panel-verfuegbarkeit]'),
     panelLink: pflicht<HTMLAnchorElement>(wurzel, '[data-panel-link]'),
+    einsendenDavor: pflicht<HTMLElement>(wurzel, '[data-einsenden-davor]'),
+    einsendenNotiz: pflicht<HTMLElement>(wurzel, '[data-einsenden-notiz]'),
     panelLinkText: pflicht(wurzel, '[data-panel-link-text]'),
     zurRegal: pflicht<HTMLButtonElement>(wurzel, '[data-zum-regal]'),
     wenden: pflicht<HTMLButtonElement>(wurzel, '[data-wenden]'),
@@ -107,7 +110,7 @@ export function regalStarten(wurzel: HTMLElement) {
 
   /**
    * Schlaegt den Band auf, der gerade vorn liegt — und zwar auf der Seite,
-   * die man ansieht. Ein Doppelband hat zwei Geschichten und zwei Proben;
+   * die man ansieht. Ein Wendeband hat zwei Geschichten und zwei Proben;
    * welche gilt, entscheidet die Lage des Bandes, nicht der Knopfdruck.
    */
   function leseprobeOeffnen(von: HTMLElement | null) {
@@ -195,7 +198,7 @@ export function regalStarten(wurzel: HTMLElement) {
       el.panel.setAttribute('aria-label', 'Angaben zum Band');
       return;
     }
-    // Bei einem Doppelband gehoert zu jeder Seite eine eigene Geschichte.
+    // Bei einem Wendeband gehoert zu jeder Seite eine eigene Geschichte.
     // Das Panel folgt dem Band: was oben liegt, steht hier.
     const doppelband = buch.back !== undefined;
     const gezeigt = seite === 'hinten' && buch.back ? buch.back : buch;
@@ -208,7 +211,7 @@ export function regalStarten(wurzel: HTMLElement) {
     el.panelZitat.textContent = `„${gezeigt.quote}“`;
     el.panelZitatVon.textContent = gezeigt.quoteBy;
 
-    // Umdrehen kann man jeden Band. Nur beim Doppelcover steht auf der
+    // Umdrehen kann man jeden Band. Nur beim Wendeband steht auf der
     // anderen Seite eine zweite Geschichte — dann sagt der Knopf das auch.
     el.seitenmarken.forEach((marke) => {
       marke.hidden = !doppelband;
@@ -233,7 +236,7 @@ export function regalStarten(wurzel: HTMLElement) {
           : `Band zurück wenden zu ${buch.title}`
         : `${buch.title} umdrehen`,
     );
-    // Einheitlich kurz: „Seite A" oder „Seite B", bei jedem Doppelband
+    // Einheitlich kurz: „Seite A" oder „Seite B", bei jedem Wendeband
     // gleich und immer in der Giftfarbe.
     if (doppelband) {
       el.seitenmarken.forEach((marke) => {
@@ -242,8 +245,42 @@ export function regalStarten(wurzel: HTMLElement) {
     }
     el.panelFormat.textContent = buch.format;
     el.panelVerfuegbarkeit.textContent = buch.availability;
-    el.panelLink.href = buch.url;
-    el.panelLinkText.textContent = buch.linkLabel ?? siteConfig.bookLinkLabel;
+    /*
+     * **Der vakante Band zeigt die Adresse, kein „Zum Band".**
+     *
+     * Er hat keine Bandseite — es gibt kein Buch, das sie beschreiben
+     * koennte. Was es gibt, ist eine Bitte: schick einen Text. Also
+     * steht hier die Adresse im Klartext, abschreibbar, und darueber,
+     * wofuer sie da ist.
+     */
+    const vakant = buch.availability === 'Vakant';
+    el.einsendenDavor.hidden = !vakant;
+    // Sie stand seit jeher auf `hidden` und wurde nie eingeschaltet.
+    el.einsendenNotiz.hidden = !vakant;
+    el.panelLink.href = vakant
+      ? `mailto:${siteConfig.vormerkenAdresse}?subject=${encodeURIComponent('Einsendung')}`
+      : buch.url;
+    /*
+     * Nur in der Entwicklung: misst nach, ob der Takt der Tafel wirklich
+     * im Bild ankommt. Dreimal ist er hier unbemerkt verlorengegangen —
+     * die Begruendung steht in `takt-wache.ts`.
+     */
+    if (import.meta.env.DEV) {
+      requestAnimationFrame(() =>
+        taktPruefen({
+          ansicht: 'Tafel im Regal',
+          titel: document.querySelector('.book-details h2'),
+          autor: document.querySelector('.book-details__author'),
+          klappentext: document.querySelector('.book-details__description'),
+          zitat: document.querySelector('.book-details blockquote'),
+          danach: document.querySelector('.book-details__unten'),
+          spalte: document.querySelector('.book-details__oben'),
+        }),
+      );
+    }
+    el.panelLinkText.textContent = vakant
+      ? siteConfig.vormerkenAdresse
+      : (buch.linkLabel ?? siteConfig.bookLinkLabel);
   }
 
   function vorleseSetzen() {

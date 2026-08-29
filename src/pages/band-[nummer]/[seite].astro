@@ -1,0 +1,32 @@
+---
+/*
+ * `/band-001/a` und `/band-001/b` — dieselbe Seite, ein Stockwerk
+ * tiefer angesetzt. Ein Wendeband hat zwei Vorderseiten, und beide
+ * sollen verlinkbar sein: die Umschlaege in der Programmliste zeigen
+ * genau hierher.
+ *
+ * Es ist **kein zweites Dokument**. Es ist dieselbe Bandseite; nur
+ * faehrt sie beim Ankommen zu Block B statt oben zu bleiben. Ohne
+ * JavaScript landet man oben — und damit auf einer vollstaendigen
+ * Seite, auf der Block B einen Bildschirm weiter unten steht.
+ *
+ * `/b` gibt es nur, wo es eine zweite Seite gibt. Ein gewoehnlicher Band
+ * hat nur `/a`.
+ */
+import Bandseite from '../../components/Bandseite.astro';
+import { bandRouten } from '../../buecher';
+
+export async function getStaticPaths() {
+  const routen = await bandRouten();
+  return routen.flatMap(({ buch, nummer }) =>
+    (buch.data.rueckseite ? (['a', 'b'] as const) : (['a'] as const)).map((seite) => ({
+      params: { nummer, seite },
+      props: { buch, nummer, seite },
+    })),
+  );
+}
+
+const { buch, nummer, seite } = Astro.props;
+---
+
+<Bandseite buch={buch} nummer={nummer} start={seite} />

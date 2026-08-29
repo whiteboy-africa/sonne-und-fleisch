@@ -1,10 +1,12 @@
 ---
-# Doppelband aus zwei Platzhalter-Umschlägen.
+# Wendeband aus zwei Platzhalter-Umschlägen.
 titel: Gnadenthal — Suspiria Ex Scetis
 kurztitel: Suspiria Ex Scetis
 autor: J. von Ohrid
 klappentext: >-
   Platzhalter: zwei bis vier Sätze zur ersten Geschichte.
+klammer: >-
+  Wüstenväter-Seufzer aus Sketis neben einem Leichnam, der zu senden beginnt. Das älteste und das neueste Gebet im selben Rücken.
 zitat: Platzhalter für einen Satz aus dem Buch.
 zitat_von: Verlagsnotiz
 format: Broschur
@@ -18,7 +20,7 @@ schrift_farbe: '#ffffff'
 motiv: lattice
 hoehe: 2.0
 dicke: 0.078
-reihenfolge: 4
+reihenfolge: 5
 # Zweite Vorderseite: ein Zeitschriftenumschlag in Rosa und Schwarz,
 # Farben von dort genommen.
 # Platzhalter-Leseprobe. Was in doppelten Klammern steht, wird beim Bauen

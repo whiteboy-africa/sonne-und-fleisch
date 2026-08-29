@@ -33,13 +33,30 @@ export type Umschlagseite = {
 export type ProgrammEintrag = {
   buch: Buch;
   nummer: string;
-  /** Bei Doppelbaenden beide Titel, mit Schraegstrich. */
+  /** Bei Wendebaenden beide Titel, mit Schraegstrich. */
   titel: string;
   /** Beide Namen, mit Schraegstrich — schreibt eine Person beide
       Geschichten, steht sie nur einmal da. */
   autor: string;
-  /** Ein Umschlag, bei Doppelbaenden zwei. */
+  /**
+   * Was im Verzeichnis steht: die **Klammer** um beide Seiten
+   * (`klammer`), und nur wo die fehlt der Klappentext der ersten Seite
+   * als Notloesung.
+   *
+   * Die Liste hat damit weiterhin keinen eigenen Text — sie hat einen
+   * anderen: der Klappentext gehoert einer Geschichte, die Klammer
+   * gehoert dem Band. Im Verzeichnis stand vorher nur die Haelfte jedes
+   * Wendebands.
+   */
+  klappentext: string;
+  /** Steht die Klammer wirklich da, oder ist es der Notbehelf? */
+  geklammert: boolean;
+  /** Ein Umschlag, bei Wendebaenden zwei. */
   seiten: Umschlagseite[];
+  /** Ist es ein Wendeband? Dann steht die Marke daneben. */
+  wendeband: boolean;
+  /** Zustand — die einzige Angabe, die in der Liste steht. */
+  stand: string;
 };
 
 /**
@@ -75,6 +92,10 @@ export async function programmListe(): Promise<ProgrammEintrag[]> {
         nummer: nummern[position] ?? '',
         titel: hinten ? `${d.titel} / ${hinten.titel}` : d.titel,
         autor: namen,
+        klappentext: d.klammer ?? d.klappentext,
+        geklammert: d.klammer !== undefined,
+        wendeband: hinten !== undefined,
+        stand: d.verfuegbarkeit,
         seiten: [
           {
             cover_farbe: d.cover_farbe,
@@ -94,8 +115,7 @@ export async function programmListe(): Promise<ProgrammEintrag[]> {
       };
     })
     .filter(
-      ({ buch }) =>
-        !buch.data.blind && !buch.data.blatt && !buch.data.magazin,
+      ({ buch }) => !buch.data.blind && !buch.data.blatt && !buch.data.magazin,
     )
     .reverse();
 }
@@ -121,8 +141,12 @@ function leseprobeLesen(
   seite: number,
   bild?: string,
   geschwaerzt?: string[],
+  schluss?: string,
 ): BookExcerpt {
-  const seiten = geschwaerzt?.length ? { blackImages: geschwaerzt } : {};
+  const seiten = {
+    ...(geschwaerzt?.length ? { blackImages: geschwaerzt } : {}),
+    ...(schluss ? { closingImage: schluss } : {}),
+  };
   // Liegt die echte Seite als Bild vor, gibt es nichts zu setzen: das Buch
   // hat seinen Satz schon, samt gedruckter Schwaerzung.
   if (bild) return { page: seite, paragraphs: [], image: bild, ...seiten };
@@ -163,9 +187,56 @@ function leseprobeLesen(
   return { page: seite, paragraphs, ...seiten };
 }
 
-/** Adresse der Buchseite. */
-export function buchPfad(buch: Buch): string {
-  return `/programm/${buch.id}`;
+/**
+ * **Die Adresse eines Bandes ist seine Nummer.** `/band-001`, und die
+ * beiden Vorderseiten darunter als `/band-001/a` und `/band-001/b`.
+ *
+ * Frueher stand hier `/programm/{slug}` — der Dateiname als Adresse. Das
+ * war ein Nebenprodukt der Ablage: dieselbe Sache hiess im Regal 001, auf
+ * dem Buchruecken 001 und in der Adresszeile `weine-nicht-artur`. Jetzt
+ * heisst sie ueberall gleich. Die alten Adressen leiten dauerhaft hierher
+ * (`pages/_redirects.ts`).
+ *
+ * Ohne Nummer gibt es keine Bandseite: Blatt und Heft sind keine Baende.
+ * Fuer sie fuehrt der Weg in den Stapel zurueck.
+ */
+export function bandPfad(nummer: string | undefined, seite?: 'a' | 'b'): string {
+  if (!nummer) return '/';
+  return seite ? `/band-${nummer}/${seite}` : `/band-${nummer}`;
+}
+
+/** Ein Band mit seiner Nummer — die Grundlage jeder Bandroute. */
+export type Bandroute = { buch: Buch; nummer: string };
+
+/**
+ * Alle Baende, die eine eigene Seite bekommen — in Regalordnung, mit
+ * ihrer Nummer.
+ *
+ * **Eine Liste, drei Abnehmer:** die Route `/band-{nn}`, die beiden
+ * Tiefverweise darunter und die Tabelle der Weiterleitungen. Frueher
+ * rechnete jede dieser Stellen die Nummern selbst aus; dann mussten drei
+ * Stellen gleichzeitig geaendert werden, wenn ein Band dazukam.
+ */
+export async function bandRouten(): Promise<Bandroute[]> {
+  const buecher = await alleBuecher();
+  const nummern = nummernFolge(buecher);
+  return buecher
+    .map((buch, position) => ({ buch, nummer: nummern[position] }))
+    .filter((eintrag): eintrag is Bandroute => Boolean(eintrag.nummer))
+    /*
+     * **Der Blindband bekommt keine.**
+     *
+     * Eine Bandseite ist die Textfassung eines Buches — Titelpaar, zwei
+     * Klappentexte, zwei Zitate, Angaben, Bestellzeile. Der Rohling hat
+     * von alledem nichts, weil es ihn nicht gibt; die Seite haette
+     * Ueberschriften ueber leeren Feldern gezeigt und damit behauptet,
+     * da sei ein Buch.
+     *
+     * Er bleibt, was er ist: eine offene Stelle im Stapel. Man kommt an
+     * ihn heran, indem man ihn anfasst, und was zu sagen ist — was
+     * eingeschickt werden soll und wohin — steht auf der Tafel daneben.
+     */
+    .filter(({ buch }) => !buch.data.blind);
 }
 
 /**
@@ -192,7 +263,13 @@ export function alsKatalogBuch(
     quoteBy: d.zitat_von,
     format: d.format,
     availability: d.verfuegbarkeit,
-    url: buchPfad(buch),
+    // Die Adresse ist die Nummer. Ohne Nummer — Blatt, Heft — gibt es
+    // keine Bandseite, und der Verweis fuehrt in den Stapel zurueck.
+    // Blatt, Heft und Blindband haben keine Bandseite — sie fuehren
+    // dorthin zurueck, wo sie wirklich liegen.
+    url: bandPfad(
+      d.blind || ausserDerReihe(buch) ? undefined : (nummer ?? releasenummer(position)),
+    ),
     linkLabel: siteConfig.bookLinkLabel,
     cover: d.cover_farbe,
     accent: d.akzent_farbe,
@@ -214,6 +291,7 @@ export function alsKatalogBuch(
             d.leseprobe.seite,
             d.leseprobe.bild,
             d.leseprobe.geschwaerzt,
+            d.leseprobe.schluss,
           ),
         }
       : {}),
@@ -251,6 +329,7 @@ export function alsKatalogBuch(
                     d.rueckseite.leseprobe.seite,
                     d.rueckseite.leseprobe.bild,
                     d.rueckseite.leseprobe.geschwaerzt,
+                    d.rueckseite.leseprobe.schluss,
                   ),
                 }
               : {}),
@@ -261,7 +340,7 @@ export function alsKatalogBuch(
 }
 
 /** Hat der Band zwei Vorderseiten? */
-export function istDoppelband(buch: Buch): boolean {
+export function istWendeband(buch: Buch): boolean {
   return buch.data.rueckseite !== undefined;
 }
 

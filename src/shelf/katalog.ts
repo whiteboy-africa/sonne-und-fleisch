@@ -65,6 +65,11 @@ export type BookExcerpt = {
   image?: string;
   /** Die geschwaerzten Folgeseiten als echte Seiten, der Reihe nach. */
   blackImages?: string[];
+  /**
+   * Die Schlussseite als echte Seite, mit ausgesparter Zone fuer den
+   * Stempel. Ohne sie zeichnet die Schlussseite ihre Balken selbst.
+   */
+  closingImage?: string;
 };
 
 export type CatalogBook = {
@@ -132,7 +137,7 @@ export type CatalogBook = {
    */
   excerpt?: BookExcerpt;
   /**
-   * Zweite Vorderseite. Ist sie gesetzt, ist der Band ein Doppelcover
+   * Zweite Vorderseite. Ist sie gesetzt, ist der Band ein Wendeband
    * (tête-bêche): die zweite Geschichte steht kopfüber auf der Rückseite,
    * man dreht das Buch um und auf den Kopf.
    */

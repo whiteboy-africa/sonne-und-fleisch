@@ -506,8 +506,18 @@
  * Schwaerzungen selbst mit — hier wird nichts mehr darueber gelegt. Der
  * Rand der Seite ist im Bild, also faellt die Polsterung weg.
  */
+/*
+ * **Unter dem Bild liegt Papier.**
+ *
+ * Der Bogen wird schwarz auf weiss ausgespielt und multipliziert sich
+ * auf das, was unter ihm liegt — also muss dort der Papierton liegen und
+ * nicht die Buehne. Ohne diese Zeile multiplizierte er gegen die
+ * Leinwand: die Seite stand weiss da, mit dem rosa Anflug der Szene
+ * oben drin, waehrend die nachgebauten Seiten daneben cremefarben waren.
+ */
 .blatt--bild {
   padding: 0;
+  background: #ece8dd;
 }
 
 .blatt__bild {
@@ -515,8 +525,19 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  /* Der Bogen ist beim Ausspielen schon auf den Papierton multipliziert
-     worden; hier bleibt er, wie er ist. */
+  /*
+   * **Den Papierton gibt die Buehne, und zwar einmal.**
+   *
+   * Der Bogen wird schwarz auf weiss ausgespielt und legt sich hier
+   * multiplizierend auf den cremefarbenen Grund. Deshalb sitzt er im
+   * selben Papier wie die nachgebauten Seiten, und die Rinne am Bund
+   * scheint durch ihn hindurch.
+   *
+   * Hier stand einmal der Vermerk, die Datei bringe ihren Ton schon mit
+   * — und darunter trotzdem dieses `multiply`. Der Ton kam damit zweimal
+   * drauf: aus (236, 232, 221) wurde rund (218, 211, 192), und die
+   * Leseprobe stand braeunlich neben allem anderen.
+   */
   mix-blend-mode: multiply;
 }
 
@@ -588,7 +609,7 @@
  * Die letzte Seite ist eine geschwaerzte Seite wie die davor — Kolumne,
  * Seitenzahl, Balken in Registerhaltung. Nur ist in den Balkenblock ein
  * sauberes Rechteck geschnitten: die Balken hoeren darueber auf, fangen
- * darunter wieder an, und in der Luecke stehen die zwei Zeilen.
+ * darunter wieder an, und in der Luecke steht der Abdruck.
  *
  * Kein eigener Grund, kein Rahmen, kein Kasten: die Stanze ist das
  * **Fehlen** von Balken, nicht ein Aufkleber darauf. Deshalb steht hier
@@ -598,63 +619,140 @@
 .blatt__stanze {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   align-items: center;
   /* Der Abstand nach oben und unten ist die Luecke selbst: er ersetzt die
-     zwei bis drei Balkenzeilen, die hier nicht stehen. */
-  margin: 26px 0 30px;
+     zwei bis drei Balkenzeilen, die hier nicht stehen. Er ist etwas
+     groesser als der Abdruck hoch ist, weil der Abdruck schief sitzt und
+     seine Ecken sonst in die naechste Balkenzeile stiessen. */
+  margin: 34px 0 34px;
   text-align: center;
 }
 
-.blatt__schlusszeile {
-  margin: 0;
-  color: rgba(23, 20, 15, 0.74);
-  font-family: var(--schrift);
-  font-size: clamp(10px, 0.82vw, 12px);
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  line-height: 1.9;
-  text-transform: uppercase;
+/*
+ * **Der Abdruck.**
+ *
+ * Ein Gegenstand, kein Knopf: Gummi, das einmal auf dieses Papier
+ * gedrueckt wurde. Deshalb hat er keinen Schatten, keinen Verlauf und
+ * keinen Schimmer.
+ *
+ * **Form und Farbe sind getrennt.** Die Form ist ein freigestellter
+ * Abdruck (`/stempel/nur-auf-papier.webp`, weiss mit der Deckung im
+ * Alphakanal) und liegt als `mask-image` darueber; die Farbe ist
+ * `currentColor` und kommt aus `--tinte`. Deshalb laesst sich `STAMP_INK`
+ * weiter auf Schwarz stellen und der Abdruck unter dem Zeiger
+ * nachdunkeln, obwohl die Form aus einer Bilddatei kommt.
+ *
+ * Hier standen vorher zwei Linien, ein Wort in der Plakatschrift und eine
+ * gerechnete Maske aus Kreisen. Das ist raus: eine Nachahmung von
+ * Gummierosion, und Gummi franst nicht rund aus, sondern laengs der Faser.
+ *
+ * **Die Hoehe wird gerechnet, nicht gesetzt.** `--abdruck-verhaeltnis`
+ * kommt aus der Datei (900 zu 246). Stuende hier eine feste Hoehe, zoege
+ * `mask-size: 100% 100%` die Koerner ins Ovale, sobald jemand die Datei
+ * austauscht — genau der Fehler, an dem der gerechnete Vorgaenger
+ * gescheitert ist.
+ */
+.blatt__stempel {
+  display: block;
+  align-self: center;
+  width: min(78%, 260px);
+  aspect-ratio: var(--abdruck-verhaeltnis, 3.6585);
+  color: var(--tinte, #b3271e);
+  /* Die Flaeche ist die Tinte; die Maske schneidet den Abdruck heraus. */
+  background: currentColor;
+  -webkit-mask-image: var(--abdruck);
+  mask-image: var(--abdruck);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  text-decoration: none;
+  transform: rotate(var(--dreh, -5deg));
 }
 
+/*
+ * Ohne Maskenunterstuetzung bliebe ein volles Farbrechteck stehen — ein
+ * Balken mehr auf einer geschwaerzten Seite, und niemand wuesste, dass
+ * dort ein Stempel gemeint war. Dann lieber nichts.
+ */
+@supports not (mask-image: url("#a")) {
+  .blatt__stempel {
+    display: none;
+  }
+}
+
+/* Unter dem Zeiger sinkt die Farbe nach. Sonst nichts: kein Heben, kein
+   Wackeln, keine Bewegung. Ein Abdruck bewegt sich nicht. */
+.blatt__stempel:hover,
+.blatt__stempel:focus-visible {
+  color: var(--tinte-druck, #a5241c);
+  cursor: pointer;
+}
+
+/*
+ * **Die Zeile.** Der Abdruck spricht, die Zeile bedient — also traegt sie
+ * keinen Ton: klein, grau, ohne Strich. Der Strich kommt erst unter dem
+ * Zeiger, und dann in der Giftfarbe: das ist die eine Farbe, die auf
+ * dieser Seite etwas anfassbar meldet.
+ */
 .blatt__vormerken {
   display: inline-flex;
   gap: 8px;
   align-items: center;
   padding-bottom: 3px;
-  border-bottom: 1px solid rgba(23, 20, 15, 0.32);
-  color: #17140f;
+  border-bottom: 2px solid transparent;
+  color: rgba(23, 20, 15, 0.56);
   font-family: var(--schrift);
-  font-size: clamp(11px, 0.9vw, 13px);
+  font-size: clamp(10px, 0.82vw, 12px);
   font-weight: 500;
   letter-spacing: 0.2em;
   text-decoration: none;
   text-transform: uppercase;
-  transition: border-color 160ms ease;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
 }
 
 .blatt__vormerken:hover,
 .blatt__vormerken:focus-visible {
-  border-bottom-color: #17140f;
+  border-bottom-color: var(--accent);
+  color: #17140f;
 }
 
 /* ------------------------------------------------------------- Zuklappen */
 
+/*
+ * **Der Ausgang.**
+ *
+ * Ein Kreuz oben rechts, im Schwarzen neben der Seite — nicht auf ihr:
+ * auf dem Papier waere es ein Zeichen, das im Buch steht. Grau, unter dem
+ * Zeiger in der Giftfarbe, und gross genug zum Antippen (44 Punkte
+ * Trefferflaeche bei 20 Punkten Zeichen).
+ *
+ * Vorher stand hier eine Leiste unter der Seite: „ZUKLAPPEN" und die
+ * Taste ESC im Kaestchen. Beides ist weg. Was zu bedienen ist, muss
+ * dastehen; wie man es sonst noch koennte, muss nicht.
+ */
 .leseprobe__zu {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  display: inline-flex;
-  gap: 10px;
+  /* Fest im Fenster, nicht am Band: das Band ist die Doppelseite. */
+  position: fixed;
+  z-index: 30;
+  top: max(20px, 3vh);
+  right: max(20px, 2.4vw);
+  display: flex;
   align-items: center;
-  margin-top: 16px;
-  transform: translateX(-50%);
-  color: var(--ink-soft);
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #55554f;
   font-family: var(--schrift);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
   transition: color 160ms ease;
 }
 
@@ -663,20 +761,17 @@
   color: var(--accent);
 }
 
-/* Herangefahren deckt der Band seinen eigenen Fussbereich zu — dann tritt
-   die Zeile zurueck. ESC bleibt. */
+.leseprobe__zu:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Herangefahren deckt der Band seinen eigenen Rand zu — dann tritt das
+   Kreuz zurueck. ESC bleibt. */
 .leseprobe:has(.leseprobe__rahmen[data-lupe='an']) .leseprobe__zu {
   opacity: 0;
   pointer-events: none;
   transition: opacity 160ms ease;
-}
-
-.leseprobe__zu kbd {
-  padding: 2px 5px;
-  border: 1px solid var(--hairline);
-  font: inherit;
-  font-size: 9px;
-  letter-spacing: 0.1em;
 }
 
 /* ------------------------------------------------- Die Zeile in den Angaben */
@@ -783,4 +878,27 @@
   .blatt {
     animation: none;
   }
+}
+
+/*
+ * **Die Stanze über einer echten Schlussseite.**
+ *
+ * Auf dem Nachbau ist die Stanze das Fehlen von Balken — sie steht im
+ * Fluss und schiebt die Zeilen auseinander. Auf einer echten Seite ist
+ * die Lücke schon ins Bild gerechnet (`--stanze` beim Ausspielen); hier
+ * legt sich der Stempel nur noch darüber, an dieselbe Stelle.
+ *
+ * Die Zahlen sind dieselben wie beim Ausspielen: 40 % bis 66 % der
+ * Seitenhöhe. Wer eine ändert, ändert die andere mit — sonst sitzt der
+ * Stempel neben seiner Lücke statt darin.
+ */
+.blatt__stanze--auf-bild {
+  position: absolute;
+  top: 40%;
+  right: 0;
+  bottom: 34%;
+  left: 0;
+  justify-content: center;
+  margin: 0;
+  padding: 0 12%;
 }

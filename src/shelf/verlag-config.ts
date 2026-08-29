@@ -15,7 +15,7 @@ export const siteConfig = {
   coverTagline: 'VERLAG',
   // Kuerzel unten auf dem Buchruecken.
   spineMark: 'SF',
-  bookLinkLabel: 'Zum Buch',
+  bookLinkLabel: 'Zum Band',
   /**
    * Steht unten rechts im Regal, wo sonst die Bedienhinweise staenden.
    * Eine Zeile, Versalien.
@@ -30,6 +30,23 @@ export const siteConfig = {
    * gilt — beide gehoeren umgestellt, wenn der Verlag oeffentlich wird.
    */
   suchmaschinen: false,
+  /**
+   * **Welcher Mono die Bedienung traegt.** Ein Token, das ueberall gilt:
+   * es setzt `--schrift` in `basis.css` um, und `--schrift` ist die
+   * einzige Stelle, an der die Bedienschrift benannt wird.
+   *
+   * - `space` — **Space Mono.** Die Entscheidung. Zwei Schnitte, 400
+   *   und 700; die Zuordnung der neununddreissig 500er-Regeln auf diese
+   *   beiden steht als eine Tafel in `basis.css`.
+   * - `plex` — IBM Plex Mono, der Stand davor. Der Weg zurueck.
+   * - `fragment` — Fragment Mono, ein einziger Schnitt. Bleibt zum
+   *   Vergleichen eingebunden.
+   *
+   * Courier Prime ist raus: auf schwarzem Grund trug es bei 8 und 9 px
+   * nicht, und der fette Schnitt, mit dem es doch stand, war eine
+   * andere Seite.
+   */
+  FONT_MONO: 'space' as 'space' | 'plex' | 'fragment',
   /**
    * Handy-Fluss: auf schmalen Schirmen verlaesst die Bedienung die feste
    * Lage und fliesst als normale Seite unter der Leinwand her. Die
@@ -49,6 +66,34 @@ export const siteConfig = {
    * eigenen Bestell-Link.
    */
   vormerkenAdresse: 'salve@sonneundfleisch.com',
+  /**
+   * **Wie der Band wendet — im Stapel wie in der Betrachtung.**
+   *
+   * Gewendet wird durch eine **halbe** Drehung um die Querachse: die
+   * dreht den Band um *und* stellt ihn auf den Kopf, und genau so kommt
+   * die zweite, kopfueber gedruckte Vorderseite richtig herum zu stehen.
+   * Daran liest `seiteAblesen` ab, welche Seite vorn liegt.
+   *
+   * `hoch` sind die ganzen Zusatzdrehungen um die **Hochachse**, die
+   * gleichzeitig dazulaufen — das ist der Schwung. Auf `0` bleibt das
+   * nackte Kippen uebrig, und das sah zu brav aus.
+   *
+   * `jedes` sagt, **wie selten** der Schwung kommt: bei `4` klappt der
+   * Band dreimal schlicht um und dreht sich beim vierten Mal. Ein
+   * Kunststueck, das jedes Mal kommt, ist keins mehr — es wird zur
+   * Mechanik des Knopfes. So bleibt es eine Zugabe, und man drueckt
+   * noch einmal, um zu sehen, ob es wieder passiert.
+   *
+   * Auf `1` gestellt dreht sich jedes Wenden.
+   *
+   * **Nur die Hochachse, und nur ganze Drehungen.** Zusatzdrehungen um
+   * die Querachse gab es hier einmal (anderthalb statt einer halben):
+   * der Kippwinkel lief damit ueber die Pole, und weil die
+   * Inhaltsgruppe auf `rotation.order = 'YXZ'` steht, taumelte der Band
+   * dort, statt sich zu drehen. Die Querachse macht ihre halbe Drehung
+   * und sonst nichts.
+   */
+  wendeSpin: { hoch: 1, jedes: 4 },
   /**
    * Wie der Band aufgeht. Zwei Wege, beide fertig gebaut:
    *

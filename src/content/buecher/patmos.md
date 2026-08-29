@@ -1,10 +1,12 @@
 ---
-# Doppelband aus zwei Platzhalter-Umschlägen.
+# Wendeband aus zwei Platzhalter-Umschlägen.
 titel: Patmos
 kurztitel: Patmos
 autor: Mona Salva
 klappentext: >-
   Platzhalter: zwei bis vier Sätze zur ersten Geschichte.
+klammer: >-
+  Auf Patmos schreibt eine Frau mit, was ihr diktiert wird. Von Ohrid antwortet mit einem Traktat über das überhelle Dunkel.
 zitat: Platzhalter für einen Satz aus dem Buch.
 zitat_von: Verlagsnotiz
 format: Broschur
@@ -18,7 +20,7 @@ schrift_farbe: '#d4b99f'
 motiv: continuum
 hoehe: 2.0
 dicke: 0.078
-reihenfolge: 5
+reihenfolge: 6
 # Zweite Vorderseite: eine Titelseite in Fraktur, Schwarz auf Papierweiß.
 # Platzhalter-Leseprobe. Was in doppelten Klammern steht, wird beim Bauen
 # herausgeschnitten und als Balken gedruckt — es steht in keinem HTML.

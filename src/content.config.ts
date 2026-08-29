@@ -4,7 +4,7 @@ import { MOTIVE, VERFUEGBARKEITEN } from './shelf/katalog';
 
 /**
  * Die Leseprobe: eine einzige offene Stelle in einem sonst geschwaerzten
- * Block. Jede Seite eines Doppelbandes hat ihre eigene.
+ * Block. Jede Seite eines Wendebandes hat ihre eigene.
  *
  * Geschwaerzt wird **im Text selbst**, nicht ueber eine Liste von
  * Positionen daneben: `[[hier steht der Klartext]]` wird zum Balken. Was
@@ -42,6 +42,17 @@ const leseprobe = z
      * Seite ihre Balken selbst.
      */
     geschwaerzt: z.array(z.string()).optional(),
+    /**
+     * Die **Schlussseite** als echte Seite — geschwaerzt, aber mit einer
+     * ausgesparten Zone in der Mitte, in der der Stempel sitzt
+     * (`node scripts/seite-schwaerzen.mjs … --stanze 0.40 0.66`).
+     *
+     * Ohne sie zeichnet die Schlussseite ihre Balken selbst. Das faellt
+     * auf, sobald die Seiten davor echt sind: andere Schrift, anderes
+     * Papier, anderer Zeilenfall — man sieht dem Band an, dass die
+     * letzte Doppelseite nachgebaut ist.
+     */
+    schluss: z.string().optional(),
   })
   .refine((werte) => Boolean(werte.text || werte.bild), {
     message: 'Eine Leseprobe braucht entweder `text` oder `bild`.',
@@ -62,6 +73,37 @@ const buecher = defineCollection({
     // Klappentext: erscheint im Regal, wenn der Band herausgezogen ist.
     // Zwei bis vier Saetze, mehr passt nicht ins Panel.
     klappentext: z.string(),
+    /**
+     * **Die Klammer: beide Seiten in ein paar Saetzen.** Sie steht im
+     * Programm als Eintragstext und auf der Bandseite als Zeile unter
+     * dem Titelpaar — ueberall dort, wo eine Zeile fuer den **ganzen**
+     * Band gebraucht wird und nicht fuer eine seiner Geschichten.
+     *
+     * In der Betrachtung im Regal steht sie **nicht**: dort ist immer
+     * genau eine Seite vorn, und die hat ihren eigenen Klappentext.
+     *
+     * Der Klappentext gehoert **einer** Seite; im Verzeichnis stand
+     * damit nur die Haelfte des Bandes, und die zweite Geschichte kam
+     * gar nicht vor. Das hier ist die andere Textsorte: was zwischen den
+     * beiden liegt.
+     *
+     *     Ein Klaeffer in einem Wiener Hinterhof, eine Ziege an den
+     *     Tafeln von Damaskus. Tiere, an denen Menschen sich erklaeren.
+     *
+     * Zwei bis drei Saetze: erst beide Geschichten in je einem Halbsatz,
+     * dann der Satz, der sie zusammenhaelt. Die Nummer gehoert nicht
+     * hinein — die steht in ihrer eigenen Spalte.
+     *
+     * Ohne Angabe faellt das Programm auf den Klappentext der ersten
+     * Seite zurueck. Das ist eine Notloesung; wer einen Band einstellt,
+     * schreibt die Zeile.
+     *
+     * **Hoechstens 200 Zeichen**, und das prueft der Bau: die Klammer
+     * steht in einer Liste zwischen zwei Umschlaegen und hat dort drei
+     * bis vier Zeilen Platz. Laenger, und sie ist kein Eintrag mehr,
+     * sondern ein zweiter Klappentext.
+     */
+    klammer: z.string().max(200, 'Die Klammer fasst sich kurz: höchstens 200 Zeichen.').optional(),
     // Ein Satz aus dem Buch (oder darueber) und wer ihn sagt.
     zitat: z.string(),
     zitat_von: z.string(),
@@ -173,7 +215,7 @@ const buecher = defineCollection({
       })
       .optional(),
 
-    // Doppelcover (tête-bêche): das Buch hat zwei Vorderseiten. Die zweite
+    // Wendeband (tête-bêche): das Buch hat zwei Vorderseiten. Die zweite
     // ist kopfüber auf die Rückseite gedruckt — man dreht den Band um und
     // stellt ihn auf den Kopf, dann fängt die andere Geschichte an.
     //

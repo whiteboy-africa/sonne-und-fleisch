@@ -1,0 +1,31 @@
+---
+/*
+ * `/band-001` — die Adresse eines Bandes. Eine Huelle um `Bandseite`,
+ * mehr steht hier nicht: es gibt genau **eine** Vorlage fuer die
+ * Detailansicht, und die liegt in `components/Bandseite.astro`.
+ *
+ * Adressiert wird ueber die Nummer, nicht ueber den Dateinamen. Die
+ * Nummer ist das, was auf dem Buchruecken steht, in der Nummernleiste
+ * und in der Programmliste — der Slug war ein Nebenprodukt der
+ * Dateiablage. Die alten Adressen `/programm/{slug}` leiten hierher
+ * (`pages/_redirects.ts`).
+ *
+ * **Sonderobjekte bekommen keine.** Blatt und Heft tragen keine Nummer
+ * und stehen nicht in der Reihe; sie liegen im Stapel, und man kommt an
+ * sie heran, indem man sie anfasst. Der Blindband dagegen traegt eine
+ * und bekommt seine Seite wie jeder andere Band.
+ */
+import Bandseite from '../../components/Bandseite.astro';
+import { bandRouten } from '../../buecher';
+
+export async function getStaticPaths() {
+  return (await bandRouten()).map(({ buch, nummer }) => ({
+    params: { nummer },
+    props: { buch, nummer },
+  }));
+}
+
+const { buch, nummer } = Astro.props;
+---
+
+<Bandseite buch={buch} nummer={nummer} />

@@ -5,6 +5,8 @@ autor: Alexander Keppel
 klappentext: >-
   Platzhalter: zwei bis vier Sätze, die im Regal erscheinen, wenn der Band
   herausgezogen ist.
+klammer: >-
+  Ein Kläffer in einem Wiener Hinterhof, eine Ziege an den Tafeln von Damaskus. Tiere, an denen Menschen sich erklären.
 zitat: Platzhalter für einen Satz aus dem Buch.
 zitat_von: Verlagsnotiz
 format: Broschur
@@ -18,8 +20,8 @@ schrift_farbe: '#e0e7f7'
 motiv: branches
 hoehe: 2.0
 dicke: 0.078
-reihenfolge: 3
-# Doppelcover: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
+reihenfolge: 2
+# Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Platzhalter-Leseprobe. Was in doppelten Klammern steht, wird beim Bauen
 # herausgeschnitten und als Balken gedruckt — es steht in keinem HTML.
 leseprobe:

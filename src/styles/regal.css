@@ -104,12 +104,18 @@ body {
   pointer-events: none;
 }
 
+/*
+ * Die Wortmarke folgt der Mono-Probe **nicht**. Sie und die Parole unten
+ * rechts stehen fest in IBM Plex Mono (`--schrift-marke`, siehe
+ * `basis.css`): das ist das Zeichen des Verlags, keine Bedienung. Was
+ * `FONT_MONO` umstellt, ist der Katalog — nicht der Name darueber.
+ */
 .wordmark {
   display: flex;
   gap: 15px;
   align-items: center;
   color: inherit;
-  font-family: var(--schrift);
+  font-family: var(--schrift-marke);
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.01em;
@@ -159,7 +165,8 @@ body {
   justify-items: end;
   color: var(--ink-soft);
   font-family: var(--schrift);
-  font-size: 10px;
+  /* Untergrenze der Seite: elf. */
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.06em;
   line-height: 1;
@@ -213,6 +220,16 @@ body {
 }
 
 /* Steht allein ueber dem Titel, darf also etwas groesser sein. */
+/*
+ * Die Katalognummer folgt der Bedienschrift wieder. Sie war eine Weile
+ * auf `--schrift-marke` festgenagelt, zusammen mit Wortmarke und Parole
+ * — bei Fragment Mono haette die durchgestrichene Null aus 001 ein
+ * anderes Zeichen gemacht. Space Mono setzt eine Null mit Schraegstrich
+ * ohne Durchstrich; ob die Reihe das vertraegt, entscheidet das Auge und
+ * nicht diese Regel, also steht die Ziffer wieder im Satz.
+ *
+ * Wortmarke und Parole bleiben festgenagelt.
+ */
 .eyebrow--nummer {
   font-size: 14px;
   letter-spacing: 0.06em;
@@ -317,7 +334,10 @@ body {
   bottom: -17px;
   left: 0;
   color: var(--ink-soft);
-  font-size: 10px;
+  /* Elf ist die Untergrenze der Seite. Zehn stand hier, solange die
+     Ziffern in Plex gesetzt waren; Space Mono laeuft enger und braucht
+     den Punkt. */
+  font-size: 11px;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
   opacity: 0.55;
@@ -351,7 +371,8 @@ body {
   bottom: -17px;
   left: 0;
   color: var(--ink-soft);
-  font-size: 10px;
+  /* Elf ist die Untergrenze der Seite — siehe `.shelf-index__weiter b`. */
+  font-size: 11px;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
   text-align: center;
@@ -412,6 +433,8 @@ body {
   margin: 0;
   padding-bottom: 0;
   color: var(--ink-soft);
+  /* Steht fest, wie die Wortmarke — siehe dort. */
+  font-family: var(--schrift-marke);
   text-decoration: none;
   transition: color 200ms ease;
   white-space: nowrap;
@@ -487,7 +510,8 @@ body {
   background: transparent;
   cursor: pointer;
   font-family: var(--schrift);
-  font-size: 10px;
+  /* Untergrenze der Seite: elf. */
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.06em;
   line-height: 1;
@@ -535,8 +559,41 @@ body {
   );
 }
 
+/*
+ * **Der Rhythmus im Fussblock.**
+ *
+ * Drei Abstaende, und keine zwei nebeneinander gleich gross — dieselbe
+ * Regel wie im Kopfblock. Die Angabentabelle hat innen ihre eigenen,
+ * engen Abstaende; kaeme der Wenden-Knopf im selben Mass danach, laese
+ * sich der Block als eine durchgehende Liste statt als Tabelle **und**
+ * zwei Handgriffe.
+ *
+ *   Trennlinie  →  Format/Verfuegbarkeit   1,2em
+ *   Tabelle     →  Wenden                  1,6em   (sichtbar groesser)
+ *   Wenden      →  Zum Band                1,6em
+ */
 .book-details__unten {
   flex: none;
+  /* Zweieinhalb Zeilen unter dem Zitat — dieselbe Strecke wie auf der
+     Bandseite zwischen Zitat und Wende-Trenner. */
+  margin-top: 2.5rem;
+  /*
+   * **In `rem`, nicht in `em`.** Ein Token mit `em` loest sich dort auf,
+   * wo es benutzt wird — und der Wenden-Knopf steht auf 12 px. Aus
+   * „1,6em" wurden dort 19,2 px statt 25,6, und der weite Abstand war
+   * genauso gross wie der enge. Gemessen und behoben; `rem` haengt an
+   * der Wurzel und ist an jeder Stelle des Blocks dieselbe Strecke.
+   */
+  --takt-eng: 1.2rem;
+  --takt-weit: 1.6rem;
+}
+
+.book-details__unten .wenden-knopf {
+  margin-top: var(--takt-weit);
+}
+
+.book-details__unten .bandweg {
+  margin-top: var(--takt-weit);
 }
 
 .is-focused .back-button {
@@ -718,6 +775,53 @@ body {
   display: none;
 }
 
+/*
+ * ------------------------------------------------ Der Takt der Tafel
+ *
+ * **Warum diese vier Regeln unter `.book-details` gescoped stehen.**
+ *
+ * Weiter oben steht ein pauschaler Reset:
+ *
+ *     .press-experience :is(h1, h2, p, blockquote, dl, dd, figure)
+ *       { margin: 0 }
+ *
+ * Der wiegt 0-1-1 (Klasse plus Typ). Eine Bauteilregel wie
+ * `.book-details__author` wiegt nur 0-1-0 — der Reset gewinnt und
+ * plaettet jeden Absatzrand der Tafel auf null. Genau deshalb standen
+ * hier `0.4em` und `1.7em` im Stylesheet und kamen **nie im Bild an**:
+ * gemessen waren Titel→Autor und Autor→Klappentext beide 0.
+ *
+ * `.book-details .book-details__author` wiegt 0-2-0 und schlaegt den
+ * Reset. Das ist die ganze Reparatur; an den Werten selbst war nichts
+ * falsch.
+ *
+ * Das Zitat war nie betroffen — `.book-details blockquote` wiegt 0-2-1
+ * und lag ohnehin darueber.
+ */
+.book-details .book-details__author {
+  margin-top: 0.4rem;
+}
+
+.book-details .book-details__description {
+  /* Zwischen Autor und Klappentext viermal so viel Luft wie zwischen
+     Titel und Autor: Titel und Name gehoeren zusammen, der Text ist
+     das Naechste. In `rem`, nicht in `em` — die drei Elemente stehen
+     auf drei verschiedenen Schriftgraden, und `em` haette drei
+     verschiedene Strecken ergeben. */
+  margin-top: 1.6rem;
+  /* Klappentext liest sich, also braucht er Durchschuss. */
+  line-height: 1.7;
+}
+
+/*
+ * Das Zitat sitzt am Fuss seines Blocks, der Ueberschuss sammelt sich
+ * **darueber**. Vorher lag er darunter: zwischen Zitat und Fussblock
+ * klafften 129 Punkte, die niemand gesetzt hatte.
+ */
+.book-details .book-details__oben {
+  flex: 1;
+}
+
 .book-details__author {
   display: flex;
   gap: 10px;
@@ -750,7 +854,17 @@ body {
 .book-details blockquote {
   position: relative;
   max-width: 475px;
-  margin: 24px 0 0;
+  /*
+   * `auto` statt 24: das Zitat wird an den Fuss seines Blocks
+   * geschoben, und der Ueberschuss sammelt sich **darueber** — zwischen
+   * Klappentext und Zitat, wo Luft nicht stoert. Vorher lag er
+   * darunter, und zwischen Zitat und Fussblock klafften 124 Punkte.
+   *
+   * Der Wert steht hier und nicht in einer eigenen Regel weiter oben:
+   * die verlor bei gleichem Gewicht gegen diese, weil diese spaeter
+   * kommt. Nachgemessen — der Rand blieb auf 24.
+   */
+  margin: auto 0 0;
   padding: 0 0 0 20px;
   border-left: 1px solid currentColor;
 }
@@ -781,7 +895,10 @@ body {
   grid-template-columns: 0.78fr 1.22fr;
   gap: 20px;
   max-width: 500px;
-  margin: 30px 0 0;
+  /* Der enge Takt des Fussblocks — er steht als Token auf
+     `.book-details__unten` und wird hierher vererbt. Hier stand 30px;
+     zwei Zahlen fuer denselben Abstand laufen auseinander. */
+  margin: var(--takt-eng, 1.2rem) 0 0;
   padding: 16px 0 0;
   border-top: 1px solid var(--hairline);
 }
@@ -806,18 +923,24 @@ body {
   line-height: 1.3;
 }
 
-.official-link {
+/*
+ * **Der Weg zur Bandseite — eine Zeile, kein Knopf.**
+ *
+ * Hier stand ein gerahmter Kasten (`border: 2px solid`), der einzige auf
+ * der ganzen Tafel. Er las sich als Schaltflaeche einer Anwendung; alles
+ * andere auf dieser Seite ist Satz. Geblieben sind die beiden
+ * Haarlinien ueber und unter der Zeile, wie sie eine Tabellenzeile auch
+ * traegt.
+ */
+.bandweg {
   display: flex;
   align-items: center;
   justify-content: space-between;
   max-width: 500px;
-  margin-top: 27px;
-  padding: 12px 14px 11px;
-  border: 2px solid var(--ink);
   color: var(--ink);
   padding: 16px 0 12px;
-  border-top: 1px solid currentColor;
-  border-bottom: 1px solid currentColor;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
   text-decoration: none;
   font-family: var(--schrift);
   font-size: 12px;
@@ -825,13 +948,13 @@ body {
   letter-spacing: 0.01em;
 }
 
-.official-link span:last-child {
+.bandweg span:last-child {
   font-size: 16px;
   font-weight: 420;
   transition: transform 220ms ease;
 }
 
-.official-link:hover span:last-child {
+.bandweg:hover span:last-child {
   transform: translate3d(3px, -3px, 0);
 }
 
@@ -974,9 +1097,11 @@ body {
 
   .wordmark {
     gap: 7px;
-    /* Eine Zeile, und daneben muss noch die Navigation Platz haben. */
-    font-size: 9px;
-    letter-spacing: 0.08em;
+    /* Eine Zeile, und daneben muss noch die Navigation Platz haben.
+       Elf ist die Untergrenze der Seite; die Sperrung faengt den Platz
+       auf, den der Punkt mehr kostet. */
+    font-size: 11px;
+    letter-spacing: 0.04em;
     white-space: nowrap;
   }
 
@@ -993,9 +1118,12 @@ body {
   }
 
   .regal-nav {
-    gap: 12px;
-    font-size: 8px;
-    letter-spacing: 0.13em;
+    gap: 10px;
+    /* Acht lag unter jeder Lesbarkeit — elf ist die Untergrenze. Die
+       Sperrung geht dafuer zurueck, sonst passt die Reihe nicht mehr
+       neben die Wortmarke. */
+    font-size: 11px;
+    letter-spacing: 0.04em;
   }
 
   .experience-status {
@@ -1181,7 +1309,7 @@ body {
     margin-top: 16px;
   }
 
-  .official-link {
+  .bandweg {
     margin-top: 16px;
   }
 
@@ -1244,7 +1372,7 @@ body {
 /* --- Ergaenzungen fuer den Verlag ---------------------------------------- */
 
 /*
- * Doppelband: die Marke sagt, welche der beiden Vorderseiten oben liegt,
+ * Wendeband: die Marke sagt, welche der beiden Vorderseiten oben liegt,
  * der Knopf wendet den Band.
  */
 .seitenmarke {
@@ -1320,16 +1448,12 @@ body {
   display: none;
 }
 
-/* Der Tastenhinweis im Flip-Knopf: das einzige Kaestchen der Seite, und
-   zwar zu Recht — ohne Gehaeuse liest sich das F wie ein Tippfehler. */
-.wenden-knopf kbd {
-  padding: 1px 5px;
-  border: 1px solid currentColor;
-  font-family: inherit;
-  font-size: 10px;
-  line-height: 1.5;
-  opacity: 0.7;
-}
+/*
+ * Hier stand die Regel fuer den Tastenhinweis [F] — das einzige
+ * Kaestchen der Seite. Es ist weg, samt der langen Begruendung, warum es
+ * auf Fingergeraeten wegfaellt: es faellt jetzt ueberall weg. Die Taste
+ * wirkt weiter, sie steht nur nirgends mehr geschrieben.
+ */
 
 /*
  * Auf dem Finger bleibt vom Knopf nur das Wort.
@@ -1348,7 +1472,6 @@ body {
  * Hinweis genau dort, wo man ihn nachsieht.
  */
 @media (max-width: 767px), (pointer: coarse) {
-  .wenden-knopf kbd,
   .wenden-knopf > span[aria-hidden='true'] {
     display: none;
   }
@@ -1484,7 +1607,7 @@ body {
     order: 1;
   }
 
-  [data-handy-fluss='an'] .official-link,
+  [data-handy-fluss='an'] .bandweg,
   [data-handy-fluss='an'] .einsenden-notiz {
     order: 2;
   }
@@ -1569,4 +1692,23 @@ body {
   [data-handy-fluss='an'] .site-header {
     position: fixed;
   }
+}
+
+/*
+ * Beim vakanten Band steht über der Adresse, wofür sie da ist. Ohne die
+ * Zeile wäre eine Mailadresse an dieser Stelle bloß ein Kontakt; mit ihr
+ * ist sie eine Aufforderung.
+ */
+.bandweg__davor {
+  margin: var(--takt-weit, 1.6rem) 0 6px;
+  color: var(--ink-soft);
+  font-family: var(--schrift);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Steht die Zeile da, bringt sie den Abstand mit — dann nicht doppelt. */
+.bandweg__davor:not([hidden]) + .bandweg {
+  margin-top: 0;
 }

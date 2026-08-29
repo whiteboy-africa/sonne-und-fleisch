@@ -1,0 +1,72 @@
+---
+/*
+ * Ein Umschlag im Dokument — im Programm als Daumennagel, auf der
+ * Bandseite gross. Beide Male dasselbe Bauteil, damit beide Male dasselbe
+ * Verhaeltnis herauskommt.
+ *
+ * **Der Umschlag rendert nackt.** Keine Kante, kein Rahmen, kein
+ * Palettenhintergrund — nur die Kunst im Verhaeltnis-Behaelter. Hier
+ * bekam er einmal Einbandfarbe als Grund und einen Akzentstreifen als
+ * „Buchruecken"; im Bild war das ein farbiger Balken neben dem Bild.
+ *
+ * **Der Behaelter bestimmt die Form, nicht die Datei.** Er steht auf
+ * `aspect-ratio: var(--book-ratio)` — dem Verhaeltnis der Vorderseite des
+ * 3D-Modells — und das Bild legt sich mit `object-fit: cover` hinein. Ein
+ * Umschlag, der schief geliefert wird, verzieht damit nicht das Raster;
+ * er wird beschnitten. Damit dabei nichts Wichtiges wegfaellt, werden die
+ * Dateien beim Bauen auf dasselbe Verhaeltnis gebracht
+ * (`scripts/cover-pruefen.mjs`) — der Beschnitt hier ist die zweite
+ * Sicherung, nicht die erste.
+ *
+ * **Fehlt eine Seite, kommt der Blindband.** Nicht ein leeres Rechteck
+ * und nicht das Cover der anderen Seite: dieselbe cremefarbene Flaeche
+ * mit Papierkorn und dem Verlagszeichen unten, die im Regal auf dem
+ * Rohling steht (`drawBlindCover` in `shelf/cover-art.ts`). Ein Paar
+ * steht damit immer in zwei gleich grossen Feldern, auch wenn nur eine
+ * Datei da ist.
+ */
+interface Props {
+  bild?: string;
+  /** Fuer den Alternativtext; leer heisst schmueckend. */
+  titel?: string;
+  /** Ohne Bild wird die Blindflaeche gezeichnet. */
+  blind?: boolean;
+  klasse?: string;
+}
+
+const { bild, titel, blind = false, klasse } = Astro.props;
+
+/*
+ * **Ein Maß, ausnahmslos.**
+ *
+ * Hier stand eine Ausnahme: trug ein Band ein eigenes
+ * `breite_verhaeltnis`, schrieb dieses Bauteil es als `--book-ratio`
+ * inline ans Element. Gut gemeint — und falsch, denn der
+ * **Vorgabewert** des Schemas ist A5, nicht das Hausmaß. Damit bekam
+ * praktisch jeder Band seinen Inline-Wert und überschrieb den Token:
+ * 001 stand auf 0,7048, 002 auf 0,648, und in der Liste standen zwei
+ * verschiedene Rasterhöhen nebeneinander. Der Umstieg des Tokens auf
+ * 2:3 blieb dadurch wirkungslos — nachgemessen, vorher wie nachher
+ * dieselben Zahlen.
+ *
+ * `breite_verhaeltnis` beschreibt jetzt wieder nur, wofür es da ist:
+ * den Buchkörper in der Szene. Was ein Umschlag im Dokument für ein
+ * Feld bekommt, entscheidet allein `--book-ratio`.
+ */
+
+// Kein Bild ist derselbe Fall wie ein Blindband: eine offene Stelle im
+// Paar. Beide bekommen dieselbe Flaeche.
+const leer = blind || !bild;
+---
+
+<span class:list={['umschlag', leer && 'umschlag--blind', klasse]}>
+  {
+    leer ? (
+      <span class="umschlag__marke" aria-hidden="true">
+        SONNE + FLEISCH
+      </span>
+    ) : (
+      <img src={bild} alt={titel ? `Umschlag von ${titel}` : ''} loading="lazy" decoding="async" />
+    )
+  }
+</span>
