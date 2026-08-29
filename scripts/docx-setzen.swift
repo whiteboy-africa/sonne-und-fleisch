@@ -17,7 +17,12 @@
 // Zahl aussen rechts; so steht es in den Kopfzeilen des Dokuments und so
 // haelt es die Leseprobe im Regal.
 //
-//   swift scripts/docx-setzen.swift <quelle.docx> <ziel.pdf>
+//   swift scripts/docx-setzen.swift <quelle.docx> <ziel.pdf> [--kolumne-ab N]
+//
+// `--kolumne-ab` ist die erste Seite, die eine Kolumne traegt. Vorgabe 7.
+// Sie haengt an der Titelei des jeweiligen Buches, und die ist verschieden
+// lang: bei Lichas sechs Seiten, bei Quidams Schwermut vier. Die erste
+// Textseite bleibt frei — ueber einem Kapitelanfang steht im Buch nichts.
 
 import AppKit
 
@@ -28,6 +33,11 @@ guard args.count >= 3 else {
 }
 let quelle = URL(fileURLWithPath: args[1])
 let ziel = URL(fileURLWithPath: args[2])
+let kolumneAb: Int = {
+  guard let i = args.firstIndex(of: "--kolumne-ab"), args.count > i + 1,
+        let n = Int(args[i + 1]) else { return 7 }
+  return n
+}()
 
 // Seitenformat und Raender stehen im Dokument, in Twips (1/1440 Zoll).
 func twips(_ xml: String, _ tag: String, _ attr: String) -> Double? {
@@ -125,7 +135,7 @@ while gesetzt < setzer.numberOfGlyphs || seiten == 0 {
   // Die Kolumne. Die erste Seite eines Abschnitts traegt sie nicht — wie
   // im Buch, wo ueber einem Kapitelanfang nichts steht.
   let nummer = seiten + 1
-  if nummer > 6, let lauf = (nummer % 2 == 0 ? kolumneGerade : kolumneUngerade) {
+  if nummer >= kolumneAb, let lauf = (nummer % 2 == 0 ? kolumneGerade : kolumneUngerade) {
     let grad = NSFont.systemFontSize * 0.62
     let stil = NSMutableParagraphStyle()
     stil.alignment = nummer % 2 == 0 ? .left : .right

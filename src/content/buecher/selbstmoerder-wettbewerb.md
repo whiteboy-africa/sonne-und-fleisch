@@ -54,9 +54,20 @@ seiten_zahl: 80
 # wir nicht, also bleibt es bei der Hausserife; `leseprobe_schrift` waere
 # die Stelle, falls je eine Bleisatz-Naeherung dazukommt.
 leseprobe:
-  # GESCHAETZT: der Buchsatz hat keine harten Seitenumbrueche, die Zahl
-  # laesst sich daraus nicht ablesen. Aus dem Umbruch nachtragen.
-  seite: 9
+  # Echte Seiten, wie bei Yellow Fever: aus „DER SELBSTMÖRDER-WETTBEWERB –
+  # Buchsatz.docx" gesetzt (`scripts/docx-setzen.swift --kolumne-ab 5`),
+  # gerastert, dann registerhaltig geschwaerzt.
+  #
+  # **Der Umbruch ist TextKits, nicht Words.** Kommt das PDF aus Word,
+  # laufen dieselben drei Schritte darueber.
+  seite: 4
+  bild: /buecher/selbstmoerder-wettbewerb/leseprobe-s4.webp
+  geschwaerzt:
+    - /buecher/selbstmoerder-wettbewerb/leseprobe-s5-schwarz.webp
+    - /buecher/selbstmoerder-wettbewerb/leseprobe-s6-schwarz.webp
+    - /buecher/selbstmoerder-wettbewerb/leseprobe-s7-schwarz.webp
+    - /buecher/selbstmoerder-wettbewerb/leseprobe-s8-schwarz.webp
+  schluss: /buecher/selbstmoerder-wettbewerb/leseprobe-s9-stanze.webp
   text: >-
     Daß die Verurteilung des Selbstmordes eine speziell christliche oder
     europäische Anschauungsweise ist, zeigen die bekannten und durchaus
@@ -94,5 +105,7 @@ dicke: 0.06
 # nicht bekannt, also gilt die Vorgabe wie bei allen anderen. Der Umschlag
 # liegt mit 900 zu 1350 ohnehin genau auf dem Hausmass (`--book-ratio`,
 # 2:3) und wird von `cover-normalisieren.mjs` nicht angeruehrt.
+# Das wirkliche Druckformat aus dem Buchsatz: 5,06 x 7,81 Zoll.
+breite_verhaeltnis: 0.648
 reihenfolge: 10
 ---

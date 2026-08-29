@@ -34,6 +34,9 @@ schrift_farbe: '#d67016'
 motiv: boom
 hoehe: 2.0
 dicke: 0.078
+# Das wirkliche Druckformat aus dem Buchsatz: 5,06 x 7,81 Zoll. Ohne die
+# Angabe stuende die echte Seite in einem A5-Rahmen.
+breite_verhaeltnis: 0.648
 reihenfolge: 8
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Aus dem Manuskript, im Wortlaut: der Gang in die Empfangshalle.
@@ -66,8 +69,7 @@ leseprobe:
     wieder gefangen hat, weisen wir uns bei der Empfangsdame aus. Sie
     reicht uns die Sicherheitskarten mit beiden Händen, ein Lächeln, eine
     Verbeugung. Wir nehmen die Karten entgegen und passieren die
-    Drehkreuze hin zu den Aufzügen. Biep, biep. Dort hängt ein Flatscreen
-    an der Wand. Er zeigt ein Video, in dem [[|17]]
+    Drehkreuze hin zu den Aufzügen. [[Biep, biep. |14]]
 rueckseite:
   titel: The Melancholy of Quidam
   kurztitel: Melancholy of Quidam
@@ -95,9 +97,24 @@ rueckseite:
   schrift_farbe: '#e4d6ae'
   motiv: fracture
   leseprobe:
-    # GESCHAETZT: der Buchsatz hat keine harten Seitenumbrueche. Aus dem
-    # Umbruch nachtragen.
-    seite: 7
+    # Echte Seiten, wie bei Yellow Fever: aus „QUIDAMS SCHWERMUT –
+    # Buchsatz.docx" gesetzt (`scripts/docx-setzen.swift --kolumne-ab 6`),
+    # gerastert, dann registerhaltig geschwaerzt. Die Balken sind ins Bild
+    # gerechnet; darunter steht nichts mehr.
+    #
+    # **Der Umbruch ist TextKits, nicht Words.** Die Seitenzahl stimmt
+    # fuer diesen Satz. Kommt das PDF aus Word, laufen dieselben drei
+    # Schritte darueber.
+    seite: 5
+    bild: /buecher/tokio-burning/leseprobe-quidam-s5.webp
+    geschwaerzt:
+      - /buecher/tokio-burning/leseprobe-quidam-s6-schwarz.webp
+      - /buecher/tokio-burning/leseprobe-quidam-s7-schwarz.webp
+      - /buecher/tokio-burning/leseprobe-quidam-s8-schwarz.webp
+      - /buecher/tokio-burning/leseprobe-quidam-s9-schwarz.webp
+    schluss: /buecher/tokio-burning/leseprobe-quidam-s10-stanze.webp
+    # Der Wortlaut bleibt stehen: liegt ein `bild` vor, zeichnet die Seite
+    # nicht mehr. Faellt es einmal weg, ist der Text noch da.
     # Im Wortlaut von „QUIDAMS SCHWERMUT – Buchsatz.docx". Hier stand eine
     # Fassung aus dem aelteren Entwurf, in der ein Satz des Buches in zwei
     # zerlegt und die Fuge umgeschrieben war („dessen grausame Taten …
