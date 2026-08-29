@@ -946,3 +946,16 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
+
+/*
+ * **Auf dem Telefon steht nur der Name** — wie im Regal. Der Strich und
+ * „VERLAG" dahinter fallen weg, sonst schiebt sich die Kopfzeile mit der
+ * Navigation ineinander. Das `aria-label` am Verweis traegt weiterhin
+ * beides.
+ */
+@media (max-width: 760px) {
+  .kopf__strich,
+  .kopf__marke span:last-child {
+    display: none;
+  }
+}

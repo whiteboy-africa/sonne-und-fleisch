@@ -1105,8 +1105,22 @@ body {
     white-space: nowrap;
   }
 
-  .wordmark__divider {
-    width: 14px;
+  /*
+   * **Auf dem Telefon steht nur der Name.**
+   *
+   * Der Strich und „VERLAG" dahinter fallen weg: die Reihe aus Wortmarke
+   * und Navigation passt sonst nicht mehr nebeneinander und schiebt sich
+   * ineinander. Aufgefallen ist es, als Wortmarke und Navigation von 9
+   * und 8 auf die Untergrenze von 11 Punkten stiegen — vorher war beides
+   * so klein, dass es gerade noch ging, und so klein soll es nicht sein.
+   *
+   * Der Name allein sagt genug; das Wort „Verlag" steht auf jeder
+   * Unterseite noch einmal. Vorgelesen wird weiterhin beides, das
+   * `aria-label` am Verweis bleibt vollstaendig.
+   */
+  .wordmark__divider,
+  .wordmark span:last-child {
+    display: none;
   }
 
   .edition-mark {

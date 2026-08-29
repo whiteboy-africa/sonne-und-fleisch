@@ -27,7 +27,14 @@ const seiten = (await getCollection('seiten', ({ data }) => !data.versteckt)).so
 <Basis titel={titel} beschreibung={beschreibung}>
   <div class="seite">
     <header class="kopf">
-      <a class="kopf__marke" href="/">
+      {/* Das Label traegt beides — auf dem Telefon ist „VERLAG" im Bild
+          ausgeblendet, damit die Kopfzeile nicht mit der Navigation
+          zusammenstoesst. Vorgelesen wird die ganze Marke. */}
+      <a
+        class="kopf__marke"
+        href="/"
+        aria-label={`${siteConfig.wordmark}, ${siteConfig.collectionName}`}
+      >
         <span>{siteConfig.wordmark}</span>
         <span class="kopf__strich"></span>
         <span>{siteConfig.collectionName}</span>
