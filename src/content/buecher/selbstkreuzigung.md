@@ -7,9 +7,14 @@ klappentext: >-
   seinem Bettpfosten und hängt es aus dem Fenster. Sein Arzt Ruggieri
   fragt ihn wochenlang nach dem Grund und bekommt jedes Mal denselben
   Satz.
+# Die zweite Haelfte hiess einmal „Daneben sieben Flüche, die in Händen
+# und Haut wohnen" — das beschrieb ein Register gesammelter Flueche, also
+# das Buch, das ich mir vor dem Text ausgedacht hatte. Corporal Curses
+# erzaehlt von Helena.
 klammer: >-
-  Venedig, 1805: Ein Schuster nagelt sich ans Kreuz. Daneben sieben Flüche, die in Händen
-  und Haut wohnen.
+  Venedig, 1805: Ein Schuster nagelt sich ans Kreuz. Daneben Helena,
+  unter dem Rentierfell aufgewachsen, die durch die Jahrhunderte der
+  Verfolgungen zieht. Zwei Körper als Altar.
 zitat: Der Stolz der Menschen müsse gezüchtigt werden und am Kreuze endigen.
 zitat_von: Mathieu Lovat, auf jede Frage dieselbe Antwort
 format: Broschur

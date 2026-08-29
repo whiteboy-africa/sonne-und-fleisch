@@ -7,6 +7,18 @@ klappentext: >-
   im 52. Stock ein blaues Auge und bleibt in der Stadt. Zimmer nordseitig,
   Blick auf den Innenhof der Sumohalle, Training ab sechs: man muss seinen
   Feind studieren, um ihn zu bezwingen.
+# Der Anfang ist dein Satz („Ein gefeuerter Salaryman legt Feuer in
+# Tokio, ein gewisser Quida…"); die zweite Haelfte kommt aus dem
+# Manuskript von Quidams Schwermut.
+#
+# ACHTUNG: der Klappentext der Vorderseite spricht von einem
+# „Verhandlungsfuehrer", der seinen Sieg feiert — den habe ich erfunden,
+# bevor ein Text da war. Deine Klammer sagt „gefeuerter Salaryman". Wenn
+# das stimmt, gehoert der Klappentext nachgezogen.
+klammer: >-
+  Ein gefeuerter Salaryman legt Feuer in Tokio, ein gewisser Quidam
+  beschließt zwischen den Quitten einen letzten Aufstand. Zweimal brennt
+  eine Welt, einmal aus Kränkung, einmal aus Lehre.
 zitat: >-
   Früher hätten Männer wie ich Kriege gewonnen. Heute gewinnen wir
   Verhandlungsgespräche.

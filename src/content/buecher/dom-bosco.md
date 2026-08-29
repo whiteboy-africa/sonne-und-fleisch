@@ -71,7 +71,7 @@ rueckseite:
   zitat_von: Chinesisches Sprichwort, bei Matignon
   # Neuer Umschlag, neuer Dateiname — ein Bild nie unter demselben
   # austauschen, sonst zeigt der Cache weiter das alte.
-  cover_bild: /buecher/dom-bosco/la-chine-hermetique-2.webp
+  cover_bild: /buecher/dom-bosco/la-chine-hermetique-3.webp
   # Aus dem Umschlag genommen: das Nachtblau der Gasse, das Orange des
   # brennenden Himmels, das Elfenbein der Schrift.
   cover_farbe: '#151a20'

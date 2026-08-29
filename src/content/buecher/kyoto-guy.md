@@ -15,6 +15,10 @@ klappentext: >-
   Ein Wiener Sammler hört von einem verschollenen Autor kolonialer
   Reiseberichte, bucht noch am selben Nachmittag den Flug nach Kunming und
   kauft ihm sein letztes Werk ab.
+klammer: >-
+  Ein Sammler fliegt nach Kunming und kauft einem Alten sein letztes Werk
+  ab; ein Gast in Gion wird über acht Wochen zum Fall. Zwei Männer, die
+  etwas suchen und etwas anderes finden.
 zitat: >-
   Sie lieben das Abenteuer, deswegen werde ich Ihnen die letzte Note nicht
   verraten.
