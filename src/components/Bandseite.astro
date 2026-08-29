@@ -201,9 +201,23 @@ const bestellung =
           id={`seite-${seite.schluessel}`}
         >
           <div class="bandblock__text">
-            <p class="bandblock__marke">{hinten ? seite.marke : 'Der Band'}</p>
-            <h2>{seite.titel}</h2>
-            <p class="bandblock__autor">{seite.autor}</p>
+            {
+              /*
+               * **Ein Band mit einer Geschichte wiederholt seinen Titel
+               * nicht.** Bei einem Wendeband stehen oben beide Titel als
+               * Paar und hier der einzelne — zwei verschiedene Zeilen.
+               * Hat der Band nur eine Seite, sind es zweimal dieselbe,
+               * und dazu eine Marke („Der Band"), die nichts
+               * unterscheidet. Dann faengt der Block beim Text an.
+               */
+              hinten && (
+                <>
+                  <p class="bandblock__marke">{seite.marke}</p>
+                  <h2>{seite.titel}</h2>
+                  <p class="bandblock__autor">{seite.autor}</p>
+                </>
+              )
+            }
             <p class="fliesstext">{seite.klappentext}</p>
             <blockquote class="buchkopf__zitat">
               „{seite.zitat}“

@@ -321,7 +321,7 @@ unten auf der Tafel.
 Am Ende der Reihe steht ein unbedruckter Rohling: `blind: true` im
 Frontmatter, `reihenfolge: 999`, damit echte Baende immer davor ruecken.
 Seine Nummer ergibt sich wie bei allen anderen aus der Position — heute
-010, nach dem naechsten echten Band 011. Sein Umschlag wird nicht bemalt
+011, nach dem naechsten echten Band 012. Sein Umschlag wird nicht bemalt
 (`drawBlindCover` in `cover-art.ts`): cremefarbener Karton, Papierkorn,
 das Verlagszeichen unten in der Mitte, die Nummer auf dem Ruecken.
 
@@ -333,7 +333,7 @@ solange er nicht der betrachtete ist, und beim Zurueckgehen bleibt er auch
 nicht davor stehen, wie es ein Band taete.
 
 **Station bleibt er trotzdem, und zwar die letzte.** Vom letzten echten
-Band nach rechts kommt man zu ihm, und dort steht er allein: 010, „Vakant".
+Band nach rechts kommt man zu ihm, und dort steht er allein: 011, „Vakant".
 Weil es nichts herauszuziehen gibt, faellt der gewohnte Zweischritt („erst
 herausholen, dann aufschlagen") aus — von der Nachbarzeile und von der
 Leiste aus geht es geradewegs in die Betrachtung (`blindOeffnen`).

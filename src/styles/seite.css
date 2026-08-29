@@ -667,7 +667,13 @@
 
 .angaben {
   max-width: 620px;
-  margin: 0 0 46px;
+  /*
+   * Zweieinhalb Zeilen ueber der Tabelle — dieselbe Strecke wie zwischen
+   * Zitat und Wende-Trenner. Oben stand hier nichts: das Zitat des
+   * letzten Blocks wird an seinen Fuss geschoben (`margin-top: auto`)
+   * und stiess damit unmittelbar an die erste Haarlinie der Tabelle.
+   */
+  margin: 2.5rem 0 46px;
   font-size: 13px;
 }
 
