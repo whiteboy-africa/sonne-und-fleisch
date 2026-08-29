@@ -3,11 +3,6 @@
 # „La Chine hermetique" (85.254 Zeichen). Klappentexte, Zitate und
 # Leseproben stehen im Wortlaut der Uebersetzungen.
 #
-# OFFEN: der Umschlag der Vorderseite (Dom Bosco). Solange kein
-# `cover_bild` da ist, zeigt das Programm die cremefarbene Blindflaeche
-# und das Regal malt den Band aus den Farben unten. Die Rueckseite hat
-# ihren.
-#
 # OFFEN: `seiten_zahl`. Aus dem Umbruch nachtragen.
 titel: Biographische Skizze über Dom Bosco
 kurztitel: Dom Bosco
@@ -28,11 +23,12 @@ format: Broschur
 verfuegbarkeit: In Vorbereitung
 # Gesetzt in Times New Roman — wie die uebrigen Baende der Reihe.
 leseprobe_schrift: "'Times New Roman', Times, serif"
-# Vorlaeufig, bis der Umschlag da ist: das Schwarzblau der Soutane, ein
-# stumpfes Messing, Knochenweiss fuer die Schrift.
-cover_farbe: '#161a22'
-akzent_farbe: '#a8863c'
-schrift_farbe: '#e6e0d2'
+cover_bild: /buecher/dom-bosco/dom-bosco.webp
+# Aus dem Umschlag genommen: das Schwarz der Soutane, das Gold des
+# Heiligenscheins, das Cremeweiss der Spitze.
+cover_farbe: '#0e1416'
+akzent_farbe: '#c9a23f'
+schrift_farbe: '#f1d7b3'
 motiv: gather
 hoehe: 2.0
 dicke: 0.078
