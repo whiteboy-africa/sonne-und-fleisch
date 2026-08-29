@@ -108,4 +108,35 @@ dicke: 0.06
 # Das wirkliche Druckformat aus dem Buchsatz: 5,06 x 7,81 Zoll.
 breite_verhaeltnis: 0.648
 reihenfolge: 10
+# Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
+#
+# Der Umschlag ist ein Filmplakat — Sonne + Fleisch Produktion, 1975,
+# Regie Marlies van Addak, im Vorspann Peter Schamoni an der Kamera und
+# Martin Kutschenreuter an der Musik. Ein Buch, das sich als Film ausgibt.
+#
+# **OFFEN: Klappentext und Zitat.** Was unten steht, ist vom Plakat
+# abgelesen und beschreibt die Ausstattung, nicht die Erzaehlung — genau
+# der Fehler, der bei Auerbach schon einmal passiert ist (dort stand die
+# erfundene Geschaeftsstelle im Klappentext, weil sie auf dem Umschlag
+# steht). Sobald der Text da ist, gehoert beides ersetzt.
+rueckseite:
+  titel: Justine Segunda
+  kurztitel: Justine Segunda
+  autor: Marlies van Addak
+  klappentext: >-
+    Ein Film, den es nicht gibt: Sonne + Fleisch Produktion, 1975, Regie
+    Marlies van Addak, Drehbuch mit Jürgen Kneifel. Neben John Kubic
+    spielen Anne Brennan und Günther Kauffmann. Genehmigt für Deutschland,
+    FSK freigegeben.
+  # Vom Plakat, unten im Vorspann.
+  zitat: Genehmigt für Deutschland. Alle Rechte vorbehalten.
+  zitat_von: Aus dem Vorspann
+  cover_bild: /buecher/selbstmoerder-wettbewerb/justine-segunda.webp
+  # Aus dem Umschlag genommen: das Plakatrot, das Schwarz des
+  # Vorspannbalkens, das Hautlicht der Schrift.
+  cover_farbe: '#0b0d0e'
+  akzent_farbe: '#e00e03'
+  schrift_farbe: '#facb9d'
+  motiv: boom
+
 ---
