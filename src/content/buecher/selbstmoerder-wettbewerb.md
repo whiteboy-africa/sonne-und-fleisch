@@ -33,7 +33,7 @@ klappentext: >-
   Schiedsrichter, zwei Scharfrichter, ein Diner vorweg. Für das Publikum
   steht ein Buffet bereit.
 klammer: >-
-  Auerbachs Groteske von 1921, geschrieben nach dem eigenen missglückten Versuch: der Tod als Preisausschreiben, mit Schiedsgericht, Filmkamera und Erfrischungen für die Zuschauer.
+  Ein Milliardär schreibt den Tod aus, eine Komponistin spielt ihn auf einer Duftorgel. Zwei Aufführungen mit Publikum, Preisgericht und Buffet.
 # Aus dem Ausschreiben, im Wortlaut des Buchsatzes.
 #
 # Hier stand „Die Jury tritt nicht öffentlich zusammen." — das stammte vom
@@ -114,23 +114,21 @@ reihenfolge: 10
 # Regie Marlies van Addak, im Vorspann Peter Schamoni an der Kamera und
 # Martin Kutschenreuter an der Musik. Ein Buch, das sich als Film ausgibt.
 #
-# **OFFEN: Klappentext und Zitat.** Was unten steht, ist vom Plakat
-# abgelesen und beschreibt die Ausstattung, nicht die Erzaehlung — genau
-# der Fehler, der bei Auerbach schon einmal passiert ist (dort stand die
-# erfundene Geschaeftsstelle im Klappentext, weil sie auf dem Umschlag
-# steht). Sobald der Text da ist, gehoert beides ersetzt.
 rueckseite:
   titel: Justine Segunda
   kurztitel: Justine Segunda
   autor: Marlies van Addak
+  # Aus „JUSTINE SEGUNDA – Buchsatz.docx". Hier stand eine Fassung, die
+  # vom Plakat abgelesen war und die Ausstattung beschrieb statt der
+  # Erzaehlung — derselbe Fehler wie vorn bei Auerbach.
   klappentext: >-
-    Ein Film, den es nicht gibt: Sonne + Fleisch Produktion, 1975, Regie
-    Marlies van Addak, Drehbuch mit Jürgen Kneifel. Neben John Kubic
-    spielen Anne Brennan und Günther Kauffmann. Genehmigt für Deutschland,
-    FSK freigegeben.
-  # Vom Plakat, unten im Vorspann.
-  zitat: Genehmigt für Deutschland. Alle Rechte vorbehalten.
-  zitat_von: Aus dem Vorspann
+    Eine Komponistin, des Lebens überdrüssig, findet bei den Dekadenten
+    die „Whisky-Orgel" eines Herzogs und baut sie zur Duftorgel um. Am
+    Karfreitag hängen in der Stadt Plakate, die nach Pumakäfig stinken:
+    ihr letztes Konzert.
+  # Der letzte Satz des Buches.
+  zitat: Abfüllen.
+  zitat_von: Der einzige Mann, der in der ersten Reihe geblieben war
   cover_bild: /buecher/selbstmoerder-wettbewerb/justine-segunda.webp
   # Aus dem Umschlag genommen: das Plakatrot, das Schwarz des
   # Vorspannbalkens, das Hautlicht der Schrift.
@@ -138,5 +136,22 @@ rueckseite:
   akzent_farbe: '#e00e03'
   schrift_farbe: '#facb9d'
   motiv: boom
+  # Echte Seiten, wie vorn: aus dem Buchsatz gesetzt
+  # (`docx-setzen.swift --kolumne-ab 5`), gerastert, registerhaltig
+  # geschwaerzt.
+  #
+  # Das Fenster ist Seite 5, nicht 4: Seite 4 ist der Kapitelanfang und
+  # traegt nur den Titel und die ersten Zeilen — 248 Zeichen auf einer
+  # Seite, die 1.600 haelt. Eine Probe, die zu vier Fuenfteln leer ist,
+  # sieht nicht nach Entzug aus, sondern nach unfertig.
+  leseprobe:
+    seite: 5
+    bild: /buecher/selbstmoerder-wettbewerb/leseprobe-justine-s5.webp
+    geschwaerzt:
+      - /buecher/selbstmoerder-wettbewerb/leseprobe-justine-s6-schwarz.webp
+      - /buecher/selbstmoerder-wettbewerb/leseprobe-justine-s7-schwarz.webp
+      - /buecher/selbstmoerder-wettbewerb/leseprobe-justine-s8-schwarz.webp
+      - /buecher/selbstmoerder-wettbewerb/leseprobe-justine-s9-schwarz.webp
+    schluss: /buecher/selbstmoerder-wettbewerb/leseprobe-justine-s10-stanze.webp
 
 ---
