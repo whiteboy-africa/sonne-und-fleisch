@@ -45,16 +45,101 @@ gut gegangen. `| tail -20` zeigt das Ende ehrlich, mitsamt Grund.
 ## Wo was liegt
 
 ```
-src/content/buecher/*.md   Ein Buch, eine Datei. Dateiname = Adresse.
+src/content/buecher/*.md   Ein Buch, eine Datei. Dateiname = Schlüssel.
 src/content/seiten/*.md    Verlag, Kontakt, Impressum, Datenschutz.
 src/content.config.ts      Das Schema. Einzige Wahrheit über die Felder.
 src/buecher.ts             Übersetzt die deutschen Felder auf die Engine.
+src/components/Bandseite.astro  Die Detailansicht. Die einzige.
+src/components/Umschlag.astro   Ein Umschlag. Trägt das kanonische Maß.
+src/pages/band-[nummer]/   /band-001 und /band-001/a, /band-001/b.
+src/pages/weiterleitungen.txt.ts  Wird beim Bau zu dist/_redirects.
 src/shelf/                 Das 3D-Regal (siehe unten).
 public/buecher/<slug>/     Umschlagbilder.
 public/magazin/pages/      Die Seiten des Heftes. Aus dem Bau, nicht von Hand.
 content/magazin.pdf        Die Druckdatei dazu. Nicht im Git (125 MB).
 public/admin/config.yml    Die Redaktionsoberfläche. Muss zum Schema passen.
+scripts/cover-normalisieren.mjs  Bringt Umschläge auf ihr Maß. Läuft im Bau.
+scripts/platzhalter-pruefen.mjs  Kein „Platzhalter" in den Kopfdaten.
 ```
+
+## Die Adresse eines Bandes ist seine Nummer
+
+`/band-001`, und die beiden Vorderseiten darunter als `/band-001/a` und
+`/band-001/b`. Der Dateiname ist nur noch der Schlüssel zu den Cover-Ordnern,
+nicht mehr die Adresse.
+
+Vorher lag jeder Band unter `/programm/{slug}`. Dieselbe Sache hieß damit im
+Regal 001, auf dem Buchrücken 001 und in der Adresszeile `weine-nicht-artur`.
+Jetzt heißt sie überall gleich.
+
+- **Eine einzige Vorlage**, `components/Bandseite.astro`. Die drei Routen
+  sind dünne Hüllen darum; eine zweite Detailansicht gibt es nicht.
+- **Die alten Adressen leiten dauerhaft.** `src/pages/weiterleitungen.txt.ts`
+  rechnet die Tabelle beim Bau aus der Sammlung aus, die kleine Integration
+  in `astro.config.mjs` benennt sie in `dist/_redirects` um. Cloudflare Pages
+  antwortet damit mit einem echten 301, bevor irgendein HTML entsteht.
+  Astros eingebaute `redirects` täten das nicht — sie erzeugen im statischen
+  Bau eine Seite mit `<meta http-equiv="refresh">`.
+- **Warum die Datei nicht `_redirects.ts` heißt:** Astro nimmt jede Datei
+  unter `src/pages/` mit führendem Unterstrich vom Routing aus. Sie wurde
+  nie gebaut, und das fiel erst auf, als sie im `dist` fehlte.
+- **Blatt und Heft haben keine Bandseite.** Sie tragen keine Nummer. Ihre
+  alten Adressen führen dorthin, wo sie wirklich liegen: in den Stapel und
+  auf `/magazin`.
+- **Kein 3D auf der Bandseite.** Sie ist ein Dokument und bleibt eines.
+  Gewendet wird mit dem Trenner in der Mitte, der zur anderen Hälfte rollt;
+  wer die Szene will, geht über die Zeile darunter nach `/?band={nn}`.
+
+Die Programmliste ist das Inhaltsverzeichnis dazu, mehr nicht: **jeder Text
+darin kommt aus demselben Feld, das die Bandseite zeigt.** Es gibt keinen
+listeneigenen Klappentext — zwei Fassungen desselben Textes wären zwei
+Fassungen desselben Buches. Angaben (Format, Preis, Umfang) stehen auf der
+Bandseite; in der Liste steht nur der Zustand.
+
+Gezählt wird an beiden Stellen gleich: Bände sind die mit einer Nummer, ohne
+die offene Stelle. Der Ladeschirm des Regals rechnete früher `katalog.length`
+und zählte damit Blatt, Heft und Blindband mit — er sagte „12 Bände werden
+gestellt", während das Programm neun zeigte.
+
+## Das Maß eines Umschlags
+
+`--book-ratio` in `src/styles/basis.css`: 148 zu 210, also A5 — und damit
+genau das Verhältnis der Vorderseite am 3D-Modell (`breite_verhaeltnis`,
+Vorgabe `148 / 210`). Jeder Behälter, in dem ein Umschlag steht, hängt daran.
+
+**Das Maß gehört dem Band, nicht der Datei.** Weicht ein Band ab, trägt er
+sein eigenes `breite_verhaeltnis` — Yellow Fever steht auf 0,648, weil das
+sein wirkliches Druckformat ist, das Blatt auf 1,41, weil es quer liegt.
+`Umschlag.astro` setzt `--book-ratio` dann lokal um. **Ein einziges Maß für
+alle wäre hier falsch:** Yellow Fever verlöre acht Prozent Höhe, ohne dass
+irgendwo ein A5-Buch entstünde, und vom Aquarell bliebe die Mitte übrig.
+
+`npm run build` bringt die Dateien vorher auf dasselbe Maß
+(`scripts/cover-normalisieren.mjs`): mehr als anderthalb Prozent Abweichung
+heißt **mittig beschneiden, nie strecken**, und jede beschnittene Datei wird
+mit Namen und ursprünglichem Verhältnis gemeldet. Geschnitten wird in
+`dist/`, nicht in `public/` — dort liegt Arbeit, die jemand gemacht hat, und
+ein Bild unter demselben Dateinamen auszutauschen ließe den Cache das alte
+weiter zeigen.
+
+Geprüft werden nur die Dateien, die im Frontmatter als Umschlag stehen.
+Unter `public/buecher/` liegt mehr: `ruecken.webp` ist ein Buchrücken (43 zu
+1200), `leseprobe-*.webp` sind Buchseiten. Beide auf A5 zu beschneiden wäre
+Unsinn.
+
+**Keine ungefragten Dekor-Elemente an Covern — kein Rücken, kein Rahmen,
+kein Palette-Hintergrund. Cover rendern nackt im Ratio-Container.** Hier
+stand einmal ein „Anschnitt des Buchblocks": ein 3 px breiter Streifen in
+der Akzentfarbe des Bandes, dazu der Einbandton als Grund und ein
+eingesetzter Schatten als gemalter Rücken. Gemeint war das Buch wie im
+Regal; im Bild war es ein farbiger Balken neben der Kunst, und bei
+Götveren und Mountains of Sadness sah man vor allem den Balken. Der
+Daumennagel zeigt das Bild, sonst nichts.
+
+**Fehlt einer Seite ihr Umschlag, kommt die Blindfläche** — cremefarbener
+Karton mit Papierkorn und dem Verlagszeichen unten, dieselbe Fläche wie auf
+dem Rohling im Regal. Nicht ein leeres Rechteck und nicht das Cover der
+anderen Seite: ein Paar steht immer in zwei gleich großen Feldern.
 
 ## Das Regal
 
@@ -89,7 +174,7 @@ Tasten wählen bloß aus, sie holen nichts heraus.
 - In der Betrachtung dreht Ziehen den Band selbst, ohne Anschlag. Die
   Kamera kreist dort nicht (`enableRotate = false`), sonst ließe sich der
   Band nie auf den Kopf stellen.
-- Welche Seite eines Doppelbandes vorn liegt, liest `seiteAblesen` aus der
+- Welche Seite eines Wendebandes vorn liegt, liest `seiteAblesen` aus der
   Lage des Bandes ab — nicht aus dem Knopfdruck. Deshalb stimmt die
   Beschreibung auch, wenn von Hand gedreht wird.
 
@@ -143,6 +228,36 @@ Drei Rollen, benannt ausschliesslich in `src/styles/basis.css`:
 
 Das ist ein Versuch und widerspricht der frueheren Regel „eine einzige
 Schrift". Rueckbau: `git revert 28451c5`.
+
+### Die Mono-Probe: FONT_MONO
+
+`FONT_MONO` in `src/shelf/verlag-config.ts` stellt `--schrift` fuer die
+ganze Seite um — vier Zustaende: `aktuell`, `plex`, `courier-prime`,
+`fragment`. Der Wert kommt als `data-mono` ans `<html>`, umgeschaltet wird
+in `basis.css`, und weil `--schrift` die einzige Stelle ist, an der die
+Bedienschrift benannt wird, reicht das eine Token fuer jede Zeile der Seite.
+
+`aktuell` und `plex` sind **dieselbe Schrift** — der bestehende Mono ist
+IBM Plex Mono, kein geerbter Template-Standard. Verglichen werden real drei
+Schnittbilder.
+
+**Drei Dinge wandern nicht mit** (`--schrift-marke`): Wortmarke, Parole und
+die dreistelligen Katalognummern. Sie sind nicht Bedienung, sondern das
+Zeichen des Verlags. Bei den Ziffern kommt ein handfester Grund dazu:
+Fragment Mono setzt eine durchgestrichene Null, und aus 001 wird damit ein
+anderes Zeichen.
+
+**Courier Prime braucht seinen fetten Schnitt fuer die Marken.** Es bringt
+nur 400 und 700 mit, die Seite setzt ihre Bedienung aber durchweg auf 500 —
+und 500 faellt bei zwei Schnitten auf 400. Auf Schwarz brach das ein:
+Navigation (8 px), Nummernleiste (9 px) und Parole waren eher Schleier als
+Schrift. Der Block in `basis.css` legt deshalb 700 auf die Marken, laesst
+aber die Anton-Titel aussen vor (Anton hat einen einzigen Schnitt), den
+Fliesstext bei 400, und die Leseprobe ganz aussen vor — die liegt auf
+cremefarbenem Papier, dort tritt das Problem gar nicht auf.
+
+Steht ein Sieger fest, fliegen die Einbindungen der anderen aus
+`layouts/Basis.astro`.
 
 ## Wechsel zwischen Baenden: der Abblender
 
@@ -206,7 +321,7 @@ unten auf der Tafel.
 Am Ende der Reihe steht ein unbedruckter Rohling: `blind: true` im
 Frontmatter, `reihenfolge: 999`, damit echte Baende immer davor ruecken.
 Seine Nummer ergibt sich wie bei allen anderen aus der Position — heute
-009, nach dem naechsten echten Band 010. Sein Umschlag wird nicht bemalt
+010, nach dem naechsten echten Band 011. Sein Umschlag wird nicht bemalt
 (`drawBlindCover` in `cover-art.ts`): cremefarbener Karton, Papierkorn,
 das Verlagszeichen unten in der Mitte, die Nummer auf dem Ruecken.
 
@@ -218,7 +333,7 @@ solange er nicht der betrachtete ist, und beim Zurueckgehen bleibt er auch
 nicht davor stehen, wie es ein Band taete.
 
 **Station bleibt er trotzdem, und zwar die letzte.** Vom letzten echten
-Band nach rechts kommt man zu ihm, und dort steht er allein: 009, „Vakant".
+Band nach rechts kommt man zu ihm, und dort steht er allein: 010, „Vakant".
 Weil es nichts herauszuziehen gibt, faellt der gewohnte Zweischritt („erst
 herausholen, dann aufschlagen") aus — von der Nachbarzeile und von der
 Leiste aus geht es geradewegs in die Betrachtung (`blindOeffnen`).
@@ -348,6 +463,37 @@ unkaschiertes Papier glaenzt nicht.
 liegt, 0,15 Lack dazu. Eine Eskalationsstufe zum Ausprobieren, falls Saum
 und Rand zu leise bleiben.
 
+### Der Stempel auf der Schlussseite
+
+In der Stanze der Schlussdoppelseite steht ein Abdruck: NUR AUF PAPIER,
+schief aufgesetzt, mit Aussetzern in der Farbe (`shelf/stempel.ts`,
+`STAMP_INK: 'scarlet' | 'black'`). Darunter eine kleine graue Zeile,
+„Vormerken ↗", die erst unter dem Zeiger einen Strich in der Giftfarbe
+bekommt. Beide fuehren an dieselbe Stelle.
+
+**Keine Ziffern.** Hier stand einmal „Weiter nur im Band — 224 Seiten"; eine
+Zahl an dieser Stelle ist eine Auskunft, und Auskuenfte gibt diese Seite
+nicht. Gezaehlt wird dort nur, was zur Buchhaltung gehoert: die Seitenzahl
+in der Kolumne.
+
+**Die Aussetzer sind das Ganze.** Ein sauberer Kasten mit doppelter Linie
+ist ein Etikett; erst die gebrochene Deckung macht daraus Gummi auf Papier.
+Sie stehen als SVG-Maske ueber dem **ganzen** Abdruck — Rahmen und Schrift
+zusammen —, weil ein Stempel in einem Zug aufs Papier kommt. Rund zwoelf
+Prozent der Flaeche fehlen, in drei Groessen: grosse Aussetzer nur am Rand,
+Splitter an den Linien, Korn in der Farbe.
+
+Zwei Fallen, beide teuer bezahlt:
+
+- **Das Seitenverhaeltnis der Maske muss dem des Rahmens entsprechen.** Der
+  Rahmen nimmt 208 zu 57 an; stand die Maske auf 280 zu 66, zog das Ziehen
+  jedes Korn zu einem stehenden Oval — aus Aussetzern wurden Schlieren, und
+  der Abdruck sah nicht abgenutzt aus, sondern verwaschen. Wer Rand oder
+  Schriftgrad aendert, misst `bogen` in `stempel.ts` nach.
+- **Klein muss klein bleiben.** Ein Loch so breit wie der Stamm eines
+  Buchstabens schneidet ihn durch, und dann steht dort nicht ein abgenutzter
+  Stempel, sondern ein falsches Wort.
+
 ### Ein Weg in den Band, nicht zwei
 
 Aufgeschlagen wird der Band, indem man **den Umschlag anklickt**. Mehr
@@ -364,7 +510,7 @@ Damit faellt auch die Kopplung: der Umschlag leuchtet von selbst, wenn
 der Zeiger auf ihm liegt, und braucht kein Gegenstueck mehr. Auf
 Fingergeraeten laeuft davon ohnehin nichts.
 
-## Doppelcover (tête-bêche)
+## Wendeband (tête-bêche)
 
 Manche Bände haben zwei Vorderseiten: die zweite Geschichte steht kopfüber auf
 der Rückseite. Im Frontmatter ist das der Block `rueckseite`.
@@ -413,7 +559,7 @@ letzte Zeile — der Satz bricht ab. Positionen in einer eigenen Liste zu
 fuehren waere beim ersten Umschreiben des Satzes verrutscht; im Text kann
 das nicht passieren.
 
-Jede Seite eines Doppelbandes hat ihre eigene Probe (`rueckseite.leseprobe`).
+Jede Seite eines Wendebandes hat ihre eigene Probe (`rueckseite.leseprobe`).
 Welche gilt, entscheidet die Lage des Bandes — dieselbe Regel wie bei der
 Beschreibung. Ohne Probe schlaegt der Band auf dieser Seite nicht auf, und
 die Zeile in den Angaben steht nicht da.

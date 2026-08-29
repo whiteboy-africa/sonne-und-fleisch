@@ -20,6 +20,14 @@ const { katalog, direkt } = Astro.props;
 const katalognummer = (zahl: number) => String(zahl).padStart(3, '0');
 const erstes = katalog[0];
 const gesamt = katalognummer(katalog.length);
+/*
+ * Wie viele **Baende** im Stapel liegen. Nicht `katalog.length`: darin
+ * stehen auch das Blatt, das Heft und der Blindband. Baende sind die mit
+ * einer Nummer, und die offene Stelle am Ende ist keiner — dieselbe
+ * Rechnung wie unter `/programm`, damit die beiden Zahlen nicht
+ * auseinanderlaufen.
+ */
+const baendeGestellt = katalog.filter((buch) => buch.release && !buch.blind).length;
 ---
 
 <main
@@ -178,21 +186,45 @@ const gesamt = katalognummer(katalog.length);
             selbst, angeklickt im aufgeschlagenen Zustand.
         */}
 
-        {/* Wenden: dreht den Band um und auf den Kopf. Bei Doppelbänden
+        {/* Wenden: dreht den Band um und auf den Kopf. Bei Wendebänden
             wechselt damit auch die Beschreibung auf die andere Geschichte. */}
-        <button type="button" class="wenden-knopf" data-wenden>
-          <span aria-hidden="true">⟳</span>
+        {/*
+            Kein sichtbarer Tastenhinweis mehr. Das [F] im Kaestchen stand
+            hier als einziges Tastenzeichen der Seite und las sich wie die
+            Bedienleiste eines Programms; die Taste selbst tut weiter, was
+            sie tat. Angesagt wird sie nur noch Vorlesegeraeten
+            (`aria-keyshortcuts`) — kein `title`, kein Hinweis beim
+            Darueberfahren, nichts im Bild.
+        */}
+        {/* Ohne Zeichen davor: die Zeile sagt, was sie tut. Das `⟲` sass
+            als einziges Symbol auf der Tafel und las sich wie eine
+            Werkzeugleiste. */}
+        <button type="button" class="wenden-knopf" data-wenden aria-keyshortcuts="f">
           <span data-wenden-text>Band wenden</span>
-          <kbd aria-hidden="true">F</kbd>
         </button>
 
-        <a class="official-link" data-panel-link href="/programm">
+        {/*
+            Hier stand ein gerahmter Knopf „Zum Buch". Der Rahmen ist weg:
+            auf dieser Seite ist nichts sonst gerahmt, und ein Kasten um
+            eine Zeile macht aus einem Weg eine Schaltflaeche. Geblieben
+            ist die Zeile — sie fuehrt an dieselbe Stelle wie die Nummer
+            im Programm, `/band-{nn}`.
+        */}
+        {/*
+            Beim vakanten Band steht hier, wofuer die Adresse da ist. Er
+            hat keine Bandseite — er ist eine offene Stelle, kein Buch —,
+            also ist **diese** Tafel der einzige Ort, an dem die Bitte um
+            einen Text stehen kann.
+        */}
+        <p class="bandweg__davor" data-einsenden-davor hidden>Ganzen Text einsenden an</p>
+
+        <a class="bandweg" data-panel-link href="/programm">
           <span data-panel-link-text>{siteConfig.bookLinkLabel}</span>
-          <span aria-hidden="true">↗</span>
         </a>
-        {/* Nur beim vakanten Band: der Nachsatz unter der Zeile. */}
+        {/* Nur beim vakanten Band: was gesucht wird, und der Nachsatz. */}
         <p class="einsenden-notiz" data-einsenden-notiz hidden>
-          Antwort kommt. Vielleicht.
+          Erzählende Prosa, 40.000 bis 50.000 Zeichen. Ganzer Text, keine
+          Exposés. Antwort kommt. Vielleicht.
         </p>
         </div>
       </div>
@@ -213,7 +245,14 @@ const gesamt = katalognummer(katalog.length);
       <span></span>
       <span></span>
     </div>
-    <p>{katalog.length} {katalog.length === 1 ? 'Band' : 'Bände'} werden gestellt</p>
+      {/*
+        Gezaehlt werden die **Baende**, nicht die Eintraege. Im Katalog
+        liegen auch das Blatt, das Heft und der Blindband; die drei sind
+        kein Band, und mit ihnen stand hier eine andere Zahl als unter
+        `/programm`. Eine Seite, die sich selbst widerspricht, ist an
+        genau der Stelle unglaubwuerdig, an der sie zaehlt.
+    */}
+    <p>{baendeGestellt} {baendeGestellt === 1 ? 'Band' : 'Bände'} werden gestellt</p>
   </div>
 
   {/* Ausweg, wenn kein WebGL zur Verfügung steht oder die Szene abstürzt.
@@ -245,11 +284,26 @@ const gesamt = katalognummer(katalog.length);
       <div class="leseprobe__rahmen" data-leseprobe-rahmen>
         <div class="leseprobe__spanne" data-leseprobe-spanne></div>
       </div>
-      <button type="button" class="leseprobe__zu" data-leseprobe-zu>
-        <span>Zuklappen</span>
-        <kbd aria-hidden="true">ESC</kbd>
-      </button>
     </div>
+
+    {/*
+        Der Ausgang: ein Kreuz oben rechts im Schwarzen.
+
+        Es haengt **an der Huelle, nicht am Band** — der Band ist die
+        Doppelseite, und darin sass das Kreuz auf dem Papier neben der
+        Seitenzahl. Auf dem Blatt waere es ein Zeichen, das im Buch
+        steht; es gehoert daneben.
+
+        Hier stand vorher eine Leiste unter der Seite: „ZUKLAPPEN [ESC]",
+        das Wort und die Taste im Kaestchen. Sie las sich wie die
+        Fusszeile eines Programms und erklaerte einen Weg, den ohnehin
+        jeder findet. ESC, ein Klick ins Schwarze und der Zurueck-Knopf
+        des Browsers tun weiter dasselbe; sie stehen nur nirgends mehr
+        angeschrieben.
+    */}
+    <button type="button" class="leseprobe__zu" data-leseprobe-zu aria-label="Zuklappen">
+      <span aria-hidden="true">×</span>
+    </button>
   </div>
 
   {/*

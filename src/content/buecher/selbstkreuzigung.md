@@ -3,10 +3,15 @@ titel: Mathieu Lovats Selbstkreuzigung
 kurztitel: Selbstkreuzigung
 autor: J. H. G. Schlegel
 klappentext: >-
-  Platzhalter: zwei bis vier Sätze zu Mathieu Lovats Selbstkreuzigung in
-  Venedig im Jahr 1805.
-zitat: Platzhalter für einen Satz aus dem Buch.
-zitat_von: Verlagsnotiz
+  Venedig, 19. Juli 1805: Ein Schuster nagelt sich an ein Kreuz aus
+  seinem Bettpfosten und hängt es aus dem Fenster. Sein Arzt Ruggieri
+  fragt ihn wochenlang nach dem Grund und bekommt jedes Mal denselben
+  Satz.
+klammer: >-
+  Venedig, 1805: Ein Schuster nagelt sich ans Kreuz. Daneben sieben Flüche, die in Händen
+  und Haut wohnen.
+zitat: Der Stolz der Menschen müsse gezüchtigt werden und am Kreuze endigen.
+zitat_von: Mathieu Lovat, auf jede Frage dieselbe Antwort
 format: Broschur
 # Platzhalter, bis die Druckdatei da ist.
 seiten_zahl: 144
@@ -18,43 +23,42 @@ schrift_farbe: '#c3b189'
 motiv: network
 hoehe: 2.0
 dicke: 0.078
-reihenfolge: 6
-# Doppelcover: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
+reihenfolge: 7
+# Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Der Umschlag ist ein Holzschnitt in Schwarz auf Papierweiß. Untertitel auf
 # dem Bild: „10,000 Dead Martyrs: A Study on Sensitivitiy".
-# Platzhalter-Leseprobe. Was in doppelten Klammern steht, wird beim Bauen
+# Was in doppelten Klammern steht, wird beim Bauen
 # herausgeschnitten und als Balken gedruckt — es steht in keinem HTML.
 leseprobe:
+  # Der Wortlaut aus dem Buchsatz — Ruggieris Brief in Schlegels
+  # Übersetzung, nicht mehr nacherzählt. Geschwärzt wird im Text selbst:
+  # was in [[doppelten Klammern]] steht, wird beim Bauen herausgeschnitten
+  # und als Balken gedruckt; es steht in keinem HTML.
   seite: 19
   text: >-
-    Am Morgen des zweiten Ostertages fand man Mathieu Lovat vor dem
-    Fenster seiner Kammer in Venedig, und was man fand, hat der Arzt
-    Ruggieri in einer Sprache aufgeschrieben, die sich um Nüchternheit
-    bemüht und daran scheitert.
+    Ich halte Wort, mein werter Freund, indem ich Ihnen hier die
+    Kreuzigung beschreibe, welche Mathieu Lovat, Marcs Sohn, 47 Jahre
+    alt, mit dem Beinamen Casale – von seinem Geburtsorte, einem zum
+    Kirchspiele [[Soldo gehörenden Dörfchen im Bezirke von Bellune]] –
+    am Morgen des 19. Juli 1805 an sich selbst vollzogen hat.
 
 
-    Er hatte es allein getan, und er hatte es zweimal versucht. Der erste
-    Versuch, im Sommer davor, [[wird in den Akten mit einem Wort
-    abgetan]]; beim zweiten hatte er dazugelernt, und diese Tatsache ist
-    das Unerträgliche an dem Fall, nicht das Blut.
+    Bevor ich mich in eine nähere Schilderung dieser seltsamen,
+    wahnsinnigen Handlung einlasse, ist es nötig, vorläufig Ihnen einige
+    Umstände darzulegen, die Licht über den [[körperlichen und
+    moralischen Zustand]] des hier in Frage stehenden Menschen
+    verbreiten.
 
 
-    Die Nachbarn sagten aus, er sei ruhig gewesen. Kein Streit, keine
-    Schulden, keine Frau. Er habe Schuhe gemacht, ordentlich und pünktlich,
-    und sonntags sei er gegangen wie alle. Einer erinnerte sich, dass er
-    seit dem Frühjahr nicht mehr gegrüßt habe.
-
-
-    Ruggieri versuchte es mit der Melancholie und kam nicht weit. Dann
-    versuchte er es mit der Frömmigkeit und kam noch weniger weit. Am Ende
-    schrieb er den Satz, für den man ihn später auslachte und der [[das
-    Ehrlichste in der ganzen Schrift]] ist.
-
-
-    Lovat starb nicht daran. Er lebte noch ein Jahr, sprach wenig und
-    ordentlich, und niemand hat ihn in dieser Zeit gefragt, warum. Man
-    fragte die Ärzte, man fragte die Priester, man fragte die Nachbarn.
-    Ihn selbst fragte [[|26]]
+    Von armen, mit den größten Arbeiten des Ackerbaues beschäftigten
+    Eltern erzeugt, in einer, so zu sagen, fast von aller menschlichen
+    Gesellschaft abgeschnittenen Lage, kann man sich vorstellen, was für
+    eine Erziehung er gehabt haben mag. In seiner Einbildung ward es ihm
+    auffallend zu sehen, dass der Pfarrer und sein Vikar die einzigen
+    waren, welche keineswegs das Feld bearbeiteten, und dass sie in
+    ihren Personen alles vereinten, was die kleine Welt, in der er
+    lebte, ihm an [[Macht und Ansehen vorspiegelte. Dies zusammen
+    erweckte, aus Nachahmung, |26]]
 rueckseite:
   titel: Corporal Curses
   kurztitel: Corporal Curses

@@ -5,6 +5,41 @@ import '@fontsource/ibm-plex-mono/500.css';
 import '@fontsource/ibm-plex-mono/600.css';
 import '@fontsource/anton/400.css';
 import '@fontsource/source-serif-4/400.css';
+
+/*
+ * **Die Bedienschrift und was zum Vergleichen daneben liegt.**
+ * `siteConfig.FONT_MONO` schaltet um. Space Mono ist die Entscheidung;
+ * Plex und Fragment bleiben eingebunden, damit der Weg zurueck eine
+ * Zeile in der Konfiguration ist und kein Wiedereinbau.
+ *
+ * Geladen wird nach Teilmengen — `latin` und `latin-ext` —, nicht als
+ * ganze Familie: Deutsch braucht Umlaute, das Eszett und die
+ * Anfuehrungszeichen unten/oben, und die stehen alle in `latin`;
+ * `latin-ext` kommt fuer die Namen dazu, die es darueber hinaus gibt.
+ *
+ * Was jede Schrift mitbringt, ist verschieden, und das entscheidet ueber
+ * die Bedienung: Plex hat 400/500/600, **Space Mono 400 und 700**,
+ * Fragment Mono einen einzigen Schnitt. Space Mono hat kein 500 — was
+ * die Seite an Marken auf 500 setzt, wird deshalb auf 700 abgebildet
+ * und was Fliesstext ist auf 400. Die Tafel dazu steht in `basis.css`.
+ *
+ * Courier Prime ist raus. Es traegt auf Schwarz nicht: bei 8 und 9 px
+ * war es eher Schleier als Schrift, und der fette Schnitt, mit dem es
+ * doch stand, war eine andere Seite.
+ */
+import '@fontsource/ibm-plex-mono/latin-400.css';
+import '@fontsource/ibm-plex-mono/latin-500.css';
+import '@fontsource/ibm-plex-mono/latin-600.css';
+import '@fontsource/ibm-plex-mono/latin-ext-400.css';
+import '@fontsource/ibm-plex-mono/latin-ext-500.css';
+import '@fontsource/ibm-plex-mono/latin-ext-600.css';
+import '@fontsource/space-mono/latin-400.css';
+import '@fontsource/space-mono/latin-700.css';
+import '@fontsource/space-mono/latin-ext-400.css';
+import '@fontsource/space-mono/latin-ext-700.css';
+import '@fontsource/fragment-mono/latin-400.css';
+import '@fontsource/fragment-mono/latin-ext-400.css';
+
 import '../styles/basis.css';
 import { siteConfig } from '../shelf/verlag-config';
 
@@ -25,7 +60,7 @@ const kanonisch = new URL(Astro.url.pathname, Astro.site).href;
 ---
 
 <!doctype html>
-<html lang="de">
+<html lang="de" data-mono={siteConfig.FONT_MONO}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

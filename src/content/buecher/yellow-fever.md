@@ -12,6 +12,8 @@ klappentext: >-
   Ein österreichischer Schriftsteller fährt mit einem Reisestipendium nach
   Bangkok, um ein Buch zu beenden, und schreibt stattdessen dieses. Im
   Untertitel: A Single Man's Guide to Thailand, Laos and Despair.
+klammer: >-
+  Selters fährt nach Bangkok und kommt mit einem türkischen Schimpfwort zurück. Hinweg und Rückweg in einem Band.
 zitat: >-
   Ich bin kein Tourist mehr, kein Reisender und schon lange kein
   Schriftsteller …
@@ -39,14 +41,22 @@ reihenfolge: 1
 # Die Leseprobe ist die echte gesetzte Seite aus der Druckdatei — mit den
 # Schwaerzungen, die im Buch stehen. Seitenzahl ist die des Buches.
 leseprobe:
-  seite: 30
-  bild: /buecher/yellow-fever/leseprobe-s30.webp
+  # Aus der Druckdatei „yf fkp / mysteriöse g" gerastert (Seiten 11–14),
+  # mit scripts/magazin-rendern.swift und scripts/seite-schwaerzen.mjs.
+  # Die alten Seiten 30–33 liegen weiter im Ordner; zum Zurückstellen
+  # genügt es, hier die Nummern zu tauschen.
+  seite: 11
+  bild: /buecher/yellow-fever/leseprobe-s11.webp
   # Die Folgeseiten, ebenfalls echt — schon beim Ausspielen geschwaerzt.
   geschwaerzt:
-    - /buecher/yellow-fever/leseprobe-s31-schwarz.webp
-    - /buecher/yellow-fever/leseprobe-s32-schwarz.webp
-    - /buecher/yellow-fever/leseprobe-s33-schwarz.webp
-# Doppelcover: die zweite Vorderseite liegt im Druckbogen kopfüber links.
+    - /buecher/yellow-fever/leseprobe-s12-schwarz.webp
+    - /buecher/yellow-fever/leseprobe-s13-schwarz.webp
+    - /buecher/yellow-fever/leseprobe-s14-schwarz.webp
+    - /buecher/yellow-fever/leseprobe-s15-schwarz.webp
+  # Die Schlussseite, ebenfalls echt — mit ausgesparter Zone für den
+  # Stempel (`--stanze 0.40 0.66` beim Ausspielen).
+  schluss: /buecher/yellow-fever/leseprobe-s16-stanze.webp
+# Wendeband: die zweite Vorderseite liegt im Druckbogen kopfüber links.
 # Hier ist sie aufrecht abgelegt — das Regal dreht sie beim Drucken selbst.
 rueckseite:
   titel: Götveren

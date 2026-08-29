@@ -1,17 +1,37 @@
 ---
-// Das Programm als Liste — die Textfassung des Regals, auch ohne WebGL
-// lesbar und von Suchmaschinen erfassbar.
+/*
+ * **Das Programm ist ein Inhaltsverzeichnis, mehr nicht.**
+ *
+ * Jede Zeile ist ein Verweis auf `/band-{nn}`, und jeder Text darin
+ * kommt aus **demselben Feld**, das die Bandseite zeigt — es gibt keinen
+ * eigenen Listentext mehr. Zwei Fassungen desselben Klappentexts waeren
+ * zwei Fassungen desselben Buches.
+ *
+ * Was hier **nicht** steht: Format, Preis, Umfang. Das sind Angaben, und
+ * Angaben stehen auf der Bandseite. Hier steht der Zustand — mehr braucht
+ * ein Verzeichnis nicht, um zu sagen, ob es das Buch gibt.
+ *
+ * Die beiden Umschlaege sind einzeln anfassbar und fuehren an die beiden
+ * Vorderseiten (`/band-{nn}/a` und `/band-{nn}/b`). Deshalb ist die Zeile
+ * **kein** umschliessender Verweis: ein Link im Link ist keiner. Verwiesen
+ * wird von der Nummer, vom Titel und von den Umschlaegen — drei Griffe an
+ * dieselbe Tuer.
+ */
 import Seite from '../../layouts/Seite.astro';
-import { programmListe, buchPfad } from '../../buecher';
+import Umschlag from '../../components/Umschlag.astro';
+import { programmListe, bandPfad } from '../../buecher';
 
-// Neuester Band oben, aeltester unten. Die Nummer bleibt am Buch.
+// Neuester Band oben, aeltester unten, der Blindband ganz am Ende.
 const eintraege = await programmListe();
+// Gezaehlt werden die Baende, die es gibt — die offene Stelle am Ende ist
+// keiner. Dieselbe Zahl steht auf dem Ladeschirm des Regals.
+const baende = eintraege.filter(({ buch }) => !buch.data.blind).length;
 ---
 
 <Seite
   titel="Programm"
-  augenbraue={`${eintraege.length} ${eintraege.length === 1 ? 'Band' : 'Bände'}`}
-  untertitel="Alle zwei Monate ein neuer Doppelband."
+  augenbraue={`${baende} ${baende === 1 ? 'Band' : 'Bände'}`}
+  untertitel="Alle zwei Monate ein Band."
   beschreibung="Das vollständige Programm des Verlags Sonne und Fleisch."
   weit
 >
@@ -19,53 +39,40 @@ const eintraege = await programmListe();
     eintraege.length === 0 ? (
       <p class="fliesstext">Das Programm wird gerade gesetzt.</p>
     ) : (
-      <div class="programm">
-        {eintraege.map(({ buch, nummer, titel, autor, seiten }) => (
-          <a class="band" href={buchPfad(buch)}>
-            <span class="band__umschlaege" aria-hidden="true">
-              {seiten.map((seite) => (
-                <span
-                  class="band__ruecken"
-                  style={`background: ${seite.cover_farbe}; border-right: 3px solid ${seite.akzent_farbe};`}
+      <ol class="programm">
+        {eintraege.map(({ buch, nummer, titel, autor, klappentext, geklammert, seiten, wendeband, stand }) => (
+          <li class="band">
+            <span class="band__umschlaege">
+              {seiten.map((seite, index) => (
+                <a
+                  class="band__umschlag"
+                  href={bandPfad(nummer, index === 0 ? 'a' : 'b')}
+                  aria-label={`${titel} — Seite ${index === 0 ? 'A' : 'B'}`}
                 >
-                  {
-                    seite.cover_bild && (
-                      <img src={seite.cover_bild} alt="" loading="lazy" decoding="async" />
-                    )
-                  }
-                </span>
+                  <Umschlag
+                    bild={seite.cover_bild}
+                    blind={buch.data.blind}
+                  />
+                </a>
               ))}
             </span>
             <span class="band__text">
-              <span class="band__nummer">{nummer}</span>
-              <h2>{titel}</h2>
+              <a class="band__nummer" href={bandPfad(nummer)}>{nummer}</a>
+              <h2>
+                <a href={bandPfad(nummer)}>{titel}</a>
+              </h2>
               <p class="band__autor">{autor}</p>
-              <p class="band__klappentext">{buch.data.klappentext}</p>
-              {buch.data.rueckseite && (
-                <p class="band__doppel">
-                  {buch.data.blind ? 'Wendeband' : 'Doppelcover'}
-                </p>
-              )}
+              <p class:list={['band__klappentext', !geklammert && 'band__klappentext--notbehelf']}>
+                {klappentext}
+              </p>
+              {wendeband && <p class="band__wende">Wendeband</p>}
             </span>
             <span class="band__marge">
-              <span
-                class="band__stand"
-                data-stand={buch.data.verfuegbarkeit}
-              >
-                {buch.data.verfuegbarkeit}
-              </span>
-              <br />
-              {buch.data.format}
-              {buch.data.preis && (
-                <>
-                  <br />
-                  {buch.data.preis}
-                </>
-              )}
+              <span class="band__stand" data-stand={stand}>{stand}</span>
             </span>
-          </a>
+          </li>
         ))}
-      </div>
+      </ol>
     )
   }
 </Seite>

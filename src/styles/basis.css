@@ -22,6 +22,29 @@
   /* Das Gold der Umschlaege, fuer stille Zweitakzente. */
   --gold: #d8b25a;
   /*
+   * **Das Mass eines Umschlags: 2 zu 3.** Jeder Behaelter, in dem ein
+   * Umschlag steht, haengt daran — Daumennagel im Programm, Umschlag auf
+   * der Bandseite, spaeter das Teilenbild.
+   *
+   * Hier stand zuerst `148 / 210`, A5, weil das der **Vorgabewert** von
+   * `breite_verhaeltnis` im Schema ist. Das war der falsche Ort zum
+   * Abschreiben: die Vorgabe beschreibt den Buchkoerper in der Szene,
+   * nicht die Kunst. Die Umschlaege sind zu zwei Dritteln 900 zu 1350 —
+   * also 2:3, das uebliche Mass eines Buchdeckels.
+   *
+   * Nachgerechnet ueber alle sechzehn Umschlaege: A5 kostet im Mittel
+   * 4,59 % der Flaeche und laesst drei Dateien unangetastet; 2:3 kostet
+   * 2,64 % und laesst acht unangetastet. Die Zahl kommt jetzt von der
+   * Kunst, nicht vom Vorgabewert.
+   *
+   * Ein Band mit eigenem `breite_verhaeltnis` — Yellow Fever, das
+   * Blatt — setzt sie lokal um (`Umschlag.astro`).
+   */
+  --book-ratio: 2 / 3;
+  /* Der Karton des Blindbands: cremefarben, unbedruckt. */
+  --blindkarton: #e9e5da;
+  --blindtinte: #6f6656;
+  /*
    * Ein technischer Mono. Feste Zeichenbreite, kalte Ziffern, keine
    * Designschul-Groteske. Alles Kleine bleibt klein — gross ist nur das
    * Buch selbst.
@@ -33,8 +56,143 @@
    * Schaugroesse. Die Serife spricht aus dem Buch heraus — Zitate,
    * Leseproben, der Traktat. Nirgends sonst wird eine Schrift benannt.
    */
+  /*
+   * **Was nicht mitwandert.** Wortmarke, Parole und die dreistelligen
+   * Katalognummern stehen fest in IBM Plex Mono, was die Mono-Probe
+   * unten auch waehlt.
+   *
+   * Die Begruendung ist bei allen dreien dieselbe: sie sind nicht
+   * Bedienung, sondern das Zeichen des Verlags. Die eine Zeile oben
+   * links, die eine unten rechts, und dazwischen 001, 002, 003 — die
+   * Nummern eines Labels, die auf dem Buchruecken genauso stehen wie
+   * auf dem Schirm. Eine Probe darf ausprobieren, was der Katalog
+   * traegt; nicht, wie der Verlag heisst und wie er zaehlt.
+   *
+   * Bei den Ziffern kommt ein handfester Grund dazu: Fragment Mono
+   * setzt eine **durchgestrichene Null**, und aus 001 wird damit ein
+   * anderes Zeichen. Courier Prime wiederum traegt sie bei 10 Pixel auf
+   * Schwarz so duenn, dass die Leiste ausfranst.
+   *
+   * Das ist die Ausnahme von „ein Token, ueberall". Sie steht hier,
+   * nicht in `regal.css`, damit sie in derselben Zeile Text begruendet
+   * ist wie die Regel, von der sie abweicht.
+   */
+  --schrift-marke: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
   --schrift-plakat: 'Anton', var(--schrift);
   --schrift-buch: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+}
+
+/*
+ * ------------------------------------------------- Die Mono-Probe
+ *
+ * Welcher Mono die Bedienung traegt, steht als `FONT_MONO` in
+ * `shelf/verlag-config.ts` und kommt als `data-mono` an das `html`.
+ * Umgeschaltet wird **hier und nur hier**: `--schrift` ist die einzige
+ * Stelle, an der die Bedienschrift benannt wird, also reicht ein Token,
+ * um jede Zeile der Seite mitzunehmen — Navigation, Marken, Ziffern,
+ * Nummernleiste, Angaben, Klappentexte, die Kolumnen der Leseprobe.
+ *
+ * Die Regeln stehen **nach** `:root`, nicht davor: `[data-mono='…']` und
+ * `:root` wiegen gleich schwer (beide 0-1-0), und bei Gleichstand
+ * gewinnt die spaetere. Andersherum bliebe der Umschalter wirkungslos.
+ *
+ * `aktuell` bekommt keine eigene Regel — es ist der Satz oben,
+ * unangetastet.
+ */
+[data-mono='plex'] {
+  /* Der Stand vor Space Mono. Der Weg zurueck ist diese eine Zeile. */
+  --schrift: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+[data-mono='space'] {
+  --schrift: 'Space Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+[data-mono='fragment'] {
+  --schrift: 'Fragment Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+/*
+ * ============================================================ Gewichte
+ *
+ * **Space Mono hat kein 500.** Die Seite setzt ihre Bedienung aber
+ * durchweg auf 500 — neununddreissig Regeln. Ohne Zuordnung faellt jede
+ * davon auf 400 zurueck, und auf schwarzem Grund heisst das: die
+ * Navigation, die Nummernleiste und die Marken werden zu Schleiern.
+ * (Genau daran ist Courier Prime gescheitert, das dieselbe Luecke hat.)
+ *
+ * Also wird 500 aufgeteilt, und zwar **hier und nur hier**:
+ *
+ *   → 700  was **markiert**: Navigation, Marken, Ziffern der Leiste,
+ *          Augenbrauen, Knoepfe, Chips, gesperrte Versalzeilen,
+ *          Tabellenkoepfe. Es soll stehen, nicht mitlesen.
+ *
+ *   → 400  was **gelesen** wird: Namen, Zitatquellen, Bildunterschriften,
+ *          Meldungen. Fett gesetzter Fliesstext waere eine andere Seite.
+ *
+ * **Nicht dabei sind die Plakattitel** (`.browse-caption h1`,
+ * `.book-details h2`, `.seitenkopf h1`, `.band__text h2`,
+ * `.bandblock h2`): sie stehen in Anton, und Anton hat einen einzigen
+ * Schnitt. 700 darauf hiesse, dass der Browser sich einen fetten
+ * Schnitt ausrechnet, den es nicht gibt — ein Scheinfett.
+ *
+ * Die Tafel haengt an `[data-mono='space']`. Wer auf `plex`
+ * zurueckstellt, bekommt seine 500 zurueck, ohne dass hier etwas
+ * geaendert werden muss.
+ */
+/*
+ * Wortmarke und Parole stehen **nicht** in dieser Tafel: sie sind auf
+ * `--schrift-marke` (IBM Plex Mono) festgenagelt, und Plex hat sein 500.
+ * Wer sie hier mitfuehrte, faerbte sie fett, ohne dass die Schrift dazu
+ * gewechselt haette — nachgemessen: Wortmarke stand auf 700 in Plex.
+ */
+[data-mono='space']
+  :is(
+    .regal-nav,
+    .edition-mark,
+    .eyebrow,
+    .back-button,
+    .wenden-knopf,
+    .bandweg,
+    .experience-status,
+    .heft-zeile,
+    .shelf-index__ticks button b,
+    .shelf-index__weiter b,
+    .book-details dt,
+    .kopf__marke,
+    .kopf__nav,
+    .seitenkopf .augenbraue,
+    .band__nummer,
+    .band__marge,
+    .band__wende,
+    .bandblock__marke,
+    .wende-trenner,
+    .rand-zurueck__zeile,
+    .bestellzeile,
+    .angaben dt,
+    .fuss,
+    .blatt__vormerken,
+    .leseprobe__zu
+  ) {
+  font-weight: 700;
+}
+
+[data-mono='space']
+  :is(
+    .browse-caption__author,
+    .book-details__author,
+    .book-details blockquote cite,
+    .buchkopf__zitat cite,
+    .nachbar__zeile,
+    .loading-screen p,
+    .band__autor,
+    .bandblock__autor,
+    .band__doppel,
+    .fliesstext h3,
+    .band__klappentext,
+    .ohne-3d-ausweg a
+  ) {
+  font-weight: 400;
 }
 
 *,

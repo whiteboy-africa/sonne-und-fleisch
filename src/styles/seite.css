@@ -175,28 +175,49 @@
 
 /* Programm: Liste der Baende */
 
+/*
+ * Das Programm ist eine **geordnete Liste** — es ist ein
+ * Inhaltsverzeichnis, und ein Verzeichnis hat eine Reihenfolge. Die
+ * Marken des Browsers stehen dabei im Weg: gezaehlt wird mit den
+ * Katalognummern, und die stehen im Satz.
+ */
 .programm {
   display: grid;
   gap: 1px;
+  margin: 0;
+  padding: 0;
   background: var(--hairline);
   border-block: 1px solid var(--hairline);
+  list-style: none;
 }
 
+/*
+ * Die Zeile ist **kein** umschliessender Verweis mehr.
+ *
+ * Frueher lag ein `<a>` um alles, und die beiden Umschlaege lagen darin.
+ * Seit jeder Umschlag an seine eigene Vorderseite fuehrt
+ * (`/band-{nn}/a`, `/band-{nn}/b`), geht das nicht mehr: ein Verweis im
+ * Verweis ist keiner, und der Browser wirft den inneren weg. Verwiesen
+ * wird jetzt von der Nummer, vom Titel und von den beiden Umschlaegen —
+ * drei Griffe an dieselbe Tuer, und der zweite Umschlag geht an die
+ * andere Seite derselben Tuer.
+ */
 .band {
   display: grid;
-  /* Platz fuer zwei Umschlaege: Doppelbaende zeigen beide Vorderseiten
+  /* Platz fuer zwei Umschlaege: Wendebaende zeigen beide Vorderseiten
      nebeneinander, einfache Baende lassen die zweite Stelle leer. So
      stehen alle Titel auf derselben Linie. */
   grid-template-columns: 184px 1fr auto;
   gap: 8px 28px;
   align-items: start;
   padding: 26px 4px;
-  text-decoration: none;
   background: var(--paper);
   color: inherit;
   transition: background 0.2s ease;
 }
 
+/* Angefasst wird die Zeile ueber ihre Verweise — hell wird sie trotzdem
+   ganz, sonst leuchtet nur ein Wort in einer dunklen Reihe. */
 .band:hover {
   background: rgba(232, 229, 222, 0.07);
 }
@@ -208,27 +229,26 @@
   align-items: start;
 }
 
-.band__ruecken {
+/*
+ * Beide Umschlaege eines Paares stehen in gleich grossen Feldern — das
+ * Mass kommt aus `--book-ratio` und steht im Bauteil `Umschlag.astro`.
+ *
+ * Kein Schatten mehr. Der innere (`inset -6px 0 12px`) war ein gemalter
+ * Buchruecken und legte einen dunklen Balken auf den rechten Rand der
+ * Kunst; der aeussere ist mit ihm gegangen. Ein Daumennagel ist das
+ * Bild, nicht ein Buch in Perspektive.
+ */
+.band__umschlag {
   display: block;
-  /* Taschenbuchformat, damit vom Umschlag fast alles zu sehen ist. Mit
-     einem quadratischeren Kasten schneidet object-fit den Titel weg und
-     uebrig bleibt eine Farbflaeche. */
-  width: 100%;
-  aspect-ratio: 148 / 210;
-  overflow: hidden;
-  box-shadow: inset -6px 0 12px rgba(0, 0, 0, 0.22),
-    2px 3px 14px rgba(0, 0, 0, 0.55);
 }
 
-/* Liegt ein Umschlag vor, steht er hier statt der Farbflaeche. */
-.band__ruecken img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.band__umschlag:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
-/* Marke fuer Doppelbaende. */
-.band__doppel {
+/* Marke fuer Wendebaende. */
+.band__wende {
   display: inline-block;
   margin: 12px 0 0;
   padding: 3px 7px 2px;
@@ -252,6 +272,21 @@
 
 .band__text {
   min-width: 0;
+}
+
+/* Nummer und Titel fuehren an dieselbe Stelle. Beide tragen keinen
+   Strich: die ganze Zeile ist schon als Eintrag zu erkennen. */
+.band__nummer,
+.band__text h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.band__nummer:hover,
+.band__text h2 a:hover,
+.band__nummer:focus-visible,
+.band__text h2 a:focus-visible {
+  color: var(--accent);
 }
 
 .band__text h2 {
@@ -345,8 +380,68 @@
   align-items: start;
 }
 
+/*
+ * **Der gewendete Block spiegelt die Spalten, nicht nur die Reihenfolge.**
+ *
+ * Hier stand nur `order: 2` auf dem Text. Damit rutschte der Umschlag in
+ * die **breite** Spalte (1fr) und der Text in die schmale (250 px) — Block
+ * B stand mit einem riesigen Umschlag und einer Textsaeule daneben, waehrend
+ * Block A richtig gesetzt war. Gespiegelt heisst: dieselben zwei Spalten,
+ * andersherum.
+ */
+.bandblock--gewendet {
+  grid-template-columns: 250px minmax(0, 1fr);
+}
+
 .bandblock--gewendet .bandblock__text {
   order: 2;
+}
+
+/*
+ * **Die Textspalte ist eine Spalte, kein Stapel.**
+ *
+ * Sie stand auf `display: block`, und das Raster darueber auf
+ * `align-items: start` — die Spalte wuchs also nur so hoch wie ihr
+ * Inhalt (gemessen: 337 von 375 Bildpunkten), und die 38 Punkte
+ * Ueberschuss lagen **unter** ihr. Das Zitat klebte damit am
+ * Klappentext, und zwischen ihm und dem Trenner stand ein Loch von 84
+ * Punkten, das niemand gesetzt hatte: es war der Rest des Blocks.
+ *
+ * Jetzt streckt sich die Spalte auf die Hoehe des Blocks (den der
+ * Umschlag vorgibt), und das Zitat wird mit `margin-top: auto` an ihren
+ * Fuss geschoben. Der Ueberschuss sammelt sich damit **ueber** dem
+ * Zitat, wo er hingehoert: zwischen Klappentext und Zitat darf Luft
+ * stehen, zwischen Zitat und Trenner nicht.
+ */
+.bandblock__text {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+
+/*
+ * Der Klappentext rueckt weit vom Namen ab — mindestens dreimal so
+ * weit, wie der Name vom Titel absteht. Titel, Name und Text sind drei
+ * Dinge, aber die ersten beiden gehoeren zusammen: der Name ist die
+ * Unterzeile des Titels, nicht der Anfang des Textes.
+ *
+ * Im Flex faellt das Zusammenfallen der Raender weg, also stehen die
+ * Zahlen hier einzeln und nicht mehr als Maximum zweier Werte.
+ */
+.bandblock__text .bandblock__autor {
+  margin-bottom: 0;
+}
+
+.bandblock__text .fliesstext {
+  margin-top: 2.5rem;
+  /* Der Mindestabstand zum Zitat, falls die Spalte randvoll ist und
+     `auto` nichts mehr zu verteilen hat. */
+  margin-bottom: 1.9rem;
+}
+
+.bandblock .buchkopf__zitat {
+  margin-top: auto;
+  margin-bottom: 0;
 }
 
 .bandblock__marke {
@@ -376,34 +471,58 @@
   font-weight: 500;
 }
 
+/*
+ * Mass und Beschnitt kommen aus `.umschlag` (`--book-ratio`), nicht von
+ * hier. Frueher stand hier `aspect-ratio: 2 / 3` — ein drittes Mass neben
+ * dem der Szene und dem der Daumennaegel. Was bleibt, ist der Schatten,
+ * der den Umschlag vom schwarzen Grund abhebt.
+ */
+/* Nackt, wie der Daumennagel — kein gemalter Ruecken, keine Rundung. */
 .bandblock__cover {
-  aspect-ratio: 2 / 3;
-  border-radius: 2px 5px 5px 2px;
-  box-shadow: inset -10px 0 22px rgba(0, 0, 0, 0.2),
-    4px 6px 26px rgba(0, 0, 0, 0.6);
-  overflow: hidden;
-}
-
-.bandblock__cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  border-radius: 0;
 }
 
 .bandblock__nachwort {
   margin-top: 46px;
 }
 
-/* Zwischen den beiden Geschichten: die Wendemarke auf einer Haarlinie. */
+/*
+ * Zwischen den beiden Geschichten: die Wendemarke auf einer Haarlinie.
+ *
+ * Sie ist ein `<button>`, seit ein Klick zur anderen Haelfte rollt — und
+ * ein Knopf bringt Grund, Rahmen und Schrift des Systems mit. Das alles
+ * wird hier abgeraeumt: zu sehen sein soll eine Linie mit zwei
+ * Buchstaben, nicht eine Schaltflaeche.
+ */
 .wende-trenner {
+  /* Das Zitat sitzt zweieinhalb Zeilen ueber der Linie. Vorher lagen
+     hier 46 Punkte plus der ungenutzte Rest der Textspalte. */
+  margin: 2.5rem 0 46px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--schrift);
+  text-transform: uppercase;
+  /* Anfassbar erst, wenn das Skript sie uebernommen hat — ohne das rollt
+     nichts, und ein Zeigefinger ueber etwas Totem ist ein Versprechen. */
+  cursor: default;
   display: flex;
   gap: 18px;
   align-items: center;
-  margin: 46px 0;
   color: var(--ink-soft);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.22em;
+}
+
+.wende-trenner--anfassbar {
+  cursor: pointer;
+}
+
+.wende-trenner--anfassbar:hover,
+.wende-trenner:focus-visible {
+  color: var(--accent);
 }
 
 .wende-trenner::before,
@@ -536,10 +655,7 @@
 }
 
 .buchkopf__cover {
-  aspect-ratio: 2 / 3;
-  border-radius: 2px 5px 5px 2px;
-  box-shadow: inset -10px 0 22px rgba(0, 0, 0, 0.2),
-    4px 6px 26px rgba(0, 0, 0, 0.6);
+  aspect-ratio: var(--book-ratio);
 }
 
 .buchkopf__cover img {
@@ -550,14 +666,22 @@
 }
 
 .angaben {
+  max-width: 620px;
   margin: 0 0 46px;
   font-size: 13px;
 }
 
+/*
+ * Zwei Spalten, und die rechte hoert auf, wo der Wert aufhoert. Vorher
+ * lief sie ueber die ganze Breite: „Broschur" stand dann links in einer
+ * Zeile, die noch achthundert Bildpunkte weit leer weiterlief, und die
+ * Haarlinie darunter zog quer durch nichts.
+ */
 .angaben div {
   display: grid;
-  grid-template-columns: 168px 1fr;
+  grid-template-columns: minmax(0, 30%) minmax(0, 1fr);
   gap: 16px;
+  max-width: 620px;
   padding: 11px 0;
   border-top: 1px solid var(--hairline);
 }
@@ -661,4 +785,158 @@
     grid-template-columns: 1fr;
     gap: 4px;
   }
+}
+
+/* ------------------------------------------------------------ Umschlaege */
+
+/*
+ * **Ein Umschlag hat ein Mass, und das Mass kommt nicht aus der Datei.**
+ *
+ * Der Behaelter steht auf `--book-ratio` — dem Verhaeltnis der
+ * Vorderseite am 3D-Modell — und das Bild legt sich mit `object-fit:
+ * cover` hinein. Vorher richtete sich der Behaelter nach dem Bild: kamen
+ * zwei Umschlaege eines Paares in verschiedenen Verhaeltnissen, standen
+ * sie verschieden hoch nebeneinander, und die Zeile kippte.
+ *
+ * Beschnitten wird hier nur noch, was beim Bauen durchgerutscht ist:
+ * `npm run cover:pruefen` bringt die Dateien vorher auf dasselbe Mass und
+ * meldet jede, die mehr als anderthalb Prozent daneben lag. Gestreckt
+ * wird nirgends — ein verzogener Umschlag ist schlimmer als ein
+ * beschnittener.
+ */
+/*
+ * **Ein Umschlag rendert nackt.**
+ *
+ * Hier stand ein „Anschnitt des Buchblocks": `border-right: 3px solid`
+ * in der Akzentfarbe des Bandes, dazu der Einbandton als Grund. Gemeint
+ * war der Buchruecken wie im Regal — im Bild war es ein farbiger Streifen
+ * neben der Kunst, und bei Götveren und Mountains of Sadness sah man vor
+ * allem den Streifen. Der Daumennagel zeigt das Bild, sonst nichts.
+ *
+ * Der Grund ist jetzt der cremefarbene Karton des Blindbands: ein
+ * Umschlag, der noch nicht geladen ist, zeigt Papier und keine
+ * Palettenfarbe. Fehlt er ganz, uebernimmt `--blind` samt Korn und
+ * Verlagszeichen.
+ */
+.umschlag {
+  position: relative;
+  display: block;
+  aspect-ratio: var(--book-ratio);
+  overflow: hidden;
+  width: 100%;
+  background: var(--blindkarton);
+}
+
+.umschlag img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /*
+   * **Oben verankert.** Faellt Hoehe weg, faellt sie unten weg — und
+   * oben steht der Titel. Mittig beschnitten haette jeder Umschlag,
+   * dessen Kunst hoeher ist als das Feld, oben eine Zeile verloren.
+   * Waagerecht bleibt es mittig: die Seitenraender eines Deckels sind
+   * links und rechts gleich viel wert.
+   */
+  object-position: center top;
+}
+
+/*
+ * Die Blindflaeche: derselbe Karton wie auf dem Rohling im Regal
+ * (`drawBlindCover`). Sie steht ueberall dort, wo eine Seite keinen
+ * Umschlag hat — nicht als Fehlermeldung, sondern als das, was der
+ * Verlag an dieser Stelle wirklich hat: unbedrucktes Papier.
+ */
+.umschlag--blind {
+  /* Damit die Marke unten in `cqw` rechnen kann — sie soll mit dem
+     Umschlag wachsen, nicht mit der Seite. */
+  container-type: inline-size;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 9%;
+  background-color: var(--blindkarton);
+  /* Papierkorn. Ein Rauschen, kein Muster — sonst liest es sich als Raster. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='k'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.33 0 0 0 0 0.27 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23k)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+.umschlag__marke {
+  color: var(--blindtinte);
+  font-family: var(--schrift);
+  font-size: clamp(6px, 0.9cqw, 10px);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  /* Der Sperrsatz schiebt nach rechts; das holt die Zeile in die Mitte. */
+  text-indent: 0.3em;
+  white-space: nowrap;
+}
+
+/*
+ * Der Weg von der Bandseite in die Szene. Eine Zeile, kein Knopf — hier
+ * steht das Buch als Text, dort liegt es im Stapel und laesst sich
+ * anfassen.
+ */
+.bandblock__regalweg {
+  margin: 18px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.bandblock__regalweg a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.bandblock__regalweg a:hover,
+.bandblock__regalweg a:focus-visible {
+  border-bottom-color: var(--accent);
+  color: var(--ink);
+}
+
+/*
+ * **Die Klammer** unter dem Titelpaar: eine Zeile fuer den ganzen Band,
+ * bevor die beiden Geschichten einzeln anfangen. Mono, weil sie Auskunft
+ * ueber das Buch ist und nicht Text aus dem Buch — die Klappentexte
+ * darunter stehen in derselben Schrift, aber diese hier steht ueber
+ * beiden und traegt deshalb den weiteren Satz.
+ */
+.bandklammer {
+  max-width: 62ch;
+  margin: 0 0 40px;
+  color: var(--ink-soft);
+  font-family: var(--schrift);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/*
+ * Fehlt einem Band seine Klammer, steht im Verzeichnis der Klappentext
+ * der ersten Seite — also nur die Haelfte des Bandes. Das ist ein
+ * Notbehelf, und er soll als einer zu erkennen sein: eine Haarlinie
+ * links, wie ein Vermerk am Rand. Wer den Band einstellt, sieht auf
+ * einen Blick, wo die Zeile noch fehlt.
+ */
+.band__klappentext--notbehelf {
+  padding-left: 12px;
+  border-left: 1px solid var(--hairline);
+}
+
+/*
+ * Beim vakanten Band steht über der Adresse, wofür sie da ist. Die
+ * Bestellzeile allein sagt bei einem Band, den es noch nicht gibt,
+ * nichts — sie muss um einen Text bitten, bevor sie ein Postfach nennt.
+ */
+.bestellzeile__davor {
+  margin: 0 0 6px;
+  color: var(--ink-soft);
+  font-family: var(--schrift);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }

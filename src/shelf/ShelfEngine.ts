@@ -45,7 +45,7 @@ import {
 import { siteConfig, type OeffnenModus } from "./verlag-config";
 
 export type ShelfMode = "browse" | "focusing" | "inspect" | "returning";
-/** Bei Doppelbaenden: 'vorn' ist die erste Geschichte, 'hinten' die zweite. */
+/** Bei Wendebaenden: 'vorn' ist die erste Geschichte, 'hinten' die zweite. */
 export type BookSide = "vorn" | "hinten";
 
 type ShelfCallbacks = {
@@ -106,7 +106,7 @@ type RuntimeBook = {
     THREE.PlaneGeometry,
     THREE.MeshPhysicalMaterial
   >;
-  /** Die Rueckseite — bei Doppelbaenden die zweite Vorderseite. */
+  /** Die Rueckseite — bei Wendebaenden die zweite Vorderseite. */
   backSurface: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial>;
   spineSurface: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshPhysicalMaterial>;
   pickProxy: THREE.Mesh;
@@ -663,7 +663,7 @@ export class ShelfEngine {
   private scrollIndex = 0;
   private targetScrollIndex = 0;
   private focusProgress = 0;
-  /** Welche Vorderseite oben ist. Nur bei Doppelbaenden veraenderbar. */
+  /** Welche Vorderseite oben ist. Nur bei Wendebaenden veraenderbar. */
   private side: BookSide = "vorn";
   /** Freie Drehung des betrachteten Bandes, in Bogenmass. */
   private inspectYaw = inspectDefaultYaw;
@@ -846,6 +846,9 @@ export class ShelfEngine {
    */
   private stehendGedreht = false;
   private stehendBasisPitch: number | null = null;
+  /** Wohin der aufgestellte Band sich dreht — Quer- und Hochachse. */
+  private stehendZielPitch: number | null = null;
+  private stehendZielYaw: number | null = null;
   private pointerStartX = 0;
   private pointerLastX = 0;
   private pointerLastY = 0;
@@ -1361,7 +1364,7 @@ export class ShelfEngine {
       ? null
       : toTexture(createSpineCover(book), this.renderer, 4);
 
-    // Doppelcover: hinten steht keine Klappentext-Rueckseite, sondern eine
+    // Wendeband: hinten steht keine Klappentext-Rueckseite, sondern eine
     // zweite Vorderseite — und zwar kopfueber. Genau so ist ein
     // tête-bêche-Band gedruckt: umdrehen genuegt nicht, man muss ihn auch
     // auf den Kopf stellen.
@@ -2185,7 +2188,18 @@ export class ShelfEngine {
     const band = this.runtimeBooks[this.presentedIndex];
     if (this.stehendBasisPitch === null) {
       this.stehendBasisPitch = band.content.rotation.x;
+      this.stehendZielPitch = band.content.rotation.x;
+      this.stehendZielYaw = band.content.rotation.y;
     }
+    /*
+     * Derselbe Schritt wie in der Betrachtung — halbe Drehung um die
+     * Querachse plus der Schwung. Hier stand vorher nur ein Umschalter
+     * (`!this.stehendGedreht`), und die Lage wurde daraus gerechnet: der
+     * Band im Stapel kannte damit keinen Schwung, nur zwei Endlagen.
+     */
+    const schritt = this.wendeSchritt(this.presentedIndex);
+    this.stehendZielPitch = (this.stehendZielPitch ?? 0) + schritt.quer;
+    this.stehendZielYaw = (this.stehendZielYaw ?? 0) + schritt.hoch;
     this.stehendGedreht = !this.stehendGedreht;
     this.callbacks.onStatus(
       this.stehendGedreht
@@ -2630,7 +2644,25 @@ export class ShelfEngine {
       window.innerWidth < 760 ? mobileFocusScale : desktopFocusScale;
 
     // Die freie Drehung laeuft der Hand weich hinterher.
-    const drehTempo = this.reducedMotion ? 24 : 11;
+    /*
+     * **Waehrend der Schwung laeuft, wird langsamer gedaempft.**
+     *
+     * Die Daempfung legt in jedem Bild denselben *Anteil* des Rests
+     * zurueck — eine ganze Drehung um die Hochachse waere damit in
+     * derselben Zeit vorbei wie eine kleine Korrektur, also sechsmal so
+     * schnell. Gemessen war der Schwung nach 220 ms erledigt: man sah
+     * ihn nicht, man sah nur die andere Seite.
+     *
+     * **Beide Achsen mit demselben Wert**, sonst kommen sie nicht
+     * zusammen an und aus einer Bewegung werden zwei. Beim Ziehen mit
+     * der Hand bleibt es beim schnellen Wert: dort ist der Rest immer
+     * klein, und traege Finger sind schlimmer als ein schneller
+     * Umschlag.
+     */
+    const wendetGerade =
+      Math.abs(this.zielYaw - this.inspectYaw) > 0.05 ||
+      Math.abs(this.zielPitch - this.inspectPitch) > 0.05;
+    const drehTempo = this.reducedMotion ? 24 : wendetGerade ? 6.5 : 11;
     this.inspectYaw = damp(this.inspectYaw, this.zielYaw, drehTempo, delta);
     this.inspectPitch = damp(this.inspectPitch, this.zielPitch, drehTempo, delta);
 
@@ -2759,10 +2791,21 @@ export class ShelfEngine {
       this.stehendBasisPitch !== null
     ) {
       const stehend = this.runtimeBooks[this.presentedIndex];
+      // Wie in der Betrachtung: eine weite Drehung laeuft langsamer, sonst
+      // ist der Schwung in derselben Zeit vorbei wie ein Umklappen.
+      // Derselbe Wert wie in der Betrachtung, und fuer beide Achsen
+      // derselbe — sonst kommen sie nicht zusammen an.
+      const tempoStehend = this.reducedMotion ? 20 : 6.5;
       stehend.content.rotation.x = damp(
         stehend.content.rotation.x,
-        this.stehendBasisPitch + (this.stehendGedreht ? Math.PI : 0),
-        this.reducedMotion ? 20 : 8,
+        this.stehendZielPitch ?? stehend.content.rotation.x,
+        tempoStehend,
+        delta,
+      );
+      stehend.content.rotation.y = damp(
+        stehend.content.rotation.y,
+        this.stehendZielYaw ?? stehend.content.rotation.y,
+        tempoStehend,
         delta,
       );
     }
@@ -3560,6 +3603,8 @@ export class ShelfEngine {
     if (this.mode !== "browse") return;
     this.stehendGedreht = false;
     this.stehendBasisPitch = null;
+    this.stehendZielPitch = null;
+    this.stehendZielYaw = null;
     this.atRest = false;
     this.layDownPending = false;
     this.pendingFocusIndex = null;
@@ -3654,11 +3699,64 @@ export class ShelfEngine {
   /**
    * Wendet den betrachteten Band: eine halbe Drehung um die Querachse dreht
    * ihn um *und* stellt ihn auf den Kopf. Genau so kommt bei einem
-   * Doppelband die zweite, kopfueber gedruckte Vorderseite richtig herum zu
+   * Wendeband die zweite, kopfueber gedruckte Vorderseite richtig herum zu
    * stehen. Welche Seite dann vorn liegt, liest die Engine aus der Lage des
    * Bandes ab — es macht keinen Unterschied, ob man den Knopf drueckt oder
    * mit der Hand dreht.
    */
+  /**
+   * **Was ein Wenden ist** — eine halbe Drehung um die Querachse, dazu
+   * ganze Drehungen um die Hochachse als Schwung
+   * (`siteConfig.wendeSpin.hoch`).
+   *
+   * Drei Dinge machen den Unterschied zwischen einer Drehung und einem
+   * Taumeln, und alle drei sind hier teuer gelernt:
+   *
+   * 1. **Die Querachse macht genau eine halbe Drehung, nie mehr.** Mit
+   *    anderthalb lief der Kippwinkel ueber die Pole, und weil die
+   *    Inhaltsgruppe auf `rotation.order = 'YXZ'` steht, taumelte der
+   *    Band dort.
+   * 2. **Der Schwung wechselt die Richtung.** Hin herum, zurueck
+   *    andersherum — sonst wickelt sich die Hochachse mit jedem Wenden
+   *    weiter auf, und nach dem vierten sieht man dem Band an, dass er
+   *    einen Zaehlerstand hat.
+   * 3. **Beide Achsen mit demselben Tempo.** Nur dann kommen sie
+   *    zusammen an und es liest sich als *eine* Bewegung.
+   */
+  private wendeRichtung = 1;
+  /**
+   * Wie oft schon gewendet wurde — der Schwung kommt nur bei jedem
+   * `wendeSpin.jedes`-ten Mal. Ein Zaehler fuer beide Ansichten: wer im
+   * Stapel dreimal klappt und dann in die Betrachtung geht, bekommt
+   * dort den Schwung. Es ist derselbe Band und dieselbe Geste.
+   */
+  private wendeZaehler = 0;
+  /**
+   * An welchem Band gezaehlt wird. Wechselt der Band, faengt die
+   * Zaehlung von vorn an — sonst sammelte sich der Schwung ueber
+   * verschiedene Buecher hinweg an und kam bei einem an, den man gerade
+   * zum ersten Mal in der Hand hat. Vier Anschlaege heisst: **an
+   * diesem** Band vier Anschlaege.
+   */
+  private wendeBand: number | null = null;
+
+  private wendeSchritt(bandIndex: number | null) {
+    if (bandIndex !== this.wendeBand) {
+      this.wendeBand = bandIndex;
+      this.wendeZaehler = 0;
+    }
+    this.wendeZaehler += 1;
+    const jedes = Math.max(1, siteConfig.wendeSpin.jedes);
+    const mitSchwung = this.wendeZaehler % jedes === 0;
+    // Die Richtung wechselt nur, wenn wirklich gedreht wird — sonst
+    // haette der naechste Schwung dieselbe wie der letzte.
+    if (mitSchwung) this.wendeRichtung = -this.wendeRichtung;
+    return {
+      quer: Math.PI,
+      hoch: mitSchwung ? this.wendeRichtung * siteConfig.wendeSpin.hoch * 2 * Math.PI : 0,
+    };
+  }
+
   flipBook() {
     // Solange das Heft offen ist, geht daran nichts vorbei: kein
     // Bandwechsel, keine Nachbarschaft, kein Wenden.
@@ -3667,7 +3765,9 @@ export class ShelfEngine {
     if (this.aufschlagStufe !== "aus") return;
     if (this.selectedIndex === null) return;
     if (this.mode !== "inspect" && this.mode !== "focusing") return;
-    this.zielPitch += Math.PI;
+    const schritt = this.wendeSchritt(this.selectedIndex);
+    this.zielPitch += schritt.quer;
+    this.zielYaw += schritt.hoch;
   }
 
   /**
@@ -5100,6 +5200,26 @@ export class ShelfEngine {
        * man „viele Buecher stehen herum", im Betrieb merkt man es als
        * Ruckeln.
        */
+      /*
+       * **Das Wenden als Zahl.** Dreimal ist hier eine Drehung
+       * verlorengegangen, ohne dass man es am Bild nachweisen konnte:
+       * die Szene aendert sich immer ein bisschen (Schwebelicht,
+       * Daempfung), also faerbt jede Bildabtastung alles gleich ein.
+       *
+       * `zaehler` sagt, beim wievielten Wenden man ist; der Schwung
+       * kommt bei jedem `wendeSpin.jedes`-ten. `yawOffen` ist, was von
+       * der Drehung um die Hochachse noch aussteht — waehrend eines
+       * Schwungs steht dort rund 6,28, sonst rund 0.
+       */
+      wenden: {
+        zaehler: this.wendeZaehler,
+        amBand: this.wendeBand,
+        schwungBeim: siteConfig.wendeSpin.jedes,
+        naechsterMitSchwung:
+          (this.wendeZaehler + 1) % Math.max(1, siteConfig.wendeSpin.jedes) === 0,
+        yawOffen: Number((this.zielYaw - this.inspectYaw).toFixed(3)),
+        pitchOffen: Number((this.zielPitch - this.inspectPitch).toFixed(3)),
+      },
       verirrt: this.runtimeBooks.filter((band, i) => {
         if (i === this.motionBookIndex) return false;
         if (!this.imStapel(i)) return false;

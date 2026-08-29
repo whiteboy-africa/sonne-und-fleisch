@@ -10,6 +10,8 @@ klappentext: >-
   nicht weinen soll. Zwischen den Straßen der Peripherie, den Sternbildern
   des Vaters und den Nachrichten eines Donnerstagmorgens setzt die Rede
   immer wieder von vorn an.
+klammer: >-
+  Ein Icherzähler, der nachts am Bahnhof Hetzendorf Jungen aufliest, und ein Fischersohn, dem die Bienen zu Ehre und Verderben werden. Wien und Rom, dieselbe Andacht.
 zitat: Wir sind alle tot, auch wenn noch nicht alle begraben sind.
 zitat_von: Der Erzähler
 format: Broschur
@@ -77,7 +79,7 @@ motiv: orbit
 hoehe: 2.0
 dicke: 0.078
 reihenfolge: 0
-# Doppelcover: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
+# Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Farben aus dem Umschlag: das Olivgrün des Gewitterhimmels, das Gold der
 # Wabe, das Knochenweiß der Schrift.
 rueckseite:
