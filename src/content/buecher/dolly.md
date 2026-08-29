@@ -2,13 +2,18 @@
 titel: Dolly
 kurztitel: Dolly
 autor: Alexander Keppel
+# Aus dem Draft „A.Keppel_Dolly_(Draft).pdf" — sechs Seiten, im Wortlaut.
 klappentext: >-
-  Platzhalter: zwei bis vier Sätze, die im Regal erscheinen, wenn der Band
-  herausgezogen ist.
+  Ein Kater in einem Wiener Hinterhof, ein Hund, der die Ruhe zerbellt,
+  und ein Erzähler, der beschließt, ihn zu Wurst zu verarbeiten. Er
+  besorgt eine neue Gartenliege, erkundet die Wochenpläne der Besitzer
+  und übt an der eigenen Tür.
 klammer: >-
   Ein Kläffer in einem Wiener Hinterhof, eine Ziege an den Tafeln von Damaskus. Tiere, an denen Menschen sich erklären.
-zitat: Platzhalter für einen Satz aus dem Buch.
-zitat_von: Verlagsnotiz
+zitat: >-
+  Ich werde diese Kreatur zu Wurst verarbeiten. Ein Kunstprojekt mit ganz
+  realen Auswirkungen.
+zitat_von: Der Erzähler
 format: Broschur
 # Platzhalter, bis die Druckdatei da ist.
 seiten_zahl: 176
@@ -22,39 +27,33 @@ hoehe: 2.0
 dicke: 0.078
 reihenfolge: 2
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
-# Platzhalter-Leseprobe. Was in doppelten Klammern steht, wird beim Bauen
-# herausgeschnitten und als Balken gedruckt — es steht in keinem HTML.
+# Was in doppelten Klammern steht, wird beim Bauen herausgeschnitten und
+# als Balken gedruckt — es steht in keinem HTML.
 leseprobe:
-  seite: 31
+  # GESCHAETZT: der Text setzt sofort ein. Aus dem Umbruch nachtragen.
+  seite: 9
   text: >-
-    Dolly wurde am dritten Tag nach dem Fest gefunden, und niemand hatte
-    sie vermisst. Das ist der Satz, mit dem alles anfing, und man hat ihn
-    mir so oft wiederholt, dass ich ihn heute für meinen eigenen halte.
+    Der Schwede wälzt sich im Gras, wirft die Arme in die Luft und ruft:
+    „Wo ist sie? Wo ist sie?" Es ging um eine kleine, tätowierte
+    Kärntnerin, die ihm auf dem Gehsteig gerade durch die Lappen gegangen
+    ist. Wir liegen im Garten, oder eher in dem begrünten kleinen
+    Hinterhof, und sind betrunken. Die Sonne brüllt mit den Vögeln vom
+    Himmel. Alles zu hell und zu laut.
 
 
-    Sie lag nicht, sie saß. Das ist der Unterschied, auf den alle
-    bestanden, und je öfter sie darauf bestanden, desto weniger glaubte
-    ich ihnen. Der Arzt schrieb [[eine Uhrzeit auf, die nicht stimmen
-    konnte]], und unterschrieb, und niemand fragte nach.
+    Dann knallte die Metalltüre zum Hof auf und das grelle Bellen von Hund
+    Dolly biss sich in mein Bewusstsein. Ich schreckte hoch. Ich sah das
+    kleine, karamellbraune Viech, wie es knurrte und keifte, sah wie [[die
+    kackfarbene Kotpumpe mit dem Dackelkörper und dem Biegelkopf]] an der
+    Leine riss. Lydia, die Besitzerin, die junge Grundschullehrerin,
+    wusste nicht, wie umgehen mit der Situation.
 
 
-    In dem Zimmer standen zwei Stühle, ein Tisch und ein Schrank, in dem
-    ihre Sachen so ordentlich lagen, wie sie zu Lebzeiten nie gelegen
-    hatten. Jemand war vor uns da gewesen. Das sagte ich damals nicht, und
-    ich sage es hier zum ersten Mal.
-
-
-    Der Gendarm war jung und hatte Angst, das zu tun, was er zu tun hatte.
-    Er stellte seine Fragen in der Reihenfolge, in der sie auf seinem
-    Zettel standen, und als ich ihm antwortete, schrieb er nicht mit.
-    Später fand ich den Zettel im Hof, [[zerrissen, aber nicht klein
-    genug]].
-
-
-    Was ich seitdem tue, ist keine Suche. Eine Suche hat ein Ende, und
-    dieses hier hat keins. Ich gehe die Wege ab, die sie gegangen ist,
-    spreche mit den Leuten, mit denen sie gesprochen hat, und jedes Mal
-    fehlt an derselben Stelle [[|26]]
+    Angst und Überforderung standen ihr ins Gesicht geschrieben, aber
+    genau wie bei ihrem Köter auch eine Art Revierempfinden. Sie dachte,
+    diese Zeit und dieser Garten gehörten jetzt ihr. Sie hätte nicht mit
+    diesen beiden menschlichen Partyüberbleibseln gerechnet, die hier im
+    Gras ihren Rausch ausdösen. Tja, [[falsch gerechnet. |18]]
 rueckseite:
   titel: The Rise of Damascus Goat
   kurztitel: Damascus Goat
