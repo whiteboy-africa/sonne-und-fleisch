@@ -20,7 +20,7 @@ schrift_farbe: '#ffffff'
 motiv: lattice
 hoehe: 2.0
 dicke: 0.078
-reihenfolge: 5
+reihenfolge: 9
 # Zweite Vorderseite: ein Zeitschriftenumschlag in Rosa und Schwarz,
 # Farben von dort genommen.
 # Platzhalter-Leseprobe. Was in doppelten Klammern steht, wird beim Bauen
