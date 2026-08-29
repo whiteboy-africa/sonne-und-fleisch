@@ -114,7 +114,17 @@
    * schiebt ihn zurecht, wie man im Regal an einen Band heranfaehrt.
    */
   transform-origin: center center;
-  will-change: transform;
+  /*
+   * **Kein festes `will-change: transform`.** Es hielt die Seite als
+   * einmal gerasterte Ebene fest; beim Aufziehen wurde diese Bitmap
+   * hochskaliert, statt dass der Satz neu gerechnet wird — auf dem
+   * Telefon, wo die Doppelseite klein steht und man weit hineingeht, sah
+   * der Text danach aus wie ein vergroessertes Foto von Text.
+   *
+   * Die Ebene wird jetzt nur waehrend der Geste gesetzt und danach
+   * wieder abgeraeumt (`lupeWeich`/`lupeScharf` in `shelf/leseprobe.ts`):
+   * fluessig beim Ziehen, scharf im Stehen.
+   */
   box-shadow:
     0 40px 90px rgba(0, 0, 0, 0.62),
     0 2px 0 rgba(0, 0, 0, 0.5);

@@ -656,6 +656,24 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     return anteil > blaetterKante && anteil < 1 - blaetterKante;
   }
 
+  /**
+   * Waehrend einer Geste darf die Seite eine eigene Ebene sein — das
+   * haelt das Ziehen fluessig. Danach muss sie wieder weg, sonst bleibt
+   * die Bitmap von vorher stehen und der Satz ist unscharf.
+   */
+  let scharfWieder = 0;
+  function lupeWeich() {
+    window.clearTimeout(scharfWieder);
+    rahmen.style.willChange = 'transform';
+  }
+  function lupeScharf() {
+    window.clearTimeout(scharfWieder);
+    // Ein Lidschlag Ruhe, damit ein Nachfassen nicht jedesmal neu rastert.
+    scharfWieder = window.setTimeout(() => {
+      rahmen.style.willChange = '';
+    }, 160);
+  }
+
   /** Beim Umblaettern faengt die neue Seite unvergroessert an. */
   function lupeZurueck() {
     lupe = 1;
@@ -1025,6 +1043,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
   rahmen.addEventListener('pointerdown', (ereignis) => {
     if (!offen || inBewegung) return;
     letzterZeigerTyp = ereignis.pointerType;
+    lupeWeich();
     finger.set(ereignis.pointerId, { x: ereignis.clientX, y: ereignis.clientY });
     gezogen = 0;
     if (finger.size === 2) {
@@ -1080,7 +1099,10 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
   const fingerWeg = (ereignis: PointerEvent) => {
     finger.delete(ereignis.pointerId);
     if (finger.size < 2) kneifAbstand = 0;
-    if (finger.size === 0) schiebtVon = null;
+    if (finger.size === 0) {
+      schiebtVon = null;
+      lupeScharf();
+    }
     // Wer nach dem Aufziehen einen Finger hebt, will meistens schieben.
     // Ohne das muesste er beide Finger heben und noch einmal aufsetzen —
     // die Hand macht das in einem Zug, die Bedienung soll es auch.
@@ -1121,7 +1143,9 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
           0.88,
           Math.min(1.14, 1 - ereignis.deltaY * 0.0032),
         );
+        lupeWeich();
         lupeAendern(lupe * schritt, ereignis.clientX, ereignis.clientY);
+        lupeScharf();
         return;
       }
 
