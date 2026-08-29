@@ -60,43 +60,45 @@ rueckseite:
   titel: The Melancholy of Quidam
   kurztitel: Melancholy of Quidam
   autor: Aleksandar Vadim
+  # Aus dem Manuskript „QUIDAMS SCHWERMUT IV.docx" — 8.864 Zeichen,
+  # dreizehn Absaetze, keine offenen Stellen.
   klappentext: >-
-    Platzhalter: die Einführung in die zweite Geschichte des Bandes.
+    Ein General, den man den „Tumor in Menschengestalt" nennt, sitzt
+    zwischen den Quitten und erinnert sich an die Jahrhunderte, die
+    seine Bruderschaft gegen die Welt der Materie geführt hat. Dann
+    beschließt er einen letzten Aufstand.
+  zitat: Das ewige Mysterium der Präferenz; oder das Rätsel des Begehrens.
+  zitat_von: Quidam
   cover_bild: /buecher/tokio-burning/rueckseite.webp
   cover_farbe: '#212a28'
   akzent_farbe: '#d2af11'
   schrift_farbe: '#c09e2a'
   motiv: fracture
   leseprobe:
-    seite: 14
+    # GESCHAETZT: der Text setzt sofort ein. Aus dem Umbruch nachtragen.
+    seite: 7
     text: >-
-      Quidam ist kein Name. Es ist das Wort, das die Akten benutzen, wenn
-      einer keinen hat: irgendeiner, ein gewisser, jemand. Vadim hat es als
-      Titel genommen und schreibt dagegen an, dass es zutrifft.
+      Die Herrscher des Erdstalls saßen zwischen den Quitten und
+      schwiegen: Es war ein chinesisches Jahrhundert, in jenen alten
+      Tagen, als das Wünschen noch geholfen hat. Ein grausamer General,
+      den man den [[„Tumor in Menschengestalt"]] nannte, brach die Stille;
+      ein sensibler Mensch und ein akribischer Sammler von Erinnerungen.
 
 
-      Der Mann, um den es geht, hat neun Monate in einer Stadt gelebt, in
-      der ihn niemand kannte, und ist dann verschwunden, ohne dass es jemand
-      bemerkt hätte. Was wir von ihm haben, sind: eine Meldebescheinigung,
-      zwei Quittungen und [[ein Brief, der nie abgeschickt wurde]].
+      Seine grausamen Taten waren über die Folklore der Göktürken bis zu
+      den germanischen Stämmen des Karpatenbeckens vorgedrungen, wo sie
+      Stoff wurden für das Epos von demjenigen, der die Tiefe sah, dessen
+      abscheulicher Held „Quidam" genannt wurde — ein Name, der bei den
+      furchtsamen Krimgoten bis heute Unbehagen auslöst, wenn er laut
+      ausgesprochen wird.
 
 
-      Aus diesen vier Blättern baut Vadim kein Leben. Er sagt ausdrücklich,
-      dass er es nicht kann, und tut es trotzdem an einer Stelle, mitten im
-      fünften Kapitel, für zwei Seiten, und nimmt es danach zurück. Diese
-      zwei Seiten sind das Buch.
-
-
-      Die Melancholie im Titel ist nicht die des Mannes. Wir wissen nicht,
-      ob er melancholisch war; wir wissen nichts. Es ist die Melancholie
-      dessen, der die vier Blätter in der Hand hält und begreift, dass
-      [[mehr nicht kommt]].
-
-
-      Am Rand steht eine zweite Geschichte, die des Archivars, der die
-      Blätter aufbewahrt hat, obwohl die Frist längst abgelaufen war. Warum
-      er das tat, hat er nie gesagt, und Vadim fragt ihn auch nicht,
-      sondern schreibt, dass [[|26]]
+      „Das Meer, das Feuer und die Frauen", sagt er, „drei Übel…", während
+      er sich in den Armen seiner Geliebten die Pfeife anzündet und seinen
+      Blick über die Wogen des südchinesischen Meeres schweifen lässt. Der
+      sanfte Strom der Erinnerung führt ihn zu den frühen Treffen seiner
+      Kabale und zurück in jene Jahrhunderte, in denen sie [[unaufhörliche
+      Kriege gegen den Kaiser und die Seinigen geführt hatten, |26]]
 ---
 
 Platzhalter für die lange Beschreibung.

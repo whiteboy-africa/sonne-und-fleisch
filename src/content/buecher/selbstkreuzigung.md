@@ -80,36 +80,20 @@ rueckseite:
   akzent_farbe: '#c9c1ad'
   schrift_farbe: '#f2ebdd'
   motiv: gather
-  leseprobe:
-    seite: 26
-    text: >-
-      Van Addak sammelt Flüche, wie andere Münzen sammeln, und ordnet sie
-      nicht nach Herkunft, sondern nach dem Körperteil, auf das sie zielen.
-      Das ergibt ein Register, das man nicht in einem Zug liest, und genau
-      dafür ist es gemacht.
-
-
-      Die ältesten Stücke stammen aus Gerichtsakten. Man notierte dort, was
-      gesagt worden war, weil das Gesagte die Tat war, und deshalb haben wir
-      heute [[Sätze, die niemand aufschreiben wollte]] und die trotzdem
-      dastehen, in der Handschrift eines Schreibers, dem es sichtlich
-      unangenehm war.
-
-
-      Auffällig ist, wie wenig sich ändert. Über vierhundert Jahre wechseln
-      die Wörter und bleibt die Anordnung: erst der Kopf, dann die Hände,
-      zuletzt das, was man nicht nennt. Van Addak nennt es und begründet das
-      in einer Vorbemerkung, die man gelesen haben muss.
-
-
-      Der zweite Teil verlässt die Akten. Hier stehen Flüche, die van Addak
-      selbst gehört hat, auf Märkten, in Wartezimmern, einmal in einem
-      Krankenhaus. Sie sind kürzer geworden und [[treffen genauer]].
-
-
-      Zum Schluss die Frage, die das ganze Buch trägt und die es nicht
-      beantwortet: ob ein Fluch etwas tut. Van Addak hält beide Antworten
-      für falsch und schlägt eine dritte vor, die darin besteht, dass [[|26]]
+  # OFFEN: die Leseprobe. Hier stand eine, die ein anderes Buch
+  # beschrieb — ein Register gesammelter Flueche, nach Koerperteilen
+  # geordnet. Das war erfunden, bevor der Text da war, und passte zu
+  # nichts: der Klappentext erzaehlt von Helena unter dem Rentierfell.
+  #
+  # Aus dem Entwurf laesst sich noch keine machen. Fertige Prosa ist
+  # dort ein einziger Absatz, und auch der traegt ein Loch („XXbrett");
+  # was folgt, hat offene Stellen wie „nach Vorbild der." und „xxte
+  # und". Einen Balken ueber die Luecke des Autors zu legen waere ein
+  # Balken, unter dem nichts steht — genau das, was diese Seite nicht
+  # tut.
+  #
+  # Ohne Probe schlaegt der Band auf dieser Seite nicht auf, und die
+  # Zeile in den Angaben steht nicht da. Kommt der Text, kommt sie.
 ---
 
 Platzhalter für die lange Beschreibung.
