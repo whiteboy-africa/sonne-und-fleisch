@@ -187,6 +187,21 @@ export function regalStarten(wurzel: HTMLElement) {
     });
   }
 
+  /**
+   * Dasselbe Mass wie in `leseprobe.ts`: unter 768 Bildpunkten oder mit dem
+   * Finger. Zwei Bedingungen, weil eine allein nicht reicht — ein Telefon
+   * quer ist 844 breit, und in mancher Geraete-Nachstellung meldet
+   * `(pointer: coarse)` gar nichts.
+   */
+  const amTelefon = () =>
+    window.matchMedia('(max-width: 767px), (pointer: coarse)').matches;
+
+  // Dreht sich das Telefon ueber die Schwelle, wechselt die Beschriftung
+  // mit. Ohne das bliebe stehen, was beim Aufstellen des Bandes galt.
+  window
+    .matchMedia('(max-width: 767px), (pointer: coarse)')
+    .addEventListener('change', () => panelSetzen());
+
   function panelSetzen() {
     const imFokus = modus !== 'browse';
     const buch = gewaehlterIndex === null ? null : katalog[gewaehlterIndex];
@@ -216,12 +231,23 @@ export function regalStarten(wurzel: HTMLElement) {
     el.seitenmarken.forEach((marke) => {
       marke.hidden = !doppelband;
     });
-    // Heissen beide Seiten gleich — wie beim Blindband —, waere der Titel
-    // im Knopf keine Auskunft. Dann sagt er schlicht, wohin es geht.
+    /*
+     * Heissen beide Seiten gleich — wie beim Blindband —, waere der Titel
+     * im Knopf keine Auskunft. Dann sagt er schlicht, wohin es geht.
+     *
+     * **Auf dem Telefon sagt er das immer.** Dort steht der Knopf ueber
+     * dem Titel des Bandes, und ein zweiter Titel ueber dem eigentlichen
+     * nimmt ihm den Platz und den Blick: man liest zuerst den Namen der
+     * Rueckseite und erst darunter, welches Buch man vor sich hat. „Seite
+     * A" und „Seite B" sagen dasselbe ueber den Weg und behaupten keinen
+     * Titel. Am Schreibtisch steht der Knopf unter den Angaben, dort
+     * stoert der Titel nicht und ist die bessere Auskunft.
+     */
     const gleicherTitel = buch.back?.shortTitle === buch.shortTitle;
+    const nurSeite = gleicherTitel || amTelefon();
     el.wendenText.textContent = !doppelband
       ? 'Band wenden'
-      : gleicherTitel
+      : nurSeite
         ? seite === 'vorn'
           ? 'Wenden zu Seite B'
           : 'Wenden zu Seite A'

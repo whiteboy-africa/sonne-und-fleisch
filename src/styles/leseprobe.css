@@ -23,6 +23,21 @@
   opacity: 0;
   /* Dieselben 120 ms wie die FLIP-Bewegung in `shelf/leseprobe.ts`. */
   transition: opacity 120ms ease-out;
+  /*
+   * **Die Gesten gehoeren dem Band, nicht dem Browser.**
+   *
+   * Hier stand nichts, und damit stand hier `auto`. Auf einem Fingergeraet
+   * heisst das: zwei Finger zoomen die **Seite**, ein Finger zieht am
+   * Dokument, ein Doppeltipp ruft den Browser-Zoom. Und sobald der Browser
+   * eine Geste an sich nimmt, schickt er ein `pointercancel` — die Lupe in
+   * `shelf/leseprobe.ts` bekam ihr `pointermove` nie zu sehen und war auf
+   * dem Telefon schlicht tot, obwohl der ganze Weg dafuer dasteht.
+   *
+   * Zu scrollen gibt es hier ohnehin nichts: der Satzspiegel ist
+   * beschnitten, und der aufgezogene Band waechst absichtlich ueber den
+   * Bildrand hinaus, statt ein Scrollfeld aufzumachen.
+   */
+  touch-action: none;
 }
 
 .leseprobe.ist-da {

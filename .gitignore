@@ -19,7 +19,12 @@ npm-debug.log*
 # Wird bei der Installation aus node_modules gelegt (scripts/cms-kopieren.mjs).
 public/admin/sveltia-cms.js
 
-# Die Druckdatei des Magazins — 125 MB, gehoert nicht ins Git.
-# `npm run magazin:build` macht daraus public/magazin/pages/, und die
+# Die Druckdateien — 125 MB das Heft allein, sie gehoeren nicht ins Git.
+# `npm run magazin:build` macht aus dem Heft public/magazin/pages/, und die
 # liegen im Repo.
-content/magazin.pdf
+#
+# **Alle** PDFs unter content/, nicht nur das Heft: dort landen die
+# Buchsaetze der Baende, aus denen die echten Leseprobe-Seiten gerastert
+# werden. Ein ganzer Buchsatz im Repo waere dasselbe Problem wie das Heft —
+# wer die Datei mitnimmt, hat das Buch nicht gelesen, sondern kopiert.
+content/*.pdf

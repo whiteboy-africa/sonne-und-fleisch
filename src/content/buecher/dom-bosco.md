@@ -71,7 +71,15 @@ rueckseite:
   zitat_von: Chinesisches Sprichwort, bei Matignon
   # Neuer Umschlag, neuer Dateiname — ein Bild nie unter demselben
   # austauschen, sonst zeigt der Cache weiter das alte.
-  cover_bild: /buecher/dom-bosco/la-chine-hermetique-3.webp
+  #
+  # **Zurueck auf -2.** Commit 47ce16c hat hier ungefragt auf
+  # `la-chine-hermetique-3.webp` gezeigt, und in dieser Datei steckt nicht
+  # Matignon, sondern ein Dom-Bosco-Umschlag (Hirtenjunge, Woelfe,
+  # Madonna). Die Datei bleibt liegen, geloescht wird in `public/` nicht;
+  # sie gehoert nur nicht hierher. Dass die Farben unten das Nachtblau der
+  # Gasse und das Orange des brennenden Himmels nennen, beschreibt -2 —
+  # sie wurden beim Wechsel gar nicht mitgezogen.
+  cover_bild: /buecher/dom-bosco/la-chine-hermetique-2.webp
   # Aus dem Umschlag genommen: das Nachtblau der Gasse, das Orange des
   # brennenden Himmels, das Elfenbein der Schrift.
   cover_farbe: '#151a20'

@@ -84,6 +84,28 @@ const lupeGrenze = 4;
 /** Ein Doppelklick geht auf diese Stufe — und wieder zurueck. */
 const lupeStufe = 2.4;
 
+/**
+ * Wie breit die Blaetterzone an jeder Aussenkante ist, als Anteil der
+ * Rahmenbreite. Die Mitte bleibt frei.
+ *
+ * Auf dem Telefon stand hier 0,5 — die ganze Seite war Blaetterzone, links
+ * zurueck, rechts vor. Das ging, solange der Finger nichts anderes zu
+ * sagen hatte. Mit dem Doppeltipp geht es nicht mehr: **zwei Gesten
+ * koennen nicht dieselbe Flaeche haben.** Ein Tipp, der umschlaegt, und
+ * ein Tipp, der vergroessert, sind an derselben Stelle nicht zu
+ * unterscheiden — der erste Tipp haette die Seite schon umgeschlagen,
+ * bevor der zweite ankommt.
+ *
+ * Also dieselbe Aufteilung wie am Schreibtisch: aussen wird geblaettert,
+ * in der Mitte wird vergroessert. Ein Drittel sind auf 375 Bildpunkten
+ * noch 127 — bequem fuer einen Daumen.
+ */
+const blaetterKante = 0.34;
+
+/** Zwei Tipper gelten als Doppeltipp, wenn sie so dicht beieinander liegen. */
+const doppelTippZeit = 300;
+const doppelTippWeg = 34;
+
 /*
  * Zeilen auf einer ganz geschwaerzten Seite. Grosszuegig gerechnet: nach
  * dem Setzen wird auf ganze Zeilen gekuerzt (`zeilenKuerzen`), damit unten
@@ -190,6 +212,15 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
   let kneifLupe = 1;
   let schiebtVon: { x: number; y: number; lx: number; ly: number } | null = null;
   let gezogen = 0;
+  /**
+   * Der letzte Tipp mit dem Finger. Ein Doppeltipp wird hier selbst
+   * gezaehlt und nicht dem `dblclick` des Browsers ueberlassen: auf
+   * Fingergeraeten haengt der davon ab, ob der Browser das Tippen nicht
+   * schon fuer seinen eigenen Zoom verbraucht hat.
+   */
+  let letzterTipp: { zeit: number; x: number; y: number } | null = null;
+  /** Womit zuletzt angefasst wurde — Finger oder Maus. */
+  let letzterZeigerTyp = 'mouse';
   /** Das Blatt, das gerade umschlaegt — hoechstens eines. */
   let wender: HTMLElement | null = null;
 
@@ -596,6 +627,18 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     lupeSetzen();
   }
 
+  /**
+   * Liegt der Punkt in der freien Mitte — also dort, wo nicht geblaettert
+   * wird? Vergroessert ist die ganze Seite frei: dann faellt das Blaettern
+   * ohnehin aus, und der Doppeltipp findet ueberall zurueck.
+   */
+  function imFreienFeld(punktX: number) {
+    if (lupe > 1) return true;
+    const kasten = rahmen.getBoundingClientRect();
+    const anteil = (punktX - kasten.left) / kasten.width;
+    return anteil > blaetterKante && anteil < 1 - blaetterKante;
+  }
+
   /** Beim Umblaettern faengt die neue Seite unvergroessert an. */
   function lupeZurueck() {
     lupe = 1;
@@ -895,15 +938,21 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     if (lupe > 1) return;
     const kasten = rahmen.getBoundingClientRect();
     const anteil = (ereignis.clientX - kasten.left) / kasten.width;
-    const kante = einzeln() ? 0.5 : 0.34;
+    const kante = blaetterKante;
     if (anteil <= kante) blaettern(-1);
     else if (anteil >= 1 - kante) blaettern(1);
   });
 
   // Doppelklick geht hinein und wieder heraus — am Schreibtisch der
-  // kuerzeste Weg, auf dem Telefon der Doppeltipp.
+  // kuerzeste Weg. Auf dem Telefon zaehlt der Doppeltipp weiter unten
+  // selbst; kaeme hier noch ein `dblclick` dazu, schaltete die Lupe
+  // zweimal und stuende wieder, wo sie war.
   rahmen.addEventListener('dblclick', (ereignis) => {
     if (!offen || inBewegung) return;
+    if (letzterZeigerTyp === 'touch') return;
+    // In der Blaetterzone hat der erste Klick laengst umgeschlagen. Dort
+    // noch zu vergroessern hiesse: eine Seite weiter, und dann hinein.
+    if (!imFreienFeld(ereignis.clientX)) return;
     ereignis.preventDefault();
     lupeAendern(lupe > 1 ? 1 : lupeStufe, ereignis.clientX, ereignis.clientY);
   });
@@ -921,6 +970,9 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
       const [a, b] = [...finger.values()];
       const abstand = Math.hypot(a.x - b.x, a.y - b.y);
       if (kneifAbstand > 8 && abstand > 8) {
+        // Wer gekniffen hat, hat nicht getippt. Sonst schlaegt der Klick,
+        // der beim Loslassen des letzten Fingers kommt, noch eine Seite um.
+        gezogen = 999;
         lupeAendern(
           (kneifLupe * abstand) / kneifAbstand,
           (a.x + b.x) / 2,
@@ -947,7 +999,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     }
     const kasten = rahmen.getBoundingClientRect();
     const anteil = (ereignis.clientX - kasten.left) / kasten.width;
-    const kante = einzeln() ? 0.5 : 0.34;
+    const kante = blaetterKante;
     const zurueck = anteil <= kante && stelle > 0;
     const vor = anteil >= 1 - kante && stelle < letzteStelle();
     rahmen.dataset.kante = zurueck ? 'zurueck' : vor ? 'vor' : '';
@@ -955,6 +1007,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
 
   rahmen.addEventListener('pointerdown', (ereignis) => {
     if (!offen || inBewegung) return;
+    letzterZeigerTyp = ereignis.pointerType;
     finger.set(ereignis.pointerId, { x: ereignis.clientX, y: ereignis.clientY });
     gezogen = 0;
     if (finger.size === 2) {
@@ -975,15 +1028,61 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     }
   });
 
+  /*
+   * Der Doppeltipp. Er steht **vor** `fingerWeg`, damit `finger` den
+   * eigenen Zeiger noch enthaelt: ein Tipp ist genau ein Finger, und das
+   * laesst sich nur zaehlen, solange er noch mitgezaehlt wird.
+   *
+   * Er wirkt nur im freien Feld. In der Blaetterzone haette der erste
+   * Tipp die Seite schon umgeschlagen — man vergroesserte dann die
+   * naechste Seite statt der, die man gemeint hat.
+   */
+  rahmen.addEventListener('pointerup', (ereignis) => {
+    if (!offen || inBewegung) return;
+    if (ereignis.pointerType !== 'touch') return;
+    if (finger.size > 1 || gezogen > 6 || !imFreienFeld(ereignis.clientX)) {
+      letzterTipp = null;
+      return;
+    }
+    const jetzt = performance.now();
+    const zweiter =
+      letzterTipp !== null &&
+      jetzt - letzterTipp.zeit < doppelTippZeit &&
+      Math.hypot(
+        ereignis.clientX - letzterTipp.x,
+        ereignis.clientY - letzterTipp.y,
+      ) < doppelTippWeg;
+    if (zweiter) {
+      letzterTipp = null;
+      lupeAendern(lupe > 1 ? 1 : lupeStufe, ereignis.clientX, ereignis.clientY);
+      return;
+    }
+    letzterTipp = { zeit: jetzt, x: ereignis.clientX, y: ereignis.clientY };
+  });
+
   const fingerWeg = (ereignis: PointerEvent) => {
     finger.delete(ereignis.pointerId);
     if (finger.size < 2) kneifAbstand = 0;
     if (finger.size === 0) schiebtVon = null;
+    // Wer nach dem Aufziehen einen Finger hebt, will meistens schieben.
+    // Ohne das muesste er beide Finger heben und noch einmal aufsetzen —
+    // die Hand macht das in einem Zug, die Bedienung soll es auch.
+    if (finger.size === 1 && lupe > 1 && !schiebtVon) {
+      const [rest] = [...finger.values()];
+      schiebtVon = { x: rest.x, y: rest.y, lx: lupeX, ly: lupeY };
+      gezogen = 999;
+    }
   };
   rahmen.addEventListener('pointerup', fingerWeg);
   rahmen.addEventListener('pointercancel', fingerWeg);
   rahmen.addEventListener('pointerleave', (ereignis) => {
-    if (!schiebtVon) fingerWeg(ereignis);
+    // Beim Aufziehen darf ein Finger ueber den Rand wandern — die Seite
+    // ist dann laengst groesser als der Rahmen, und aussen liegt bloss
+    // Schwarz. Wer hier aufraeumt, bricht die Bewegung mitten im Kneifen
+    // ab: der zweite Finger faellt aus `finger`, und das Aufziehen haelt
+    // an, obwohl beide Finger noch auf dem Glas liegen.
+    if (schiebtVon || finger.size >= 2) return;
+    fingerWeg(ereignis);
   });
 
   // Scrollen blaettert. Ein Rad-Ereignis kommt in Schueben; gezaehlt wird

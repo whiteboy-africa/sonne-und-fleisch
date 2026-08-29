@@ -569,6 +569,32 @@ Telefon Platz hat.** Der Satzspiegel ist beschnitten (`overflow: hidden`);
 laeuft der Text ueber, bricht die letzte Zeile mitten durch. Drei Absaetze
 von je vier bis neun Zeilen sind die Groessenordnung.
 
+**Und das ist eine Zahl, keine Stimmung — nur steht sie noch nicht fest.**
+Gerechnet kommen rund 1.750 bis 1.800 Zeichen heraus, aus `leseprobe.css` — Schriftgrad 1,85 cqh mal Zeilenabstand
+1,6 macht 2,96 % der Seitenhoehe je Zeile, und der Satzspiegel laesst nach
+Kopf- und Fusssteg 90,4 % uebrig: **30,5 Zeilen**. Bei rund 58 Zeichen je
+Zeile sind das etwa 1.770. Mitgezaehlt wird, was auf der Seite steht — der
+Klartext unter einem Balken belegt seine Breite, und `[[|26]]` belegt
+sechsundzwanzig Zeichen.
+
+**Zu kurz ist ein Fehler, nicht Geschmack.** Eine Probe, die bei 1.200
+Zeichen aufhoert, laesst ein Drittel der Seite leer, und die letzte Zeile
+steht allein ueber dem Fuss — dann sieht der Entzug nicht nach Entzug aus,
+sondern nach unfertig. **Der Abbruch mitten im Satz gehoert dazu, das
+leere Drittel darunter nicht.**
+
+**Die gerechnete Zahl ist nicht nachgemessen, und sie ist zu klein.** Bei
+1.775 Zeichen bleibt die Seite sichtbar leer. Gerechnet wurde mit rund 58
+Zeichen je Zeile; die Serife setzt offenbar enger. **Wer das naechste Mal
+eine Probe anfasst, misst es einmal wirklich:** Band aufschlagen und im
+Bild `document.querySelector('.blatt__satz')` nach `scrollHeight` gegen
+`clientHeight` fragen, dann steht die Zahl. Zum Vergleich: heute liegen
+alle Proben im Repo zwischen 1.038 und 1.775 — **keine einzige fuellt
+ihre Seite.** Wer eine Probe einstellt, zaehlt die
+Zeichen nach; der Buchsatz gibt genug Text her, um bis an den Fuss zu
+reichen. Das ist mehrfach angemahnt worden — es ist keine Feinheit,
+sondern die Seite.
+
 ### Wie der Band aufgeht: zwei Wege
 
 `oeffnenModus` in `src/shelf/verlag-config.ts` waehlt, und zwar getrennt
@@ -673,10 +699,55 @@ Zeile nicht **ein** Balken, sondern zwei bis vier mit Wortabstaenden
 dazwischen, in Absaetzen mit Einzug: man soll sehen, dass hier Satz stand,
 und nicht ein schwarzes Rechteck.
 
-Auf dem Telefon (unter 768 px oder Fingergeraet) wird einzeln geblaettert:
-Tippen auf die rechte oder linke Haelfte, und die Seite ist so hoch wie das
-Geraet, nicht so hoch wie A5 — an A5 festzuhalten machte sie kurz und breit,
-und der Text passte nicht mehr darauf.
+Auf dem Telefon (unter 768 px oder Fingergeraet) wird einzeln geblaettert,
+und die Seite ist so hoch wie das Geraet, nicht so hoch wie A5 — an A5
+festzuhalten machte sie kurz und breit, und der Text passte nicht mehr
+darauf.
+
+### Die Lupe
+
+Eine echte Buchseite auf einem Telefon ist klein: 345 Bildpunkte Breite fuer
+ein Taschenbuch. Also darf man hineingehen — mit zwei Fingern, mit einem
+Doppeltipp, und am Schreibtisch mit Strg und dem Rad oder einem Doppelklick.
+Verschoben wird mit einem Finger; ueber den Rand hinaus geht es nicht, die
+Kante der Seite bleibt am Bildrand stehen (`lupeSetzen`). Beim Umblaettern
+faengt die neue Seite unvergroessert an.
+
+**Zwei Gesten koennen nicht dieselbe Flaeche haben.** Deshalb gilt auf dem
+Telefon dieselbe Aufteilung wie am Schreibtisch: aussen wird geblaettert
+(`blaetterKante`, ein Drittel je Seite), **in der Mitte wird
+vergroessert**. Hier stand einmal 0,5 — die ganze Seite war Blaetterzone.
+Mit dem Doppeltipp geht das nicht: der erste Tipp haette die Seite schon
+umgeschlagen, bevor der zweite ankommt, und man vergroesserte die naechste
+Seite statt der gemeinten. Vergroessert faellt das Blaettern ohnehin aus,
+und der Doppeltipp findet von ueberall zurueck.
+
+Drei Dinge, ohne die die Lupe auf dem Telefon nicht laeuft:
+
+- **`touch-action: none` auf `.leseprobe`.** Ohne das gehoeren die Gesten
+  dem Browser: zwei Finger zoomen die Seite, ein Finger zieht am Dokument,
+  der Doppeltipp ruft den Browser-Zoom. Und sobald der Browser eine Geste
+  an sich nimmt, schickt er ein `pointercancel` — die Lupe bekam ihr
+  `pointermove` nie zu sehen. Der ganze Weg dafuer stand da und war
+  trotzdem tot.
+- **Der Doppeltipp wird selbst gezaehlt**, nicht dem `dblclick` des
+  Browsers ueberlassen: der haengt davon ab, ob der Browser das Tippen
+  nicht schon fuer seinen eigenen Zoom verbraucht hat. Der `dblclick`
+  bleibt fuer die Maus.
+- **Beim Kneifen darf ein Finger ueber den Rahmenrand wandern.** Die Seite
+  ist dann laengst groesser als der Rahmen. Wer auf `pointerleave`
+  aufraeumt, bricht das Aufziehen ab, obwohl beide Finger noch auf dem
+  Glas liegen.
+
+**Scharf ist die Seite nur bis knapp ueber 1.** Die echten Seitenbilder
+sind 1150 Bildpunkte breit und stehen auf dem Telefon in 345 CSS-Pixeln —
+bei drei Bildpunkten je Pixel sind das 1035, also reicht es fuer Stufe
+1,11 (bei zwei: 1,67). Darueber wird hochgerechnet: bei 2,4 sieht man es,
+bei 4 ist der Satz weich. Wer die Lupe scharf haben will, braucht einen
+zweiten, groesseren Satz — und zwar nur fuer die **klaren** Seiten; die
+geschwaerzten haben nichts aufzuloesen und wiegen 8 bis 16 KB. Das Heft
+macht es umgekehrt vor (`pages/` und `pages-klein/`, siehe
+`scripts/magazin-bauen.mjs`), dort aus Grafikspeicher-Gruenden.
 
 ### Abschalten
 
