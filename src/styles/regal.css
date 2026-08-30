@@ -546,7 +546,26 @@ body {
   display: flex;
   flex: 1;
   flex-direction: column;
+  /*
+   * **`safe center`, nicht `center`.**
+   *
+   * Der Block ist zentriert und scrollt. Beides zusammen hat einen alten,
+   * fiesen Haken: laeuft der Inhalt ueber, verteilt `center` den
+   * Ueberschuss auf beide Seiten — und die obere Haelfte liegt dann
+   * **vor** dem Scrollanfang. Sie ist nicht bloss abgeschnitten, sie ist
+   * unerreichbar; kein Scrollen holt sie zurueck.
+   *
+   * Aufgefallen ist es, als der Untertitel dazukam und eine Zeile mehr
+   * brauchte: bei niedrigem Fenster rutschten Nummer und Seitenmarke
+   * hinter die Kopfzeile, und der Titel hing halb darueber.
+   *
+   * `safe` heisst: zentrieren, solange es passt, und sonst oben
+   * anschlagen. Der Ueberschuss faellt dann ganz nach unten, wo er
+   * scrollbar ist und wo die Maske ihn ohnehin ausblendet. Die Zeile
+   * davor bleibt fuer Browser stehen, die `safe` nicht kennen.
+   */
   justify-content: center;
+  justify-content: safe center;
   min-height: 0;
   padding-right: 6px;
   overflow-y: auto;

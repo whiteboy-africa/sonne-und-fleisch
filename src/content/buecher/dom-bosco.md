@@ -115,9 +115,11 @@ leseprobe:
 rueckseite:
   titel: La Chine hermétique
   kurztitel: La Chine hermétique
-  # Steht auf jedem Titelblatt des Buchsatzes unter dem Titel: der Band
-  # bringt nicht das ganze Werk, sondern die Auswahl der Ausgabe von 1936.
-  untertitel: Auswahl
+  # **Vom Umschlag**, in der Zeile unter dem Titel. Hier stand „Auswahl" —
+  # das steht zwar auf dem Titelblatt des Buchsatzes, ist dort aber eine
+  # Angabe zur Ausgabe (der Band bringt nicht das ganze Werk) und kein
+  # Untertitel. Der Umschlag ist das Gedruckte; im Zweifel gilt er.
+  untertitel: Memoiren eines Arztes
   autor: J.-J. Matignon
   klappentext: >-
     Ein französischer Militärarzt sammelt in Peking zwanzig Jahre lang
