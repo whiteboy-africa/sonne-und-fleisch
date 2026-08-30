@@ -837,11 +837,13 @@ body {
  * hier schon einmal stand.
  */
 .book-details .book-details__untertitel {
-  max-width: 34ch;
+  /* Keine eigene Breite — dieselbe wie der Klappentext darunter; siehe
+     `.bandblock__untertitel`. Und ein Grad darunter, damit er dem Titel
+     nichts wegnimmt. */
   margin-top: 0.3rem;
   color: var(--ink-soft);
   font-family: var(--schrift-buch);
-  font-size: clamp(14px, 1.05vw, 17px);
+  font-size: clamp(13px, 0.95vw, 15px);
   font-style: normal;
   font-weight: 400;
   letter-spacing: 0;

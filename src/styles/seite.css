@@ -481,12 +481,23 @@
  * **Nicht kursiv.** Kursiv ist im Haus das Zeichen fuer ein Zitat; hier
  * zitiert nichts, hier steht, was auf dem Titelblatt steht.
  */
+/*
+ * **Keine eigene Breite.** Hier stand `max-width: 34ch` — und damit brach
+ * ein Untertitel um, der in die Spalte gepasst haette: bei 654 Punkten
+ * Spaltenbreite waren 324 erlaubt, also stand „10.000 Dead Martyrs — A
+ * Study on Sensitivity" in zwei Zeilen, obwohl eine gereicht haette. Der
+ * Klappentext nimmt die ganze Spalte, der Untertitel nimmt sie auch.
+ * `balance` teilt, wenn doch zwei Zeilen noetig werden.
+ *
+ * Der Grad steht eine Stufe unter dem, was hier zuerst stand (19). So
+ * nah am Klappentext (15) nahm er dem Anton-Titel Gewicht ab, statt ihm
+ * zu dienen.
+ */
 .bandblock__untertitel {
-  max-width: 34ch;
   margin: 8px 0 0;
   color: var(--ink-soft);
   font-family: var(--schrift-buch);
-  font-size: clamp(16px, 1.25vw, 19px);
+  font-size: clamp(15px, 1.1vw, 17px);
   font-style: normal;
   font-weight: 400;
   line-height: 1.34;
