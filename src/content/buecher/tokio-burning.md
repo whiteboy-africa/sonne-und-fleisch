@@ -39,48 +39,78 @@ reihenfolge: 8
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Aus dem Manuskript, im Wortlaut: der Gang in die Empfangshalle.
 leseprobe:
-  # GESCHAETZT: der Anfang.
-  seite: 5
+  # **Nicht der Anfang.** Hier stand die Ankunft im Firmengebäude — die
+  # ersten Seiten, und dazu der Satz, der ohnehin schon als Zitat auf der
+  # Bandseite steht. Zweimal dasselbe.
+  #
+  # Jetzt: das Sushi-Restaurant, in dem er seinem Feind an den Nebentisch
+  # sitzt, und die Kuendigung, die dort auf dem Telefon ankommt.
+  #
+  # GESCHAETZT: die Stelle liegt bei 64 % des Buchsatzes, bei 40 Seiten
+  # also um 25.
+  seite: 25
+  # Im Wortlaut des Buchsatzes, Absaetze 16 bis 18. Der letzte laeuft auf
+  # der rechten Seite weiter — deshalb steht er dort ohne Einzug.
   text: >-
-    Früher hätten Männer wie ich Kriege gewonnen. Heute gewinnen wir
-    Verhandlungsgespräche. Es ist, wie es ist. Mein Assistent Xi öffnet mir
-    die Eingangstür des XXXCORP-Firmengebäudes im Tokioter Stadtteil
-    Sumida. Dabei neigt er respektvoll den Kopf. Ich gehe voraus in die
-    Empfangshalle. Unsere Ledersohlen klacken im Gleichschritt über den
-    Marmorboden. Unsere Anzüge sitzen perfekt. Der Marmor glänzt unter dem
-    Licht, das durch die deckenhohe Glasfront fällt. In der Mitte der Halle
-    steht ein Springbrunnen aus dunklem Basalt. Ein Karpfen zieht unter der
-    Wasseroberfläche seine Bahn.
+    Ich betrete das Restaurant und es erklingt ein Jingle, gefolgt vom
+    gedehnten „Irasshaimase" der alten Frau hinter dem Tresen. Ich setze
+    mich an den Nebentisch des Sumos und bestelle einen Gin Tonic. Gierig
+    leere ich das Glas. Mein blaues Auge pocht und juckt unter dem
+    Make-up. Ich wünschte, ich hätte das feuchte Hello-Kitty-Taschentuch
+    der jungen Frau im Seven Eleven angenommen, um das Lid abzutupfen. Ich
+    kippe den Drink hinunter. Die Kellnerin sieht mir an, was ich brauche,
+    und bringt den nächsten. Ich trinke auch diesen in einem Zug. Runde
+    vier folgt. Diesmal hat sie zusätzlich eine große Sushiplatte dabei.
+    In der Mitte: Hühnersushi, serviert mit geriebenem Ingwer und heller
+    Sojasauce. Sie reicht mir den Gin und trägt die Platte an den Tisch
+    des Sumos. Ich nehme einen Schluck und ziehe mein Handy aus der
+    Hosentasche. Der Bildschirm ist grell im dämmrigen Licht.
 
 
-    Die Japaner haben diese Folklore arrangiert, um eine bestimmte Wirkung
-    bei ihren Gästen zu erzielen, denke ich. Sie wollen, dass sie sich
-    willkommen fühlen, sie einlullen und weich machen. Ich betrachte
-    das Ganze intensiv, achte darauf, ob es etwas in mir auslöst. Aber da
-    ist nichts.
+    „You are fired."
 
 
-    Xi scheint es anders zu gehen, jedenfalls ist er gestolpert und hat
-    seine Unterlagen über die Fliesen verteilt. Auf Knien sammelt er sie
-    ein. Ich reiche ihm die Hand und helfe ihm hoch. Seine Wangen sind rot
-    bis zu den Ohren und er sieht mir nicht ins Gesicht. Nachdem er sich
-    wieder gefangen hat, weisen wir uns bei der Empfangsdame aus. Sie
-    reicht uns die Sicherheitskarten mit beiden Händen, ein Lächeln, eine
-    Verbeugung. Wir nehmen die Karten entgegen und passieren die
-    Drehkreuze hin zu den Aufzügen. Biep, biep. Dort hängt ein Flatscreen
-    an der Wand. Er zeigt ein Video, in dem das Firmenlogo über eine
-    saftig-grüne Hügellandschaft gleitet. Vielleicht Hokkaidō.
-  # Im Wortlaut des Buchsatzes.
+    Ich starre auf die Worte, als wären sie in einer Sprache verfasst, die
+    ich nie gelernt habe. Sie dringen nicht zu mir durch, werden von der
+    grellen Leere geschluckt, die in mir wuchert, und die ich seit der
+    Auseinandersetzung mit dem Sumo geglaubt hatte, im Griff zu haben.
+    Millionen winziger schwarzer Löcher, die für einen Wimpernschlag
+    erscheinen und wieder verschwinden. Doch manchmal bleibt eines. Dann
+    noch eines. Ein drittes. Und sie vereinen sich zu einem immer größeren
+    Loch.
+  # Die rechte Seite: die uebrigen Nachrichten und der Verrat. Sie bricht
+  # ab, bevor die SMS geschrieben ist.
   fortsetzung: >-
-    Ich stelle mir vor, dass auf dem Bildschirm der Film Men Behind the Sun
-    läuft. Den habe ich zur Vorbereitung auf das heutige
-    Verhandlungsgespräch angesehen, wie ich es immer mache, wenn wir mit den
-    Japanern zu tun haben.
+    Ich muss an Xi denken. Jemanden, den dieser Zustand nie heimsuchen
+    wird. Ein Besuch in Disneyland Hongkong mit seinem Sohn reicht, um ihn
+    mit Glück zu fluten. Xi, der Gute. Xi, der Treue. Über 30 Nachrichten
+    hat er mir geschrieben. Er wird sich um mich bemüht haben. Er wird ein
+    gutes Wort für mich eingelegt haben. Ich habe bislang keine einzige
+    seiner Nachrichten geöffnet.
 
 
-    Der Film erzählt von der Einheit 731 und den Gräueltaten, die sie
-    Ende des Zweiten Weltkriegs an chinesischen Kriegsgefangenen verübt
-    hat.
+    „Please respond."
+
+
+    „They need the numbers."
+
+
+    „I couldn't go to Disneyland. I have food poisoning. Have you also
+    noticed anything? I feel so WEAK!"
+
+
+    „Mr. Le is furious."
+
+
+    „Where are you?"
+
+
+    Ich lese die Nachricht mit Disneyland noch drei, vier Mal. Dann schaue
+    ich an den Nebentisch. Zwischen den Fingern meines Feindes liegt ein
+    Hühnersushi, das er sich langsam in den Mund schiebt. Als er schluckt,
+    schließt er genussvoll die Augen. Ich lache unwillkürlich auf. Ich
+    trinke meinen Gin Tonic aus und schreibe den Leuten von Feyue eine
+    SMS, in der ich
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Getauscht — Corporal Curses ist jetzt Seite A.
 rueckseite:
@@ -115,46 +145,62 @@ rueckseite:
   # demselben Namen auszutauschen ginge nicht: der Cache zeigte weiter das
   # alte.
   leseprobe:
-    # Der Wortlaut aus dem Buchsatz — Ruggieris Brief in Schlegels
-    # Übersetzung, nicht mehr nacherzählt.
-    seite: 19
+    # **Nicht der Anfang.** Hier stand Ruggieris Vorrede — der Brief, der
+    # ankuendigt, was er beschreiben wird, und die Kindheit des Schusters.
+    # Also die Seiten, auf denen die Sache noch gar nicht passiert.
+    #
+    # Jetzt die Sache selbst: die Dornenkrone, die Naegel, das Messer.
+    #
+    # GESCHAETZT: die Stelle liegt bei 36 % des Buchsatzes. Der Band hat
+    # rund 40 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
+    # rund 20 fuer diese, und die Stelle um 8.
+    seite: 8
+    # Im Wortlaut des Buchsatzes, Absaetze 36 bis 38. Der letzte laeuft auf
+    # der rechten Seite weiter.
     text: >-
-      Ich halte Wort, mein werter Freund, indem ich Ihnen hier die
-      Kreuzigung beschreibe, welche Mathieu Lovat, Marcs Sohn, 47 Jahre
-      alt, mit dem Beinamen Casale – von seinem Geburtsorte, einem zum
-      Kirchspiele Soldo gehörenden Dörfchen im Bezirke von Bellune –
-      am Morgen des 19. Juli 1805 an sich selbst vollzogen hat.
+      Nachdem diese grausamen Vorbereitungen beendigt waren, krönte sich
+      Mathieu Lovat mit Dornen, von denen drei oder vier durch die die
+      Stirn bedeckende Haut drangen. Mit einem weißen, mit Fäden an seinen
+      Hüften und Schenkeln befestigten Taschentuche bedeckte er die
+      Gegend, welche ehemals jene Teile einnahmen, deren er sich beraubt
+      hatte. Hierauf, am ganzen übrigen Körper entblößt, seine Schenkel
+      zwischen dem Netze und dem Kreuze, auf dem er sich sitzend erhielt,
+      nahm er einen der für die Hände bestimmten, sehr glatten und
+      spitzigen Nägel und stach ihn sich mitten durch die innere Fläche
+      der rechten Hand, indem er sie nach dem Kopfe des Nagels zu so lange
+      stieß, bis dieser dadurch über die Hälfte aus dem Rücken der Hand
+      hervorragte.
 
 
-      Bevor ich mich in eine nähere Schilderung dieser seltsamen,
-      wahnsinnigen Handlung einlasse, ist es nötig, vorläufig Ihnen einige
-      Umstände darzulegen, die Licht über den körperlichen und
-      moralischen Zustand des hier in Frage stehenden Menschen
-      verbreiten.
-
-
-      Von armen, mit den größten Arbeiten des Ackerbaues beschäftigten
-      Eltern erzeugt, in einer, so zu sagen, fast von aller menschlichen
-      Gesellschaft abgeschnittenen Lage, kann man sich vorstellen, was für
-      eine Erziehung er gehabt haben mag. In seiner Einbildung ward es ihm
-      auffallend zu sehen, dass der Pfarrer und sein Vikar die einzigen
-      waren, welche keineswegs das Feld bearbeiteten, und dass sie in
-      ihren Personen alles vereinten, was die kleine Welt, in der er
-      lebte, ihm an Macht und Ansehen vorspiegelte. Dies zusammen
-      erweckte, aus Nachahmung, in ihm den Gedanken, Priester werden zu
-      wollen.
-    # Im Wortlaut des Buchsatzes.
+      Endlich legte er seine Füße über die zur Aufnahme derselben
+      verfertigte Querleiste, den rechten über den linken. Durch den
+      Rücken des obersten schlug er die Spitze eines ebenfalls glatten und
+      gut zugespitzten, fünfzehn Zoll und fünf Linien Pariser Maß langen
+      Nagels; und sobald seine linke Hand den Nagel in die vertikale
+      Richtung gebracht hatte, durchbohrte er sie mittels der Schläge
+      eines Hammers, den er in der rechten Hand hielt, bis er durch beide
+      Füße bis in das Loch gedrungen war, womit er die Leiste versehen
+      hatte.
+    # Die rechte Seite: der dritte Nagel und das Messer. Sie bricht ab, wo
+    # er sich in der falschen Seite verwundet.
     fortsetzung: >-
-      In dieser Absicht unterwarf er sich dem Unterrichte des Vikars, von
-      welchem er lesen und ein wenig schreiben lernte. Allein die Not seiner
-      Familie, die sie außer Stand setzte, ihm ein Erbteil auszusetzen, zwang
-      ihn, ganz und gar aufs Studieren Verzicht zu tun, und er entschloss
-      sich, das Schumacherhandwerk zu erlernen.
+      Das durchbohrende Eisen war hinlänglich durchgegangen, um daselbst
+      fest genug zu halten.
 
 
-      Die Verleugnung seines eigenen Willens in der Wahl eines Standes, der
-      die Geschicke des Lebens bestimmt, hat stets auch den stärksten Geist
-      empört
+      Hierauf war er darauf bedacht, nachdem er den dritten Nagel durch
+      seine linke Hand geschlagen hatte – was er durch die rechte
+      bewerkstelligte –, und sobald er sich mittels eines Strickes, den er
+      vorrätig und zu unterst ausgebreitet hatte, über der Mitte seines
+      Körpers fest an des Kreuzes Stamm angebunden hatte, sich in der
+      Seite mit einem Messer, einem Couteau de Cordonnier, das er zu
+      dieser Operation zu sich genommen hatte, eine Wunde beizubringen.
+      Allein er war in dem Augenblicke, als er sie sich beibrachte, nicht
+      bei sich, um zu begreifen, dass die Wunde die rechte und nicht die
+      linke Seite treffen und zwar in die Brusthöhle und nicht in den
+      Unterleib dringen müsse. Er verwundete sich schräg zwei Zoll unter
+      dem linken Hypochondrium gegen den inneren Winkel der
+
 ---
 
 Platzhalter für die lange Beschreibung.

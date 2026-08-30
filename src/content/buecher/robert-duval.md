@@ -32,46 +32,56 @@ reihenfolge: 3
 # Aus dem Manuskript, im Wortlaut. Der Text ist als Exposee gesetzt —
 # Kapitelzeilen und Gedankenstriche gehoeren zur Form, nicht zur Kuerzung.
 leseprobe:
-  # GESCHAETZT: das erste Kapitel.
-  seite: 5
+  # **Nicht der Anfang.** Hier stand das erste Kapitel, „Robert ist allen
+  # fremd" — die Vorstellung der Figur, und damit noch einmal der
+  # Klappentext.
+  #
+  # Jetzt Hongkong: das Dach ueber den Bankentuermen, Jo, die ihm die
+  # Firmenzeichen als Kunstwerke vorliest, und was daraus wird.
+  #
+  # GESCHAETZT: die Stelle liegt bei 73 % des Buchsatzes. Der Band hat
+  # rund 48 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
+  # rund 24 fuer diese, und die Stelle um 18.
+  seite: 18
+  # Im Wortlaut des Manuskripts, Absaetze 32 und 33. Der letzte laeuft auf
+  # der rechten Seite weiter.
   text: >-
-    Robert Duval, der eigenen Zeit fremd und ohne bedeutenden Namen oder
-    Vermögen in das geheimnislose Frankreich des 20. Jahrhunderts geboren,
-    findet nur in den Büchern kolonialer britischer Autoren eine Befreiung
-    von der Erdenschwere. Beschreibung seiner Fremdheit vom Rest der Welt —
-    Beschreibung seiner Familie: Vater Aloïs weiß einen mit
-    Wildleberpasteten gedeckten Tisch mehr zu schätzen als
-    ein gutes Buch. (Die Eltern heißen durch einen bemerkenswerten
-    Zufall Aloïs und Aloïse — er nennt sie He-Aloïs und She-Aloïs).
-    Beschreibung von Roberts idiosynkratischen Studien in öffentlichen
-    Bibliotheken — Exkurs Rudyard Kipling und das British Raj — Exkurs
-    Literatur: Romane von Paul Scott und deren Verfilmungen, The Jewel in
-    the Crown — er ist von BBC-Dokumentationen fasziniert, später besonders
-    von denen über englische Privatschulen — wünscht sich selbst eine
-    solche zu besuchen — Familie ist überrascht von der Veränderung im
-    jungen Mann, jetzt fünfzehnjährig zeigt er einen bisher ungesehenen
-    Tatendrang in Bezug auf den Aufenthalt in einem britischen boarding
-    house.
-
-
-    Aufenthalt in England
-
-
-    Robert reist nach Gloucestershire und bezieht sein Zimmer im Cheltenham
-    College. Beschreibung des Schulalltags, Beschreibung von
-    internationalen Freundschaften, Gespräche mit einem Asiaten —
-    Freundschaft zwischen den Rassen, findet Gefallen an Cricket und Rugby,
-    erster Wunsch, erwachsen zu sein, und erste liebevolle Gefühle den
-    Eltern gegenüber (sobald sie abgereist sind),
-  # Im Wortlaut des Buchsatzes.
+    Als Jo und Robert gemeinsam austraten und sich auf dem Rooftop eine
+    Mevius Menthol teilten, zeigte sie auf die Hochhäuser, die high rise
+    buildings der Banken und Berater, die sie umgaben, und erklärte ihm im
+    Vokabular von Kabbala und Proportionslehre die Genese und Bedeutung
+    der Brand-Logos und der Typographien, was er für die Dauer einer
+    Zigarette noch mit Genuss anhörte, doch als sie ihm in semiotischen
+    Theorien die Bedeutung seines maßgeschneiderten Anzuges erklärte, war
+    er in Gedanken schon sehr weit abgeschweift – als sie dann jedoch eine
+    Reihe an Namen multinationaler Unternehmen so aussprach, als würde sie
+    von Kunstwerken sprechen, da resonierte es an einer Stelle tief in
+    seinem Gedächtnis und für einen kurzen Moment spürte er wieder, was
+    die Namen der East India Trade Company und ihrer Ableger bei ihm
+    ausgelöst hatten, und dann trifft ihn ihr Pferdeblick (Hippokephalos,
+    würde sich Robert später zusammenträumen) und er sah ihr ins Gesicht
+    mit einem bestimmten Ausdruck, den er auch in ihren Augen
+    wiedererkannte, und so wurden aus zwei Körpern mit demselben Verlangen
+    noch in dieser Nacht im Peninsula Hotel zwei Herzen mit demselben
+    Schlag.
+  # Die rechte Seite: die Wochen im Island Shangri-La. Sie bricht ab, wo
+  # das Geruecht anfaengt, das den Rest des Buches traegt.
   fortsetzung: >-
-    Entwicklung des Geistes und der Physiognomie: Freundschaft mit dem
-    Physikprofessor, Geschichte oder Literatur?, er liest Carlyles Sartor
-    Resartus, Exkurse: englische Frauen aus Poole Keynes oder Dean Close
-    (sie heißen immer Lilly und haben kräftige Schenkel und
-    Pferdegesichter – er schätzt die Wildheit und setzt sie in eine
-    Kontinuität mit der keltisch-britischen Königin Boudicca), das Gefühl,
-    ein Teilnehmer am Great Game zu sein
+    Danach trafen sie sich jede Woche im Island Shangri-La, wo Robert im
+    Zimmer unruhig ihre Ankunft erwartend und sein Begehren mit
+    Gin-Tonics kühlend an die Reitstunden in England dachte, um dann im
+    Rauchgeruch von Jos Körper nach dem Ursprung seiner Unruhe zu suchen,
+    die ihn während der Woche quälte, und die beiden verstanden sich
+    wirklich gut, denn Duval nahm in dieser Hinsicht keine Geisel, was Jo,
+    die bisher nur Männer aus dem Kulturmilieu gekannt hatte, zu dumpfen
+    Schreien in ungehörten Tonarten zwang und sie in unbekannte
+    Bewusstseinsströme abgleiten ließ.
+
+
+    Es ist nicht genau überliefert, wie die beiden ein Paar wurden, und
+    die genauen Umstände von Jos Kapitulation sind umstritten, aber es
+    geht das Gerücht um, dass sie Roberts Melancholie für künstlerische
+    Sensibilität hielt anstatt für eine
 rueckseite:
   titel: Mountains of Sadness
   kurztitel: Mountains of Sadness
@@ -92,45 +102,59 @@ rueckseite:
   motiv: wave
   # Aus dem Manuskript, im Wortlaut: der Aufstieg auf den Mount Huangshan.
   leseprobe:
-    # GESCHAETZT: der Anfang.
-    seite: 5
+    # **Nicht der Anfang.** Hier stand der erste Absatz mit dem Satz vom
+    # Kent- oder Windsorkragen — und der steht als Zitat schon auf der
+    # Bandseite. Zweimal dieselbe Zeile.
+    #
+    # Jetzt die Treppen vor dem Hotel: das Gespraech mit dem
+    # Supply-Traeger, gefuehrt ueber den WeChat-Uebersetzer.
+    #
+    # GESCHAETZT: die Stelle liegt bei 47 % des Buchsatzes. Der Band hat
+    # rund 48 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
+    # rund 24 fuer diese, und die Stelle um 11.
+    seite: 11
+    # Im Wortlaut des Manuskripts, Absaetze 12 bis 14. Die chinesischen
+    # Zeilen gehoeren zum Satz und bleiben stehen — das Gespraech laeuft
+    # ueber den Uebersetzer, und ohne beide Haelften waere es keines.
     text: >-
-      Ich habe mich nie entscheiden können, ob ich bei meinem Selbstmord
-      einen Kent- oder Windsorkragen tragen möchte. Nur deshalb lebe ich
-      noch. Die Yellow Mountains in der chinesischen Provinz Anhui nehmen
-      mir diese Entscheidung ab. Hier ist man nur in Wanderklamotten
-      adäquat gekleidet und die sehen so oder so schrecklich aus. Einer der
-      Gründe, warum ich mich von Shanghai aufgemacht habe und jetzt die
-      tausenden Stufen auf den Mount Huangshan erklimme. Ein weiterer Grund
-      ist, dass James Cameron hier Avatar gedreht hat. Ich mochte den
-      Film sehr. Mir gefiel der Gedanke, ein anderer werden zu können.
-      Schließlich schlüpft der querschnittgelähmte Protagonist in den
-      Körper eines dieser anmutigen blauhäutigen Außerirdischen. Fortan
-      lebt er mit ihnen auf ihrem Heimatplaneten. Dabei hat mich vor allem
-      die Entschlossenheit des Protagonisten beeindruckt, das
-      durchzuziehen. No second thoughts.
-
-
-      All das denke ich, während ich eine Stufe nach der anderen nehme —
-      der Weg auf den Mount Huangshan ist hervorragend ausgebaut — und in
-      mein Patagonia-Shirt schwitze. In regelmäßigen Abständen schieben
-      sich Chinesen an mir vorbei und ich muss an den Wegrand ausweichen,
-      was ich für Pausen nutze. Unter ihrer sonnengebräunten Haut zeichnen
-      sich Sehnen und Muskeln ab und sie scheinen kein Gramm Fett an sich
-      zu haben. Sie haben Bambusstöcke geschultert, an denen Bündel mit
-      Lebensmitteln für das Xihai Hotel hängen. Es ist das einzige Hotel
-      dort oben, wie ich aus dem Panda-Reiseführer weiß, und hat einen
-      Hunger, der nie gestillt werden kann.
-    # Im Wortlaut des Buchsatzes.
+      Wir haben uns auf die Treppen vor dem Hotel gesetzt und die
+      Landschaft liegt im letzten Glühen des Sonnenuntergangs. Der
+      Reisschnaps ist scharf. Ich huste, sage: „Shit." Der Supply-Träger
+      kippt seine Schale in einem Zug, die Bewegung fest und sicher. Ich
+      betrachte die Silhouetten der Berge, die vor dem Abendhimmel stehen,
+      und schmecke nach. Währenddessen tippt der Supply-Träger etwas in
+      sein Smartphone – ein billiges China-Ding, wie sie Aldi in
+      Deutschland in diesen Glaskästen vor der Kasse anbietet. Dann
+      streckt er mir das Display entgegen. Es zeigt die Maske des
+      WeChat-Übersetzers. Darin die Worte: 你在这里做什么？ — What are you
+      doing here? Ich schiele zu ihm hinüber, dann schaue ich wieder ins
+      Tal. Er schiebt sein Handy näher. Seine Augen sind groß wie die
+      eines Kindes, das auf eine schöne Geschichte wartet. Ich setze die
+      Flasche an, trinke einen großen Schluck. Holidays — 假期, tippe ich
+      schließlich zurück. Er neigt den Kopf, schaut mich prüfend an. Dann
+      tippt er: At the place where you were earlier. I've never met a
+      tourist there.
+    # Die rechte Seite: der Bambusstock und die Videothek. Sie bricht ab,
+    # wo das Beruhigende an der kleinen Auswahl anfaengt.
     fortsetzung: >-
-      Für die Träger heißt das: Drei Mal am Tag hinauf und wieder hinunter.
-      Eine Sisyphos-Arbeit. Die Bambusstöcke biegen sich unter der Last
-      und ich bin froh, dass ich nur einen Rucksack mit einer Flasche Wasser,
-      einem Windbreaker, meinem iPhone, Zigaretten und Magnesiumtabletten
-      dabeihabe. Mehr brauche ich nicht. Schließlich bleibe ich nicht lange.
+      I just look for the most beautiful spot, gebe ich ein und nehme
+      einen weiteren Schluck. In meinem Kopf wird es schummrig, als würde
+      sich mein Bewusstsein in der anbrechenden Nacht auflösen. How long
+      have you been doing this job? Er liest, lächelt, und tippt zurück.
+      自从我16岁开始。 — Since I was 16.
 
 
-      Auf der anderen Seite für immer. Je nachdem, wie
+      How so? Er zeigt mit einer Kopfbewegung auf einen Bambusstock, der
+      an die Wand des Hotels gelehnt ist, holt ihn heran und löst die
+      Bündel von den Enden. Die Handgriffe sind glatt und abgenutzt, das
+      Holz glänzt wie polierter Bernstein. Dann dreht er den Stock, erst
+      langsam, dann schneller, vollführt Kunststücke, die mich an
+      Kung-Fu-Filme mit Bruce Lee erinnern. Die habe ich in der
+      Dorf-Videothek ausgeliehen, als ich ein kleiner Junge war. Die
+      Todeskralle und solche Sachen. Babsis Videothek. Es gab drei Regale
+      und einen Erwachsenenbereich. Kurz: Die Auswahl war begrenzt. Das
+      hatte etwas
+
 ---
 
 Platzhalter für die lange Beschreibung.
