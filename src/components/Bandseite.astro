@@ -78,6 +78,7 @@ const seiten = [
     schluessel: 'a' as const,
     marke: 'Seite A',
     titel: d.titel,
+    untertitel: d.untertitel,
     autor: d.autor,
     klappentext: d.klappentext,
     zitat: d.zitat,
@@ -92,6 +93,7 @@ const seiten = [
           schluessel: 'b' as const,
           marke: 'Seite B',
           titel: hinten.titel,
+          untertitel: hinten.untertitel,
           autor: autorHinten,
           klappentext: hinten.klappentext,
           zitat: hinten.zitat ?? d.zitat,
@@ -197,7 +199,11 @@ const bestellung =
           </button>
         )}
         <article
-          class:list={['bandblock', index > 0 && 'bandblock--gewendet']}
+          class:list={[
+            'bandblock',
+            index > 0 && 'bandblock--gewendet',
+            seite.untertitel && 'bandblock--mit-untertitel',
+          ]}
           id={`seite-${seite.schluessel}`}
         >
           <div class="bandblock__text">
@@ -214,6 +220,17 @@ const bestellung =
                 <>
                   <p class="bandblock__marke">{seite.marke}</p>
                   <h2>{seite.titel}</h2>
+                  {
+                    /*
+                     * **Fehlt der Untertitel, steht hier nichts** — kein
+                     * leeres Element, keine zusammengefallene Zeile. Der
+                     * Abstand Titel→Autor haengt deshalb am Attribut am
+                     * Block, nicht an einer Luecke im Fluss.
+                     */
+                    seite.untertitel && (
+                      <p class="bandblock__untertitel">{seite.untertitel}</p>
+                    )
+                  }
                   <p class="bandblock__autor">{seite.autor}</p>
                 </>
               )

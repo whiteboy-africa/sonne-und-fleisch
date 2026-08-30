@@ -90,6 +90,8 @@ export type CatalogBook = {
   release: string;
   title: string;
   shortTitle: string;
+  /** Zeile unter dem Titel, nur in der Detailspalte und auf der Bandseite. */
+  subtitle?: string;
   author: string;
   description: string;
   quote: string;
@@ -167,6 +169,8 @@ export type MagazineData = {
 export type BookBackFace = {
   title: string;
   shortTitle: string;
+  /** Zeile unter dem Titel, nur in der Detailspalte und auf der Bandseite. */
+  subtitle?: string;
   author: string;
   description: string;
   quote: string;

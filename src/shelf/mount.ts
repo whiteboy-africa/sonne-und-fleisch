@@ -39,6 +39,7 @@ export function regalStarten(wurzel: HTMLElement) {
     panelText: pflicht<HTMLElement>(wurzel, '[data-panel-text]'),
     panelAugenbraue: pflicht(wurzel, '[data-panel-augenbraue]'),
     panelTitel: pflicht(wurzel, '[data-panel-titel]'),
+    panelUntertitel: pflicht(wurzel, '[data-panel-untertitel]'),
     panelAutor: pflicht(wurzel, '[data-panel-autor]'),
     panelKlappentext: pflicht(wurzel, '[data-panel-klappentext]'),
     panelZitat: pflicht(wurzel, '[data-panel-zitat]'),
@@ -221,6 +222,14 @@ export function regalStarten(wurzel: HTMLElement) {
     el.panel.setAttribute('aria-label', `Angaben zu ${gezeigt.title}`);
     el.panelAugenbraue.textContent = buch.release;
     el.panelTitel.textContent = gezeigt.title;
+    /*
+     * **Ohne Untertitel steht dort nichts.** `hidden` statt eines leeren
+     * Absatzes: ein leerer Absatz behielte seine Zeilenhoehe und schoebe
+     * den Namen vom Titel weg — bei jedem zweiten Band anders.
+     */
+    el.panelUntertitel.textContent = gezeigt.subtitle ?? '';
+    el.panelUntertitel.hidden = !gezeigt.subtitle;
+    el.panel.classList.toggle('hat-untertitel', Boolean(gezeigt.subtitle));
     el.panelAutor.textContent = gezeigt.author;
     el.panelKlappentext.textContent = gezeigt.description;
     el.panelZitat.textContent = `„${gezeigt.quote}“`;

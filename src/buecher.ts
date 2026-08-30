@@ -277,6 +277,7 @@ export function alsKatalogBuch(
     release: nummer ?? (ausserDerReihe(buch) ? '' : releasenummer(position)),
     title: d.titel,
     shortTitle: d.kurztitel ?? d.titel,
+    ...(d.untertitel ? { subtitle: d.untertitel } : {}),
     author: d.autor,
     description: d.klappentext,
     quote: d.zitat,
@@ -333,6 +334,7 @@ export function alsKatalogBuch(
           back: {
             title: d.rueckseite.titel,
             shortTitle: d.rueckseite.kurztitel ?? d.rueckseite.titel,
+            ...(d.rueckseite.untertitel ? { subtitle: d.rueckseite.untertitel } : {}),
             // Ohne eigene Angabe steht dieselbe Person wie vorn.
             author: d.rueckseite.autor ?? d.autor,
             description: d.rueckseite.klappentext,

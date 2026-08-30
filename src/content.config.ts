@@ -85,6 +85,37 @@ const leseprobe = z
 
 // Ein Buch = eine Datei in src/content/buecher/. Der Dateiname ist der Slug
 // und damit die Adresse (/programm/<slug>) und der stabile Schluessel fuer
+/*
+ * **Der Untertitel der einzelnen Geschichte**, nicht des Bandes. Manche
+ * Buecher tragen einen auf dem Titelblatt („oder: The Life and Times of
+ * Robert Duval") oder auf dem Umschlag („10.000 Dead Martyrs — A Study on
+ * Sensitivity"). Er gehoert dorthin, wo der Titel steht, und nirgends
+ * sonst: nicht in die Programmliste, nicht in og:title, nicht in
+ * og:description.
+ *
+ * **Sechzig Zeichen.** In der Detailspalte stehen ihm zwei Zeilen zu;
+ * mehr, und er faengt an, dem Klappentext den Platz wegzunehmen und liest
+ * sich wie einer. Die Grenze bricht den Bau ab statt zu warnen — eine
+ * Warnung im Bau sieht niemand.
+ *
+ * **Eine Zeile.** Ein `|`-Block brachte einen Zeilenumbruch mit, und der
+ * stand dann mitten im Untertitel. (Andersherum ist nichts zu pruefen:
+ * `>-` faltet den Umbruch zu einem Leerzeichen, davon ist hinterher
+ * nichts mehr zu sehen.)
+ */
+const untertitelFeld = z
+  .string()
+  .refine((wert) => !wert.includes('\n'), {
+    message: 'Der Untertitel ist eine Zeile. Ohne „|" schreiben.',
+  })
+  .refine(
+    (wert) => wert.length <= 60,
+    (wert) => ({
+      message: `Der Untertitel steht unter dem Titel und hat dort zwei Zeilen: höchstens 60 Zeichen, hier ${wert.length}.`,
+    }),
+  )
+  .optional();
+
 // Cover-Dateien unter public/buecher/<slug>/.
 const buecher = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/buecher' }),
@@ -94,6 +125,8 @@ const buecher = defineCollection({
     // gedruckten Buchruecken — beides ist schmal, also kurz halten.
     // Fehlt sie, nimmt die Seite den vollen Titel.
     kurztitel: z.string().optional(),
+    // Siehe `untertitelFeld` oben.
+    untertitel: untertitelFeld,
     autor: z.string(),
     // Klappentext: erscheint im Regal, wenn der Band herausgezogen ist.
     // Zwei bis vier Saetze, mehr passt nicht ins Panel.
@@ -263,6 +296,8 @@ const buecher = defineCollection({
       .object({
         titel: z.string(),
         kurztitel: z.string().optional(),
+        // Siehe `untertitelFeld` oben. Jede Geschichte hat ihren eigenen.
+        untertitel: untertitelFeld,
         // Ohne Angabe steht dieselbe Person wie vorn.
         autor: z.string().optional(),
         // Die Einführung in die andere Geschichte.

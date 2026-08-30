@@ -151,6 +151,12 @@ const baendeGestellt = katalog.filter((buch) => buch.release && !buch.blind).len
           <span class="seitenmarke seitenmarke--kopf" data-seitenmarke hidden>Seite A</span>
         </p>
         <h2 data-panel-titel></h2>
+        <!--
+          Der Untertitel der Geschichte. Steht leer da, solange keiner
+          gesetzt ist, und wird dann ausgeblendet — kein leeres Element
+          im Fluss, sonst bliebe seine Zeilenhoehe als Luecke stehen.
+        -->
+        <p class="book-details__untertitel" data-panel-untertitel hidden></p>
         <p class="book-details__author">
           <span data-panel-autor></span>
           <span class="seitenmarke seitenmarke--autor" data-seitenmarke hidden>Seite A</span>

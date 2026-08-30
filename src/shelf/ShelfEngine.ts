@@ -1607,6 +1607,13 @@ export class ShelfEngine {
 
   private bindEvents() {
     this.canvas.addEventListener("wheel", this.handleWheel, { passive: false });
+    /*
+     * **Der Doppelklick findet von ueberall zurueck** — dieselbe Geste
+     * wie in der Leseprobe, wo sie aus der Lupe herausfuehrt. Ohne sie
+     * waere der einzige Ausweg aus einer verfahrenen Vergroesserung der
+     * Weg ueber den Stapel und wieder herein.
+     */
+    this.canvas.addEventListener("dblclick", this.handleDoubleClick);
     this.canvas.addEventListener("pointerdown", this.handlePointerDown);
     this.canvas.addEventListener("pointermove", this.handlePointerMove);
     this.canvas.addEventListener("pointerup", this.handlePointerUp);
@@ -1660,6 +1667,14 @@ export class ShelfEngine {
       this.runtimeBooks.length - 1,
     );
     this.lastInputTime = performance.now();
+  };
+
+  private handleDoubleClick = (ereignis: MouseEvent) => {
+    if (this.mode !== "inspect") return;
+    if (this.aufschlagStufe !== "aus" || this.heftStufe !== "aus") return;
+    ereignis.preventDefault();
+    this.betrachtungsblickZuruecksetzen();
+    this.callbacks.onStatus("Ansicht zurückgesetzt");
   };
 
   private handlePointerDown = (event: PointerEvent) => {
@@ -3639,6 +3654,9 @@ export class ShelfEngine {
     this.wipeFortschritt = 0;
     this.mode = "inspect";
     this.controls.enabled = true;
+    // Der naechste Band wird von vorn angesehen, nicht aus der
+    // Vergroesserung des vorigen.
+    this.betrachtungsblickZuruecksetzen();
     this.dipLicht = 1;
     this.dipGetauscht = false;
     this.callbacks.onWipeFrame(1);
@@ -3694,6 +3712,30 @@ export class ShelfEngine {
     }
   }
 
+  /**
+   * **Der Blick auf den Band wird zurueckgesetzt.**
+   *
+   * In der Betrachtung gehoert die Kamera dem Zeiger: `enableZoom` laesst
+   * heranfahren, und am Telefon ist genau das der Weg an den Umschlag.
+   * Nur nahm den Zoom niemand zurueck. Wer einmal herangefahren war,
+   * blieb es — beim Bandwechsel, beim Zurueckgehen in den Stapel, bei
+   * jedem weiteren Band. Auf dem Schreibtisch kam dazu, dass die
+   * Betrachtung mit einem Bildversatz komponiert ist (der Band links, die
+   * Tafel rechts): faehrt man heran, waechst der Band um einen Punkt, der
+   * nicht in der Bildmitte liegt, und schiebt sich oben aus dem Rahmen.
+   * Dann steht ein angeschnittenes Buch am oberen Rand und darunter
+   * Schwarz, und es gibt keine Geste, die das zuruechnimmt.
+   *
+   * `focusCameraPosition` und `focusCameraTarget` sind die komponierte
+   * Lage. Sie wieder aufzusetzen ist die ganze Ruecknahme.
+   */
+  private betrachtungsblickZuruecksetzen() {
+    this.camera.position.copy(this.focusCameraPosition);
+    this.controls.target.copy(this.focusCameraTarget);
+    this.camera.lookAt(this.controls.target);
+    this.controls.update();
+  }
+
   returnToShelf() {
     // Zugeklappt wird der Band von der Leseprobe selbst, nicht von hier.
     if (this.aufschlagStufe !== "aus") return;
@@ -3730,6 +3772,9 @@ export class ShelfEngine {
       this.wipeFortschritt = 1;
       this.updateWipe(0);
     }
+    // Der Stapel faengt wieder bei seinem eigenen Abstand an, nicht bei
+    // dem, auf den zuletzt herangefahren wurde.
+    this.betrachtungsblickZuruecksetzen();
     this.controls.enabled = false;
     this.mode = "returning";
     this.callbacks.onMode(this.mode, this.selectedIndex);
