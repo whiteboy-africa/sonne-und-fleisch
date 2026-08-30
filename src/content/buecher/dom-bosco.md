@@ -32,7 +32,7 @@ schrift_farbe: '#f1d7b3'
 motiv: gather
 hoehe: 2.0
 dicke: 0.078
-reihenfolge: 5
+reihenfolge: 6
 leseprobe:
   # GESCHAETZT: die Stelle liegt im ersten Drittel. Aus dem Umbruch
   # nachtragen, sobald er da ist.

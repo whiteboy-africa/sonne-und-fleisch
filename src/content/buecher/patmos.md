@@ -20,7 +20,7 @@ schrift_farbe: '#d4b99f'
 motiv: continuum
 hoehe: 2.0
 dicke: 0.078
-reihenfolge: 6
+reihenfolge: 7
 # Zweite Vorderseite: eine Titelseite in Fraktur, Schwarz auf Papierweiß.
 leseprobe:
   seite: 44
