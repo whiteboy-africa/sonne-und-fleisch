@@ -34,55 +34,83 @@ hoehe: 2.0
 dicke: 0.078
 reihenfolge: 5
 leseprobe:
-  # GESCHAETZT: die Stelle liegt im ersten Drittel. Aus dem Umbruch
-  # nachtragen, sobald er da ist.
-  seite: 14
+  # **Nicht der Anfang.** Hier stand die Begegnung mit Barthélemy Garelli
+  # in der Sakristei — der Gruendungsmoment, und derselbe, den der
+  # Klappentext daneben schon erzaehlt.
+  #
+  # Jetzt die Episode mit den Gefangenen von 1855: Dom Bosco fuehrt 350
+  # Haeftlinge zu einem Ausflug aus dem Gefaengnis.
+  #
+  # Aus „dom_bosco_deutsch_rohfassung.md", im Wortlaut, Absaetze 221 bis
+  # 231.
+  #
+  # GESCHAETZT: die Stelle liegt bei 91 % der Rohfassung. Der Text hat
+  # rund 68.000 Zeichen, das sind bei diesem Satzspiegel um die 38
+  # Seiten — die Stelle also um 35.
+  seite: 35
   text: >-
-    Eines Morgens, am 8. Dezember 1841, schickte er sich an, in der Kirche
-    des heiligen Franz von Assisi in Turin die Messe zu lesen; während er
-    die priesterlichen Gewänder anlegte, hörte er den Lärm eines Streits
-    und wandte den Kopf; der Sakristan schüttelte einen jungen Burschen wie
-    einen Pflaumenbaum und beschimpfte ihn als Bettler und Nichtsnutz.
-    Und da der Bursche verdutzt sich nicht rührte, stieß er ihn grob
-    hinaus.
+    Die Episode mit den Gefangenen, die die italienische Regierung in
+    Erstaunen versetzte, ereignete sich 1855.
 
 
-    – Nun, sagte er, hab keine Angst, wie heißt du? – Barthélemy Garelli. –
-    Woher bist du? – Aus Asti. – Hast du Eltern? – Sie sind tot. – Dein
-    Alter? – 16 Jahre. – Kannst du lesen und schreiben? – Ich kann
-    nichts. – Kannst du wenigstens deine Gebete? – Ich kann nichts.
+    Trotz der erdrückenden Arbeit, die ihm seine Waisenhäuser und seine
+    Patronate verschafften, fand Dom Bosco noch die Zeit, die Gefängnisse
+    zu besuchen und den Gefangenen die Beichte abzunehmen, und besonders
+    jenen Kindern, deren Anblick ihm seine Sendung offenbart hatte.
 
 
-    Und in eben diesem Augenblick, da Dom Bosco ihn zum Anfang das
-    Kreuzzeichen lehrte, wurde das salesianische Oratorium geboren. Dieser
-    Bettler war der Erstgeborene eines unermesslichen Geschlechts. Dieses
-    kaum begonnene Kreuzzeichen segnete das ganze Weltall, warf nach allen
-    Seiten eine Aussaat von Barmherzigkeit und Hingabe, die nach und nach
-    aufgehen sollte.
+    Er hatte sich von ihnen lieben gemacht und war fest überzeugt, dass
+    man, wenn man ihnen Zuneigung bezeigte, statt sie in einer verseuchten
+    Umgebung wegzuschließen, mühelos dahin gelangen würde, sie von ihren
+    Lastern zu reinigen und von ihren Übeln zu heilen.
 
 
-    Der Schüler brachte seinem Meister andere zu; bald wimmelte es von
-    ihnen; ihre Zahl überstieg rasch hundert. Dom Bosco versammelte sie
-    abends in der Sakristei der Kirche, und tagsüber ging er sie in ihren
-    Werkstätten besuchen oder suchte Arbeit für die, welche keine hatten.
-    Das Werk lief ohne allzu große Hindernisse, als er, da seine
-    Studienzeit zu Ende war, das Institut Sankt Franziskus verlassen
-    musste. Sein Beichtvater Dom Cafasso, ein heiligmäßiger Mann, der ihn
-    liebte, ließ ihn daraufhin zum Direktor des kleinen Hospizes der
-    heiligen Philomena ernennen, und er wurde bei dieser Gelegenheit einem
-    Priester französischer Herkunft namens Borel beigeordnet, der ein
-    von der Marquise von Barolo gestiftetes Mädchenasyl verwaltete.
-  # Im Wortlaut des Buchsatzes.
+    Seiner Theorie gemäß ging er durch das Sakrament der Buße und die
+    häufige Kommunion vor, sicher, dass auf diesem Weg die Gnade in sie
+    herabsteigen würde.
+
+
+    Nun hatte er in der Tat erstaunliche Ergebnisse erzielt. Er wollte
+    diese Buben für ihren guten Willen belohnen, und er bat den
+    Gefängnisdirektor, als sei es die einfachste Sache, seine kleinen
+    Beichtkinder auf einen Ausflug führen zu dürfen. Er erbot sich, sie
+    morgens mitzunehmen und abends zurückzubringen.
+
+
+    Der Direktor riss den Mund auf vor Verblüffung, dann brach er in
+    Gelächter aus, so verrückt schien ihm der Vorschlag; als er aber sah,
+    dass Dom Bosco sich nicht aus der Fassung bringen ließ, sagte er zu
+    ihm: »Ich könnte Ihnen, selbst wenn ich wollte, eine derartige
+    Erlaubnis nicht erteilen, denn ich bin dazu nicht befugt; richten Sie
+    ein Gesuch an den Innenminister, und er wird tun, was ihm gut dünkt.«
+
+
+    Und der Beamte lächelte und dachte: »Dir wird man schon
+    heimleuchten!«
+  # Die rechte Seite: die Bewilligung und der Aufbruch. Sie bricht ab, wo
+  # die Karawane losgeht.
   fortsetzung: >-
-    Seine Kammer lag in diesem Asyl. Er brachte seine Kinder dorthin, doch
-    sie reichte nicht aus, sie zu fassen; ihre Zahl wuchs unaufhörlich,
-    sie kamen über alle Pfade, sie langten über alle Straßen an. Zu mehr
-    als dreihundert quollen sie in die Korridore, ins Treppenhaus,
-    ergossen sich in den Hof.
+    Dom Bosco verfasste sogleich eine entsprechende Eingabe an den
+    Minister, der damals Herr Urbain Ratazzi war, und, so unwahrscheinlich
+    es ist, sie wurde bewilligt.
 
 
-    Der Abbé Borel, der Dom Bosco der zuverlässigste Freund war, half ihm
-    nach Kräften, aber die Lage wurde unhaltbar.
+    Die Wahrheit ist, dass Herr Ratazzi trotz seiner antiklerikalen
+    Politik ein sehr intelligenter Mann war; er kannte Dom Boscos Werke
+    und willigte als praktischer Mensch ein, den Versuch zu wagen, wobei
+    er sich vielleicht vorbehielt, im Fall des Gelingens zu prüfen, ob
+    nicht Anlass bestünde, die Korrektionshaft von Kindern auf weniger
+    barbarische Weise zu ordnen.
+
+
+    Mit seiner Ermächtigung versehen, begab sich Dom Bosco eines schönen
+    Morgens in aller Ruhe ins Gefängnis und legte dem Direktor den Brief
+    des Ministers vor, der sich verblüfft verneigte und Befehl gab, die
+    Tore zu öffnen.
+
+
+    Und Dom Bosco brach an der Spitze einer Karawane von 350 Häftlingen
+    auf und führte sie zu einem
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 rueckseite:
   titel: La Chine hermétique

@@ -27,43 +27,67 @@ hoehe: 2.0
 dicke: 0.078
 reihenfolge: 2
 leseprobe:
-  # GESCHAETZT: der Text setzt sofort ein. Aus dem Umbruch nachtragen.
-  seite: 9
+  # **Nicht der Anfang.** Hier standen die ersten Seiten — der Schwede im
+  # Gras und Lydia mit dem Hund. Genau das, was der Klappentext daneben
+  # schon erzaehlt.
+  #
+  # Jetzt der Abend am Kanalufer, an dem Tobias dazukommt.
+  #
+  # Aus „A.Keppel_Dolly_(Draft).pdf". **Der Entwurf ist unfertig**:
+  # Tippfehler, fehlende Kommas, „Busweiser" statt Budweiser,
+  # „vergas" statt vergaß. Das ist hier stillschweigend berichtigt, der
+  # Wortlaut steht. Absatzgrenzen kommen aus der PDF und sind dort nicht
+  # sicher auszulesen — sie sind nach dem Sinn gesetzt.
+  #
+  # GESCHAETZT: die Stelle liegt bei 53 % des Entwurfs. Der Band hat rund
+  # 176 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also rund
+  # 88 fuer diese, und die Stelle um 47.
+  seite: 47
   text: >-
-    Der Schwede wälzt sich im Gras, wirft die Arme in die Luft und ruft:
-    „Wo ist sie? Wo ist sie?" Es ging um eine kleine, tätowierte
-    Kärntnerin, die ihm auf dem Gehsteig gerade durch die Lappen gegangen
-    ist. Wir liegen im Garten, oder eher in dem begrünten kleinen
-    Hinterhof, und sind betrunken. Die Sonne brüllt mit den Vögeln vom
-    Himmel. Alles zu hell und zu laut.
+    Lydia schien die ganze Zeit von einer merkwürdigen Nervosität
+    durchzogen, die sie mit wirrem Geschnatter zu überspielen suchte. Wir
+    setzten uns ans Kanalufer, schräg gegenüber der „Hafenkneipe", die
+    während der Sommermonate von einem mittelalterlichen Hippiepaar
+    betrieben wurde, das Herbst und Winter in Vietnam oder Thailand oder
+    sonst irgendwo in Südostasien verbringt, wo es immer schön warm ist.
+    Das Kanalufer war jedenfalls jetzt schon schön warm. Ich öffnete ein
+    kühles Budweiser und stieß mit Lydia auf diese Angelegenheit an, die
+    wir nun ja endlich hinter uns gebracht hätten.
 
 
-    Dann knallte die Metalltüre zum Hof auf und das grelle Bellen von Hund
-    Dolly biss sich in mein Bewusstsein. Ich schreckte hoch. Ich sah das
-    kleine, karamellbraune Viech, wie es knurrte und keifte, sah wie die
-    kackfarbene Kotpumpe mit dem Dackelkörper und dem Biegelkopf an der
-    Leine riss. Lydia, die Besitzerin, die junge Grundschullehrerin,
-    wusste nicht, wie umgehen mit der Situation.
+    Dann kam, bereits angekündigt durch unzählige, nervende
+    Pärchenmikroanrufe, endlich Tobias. Tobias war ein vierschrötiger
+    Architekt, Mitte 30, der mich immer ein wenig an Supermario oder einen
+    Bullen erinnerte. Er verströmte stets eine latent aggressive
+    Fröhlichkeit und hatte ständig neue Businessideen, die er nicht müde
+    wurde mir bei diversen Begegnungen zu erzählen. Von Falkensnacks für
+    Dubai (oder waren es Käfige?) über diverse Apps, deren Inhalt und
+    Funktion ich sofort wieder vergaß, bis hin zu …… war schon alles
+    Mögliche dabei. Jetzt machte er Bildungskarenz, in der er sich zum
+    (natürlich) evangelischen Priester ausbilden lassen wollte. Er ist
+    Donauschwabe, Siebenbürgensachse oder eine andere Variante von
+    Rumäniendeutschen, nun ja.
 
 
-    Angst und Überforderung standen ihr ins Gesicht geschrieben, aber
-    genau wie bei ihrem Köter auch eine Art Revierempfinden. Sie dachte,
-    diese Zeit und dieser Garten gehörten jetzt ihr. Sie hätte nicht mit
-    diesen beiden menschlichen Partyüberbleibseln gerechnet, die hier im
-    Gras ihren Rausch ausdösen. Tja, falsch gerechnet. Die Angst in ihren
-    Augen machte mich wütend, denn sie war deplatziert und Ausdruck ihrer
-    Spießigkeit.
-  # Im Wortlaut des Entwurfs.
+    Jovial ließ er sich neben seiner Frau fallen und fragte breitbeinig,
+    wie es denn ginge und dass das mit dem Liegestuhl ja eigentlich gar
+    nicht so nötig war. Prostheidewitzka!
+  # Die rechte Seite: der Glamping-Urlaub. Sie bricht ab, wo der Erzaehler
+  # ausspricht, was er von den beiden haelt.
   fortsetzung: >-
-    Ich winkte freundlich und stand auf. Ich weckte den Schweden. Wir kennen
-    uns eigentlich ganz gut, haben uns auch schon gegenseitig besucht,
-    geredet, getrunken, tausend mal auf der Straße oder im Supermarkt
-    getroffen, aber sie schaute immer noch so ängstlich, als lägen dort
-    Freddy Krüger und Chucky die Mörderpuppe in ihrem Garten.
+    Ich musste mir Mühe geben, die freundlich nachbarschaftlichen Gleise,
+    auf denen dieser Abend fuhr, nicht zu verlassen. Er berichtete mir
+    gleich und ungefragt von einem Glamping-Urlaub in der Slowakei, wo sie
+    sich eine Art Stehzelt gemietet hatten, das auf einem Glampingplatz
+    lag, wo man nicht allein war, die Nachbarn aber auch nicht in Sicht.
 
 
-    Sie nahm sogar den kleinen, geretteten, rumänischen Straßenhund Dolly
-    auf den Arm, als würden wir ihn gleich in tausend Stücke reißen
+    Ich hatte schon ein zweites Bier intus und musste aufpassen, dass ich
+    den Zweck dieses Abends nicht aus den Augen verlor. Also fragte ich
+    sie zuerst, ob es denn nun wieder regulären Unterricht in der Schule
+    gäbe. Wobei sich herausstellte, dass sie täglich von 8 bis 14 im
+    Dienst war, also alles wie gehabt. Wahnsinn, sie kamen mir so
+    radikal-normal vor, wie das
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 rueckseite:
   titel: The Rise of Damascus Goat
