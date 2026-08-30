@@ -71,8 +71,21 @@ leseprobe:
     Artur schaute mich an, so als wolle er etwas sagen, aber immer wenn er
     sich anschickte den Mund zu öffnen, pressten sich seine Lippen wieder
     zusammen und seine Blicke irrten durch das Dunkel der Winternacht.
-    Zuerst hatte ich vor, mich abzuwenden und zu gehen, aber
-    [[dann schaute ich Artur |20]]
+    Zuerst hatte ich vor, mich abzuwenden und zu gehen, aber dann schaute
+    ich Artur abermals an, schloss meine Augen und wähnte wieder müde das
+    Licht des Sternenhimmels zu sehen.
+  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+  fortsetzung: >-
+    Als ich sie öffnete, hielt er mir die Ikone hin. Nicht, um sie mir zu
+    geben — er hielt sie mir hin, wie man jemandem etwas zeigt, das er
+    ohnehin schon kennt.
+
+
+    Ich sagte, dass sie schön sei. Er verstand das Wort nicht. Ich sagte
+    es noch einmal, langsamer, und zeigte dabei auf den Heiligenschein,
+    und er nickte und sagte etwas in seiner Sprache, von dem ich bis heute
+    glaube, dass es [[nicht ja hieß. |16]]
 # Farben für Rücken, Rückseite und Kanten — aus dem Umschlag genommen:
 # das Nachtblau des Himmels, das Gold der Schrift.
 cover_farbe: '#2e240e'

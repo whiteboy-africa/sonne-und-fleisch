@@ -59,7 +59,19 @@ leseprobe:
     noch eine weitere Geheimzutat enthalten würde, die er mir jedoch um
     nichts in der Welt verraten würde; „Sie, Herr Selters", sagte mir
     dieser unverschämte Mensch, „lieben das Abenteuer, deswegen werde ich
-    Ihnen [[|17]]
+    Ihnen den Namen nennen.
+  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+  fortsetzung: >-
+    Er nannte ihn. Er sagte ihn so leise, dass ich zweimal nachfragen
+    musste, und beim zweiten Mal lachte er, als hätte er mich
+    hereingelegt.
+
+
+    Ich habe den Namen aufgeschrieben, sobald ich auf der Straße war, auf
+    die Rückseite einer Quittung, und ich habe ihn seither niemandem
+    gesagt. Nicht aus Treue. Sondern weil er, laut ausgesprochen, sofort
+    [[nach nichts klingt. |20]]
 format: Broschur
 verfuegbarkeit: In Vorbereitung
 hoehe: 2.0
@@ -120,7 +132,18 @@ rueckseite:
       aus." Meine Stimme ist heiser. „Aber das war eine Suffaktion. Dass mein
       Leben versaut ist wegen was, hinter dem ich nicht stehe." Marie stellt
       ihre Tasche ab, zieht die Schuhe aus. „Du kennst mich", sage ich. „Wenn
-      mich jetzt alle hassen, weil ich [[|17]]
+      mich jetzt alle hassen, weil ich das gesagt habe.
+    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    fortsetzung: >-
+      Sie sagt nichts. Sie hängt ihre Jacke auf, geht in die Küche, lässt
+      Wasser laufen. Ich höre, wie sie ein Glas nimmt und wieder
+      hinstellt, ohne getrunken zu haben.
+
+
+      Dann kommt sie zurück, setzt sich mir gegenüber und schaut mich an,
+      wie man jemanden anschaut, den man kennt. „Es hassen dich nicht
+      alle", sagt sie. „Es ist nur so, dass [[dich niemand verteidigt. |26]]
 ---
 
 Ein Band, zwei Vorderseiten. Vorn „Opium" von C. T. Selters —

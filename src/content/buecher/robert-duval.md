@@ -64,7 +64,19 @@ leseprobe:
     internationalen Freundschaften, Gespräche mit einem Asiaten —
     Freundschaft zwischen den Rassen, findet Gefallen an Cricket und Rugby,
     erster Wunsch, erwachsen zu sein, und erste liebevolle Gefühle den
-    Eltern gegenüber (sobald sie [[|17]]
+    Eltern gegenüber (sobald sie weit genug weg sind).
+  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+  fortsetzung: >-
+    Zweites Jahr: Latein, Griechisch, eine Rüge wegen Unaufmerksamkeit im
+    Gottesdienst, ein Brief nach Hause, in dem das Wort Heimweh nicht
+    vorkommt.
+
+
+    Drittes Jahr: er wächst um elf Zentimeter, gewinnt einen Preis im
+    Weitsprung und schreibt zum ersten Mal etwas auf, das er niemandem
+    zeigt. Der Eintrag darüber im Register lautet: [[keine besonderen
+    Vorkommnisse. |26]]
 rueckseite:
   titel: Mountains of Sadness
   kurztitel: Mountains of Sadness
@@ -113,7 +125,18 @@ rueckseite:
       zu haben. Sie haben Bambusstöcke geschultert, an denen Bündel mit
       Lebensmitteln für das Xihai Hotel hängen. Es ist das einzige Hotel
       dort oben, wie ich aus dem Panda-Reiseführer weiß, und hat einen
-      Hunger, [[|17]]
+      Hunger, den niemand sieht.
+    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    fortsetzung: >-
+      Sie steigen schneller als ich, mit dreißig Kilo auf der Schulter,
+      und sie bleiben nicht stehen, wenn sie mich überholen. Einer nickt.
+      Die anderen sehen die Stufen an.
+
+
+      Oben, vor dem Hotel, laden sie ab, setzen sich auf ihre Stöcke und
+      essen aus mitgebrachten Behältern. Das Hotel verkauft eine Schüssel
+      Nudeln für den Lohn eines halben [[Aufstiegs. |12]]
 ---
 
 Platzhalter für die lange Beschreibung.

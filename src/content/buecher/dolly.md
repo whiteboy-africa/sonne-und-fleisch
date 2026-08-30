@@ -52,7 +52,19 @@ leseprobe:
     genau wie bei ihrem Köter auch eine Art Revierempfinden. Sie dachte,
     diese Zeit und dieser Garten gehörten jetzt ihr. Sie hätte nicht mit
     diesen beiden menschlichen Partyüberbleibseln gerechnet, die hier im
-    Gras ihren Rausch ausdösen. Tja, [[falsch gerechnet. |18]]
+    Gras ihren Rausch ausdösen. Tja, falsch gerechnet.
+  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+  fortsetzung: >-
+    Ich habe mir am Nachmittag eine neue Gartenliege besorgt. Eine mit
+    Rollen, damit ich sie in den Schatten ziehen kann, ohne aufzustehen.
+    Der Verkäufer fragte, ob ich viel draußen sei. Ab jetzt schon, sagte
+    ich.
+
+
+    Seither führe ich Buch. Wann die Besitzer das Haus verlassen, wann sie
+    zurückkommen, an welchen Tagen niemand da ist und wie lange es dauert,
+    bis jemand ein Geräusch [[im Hof für ein Geräusch hält, |30]]
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 rueckseite:
   titel: The Rise of Damascus Goat
@@ -94,7 +106,18 @@ rueckseite:
 
       Als die Prüfer kamen, fanden sie alles in Ordnung, und das war die
       Wahrheit. Sie fuhren wieder ab, und drei Wochen später brannte der
-      Stall, und der Bericht darüber besteht aus einem Satz, in dem [[|26]]
+      Stall, und der Bericht darüber besteht aus einem Satz, in dem das
+      Wort Ziege nicht vorkommt.
+    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    fortsetzung: >-
+      Ich habe den Satz abgeschrieben und trage ihn seither bei mir. Er
+      ist in der Sprache der Ämter verfasst, die nichts behauptet und
+      alles zulässt: ein Datum, ein Sachschaden, kein Urheber.
+
+
+      Wer den Bericht liest, erfährt, dass es gebrannt hat. Wer das Tier
+      gekannt hat, erfährt [[etwas anderes. |16]]
 ---
 
 Platzhalter für die lange Beschreibung.

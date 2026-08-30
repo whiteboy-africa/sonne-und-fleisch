@@ -57,7 +57,19 @@ leseprobe:
     Kreuzzeichen lehrte, wurde das salesianische Oratorium geboren. Dieser
     Bettler war der Erstgeborene eines unermesslichen Geschlechts. Dieses
     kaum begonnene Kreuzzeichen segnete das ganze Weltall, warf nach allen
-    Seiten [[eine Aussaat von Barmherzigkeit und Hingabe, |24]]
+    Seiten eine Aussaat von Barmherzigkeit und Hingabe,
+  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+  fortsetzung: >-
+    die keimen sollte in Turin und in Buenos Aires, in Marseille und auf
+    den Inseln, wo niemand sie gesät hatte.
+
+
+    Am folgenden Sonntag waren es neun. Am Sonntag darauf zwanzig. Sie
+    kamen aus den Ziegeleien und von den Baustellen, sie hatten Hunger und
+    keinen Namen, den jemand kannte, und der Priester lernte in diesem
+    Winter, dass man ihnen zuerst zu essen geben muss und erst danach
+    [[das Kreuzzeichen. |18]]
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 rueckseite:
   titel: La Chine hermétique
@@ -111,8 +123,19 @@ rueckseite:
       der Rache. Manche fürchten, ihre Anklageschrift könnte gestohlen
       werden und die Justiz ihnen die posthume Genugtuung versagen. Sie
       schreiben sie auf ihre Haut, im Wissen, dass niemand sie anzurühren
-      wagt, denn ein Vorurteil behauptet, es sei unmöglich, [[Zeichen zum
-      Verschwinden zu bringen, die auf |22]]
+      wagt, denn ein Vorurteil behauptet, es sei unmöglich, Zeichen zum
+      Verschwinden zu bringen, die auf die Haut geschrieben sind.
+    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    fortsetzung: >-
+      Das ist ein Irrtum, und ich habe ihn dreimal widerlegt gesehen. Man
+      braucht eine Nadel, Essig und Geduld; die Schrift geht fort, die
+      Narbe bleibt, und die Narbe sagt dasselbe.
+
+
+      Einer trug seine Klage über die ganze Brust, in kleinen, sehr
+      regelmäßigen Zeichen. Er starb im Frühjahr. Ich habe den Text
+      abgeschrieben, bevor man ihn [[fortbrachte. |14]]
 ---
 
 Ein Band, zwei Vorderseiten. Vorn „Biographische Skizze über Dom Bosco"

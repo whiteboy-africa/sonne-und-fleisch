@@ -126,8 +126,18 @@ rueckseite:
       bei den Quitten gemeinsam einen höhnischen Brief an den König der
       Tres Daciae verfassten und wie sie bei einer ihrer Reisen über
       ebenjenes Meer die stolzen mohammedanischen Verehrer von
-      [[Termagant]] gequält und gedemütigt hatten, welche ihre [[Marter
-      tonlos ertrugen; |24]]
+      [[Termagant]] gequält und gedemütigt hatten, welche ihre Marter
+      tonlos ertrugen;
+    # Die rechte Seite, weiter im Wortlaut des Buchsatzes. Sie bricht ab,
+    # wo der Erdball mit Splittern des Kreuzes uebersaet ist.
+    fortsetzung: >-
+      wie seine Miliz eine Gruppe von Hindu-Brahmanen in der Hitze
+      Varanasis stellte, um sie auf das [[Samsara-Leidensrad]] zu
+      flechten, und wie sie an einem anderen, etwas kühleren Tag alle in
+      Andacht versammelt und in kalte Kamelhaardecken gehüllt zum Glimmen
+      von dunklem Harz erschauderten, als sie bei einer Lesung aus den
+      Flugschriften der Heiligen Helena hörten, dass der gesamte Erdball
+      mit [[Splittern des Kreuzes des Kyrios |28]]
 ---
 
 Platzhalter für die lange Beschreibung.

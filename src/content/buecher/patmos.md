@@ -54,7 +54,18 @@ leseprobe:
 
     Was sie mitnahm, war keine Erkenntnis. Es war eine Gewöhnung: dass
     man an einem Ort sein kann, an dem etwas geschehen sein soll, und
-    dass dieses Sollen [[|26]]
+    dass dieses Sollen mit der Zeit genügt.
+  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+  fortsetzung: >-
+    Sie hat es an sich selbst beobachtet: in der ersten Woche fragte sie
+    noch, in der zweiten sagte sie schon „hier", und in der dritten zeigte
+    sie es Besuchern.
+
+
+    Es gibt keinen Punkt, an dem man sich entscheidet, das zu glauben. Es
+    gibt nur den Punkt, an dem einem auffällt, dass man aufgehört hat, es
+    [[nicht zu glauben. |18]]
 rueckseite:
   titel: Superlucens Caligo
   kurztitel: Superlucens Caligo
@@ -94,7 +105,19 @@ rueckseite:
 
 
       Der letzte Abschnitt ist der kürzeste und hat die meisten Anmerkungen.
-      Das ist kein Zufall. Je weniger dasteht, desto mehr hat man [[|26]]
+      Das ist kein Zufall. Je weniger dasteht, desto mehr hat man daran
+      zu erklären.
+    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    fortsetzung: >-
+      Der Herausgeber weiß das und wehrt sich nicht dagegen. In der
+      Vorrede nennt er die Anmerkungen „das Gerüst, das stehen bleibt,
+      nachdem das Haus abgetragen wurde".
+
+
+      Wer den Band von hinten liest, bekommt eine zweite, vollständigere
+      Schrift, die von der ersten nur behauptet, es habe sie
+      [[gegeben. |10]]
 ---
 
 Platzhalter für die lange Beschreibung.

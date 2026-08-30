@@ -56,7 +56,19 @@ leseprobe:
 
     Was blieb, ist das Weinen selbst, losgelöst von dem, wofür es einmal
     gestanden hatte. In den Akten des Hauses erscheint es als Position,
-    zwischen dem Verbrauch an Kerzen und [[|26]]
+    zwischen dem Verbrauch an Kerzen und der Ausgabe für Salz.
+  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+  fortsetzung: >-
+    Zwölf Gulden im Jahr, gleichbleibend über vier Jahrzehnte, in
+    derselben Handschrift fortgeschrieben, auch als die Hand längst eine
+    andere war.
+
+
+    Niemand hat je vermerkt, wofür die Summe stand. Sie wurde bezahlt,
+    weil sie im Vorjahr bezahlt worden war, und sie stand da, bis das Haus
+    aufgelöst wurde. In der Schlussabrechnung führt sie der Kommissar
+    unter den [[Posten ohne Gegenstand. |24]]
 rueckseite:
   titel: Qorpus Delicti
   kurztitel: Qorpus Delicti
@@ -98,7 +110,17 @@ rueckseite:
 
       Zum Schluss löst sich nichts auf. Die letzte Seite wiederholt die
       erste, mit einer Änderung, die man beim ersten Lesen nicht bemerkt und
-      beim zweiten nicht mehr los wird, weil sie [[|26]]
+      beim zweiten nicht mehr los wird, weil sie alles davor umschreibt.
+    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    fortsetzung: >-
+      Es ist ein einziges Wort, und es steht an einer Stelle, an der beim
+      ersten Mal ein anderes stand. Wer es findet, liest von vorn.
+
+
+      Man kann das für einen Kunstgriff halten. Wer den Band aber zweimal
+      gelesen hat, weiß, dass es kein Griff ist, sondern eine Auskunft
+      darüber, wie der Text [[entstanden ist. |16]]
 ---
 
 Platzhalter für die lange Beschreibung.

@@ -76,8 +76,18 @@ leseprobe:
     Selbstmörder noch nie etwas Wesentliches getan wurde, beabsichtige
     ich, den genannten Betrag zum Besten jener vernachlässigten Existenzen
     auszusetzen; denn was könnte man Besseres tun, als die Tat wenigstens
-    einer Anzahl derselben durch den [[Schein eines gewissen Ruhmes zu
-    verherrlichen |22]]
+    einer Anzahl derselben durch den Schein eines gewissen Ruhmes zu
+    verherrlichen und ihre Angehörigen von verzweifelten Waisen zu
+    glücklichen Leuten zu machen?
+  # Die rechte Seite: das Ausschreiben selbst, bis zum Denkmal fuer den
+  # Sieger. Weiter im Wortlaut des Buchsatzes.
+  fortsetzung: >-
+    Um jedoch auch dem Publikum gerecht zu werden, verbinde ich die
+    Auswahl des Geeigneten mit einem Wettbewerb von zwölf sich freiwillig
+    meldenden, heute lebenden [[Selbstmördern]] um die beste Ausführung
+    der Tat. Dem Sieger wird aus dem Fond dieser fünfzig Millionen ein
+    prächtiges Denkmal gesetzt und der Rest unter die [[Hinterbliebenen
+    verteilt. |26]]
 cover_bild: /buecher/selbstmoerder-wettbewerb/cover.webp
 # Aus dem Umschlag genommen: der Papierton als Einband, die violette
 # Schreibmaschinentinte als Akzent.
@@ -88,11 +98,9 @@ motiv: schematic
 hoehe: 2.0
 # Achtzig Seiten liegen unter dem 96-Seiter-Wert von 0,07.
 dicke: 0.06
-# Kein eigenes `breite_verhaeltnis`: das echte Druckformat des Bandes ist
-# nicht bekannt, also gilt die Vorgabe wie bei allen anderen. Der Umschlag
-# liegt mit 900 zu 1350 ohnehin genau auf dem Hausmass (`--book-ratio`,
-# 2:3) und wird von `cover-normalisieren.mjs` nicht angeruehrt.
-# Das wirkliche Druckformat aus dem Buchsatz: 5,06 x 7,81 Zoll.
+# Das wirkliche Druckformat, aus beiden Buchsaetzen: 5,06 x 7,81 Zoll.
+# (Hier stand einmal das Gegenteil — „nicht bekannt, also die Vorgabe" —,
+# geschrieben, bevor die Buchsaetze da waren.)
 breite_verhaeltnis: 0.648
 reihenfolge: 10
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
@@ -153,6 +161,16 @@ rueckseite:
       Geschmackssymphonien auf seiner zerschlissenen Zunge aufführen
       konnte, welche ihm Zugang zu jenen ersten Empfindungen verschafften,
       in denen sich die Welt zuerst erschließt – ebenjene Empfindungen, die
-      Justine selbst [[während ihrer frühen |22]]
+      Justine selbst während ihrer frühen Kompositionen so zärtlich
+      verspürt hatte und die sie nun so verzweifelt zurückzugewinnen
+      suchte.
+    # Die rechte Seite, weiter im Wortlaut: sie will den Herzog
+    # uebertreffen und bricht ab, bevor man erfaehrt, womit.
+    fortsetzung: >-
+      Da sie sich dem gerupften Herzog von Natur aus überlegen glaubte,
+      machte sie sich sogleich daran, sein Konzept zu verfeinern und Hand
+      an jene wirklichen Saiten zu legen, die unsere [[Atome schwingen
+      lassen]], entschlossen, einen von Menschen noch [[ungehörten Akkord
+      anzuschlagen |24]]
 
 ---

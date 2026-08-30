@@ -67,7 +67,18 @@ leseprobe:
     wieder gefangen hat, weisen wir uns bei der Empfangsdame aus. Sie
     reicht uns die Sicherheitskarten mit beiden Händen, ein Lächeln, eine
     Verbeugung. Wir nehmen die Karten entgegen und passieren die
-    Drehkreuze hin zu den Aufzügen. [[Biep, biep. |14]]
+    Drehkreuze hin zu den Aufzügen. Biep, biep.
+  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+  fortsetzung: >-
+    Im Aufzug spiegelt sich Xi in der polierten Wand und richtet seine
+    Krawatte, obwohl sie sitzt. Ich sehe zu, wie die Zahlen laufen. Im
+    achtzehnten Stock steigt eine Frau zu, die uns beide nicht ansieht.
+
+
+    Oben empfängt uns ein Flur, in dem es nach nichts riecht. Am Ende
+    steht eine Tür offen, und dahinter sitzen sieben Männer, die
+    aufstehen, als wir hereinkommen, und sich [[gleichzeitig verbeugen. |24]]
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Getauscht — Corporal Curses ist jetzt Seite A.
 rueckseite:
@@ -132,7 +143,18 @@ rueckseite:
       waren, welche keineswegs das Feld bearbeiteten, und dass sie in
       ihren Personen alles vereinten, was die kleine Welt, in der er
       lebte, ihm an [[Macht und Ansehen vorspiegelte. Dies zusammen
-      erweckte, aus Nachahmung, |26]]
+      erweckte, aus Nachahmung, den Wunsch, Priester zu werden.
+    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
+    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    fortsetzung: >-
+      Er sprach davon zu jedem, der ihm zuhörte, und zu vielen, die ihm
+      nicht zuhörten. Der Pfarrer seines Kirchspiels riet ihm ab, mit
+      jener Freundlichkeit, die keinen Zweifel lässt.
+
+
+      Von da an arbeitete Mathieu Lovat weiter als Schuster, ging aber
+      jeden Sonntag zweimal zur Messe und begann, sich Fragen zu stellen,
+      die ihm niemand beantwortete, weil niemand sie [[verstand. |11]]
 
 ---
 
