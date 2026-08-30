@@ -1,7 +1,12 @@
 ---
 # Wendeband aus zwei Platzhalter-Umschlägen.
-titel: Gnadenthal — Suspiria Ex Scetis
-kurztitel: Suspiria Ex Scetis
+# **Derselbe Fall wie bei Lichas.** Der Umschlag setzt „GNADENTHAL"
+# gross und „Suspiria Ex Scetis" darunter — Titel und Unterzeile, mit
+# einem Gedankenstrich zusammengeklebt, weil es das Feld nicht gab.
+# Zurueck: die drei Zeilen wieder zusammenziehen.
+titel: Gnadenthal
+kurztitel: Gnadenthal
+untertitel: Suspiria Ex Scetis
 autor: J. von Ohrid
 klappentext: >-
   Die Seufzer der Väter von Sketis, bei denen das Weinen ein Handwerk war
@@ -92,9 +97,10 @@ leseprobe:
 rueckseite:
   titel: Qorpus Delicti
   kurztitel: Qorpus Delicti
-  # Kein Werktitel, sondern die Angabe zum Band. Sie stand im
-  # Klappentext und gehoert unter den Titel.
-  untertitel: Gesammelte Schriften 1996–1998
+  # Vom Umschlag, rechts neben dem Titel. Hier stand die deutsche
+  # Fassung „Gesammelte Schriften 1996–1998" — geraten; gedruckt ist sie
+  # englisch.
+  untertitel: Collected Writings 1996–1998
   autor: QRT
   klappentext: >-
     Am Anfang steht ein Leichnam, aber nicht als Rätsel: gefragt wird nicht, wer es war, sondern was ein
