@@ -21,9 +21,22 @@ const leseprobe = z
     // Die Seitenzahl, auf der das Fenster steht — die **im Buch**, nicht die
     // im PDF. Sie steht in der Kolumne und in der Zeile „Leseprobe — S. 47".
     seite: z.number().int().min(1),
-    // Hoechstens eine Buchseite Prosa. Sie hoert mitten im Satz auf; den
-    // Rest der letzten Zeile schliesst ein Balken.
+    // Genau eine Buchseite Prosa — die linke Seite der aufgeschlagenen
+    // Doppelseite. Sie laeuft bis an den Fuss und geht rechts weiter.
     text: z.string().optional(),
+    /**
+     * Die rechte Seite, und zwar nur ihr oberes Stueck: der Satz laeuft
+     * bis etwa zur Haelfte, dann kommen die Balken bis zum Fuss.
+     *
+     * **Wo er aufhoert, ist eine redaktionelle Entscheidung, kein
+     * Messwert** — er soll an einer Stelle enden, an der man weiterlesen
+     * will. Darum steht der Bruch hier als eigenes Feld und wird nicht
+     * beim Aufschlagen ausgerechnet.
+     *
+     * Ohne `fortsetzung` bleibt die rechte Seite ganz geschwaerzt, wie
+     * frueher.
+     */
+    fortsetzung: z.string().optional(),
     /**
      * Die **echte gesetzte Seite** als Bild, etwa
      * "/buecher/yellow-fever/leseprobe-s30.webp". Ist sie da, wird sie

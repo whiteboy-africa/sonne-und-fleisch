@@ -136,28 +136,14 @@ export async function programmListe(): Promise<ProgrammEintrag[]> {
  * Endet die Probe auf einem Balken, schliesst dieser die letzte Zeile ab
  * (`last`) — der Satz hoert mitten drin auf, und der Rest ist weg.
  */
-function leseprobeLesen(
-  text: string | undefined,
-  seite: number,
-  bild?: string,
-  geschwaerzt?: string[],
-  schluss?: string,
-): BookExcerpt {
-  const seiten = {
-    ...(geschwaerzt?.length ? { blackImages: geschwaerzt } : {}),
-    ...(schluss ? { closingImage: schluss } : {}),
-  };
-  // Liegt die echte Seite als Bild vor, gibt es nichts zu setzen: das Buch
-  // hat seinen Satz schon, samt gedruckter Schwaerzung.
-  if (bild) return { page: seite, paragraphs: [], image: bild, ...seiten };
-  if (!text) return { page: seite, paragraphs: [], ...seiten };
+function absaetzeLesen(text: string): ExcerptPart[][] {
   const marke = /\[\[([^\]]*)\]\]/g;
   const absaetze = text
     .split(/\n\s*\n/)
     .map((absatz) => absatz.trim())
     .filter((absatz) => absatz.length > 0);
 
-  const paragraphs = absaetze.map((absatz) => {
+  return absaetze.map((absatz) => {
     const stuecke: ExcerptPart[] = [];
     let gelesen = 0;
     for (const treffer of absatz.matchAll(marke)) {
@@ -178,13 +164,45 @@ function leseprobeLesen(
     if (rest) stuecke.push({ text: rest.replace(/\s+/g, ' ') });
     return stuecke;
   });
+}
 
-  // Der letzte Balken des letzten Absatzes schliesst die Zeile.
-  const letzter = paragraphs.at(-1);
-  const abschluss = letzter?.at(-1);
+/** Der letzte Balken schliesst die Zeile — der Satz bricht ab. */
+function letztenBalkenSchliessen(absaetze: ExcerptPart[][]) {
+  const abschluss = absaetze.at(-1)?.at(-1);
   if (abschluss && 'bar' in abschluss) abschluss.last = true;
+}
 
-  return { page: seite, paragraphs, ...seiten };
+function leseprobeLesen(
+  text: string | undefined,
+  seite: number,
+  bild?: string,
+  geschwaerzt?: string[],
+  schluss?: string,
+  fortsetzung?: string,
+): BookExcerpt {
+  const seiten = {
+    ...(geschwaerzt?.length ? { blackImages: geschwaerzt } : {}),
+    ...(schluss ? { closingImage: schluss } : {}),
+  };
+  // Liegt die echte Seite als Bild vor, gibt es nichts zu setzen: das Buch
+  // hat seinen Satz schon, samt gedruckter Schwaerzung.
+  if (bild) return { page: seite, paragraphs: [], image: bild, ...seiten };
+  if (!text) return { page: seite, paragraphs: [], ...seiten };
+
+  const paragraphs = absaetzeLesen(text);
+  const continuation = fortsetzung ? absaetzeLesen(fortsetzung) : undefined;
+
+  // Abgebrochen wird dort, wo die Probe wirklich aufhoert: laeuft der Satz
+  // auf der rechten Seite weiter, schliesst der Balken dort — sonst auf
+  // der linken.
+  letztenBalkenSchliessen(continuation ?? paragraphs);
+
+  return {
+    page: seite,
+    paragraphs,
+    ...(continuation?.length ? { continuation } : {}),
+    ...seiten,
+  };
 }
 
 /**
@@ -292,6 +310,7 @@ export function alsKatalogBuch(
             d.leseprobe.bild,
             d.leseprobe.geschwaerzt,
             d.leseprobe.schluss,
+            d.leseprobe.fortsetzung,
           ),
         }
       : {}),
@@ -330,6 +349,7 @@ export function alsKatalogBuch(
                     d.rueckseite.leseprobe.bild,
                     d.rueckseite.leseprobe.geschwaerzt,
                     d.rueckseite.leseprobe.schluss,
+                    d.rueckseite.leseprobe.fortsetzung,
                   ),
                 }
               : {}),

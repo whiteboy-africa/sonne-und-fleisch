@@ -58,6 +58,11 @@ export type BookExcerpt = {
   /** Absaetze, jeder aus Text- und Balkenstuecken. Leer, wenn `image` steht. */
   paragraphs: ExcerptPart[][];
   /**
+   * Der Anschluss auf der rechten Seite — das obere Stueck, unter dem die
+   * Balken anfangen. Fehlt er, ist die rechte Seite ganz geschwaerzt.
+   */
+  continuation?: ExcerptPart[][];
+  /**
    * Die echte gesetzte Seite als Bild. Ist sie da, zeigt das Fenster sie
    * statt des nachgebauten Satzes — samt Kolumne, Umbruch und den im Buch
    * **gedruckten** Schwaerzungen.

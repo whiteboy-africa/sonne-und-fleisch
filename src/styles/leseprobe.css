@@ -604,6 +604,19 @@
   justify-content: flex-start;
 }
 
+/*
+ * Der Balkenblock auf der halben Seite: er faengt an, wo der Satz
+ * aufhoert, und laeuft im selben Rhythmus weiter. Auf der ganz
+ * geschwaerzten Seite haengen die Zeilen direkt im Satzspiegel, dort
+ * braucht es ihn nicht.
+ */
+.balken-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.58em;
+  margin-top: 0.58em;
+}
+
 .balken-zeile {
   display: flex;
   gap: 0.34em;

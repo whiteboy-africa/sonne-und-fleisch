@@ -145,8 +145,22 @@ rueckseite:
       Und dann triffst du [[Hedyle aus gutem Hause]]. Ihr liebt euch im
       Forum Romanum und im Forum Iulium, ihr liebt euch bis ans Ende der Via
       Latina und Hedyles Verbindungen ermöglichen dir alles – jetzt bist du
-      einer der großen Männer, ganz Rom liebt deine Waben aus [[Othoni und
-      du gehst mit den feinen Herren. |40]]
+      einer der großen Männer, ganz Rom liebt deine Waben aus Othoni und du
+      gehst mit den feinen Herren.
+    # Die rechte Seite: der Satz laeuft noch ein Stueck und bricht dort ab,
+    # wo Hedyle weiss, wer er wirklich ist.
+    fortsetzung: >-
+      Man hat dem und dem gesehen, und sogar mit Tiberius, und der lebt
+      sich gut mit Lichas.
+
+
+      Lichas und Hedyle, die ganze Stadt spricht über eure Liebe: Lichas,
+      der Othone und Hedyle, seine Bienenkönigin. Doch Lichas, sie weiß,
+      dass du ein [[Bienenlutscher]] bist und nichts weiter, dass du die
+      Schuhe der feinen Herren mit Bienenwachs geputzt hast und dass du
+      allein warst mit deinen Bienen. Dass du ein besessener
+      Bienenschlucker bist, ein Honigsäufer, dass du unter freiem Himmel
+      geschlafen hast und dass du [[nichts wärest ohne sie. |24]]
   akzent_farbe: '#c8912f'
   schrift_farbe: '#e8ddc0'
   motiv: wave

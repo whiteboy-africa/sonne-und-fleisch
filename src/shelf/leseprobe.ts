@@ -36,15 +36,18 @@ export type Seitendaten = {
 };
 
 /*
- * Wie viele geschwaerzte Seiten hinter dem Fenster liegen. Vier, und daraus
- * werden mit dem Fenster und der Schlussseite genau **drei Doppelseiten**:
- * das Fenster (links die Probe, rechts geschwaerzt), eine ganz geschwaerzte
- * Doppelseite, und die Schlussdoppelseite (links geschwaerzt, rechts die
- * Seite mit der ausgestanzten Zeile). Mehr waren es einmal, und dann sah man beim
- * Blaettern fast nur noch Schwarz — der Entzug wirkt, wenn er einmal
- * dasteht, nicht wenn man sich durch ihn hindurchklickt.
+ * **Zwei Doppelseiten, nicht drei.**
+ *
+ * Links die volle Seite, rechts laeuft der Satz noch bis etwa zur Haelfte
+ * und bricht dann in Balken ab — anderthalb Seiten, die man liest. Dann
+ * umblaettern: links ganz geschwaerzt, rechts die Seite mit dem Stempel.
+ *
+ * Dazwischen lag einmal eine ganz geschwaerzte Doppelseite. Sie sagte
+ * nichts, was die eine geschwaerzte Seite nicht auch sagt, und man
+ * klickte sich durch sie hindurch. Der Entzug wirkt, wenn er einmal
+ * dasteht.
  */
-const schwarzeSeiten = 4;
+const schwarzeSeiten = 1;
 
 /** Ab hier wird einzeln geblaettert statt in Doppelseiten. */
 const handyBreite = 768;
@@ -141,6 +144,7 @@ export type LeseprobeHaken = {
 
 type Seitenart =
   | { art: 'fenster'; nummer: number; probe: BookExcerpt }
+  | { art: 'halb'; nummer: number; probe: BookExcerpt; bild?: string }
   | { art: 'schwarz'; nummer: number; bild?: string }
   | { art: 'schluss'; nummer: number; bild?: string };
 
@@ -152,19 +156,30 @@ function seitenFolge(probe: BookExcerpt): Seitenart[] {
   const folge: Seitenart[] = [
     { art: 'fenster', nummer: probe.page, probe },
   ];
+  // Die rechte Seite der ersten Doppelseite: oben laeuft der Satz weiter,
+  // unten faengt die Schwaerzung an. Ohne `continuation` ist sie eine
+  // gewoehnliche geschwaerzte Seite.
+  const anschluss = probe.continuation?.length
+    ? ({ art: 'halb', nummer: probe.page + 1, probe } as const)
+    : ({ art: 'schwarz', nummer: probe.page + 1 } as const);
+  folge.push(
+    probe.blackImages?.[0] && anschluss.art === 'schwarz'
+      ? { ...anschluss, bild: probe.blackImages[0] }
+      : anschluss,
+  );
   for (let i = 1; i <= schwarzeSeiten; i += 1) {
     // Liegt die echte Seite geschwaerzt vor, wird sie gezeigt; sonst
     // zeichnet die Seite ihre Balken selbst.
-    const echt = probe.blackImages?.[i - 1];
+    const echt = probe.blackImages?.[i];
     folge.push({
       art: 'schwarz',
-      nummer: probe.page + i,
+      nummer: probe.page + 1 + i,
       ...(echt ? { bild: echt } : {}),
     });
   }
   folge.push({
     art: 'schluss',
-    nummer: probe.page + schwarzeSeiten + 1,
+    nummer: probe.page + schwarzeSeiten + 2,
     ...(probe.closingImage ? { bild: probe.closingImage } : {}),
   });
   return folge;
@@ -326,6 +341,64 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     return blatt;
   }
 
+  /**
+   * Die Balken einer geschwaerzten Flaeche. Dasselbe Muster fuer die ganz
+   * geschwaerzte Seite und fuer das untere Stueck der halben.
+   */
+  function balkenBlock(saat: number, zeilen: number) {
+    const block = document.createElement('div');
+    block.className = 'balken-block';
+    block.setAttribute('aria-hidden', 'true');
+    balkenMuster(saat, zeilen).forEach((muster, index) => {
+      const zeile = document.createElement('span');
+      zeile.className = `balken-zeile${muster.einzug ? ' balken-zeile--einzug' : ''}`;
+      zeile.style.setProperty('--breite', `${(muster.breite * 100).toFixed(1)}%`);
+      muster.stuecke.forEach((gewicht, stelle) => {
+        const lage = balkenLage(saat * 97 + index * 5 + stelle);
+        const stueck = document.createElement('span');
+        stueck.className = 'balken balken--stueck';
+        stueck.style.setProperty('--gewicht', gewicht.toFixed(3));
+        stueck.style.setProperty('--dreh', `${lage.dreh.toFixed(3)}deg`);
+        zeile.append(stueck);
+      });
+      block.append(zeile);
+    });
+    return block;
+  }
+
+  /**
+   * Die rechte Seite der ersten Doppelseite: oben laeuft der Satz weiter,
+   * dann faengt die Schwaerzung an.
+   *
+   * **Wo er aufhoert, steht im Frontmatter** (`fortsetzung`), nicht in
+   * einer Messung. Er soll an einer Stelle enden, an der man weiterlesen
+   * will — das entscheidet, wer den Band einstellt, nicht der Umbruch.
+   */
+  function halbBlatt(
+    seite: Seitenart & { art: 'halb' },
+    rechts: boolean,
+  ) {
+    const blatt = document.createElement('article');
+    blatt.className = 'blatt blatt--halb';
+    blatt.append(kolumne(seite.nummer, rechts));
+
+    const satz = document.createElement('div');
+    satz.className = 'blatt__satz';
+    const absaetze = seite.probe.continuation ?? [];
+    absaetze.forEach((stuecke, index) => {
+      const absatz = document.createElement('p');
+      const letzter = index === absaetze.length - 1;
+      absatz.className = `blatt__absatz${letzter ? ' blatt__absatz--abbruch' : ''}`;
+      stuecke.forEach((stueck, stelle) =>
+        stueckAnhaengen(absatz, stueck, seite.nummer * 31 + index * 7 + stelle),
+      );
+      satz.append(absatz);
+    });
+    satz.append(balkenBlock(seite.nummer, balkenZeilen));
+    blatt.append(satz);
+    return blatt;
+  }
+
   function schwarzBlatt(
     titel: string,
     seite: Seitenart & { art: 'schwarz' },
@@ -356,20 +429,8 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     const satz = document.createElement('div');
     satz.className = 'blatt__satz blatt__satz--voll';
     satz.setAttribute('aria-hidden', 'true');
-    balkenMuster(seite.nummer, balkenZeilen).forEach((muster, index) => {
-      const zeile = document.createElement('span');
-      zeile.className = `balken-zeile${muster.einzug ? ' balken-zeile--einzug' : ''}`;
-      zeile.style.setProperty('--breite', `${(muster.breite * 100).toFixed(1)}%`);
-      muster.stuecke.forEach((gewicht, stelle) => {
-        const lage = balkenLage(seite.nummer * 97 + index * 5 + stelle);
-        const stueck = document.createElement('span');
-        stueck.className = 'balken balken--stueck';
-        stueck.style.setProperty('--gewicht', gewicht.toFixed(3));
-        stueck.style.setProperty('--dreh', `${lage.dreh.toFixed(3)}deg`);
-        zeile.append(stueck);
-      });
-      satz.append(zeile);
-    });
+    const block = balkenBlock(seite.nummer, balkenZeilen);
+    satz.append(...Array.from(block.children));
     blatt.append(satz);
     return blatt;
   }
@@ -514,6 +575,7 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
 
   function blattBauen(seite: Seitenart, titel: string, buch: CatalogBook, rechts: boolean) {
     if (seite.art === 'fenster') return fensterBlatt(titel, seite, rechts);
+    if (seite.art === 'halb') return halbBlatt(seite, rechts);
     if (seite.art === 'schwarz') return schwarzBlatt(titel, seite, rechts);
     return schlussBlatt(buch, seite, rechts);
   }
@@ -576,6 +638,23 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
    * wegzunehmen und jedesmal nachzumessen kostete ein Bild.
    */
   function zeilenKuerzen() {
+    /*
+     * Auf der halben Seite haengen die Balken unter dem Satz, und wo der
+     * Satz aufhoert, steht nicht vorher fest. Gemessen wird darum am
+     * fertigen Blatt: jede Zeile, die unten ueber den Satzspiegel
+     * hinausragt, faellt weg — sonst stuende dort die Oberkante eines
+     * halben Balkens wie ein Strich, der nicht dazugehoert.
+     */
+    spanne.querySelectorAll<HTMLElement>('.balken-block').forEach((block) => {
+      const satz = block.closest<HTMLElement>('.blatt__satz');
+      if (!satz) return;
+      const unten = satz.getBoundingClientRect().bottom;
+      Array.from(block.children).forEach((kind) => {
+        const zeile = kind as HTMLElement;
+        if (zeile.getBoundingClientRect().bottom > unten) zeile.remove();
+      });
+    });
+
     spanne
       .querySelectorAll<HTMLElement>('.blatt__satz--voll')
       .forEach((satz) => {
@@ -860,6 +939,13 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
 
     const uebergabe = () => {
       schale.hidden = false;
+      /*
+       * **Jetzt erst laesst sich messen.** `zeigen()` baut die Seiten,
+       * solange die Schale noch `hidden` ist — dort ist jedes Mass null,
+       * und der Beschnitt der Balken lief ins Leere. Also noch einmal,
+       * sobald die Doppelseite im Fluss steht.
+       */
+      zeilenKuerzen();
       // Die Doppelseite legt sich zuerst genau auf die, die in der Szene
       // aufgeschlagen daliegt — gemessen, nicht gerechnet —, und faehrt von
       // dort in ihre eigene Lage. Meist ist das ein Weg von wenigen Pixeln;
