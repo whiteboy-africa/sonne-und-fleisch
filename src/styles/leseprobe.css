@@ -518,12 +518,21 @@
 }
 
 /*
- * Der Text hoert mitten im Satz auf. Damit der letzte Balken die Zeile bis
- * zum Rand schliesst, wird auch die letzte Zeile ausgetrieben — sonst
- * stuende der Abbruch als kurzer Rest da und saehe nach Absatzende aus.
+ * **Die letzte Zeile wird nicht ausgetrieben.**
+ *
+ * Hier stand `text-align-last: justify`. Das war richtig, solange der
+ * Absatz mit einem schwarzen Balken endete: der Balken schloss die Zeile
+ * bis zum Rand, und ein kurzer Rest daneben haette nach Absatzende
+ * ausgesehen statt nach Abbruch.
+ *
+ * Seit im Text selbst nicht mehr geschwaerzt wird, endet dort gewoehnlicher
+ * Satz — und der wurde auseinandergerissen: „meinem Herzen ein Samenkorn."
+ * stand mit fingerbreiten Luecken quer ueber die Seite. Kein Setzer treibt
+ * eine Ausgangszeile aus. Der Abbruch traegt sich selbst; dafuer braucht es
+ * keinen gestreckten Satz.
  */
 .blatt__absatz--abbruch {
-  text-align-last: justify;
+  text-align-last: auto;
 }
 
 /*

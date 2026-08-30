@@ -1124,22 +1124,46 @@ export class ShelfEngine {
   }
 
   private createBooks() {
-    const pileOfIndex = pilePerIndex(this.booksData.length);
+    /*
+     * **Platz im Stapel und Nummer sind zwei Dinge.**
+     *
+     * Sie waren dasselbe: die Stelle im Katalog bestimmte beides. Wer
+     * einen Band woanders hinlegen wollte, musste das Programm
+     * umnummerieren. `stapelplatz` im Frontmatter trennt das — es ist ein
+     * eigener Sortierschluessel nur fuer die Lage, Zwischenwerte
+     * eingeschlossen. Ohne Angabe gilt die Stelle im Katalog, dann ist
+     * alles wie vorher.
+     */
+    const platzRang = this.booksData.map((b, i) => b.pileSlot ?? i);
+    const nachPlatz = this.booksData
+      .map((_, i) => i)
+      .sort((a, b) => platzRang[a] - platzRang[b] || a - b);
+    const platzVonIndex: number[] = [];
+    nachPlatz.forEach((index, platz) => {
+      platzVonIndex[index] = platz;
+    });
+    const pileOfPlatz = pilePerIndex(this.booksData.length);
+
     this.booksData.forEach((book, index) => {
-      const pile = pileOfIndex[index];
+      const pile = pileOfPlatz[platzVonIndex[index]];
       const runtime = this.createBook(book, index, pile * pileSpacing, pile);
       this.runtimeBooks.push(runtime);
       this.shelfGroup.add(runtime.slot);
-      // Vorn im Katalog heisst oben im Stapel: die Reihenfolge wird beim
-      // Stapeln umgedreht, damit 001 obenauf liegt und nicht darunter
-      // verschwindet.
+    });
+
+    // Vorn im Stapel heisst oben: die Reihenfolge wird beim Stapeln
+    // umgedreht, damit der erste Band obenauf liegt und nicht darunter
+    // verschwindet. Gezaehlt wird jetzt in Platzreihenfolge, nicht in
+    // Katalogreihenfolge.
+    nachPlatz.forEach((index) => {
+      const pile = pileOfPlatz[platzVonIndex[index]];
       if (!this.pileOrder[pile]) this.pileOrder[pile] = [];
       // Der Blindband liegt in keinem Stapel. Er ist die **offene Stelle**
       // hinter dem letzten Band, und eine offene Stelle ist nichts, was
       // herumliegt — ein Rohling zwischen den Baenden waere ein Gegenstand
       // und behauptete das Gegenteil. Er bleibt trotzdem die letzte
       // Station: von rechts kommt man zu ihm, und dort steht er allein.
-      if (!book.blind) this.pileOrder[pile].unshift(index);
+      if (!this.booksData[index].blind) this.pileOrder[pile].unshift(index);
     });
 
     this.motionLayout = createMotionLayout(

@@ -35,42 +35,65 @@ verfuegbarkeit: In Vorbereitung
 # Das ist also keine Leseprobe im Wortlaut, sondern eine, die den Platz
 # haelt, bis der Buchsatz kommt. Dann gehoert sie ersetzt.
 leseprobe:
-  # GESCHAETZT: der Anfang der Erzaehlung.
-  seite: 7
+  # **Nicht der Anfang.** Hier stand die Kindheit unter dem Rentierfell,
+  # also die ersten Seiten — und das ist die eine Stelle, die jeder
+  # Klappentext ohnehin schon erzaehlt hat. Eine Leseprobe soll dorthin
+  # greifen, wo das Buch schon laeuft.
+  #
+  # Jetzt: die Abende auf den Feldern, Kali-Yuga-Schach und Khat, und
+  # der Traum vom Schlaftempel an der Nilmuendung.
+  #
+  # GESCHAETZT: die Stelle liegt bei 47 % des Entwurfs, bei 144 Seiten
+  # also um 68.
+  seite: 68
+  # Aus „Corporal Curses Helena.docx", Absatz 28 und 29. **Der Entwurf
+  # traegt Loecher des Autors** („auf den X und den Feldern", „nach dem
+  # X"), dazu Tippfehler und angefangene Saetze; beides ist hier gefuellt
+  # beziehungsweise geglaettet. Der Wortlaut der ganzen Saetze steht.
   text: >-
-    Von frühester Kindheit an war Helena daran gewöhnt, unter der Haut
-    eines Rentiers zu schlafen. Wenn sie erwachte, fiel ihr erster frommer
-    Blick auf die Heilige Tugend, die gegenüber an der Wand auf ein Brett
-    genagelt war: Ein zarter Rosenduft ging von ihr aus, der sich mit dem
-    dumpfen Moschusgeruch der Tierhäute vermischte, welche den Boden ihres
-    Schlafzimmers bedeckten und den sie niemals vergessen würde.
+    Nachdem sie in Smyrna den Ramazan gefeiert hatte und sich nur noch von
+    Datteln und Wasser ernährte, die sie ausschließlich nach
+    Sonnenuntergang zu sich nahm, und auch dort die Geschichten ihrer
+    Barmherzigkeit und ihrer Ruchlosigkeit die Runde machten, schlossen
+    sich ihr eine Reihe
+    interessanter Frauenzimmer an: zwei persische Vipernfrauen, die ihre
+    unglücklichen Liebhaber im orgiastischen Liebesakt mit den Falten
+    ihrer Leibeshöhle zu vergiften vermochten, und eine pferdegesichtige
+    Araberin, die man überall die Geisha nannte, oder Laylat al-Ward,
+    Nacht der Rosen, da sie von frühester Kindheit an in allen
+    Liebesdiensten ausgebildet und zugleich zur Keuschheit gezwungen
+    worden war, um dereinst ihrem Ehemann zu dienen: Als sie diesen
+    endlich sah — einen plumpen, alten Mann von niederer Gesinnung —,
+    schnitt sie ihm in der Brautnacht wortlos die Kehle durch und
+    verschwand in der Finsternis der Rosenfelder.
 
 
-    Die Mägde des Schlosses pflegten zu scherzen, Helenas Urahnin, die vor
-    vielen Jahren zum Glauben der Dornenkrone konvertiert war, um dann
-    jahrzehntelang Krieg gegen die benachbarten Fürstentümer zu führen,
-    habe die Gebeine tausender Märtyrer unter ihren Laken verborgen, und
-    mit ihnen tausende ihrer Geheimnisse.
-
-
-    Helenas Vater, ein elephantischer Mann von Phlegma und Würde, der eine
-    Frau von beachtlicher Schönheit aus einem Land jenseits des Schwarzen
-    Meeres geraubt und getraut hatte, hielt das alte Ritual in Ehren und
-    erzog sein einziges Kind zu vollkommener Frömmigkeit. Aus Helenas
-    Kindheit ist einer ihrer Aussprüche überliefert, der es zur Volksweise
-    gebracht hat: „Jedes Mal, wenn ich eine Oblate empfange, wächst in
-    meinem Herzen ein Samenkorn."
+    Die vier verbrachten nun häufig die Abendstunden gemeinsam auf den
+    Feldern, wo sie den Bauern zusahen, die in der Dunkelheit seltsame
+    Dinge verrichteten und Flüssigkeiten in die Furchen kippten, spielten
+    unzählige Partien Kali-Yuga-Schach, kauten die Blätter des
+    Khat-Baumes und unterhielten sich über die Fragen der Seele. „Der
+    Mensch ist nach oben hin kastriert", hieß es da etwa, oder „die
+    Mystiker reden nicht von Gott, sondern von der Unmöglichkeit, über
+    Gott zu reden".
+  # Die rechte Seite: der Rest des Abends und der Traum von Khartum. Sie
+  # bricht in Laylats Einladung ab.
   fortsetzung: >-
-    Sie verbrachte die Kinderjahre in süßer Gottesfurcht und in
-    vollkommenem, ungetrübtem Glück. Auf dem Weg in die Kapelle erfreute
-    sie das Volk und die Bediensteten mit ihrer Frömmigkeit; sie lobten
-    sie, umarmten sie, streichelten ihr langsam über den Rücken und sangen
-    die Lieder zu ihren Ehren.
+    Und: „Ich hatte immer nur das Numinose gesucht, im grausamen
+    Felsgebirge, in der Schönheit des Hains, im Nebel der Felder." Und
+    „do ut des — ich gebe, damit du gibst", was viele Jahre später als
+    returning the favour in den allgemeinen Sprachgebrauch eingehen
+    sollte. Anschließend gaben sie sich für ein paar Stunden den
+    entsprechenden Praktiken hin.
 
 
-    Nur die Nächte waren anders. Träume von Feuer, die eine Zukunft
-    verhießen, an die sie in Einsamkeit dachte, und die sie immer
-    schlimmer quälten — bis zu dem Tag ihrer Reife im dreizehnten Jahr.
+    In den Hibiskusfeldern Nubiens saßen sie an der Mündung des Blauen
+    und des Weißen Nils und träumten, ins Gras gestützt, davon, einen
+    Schlaftempel für müde Wanderer und gequälte Männerkörper zu eröffnen,
+    den sie ψυχῆς ἰατρεῖον nennen würden, Krankenhaus der Seele, und über
+    dessen Tor der Wahlspruch stehen sollte: Heute habe ich keine Linie
+    gezogen. Komm in meine Grotte, schwärmte Laylat und spuckte lachend
+    ins Feuer, öffne meinen Tempel, schlaf in meiner
 cover_bild: /buecher/selbstkreuzigung/corporal-curses-markenbogen-2.webp
 cover_farbe: '#0f0d0c'
 # Das Rosa der ersten Markenspalten. Hier stand das Papiergrau des
@@ -78,20 +101,6 @@ cover_farbe: '#0f0d0c'
 akzent_farbe: '#903546'
 schrift_farbe: '#f2ebdd'
 motiv: gather
-# OFFEN: die Leseprobe. Hier stand eine, die ein anderes Buch
-# beschrieb — ein Register gesammelter Flueche, nach Koerperteilen
-# geordnet. Das war erfunden, bevor der Text da war, und passte zu
-# nichts: der Klappentext erzaehlt von Helena unter dem Rentierfell.
-#
-# Aus dem Entwurf laesst sich noch keine machen. Fertige Prosa ist
-# dort ein einziger Absatz, und auch der traegt ein Loch („XXbrett");
-# was folgt, hat offene Stellen wie „nach Vorbild der." und „xxte
-# und". Einen Balken ueber die Luecke des Autors zu legen waere ein
-# Balken, unter dem nichts steht — genau das, was diese Seite nicht
-# tut.
-#
-# Ohne Probe schlaegt der Band auf dieser Seite nicht auf, und die
-# Zeile in den Angaben steht nicht da. Kommt der Text, kommt sie.
 hoehe: 2.0
 dicke: 0.078
 # Das wirkliche Druckformat, aus „QUIDAMS SCHWERMUT – Buchsatz.docx":
@@ -99,6 +108,10 @@ dicke: 0.078
 # zunaechst in der falschen Datei zu liegen — das Mass gehoert dem Band,
 # und Quidam liegt jetzt hier.
 breite_verhaeltnis: 0.648
+# Corporal Curses liegt oben auf dem zweiten Stapel, behaelt aber seine
+# Nummer: 4,5 legt ihn zwischen den mit 4 und den mit 5, und Stapel zwei
+# faengt beim sechsten Platz an.
+stapelplatz: 4.5
 reihenfolge: 7
 rueckseite:
   titel: Quidams Schwermut
