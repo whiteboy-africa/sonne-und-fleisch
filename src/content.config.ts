@@ -170,6 +170,19 @@ const buecher = defineCollection({
     akzent_farbe: z.string().default('#d99a3f'),
     schrift_farbe: z.string().default('#f2e9db'),
     // Eines von neunzehn festen Mustern fuer den Cover-Aufdruck.
+    /**
+     * **Wo der Band im Stapel liegt — unabhaengig von seiner Nummer.**
+     *
+     * Ohne Angabe gilt `reihenfolge`: Platz und Nummer sind dann dasselbe,
+     * und der erste Band eines Stapels liegt obenauf. Wer einen Band
+     * woanders hinlegen will, ohne das Programm umzunummerieren, setzt
+     * hier einen eigenen Sortierschluessel. **Zwischenwerte sind
+     * erlaubt** — 4,5 legt ihn zwischen den mit 4 und den mit 5.
+     *
+     * Die Nummer bleibt davon unberuehrt; sie kommt weiter aus
+     * `reihenfolge`.
+     */
+    stapelplatz: z.number().optional(),
     motiv: z.enum(MOTIVE).default('lattice'),
     // Szeneneinheiten, keine Zentimeter: eine Einheit sind etwa 105 mm.
     // A5 hoch entspricht 2,0. Die Dicke folgt dem Umfang — ein 96-Seiter

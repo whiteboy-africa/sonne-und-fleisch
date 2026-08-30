@@ -912,22 +912,16 @@ export class ShelfEngine {
     this.controls.enablePan = true;
     this.controls.screenSpacePanning = true;
     /*
-     * **Die Kamera zoomt nirgends.**
+     * **Der Zoom in der Betrachtung bleibt.** Er war einmal abgeschaltet,
+     * weil er beim Zurueckgehen in den Stapel nicht zurueckgesetzt wird —
+     * wer herangezoomt hatte, stand danach mitten im Stapel. Das
+     * Abschalten nahm aber etwas weg, das benutzt wird: am Telefon geht
+     * man damit an den Umschlag heran.
      *
-     * Im Stapel rechnet die Engine den Abstand selbst (`zielZoom`,
-     * zwischen 0,55 und 1,7) — dort ist `controls` ohnehin abgeschaltet.
-     * In der Betrachtung war `enableZoom` aber an, und OrbitControls hat
-     * das Kneifen an sich genommen und die Kamera zwischen 2,4 und 9
-     * Einheiten hin und her gefahren. Zurueckgesetzt wurde das nie: wer
-     * in der Detailansicht herangezoomt hatte und dann zum Stapel
-     * zurueckging, stand mitten im Stapel und kam kaum wieder heraus.
-     *
-     * Der Zoom in der Betrachtung war auch nie gebaut, nur nicht
-     * abgeschaltet — dort steht der Band in seiner eingerichteten Groesse,
-     * und zum Hineingehen gibt es die Lupe in der Leseprobe. Aus
-     * demselben Grund kreist die Kamera dort nicht (`enableRotate`).
+     * Der Fehler liegt nicht am Zoom, sondern daran, dass ihn niemand
+     * zuruecknimmt. Das gehoert in `returnToShelf`, nicht hierher.
      */
-    this.controls.enableZoom = false;
+    this.controls.enableZoom = true;
     this.controls.minDistance = 2.4;
     this.controls.maxDistance = 9;
     // Die Kamera dreht sich nicht mehr um das Buch — das Buch dreht sich in

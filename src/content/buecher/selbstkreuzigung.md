@@ -99,7 +99,7 @@ dicke: 0.078
 # zunaechst in der falschen Datei zu liegen — das Mass gehoert dem Band,
 # und Quidam liegt jetzt hier.
 breite_verhaeltnis: 0.648
-reihenfolge: 5
+reihenfolge: 7
 rueckseite:
   titel: Quidams Schwermut
   kurztitel: Quidams Schwermut

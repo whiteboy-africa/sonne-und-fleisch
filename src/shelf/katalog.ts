@@ -81,6 +81,11 @@ export type BookExcerpt = {
 
 export type CatalogBook = {
   id: string;
+  /**
+   * Sortierschluessel nur fuer die Lage im Stapel. Ohne ihn gilt die
+   * Stelle im Katalog — Platz und Nummer sind dann dasselbe.
+   */
+  pileSlot?: number;
   /** Releasenummer, dreistellig — steht auf dem Buchruecken. */
   release: string;
   title: string;

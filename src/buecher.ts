@@ -298,6 +298,7 @@ export function alsKatalogBuch(
     height: d.hoehe,
     thickness: d.dicke,
     widthRatio: d.breite_verhaeltnis,
+    ...(d.stapelplatz !== undefined ? { pileSlot: d.stapelplatz } : {}),
     ...(d.cover_bild ? { coverImage: d.cover_bild } : {}),
     ...(d.ruecken_bild ? { spineImage: d.ruecken_bild } : {}),
     ...(d.lebendig ? { living: true } : {}),
