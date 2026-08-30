@@ -73,21 +73,20 @@ leseprobe:
     zusammen und seine Blicke irrten durch das Dunkel der Winternacht.
     Zuerst hatte ich vor, mich abzuwenden und zu gehen, aber dann schaute
     ich Artur abermals an, schloss meine Augen und wähnte wieder müde das
-    Licht des Sternenhimmels zu sehen.
-  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    Licht des Sternenhimmels zu sehen, die Ewigkeit und glaubte alle
+    Geheimnisse des Alls gelöst.
+  # Im Wortlaut des Buchsatzes.
   fortsetzung: >-
-    Als ich sie öffnete, hielt er mir die Ikone hin. Nicht, um sie mir zu
-    geben — er hielt sie mir hin, wie man jemandem etwas zeigt, das er
-    ohnehin schon kennt.
+    „Komm Bursche", sagte ich zu ihm, tat meine Handfläche auf seinen
+    Nacken und wir begannen den Weg zu meinem Haus. Ich ging geschwind, als
+    ob ich vor dem Unstern flöhe und Artur trottete müde meinen Schritten
+    hinterher, bewegte manchmal seinen Mund, fast so als würde er mit sich
+    selber sprechen, oder [[beten]].
 
 
-    Ich sagte, dass sie schön sei. Er verstand das Wort nicht. Ich sagte
-    es noch einmal, langsamer, und zeigte dabei auf den Heiligenschein,
-    und er nickte und sagte etwas in seiner Sprache, von dem ich bis heute
-    glaube, dass es [[nicht ja hieß. |16]]
-# Farben für Rücken, Rückseite und Kanten — aus dem Umschlag genommen:
-# das Nachtblau des Himmels, das Gold der Schrift.
+    Ich sah wie seine traurigen, braunen Augen verwundert mein Haus und die
+    Linden im Garten betrachteten, dann den langen Gang mit Hirschgeweihen,
+    den [[Jagdtrophäen meines Großvaters. |30]]
 cover_farbe: '#2e240e'
 akzent_farbe: '#e5b261'
 schrift_farbe: '#c0b292'

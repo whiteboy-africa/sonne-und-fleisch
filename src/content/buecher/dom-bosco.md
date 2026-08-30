@@ -57,19 +57,18 @@ leseprobe:
     Kreuzzeichen lehrte, wurde das salesianische Oratorium geboren. Dieser
     Bettler war der Erstgeborene eines unermesslichen Geschlechts. Dieses
     kaum begonnene Kreuzzeichen segnete das ganze Weltall, warf nach allen
-    Seiten eine Aussaat von Barmherzigkeit und Hingabe,
-  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    Seiten eine Aussaat von Barmherzigkeit und Hingabe, die nach und nach
+    aufgehen sollte.
+  # Im Wortlaut des Buchsatzes.
   fortsetzung: >-
-    die keimen sollte in Turin und in Buenos Aires, in Marseille und auf
-    den Inseln, wo niemand sie gesät hatte.
+    Der Schüler brachte seinem Meister andere zu; bald wimmelte es von
+    ihnen; ihre Zahl überstieg rasch [[hundert]]. Dom Bosco versammelte sie
+    abends in der Sakristei der Kirche, und tagsüber ging er sie in ihren
+    Werkstätten besuchen oder suchte Arbeit für die, welche keine hatten.
 
 
-    Am folgenden Sonntag waren es neun. Am Sonntag darauf zwanzig. Sie
-    kamen aus den Ziegeleien und von den Baustellen, sie hatten Hunger und
-    keinen Namen, den jemand kannte, und der Priester lernte in diesem
-    Winter, dass man ihnen zuerst zu essen geben muss und erst danach
-    [[das Kreuzzeichen. |18]]
+    Das Werk lief ohne allzu große Hindernisse, als er, da seine Studienzeit
+    zu Ende war, das [[Institut Sankt Franziskus |24]]
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 rueckseite:
   titel: La Chine hermétique
@@ -124,18 +123,20 @@ rueckseite:
       werden und die Justiz ihnen die posthume Genugtuung versagen. Sie
       schreiben sie auf ihre Haut, im Wissen, dass niemand sie anzurühren
       wagt, denn ein Vorurteil behauptet, es sei unmöglich, Zeichen zum
-      Verschwinden zu bringen, die auf die Haut geschrieben sind.
-    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+      Verschwinden zu bringen, die auf die Oberhaut eines Toten
+      geschrieben wurden.
+    # Im Wortlaut des Buchsatzes.
     fortsetzung: >-
-      Das ist ein Irrtum, und ich habe ihn dreimal widerlegt gesehen. Man
-      braucht eine Nadel, Essig und Geduld; die Schrift geht fort, die
-      Narbe bleibt, und die Narbe sagt dasselbe.
+      Die Versuche des Selbstmords aus Rache glücken nicht immer. Den
+      folgenden Fall hat mir einer meiner Freunde erzählt, der die Chinesen
+      und ihre Sprache gründlich kennt.
 
 
-      Einer trug seine Klage über die ganze Brust, in kleinen, sehr
-      regelmäßigen Zeichen. Er starb im Frühjahr. Ich habe den Text
-      abgeschrieben, bevor man ihn [[fortbrachte. |14]]
+      Eine von einem [[Wucherer]] gehetzte Frau schluckt eines schönen Tages
+      Opium in ausreichender Menge und begibt sich in sein Büro, um dort zu
+      sterben. Aber unser Mann, der erraten hatte, worum es ging, ließ die
+      Türen schließen und schlug diese Frau mit Hilfe seiner [[Diener tot;
+      |14]]
 ---
 
 Ein Band, zwei Vorderseiten. Vorn „Biographische Skizze über Dom Bosco"

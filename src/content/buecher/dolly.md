@@ -52,19 +52,20 @@ leseprobe:
     genau wie bei ihrem Köter auch eine Art Revierempfinden. Sie dachte,
     diese Zeit und dieser Garten gehörten jetzt ihr. Sie hätte nicht mit
     diesen beiden menschlichen Partyüberbleibseln gerechnet, die hier im
-    Gras ihren Rausch ausdösen. Tja, falsch gerechnet.
-  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    Gras ihren Rausch ausdösen. Tja, falsch gerechnet. Die Angst in ihren
+    Augen machte mich wütend, denn sie war deplatziert und Ausdruck ihrer
+    Spießigkeit.
+  # Im Wortlaut des Entwurfs.
   fortsetzung: >-
-    Ich habe mir am Nachmittag eine neue Gartenliege besorgt. Eine mit
-    Rollen, damit ich sie in den Schatten ziehen kann, ohne aufzustehen.
-    Der Verkäufer fragte, ob ich viel draußen sei. Ab jetzt schon, sagte
-    ich.
+    Ich winkte freundlich und stand auf. Ich weckte den Schweden. Wir kennen
+    uns eigentlich ganz gut, haben uns auch schon gegenseitig besucht,
+    geredet, getrunken, tausend mal auf der Straße oder im Supermarkt
+    getroffen, aber sie schaute immer noch so ängstlich, als lägen dort
+    [[Freddy Krüger und Chucky]] die Mörderpuppe in ihrem Garten.
 
 
-    Seither führe ich Buch. Wann die Besitzer das Haus verlassen, wann sie
-    zurückkommen, an welchen Tagen niemand da ist und wie lange es dauert,
-    bis jemand ein Geräusch [[im Hof für ein Geräusch hält, |30]]
+    Sie nahm sogar den kleinen, geretteten, rumänischen Straßenhund Dolly
+    auf den Arm, als würden wir ihn gleich in [[tausend Stücke reißen |22]]
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 rueckseite:
   titel: The Rise of Damascus Goat

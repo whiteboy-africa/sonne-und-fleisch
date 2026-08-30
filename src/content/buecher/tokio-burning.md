@@ -67,18 +67,20 @@ leseprobe:
     wieder gefangen hat, weisen wir uns bei der Empfangsdame aus. Sie
     reicht uns die Sicherheitskarten mit beiden Händen, ein Lächeln, eine
     Verbeugung. Wir nehmen die Karten entgegen und passieren die
-    Drehkreuze hin zu den Aufzügen. Biep, biep.
-  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    Drehkreuze hin zu den Aufzügen. Biep, biep. Dort hängt ein Flatscreen
+    an der Wand. Er zeigt ein Video, in dem das Firmenlogo über eine
+    saftig-grüne Hügellandschaft gleitet. Vielleicht Hokkaidō.
+  # Im Wortlaut des Buchsatzes.
   fortsetzung: >-
-    Im Aufzug spiegelt sich Xi in der polierten Wand und richtet seine
-    Krawatte, obwohl sie sitzt. Ich sehe zu, wie die Zahlen laufen. Im
-    achtzehnten Stock steigt eine Frau zu, die uns beide nicht ansieht.
+    Ich stelle mir vor, dass auf dem Bildschirm der Film Men Behind the Sun
+    läuft. Den habe ich zur Vorbereitung auf das heutige
+    Verhandlungsgespräch angesehen, wie ich es immer mache, wenn wir mit den
+    Japanern zu tun haben.
 
 
-    Oben empfängt uns ein Flur, in dem es nach nichts riecht. Am Ende
-    steht eine Tür offen, und dahinter sitzen sieben Männer, die
-    aufstehen, als wir hereinkommen, und sich [[gleichzeitig verbeugen. |24]]
+    Der Film erzählt von der [[Einheit 731]] und den Gräueltaten, die sie
+    Ende des Zweiten Weltkriegs an chinesischen [[Kriegsgefangenen verübt
+    hat. |24]]
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Getauscht — Corporal Curses ist jetzt Seite A.
 rueckseite:
@@ -143,19 +145,20 @@ rueckseite:
       waren, welche keineswegs das Feld bearbeiteten, und dass sie in
       ihren Personen alles vereinten, was die kleine Welt, in der er
       lebte, ihm an [[Macht und Ansehen vorspiegelte. Dies zusammen
-      erweckte, aus Nachahmung, den Wunsch, Priester zu werden.
-    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+      erweckte, aus Nachahmung, in ihm den Gedanken, Priester werden zu
+      wollen.
+    # Im Wortlaut des Buchsatzes.
     fortsetzung: >-
-      Er sprach davon zu jedem, der ihm zuhörte, und zu vielen, die ihm
-      nicht zuhörten. Der Pfarrer seines Kirchspiels riet ihm ab, mit
-      jener Freundlichkeit, die keinen Zweifel lässt.
+      In dieser Absicht unterwarf er sich dem Unterrichte des Vikars, von
+      welchem er lesen und ein wenig schreiben lernte. Allein die Not seiner
+      Familie, die sie außer Stand setzte, ihm ein Erbteil auszusetzen, zwang
+      ihn, ganz und gar aufs Studieren [[Verzicht zu tun]], und er entschloss
+      sich, das Schumacherhandwerk zu erlernen.
 
 
-      Von da an arbeitete Mathieu Lovat weiter als Schuster, ging aber
-      jeden Sonntag zweimal zur Messe und begann, sich Fragen zu stellen,
-      die ihm niemand beantwortete, weil niemand sie [[verstand. |11]]
-
+      Die Verleugnung seines eigenen Willens in der Wahl eines Standes, der
+      die Geschicke des Lebens bestimmt, hat stets auch den [[stärksten Geist
+      empört |20]]
 ---
 
 Platzhalter für die lange Beschreibung.

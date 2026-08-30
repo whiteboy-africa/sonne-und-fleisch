@@ -64,19 +64,16 @@ leseprobe:
     internationalen Freundschaften, Gespräche mit einem Asiaten —
     Freundschaft zwischen den Rassen, findet Gefallen an Cricket und Rugby,
     erster Wunsch, erwachsen zu sein, und erste liebevolle Gefühle den
-    Eltern gegenüber (sobald sie weit genug weg sind).
-  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    Eltern gegenüber (sobald sie abgereist sind),
+  # Im Wortlaut des Buchsatzes.
   fortsetzung: >-
-    Zweites Jahr: Latein, Griechisch, eine Rüge wegen Unaufmerksamkeit im
-    Gottesdienst, ein Brief nach Hause, in dem das Wort Heimweh nicht
-    vorkommt.
-
-
-    Drittes Jahr: er wächst um elf Zentimeter, gewinnt einen Preis im
-    Weitsprung und schreibt zum ersten Mal etwas auf, das er niemandem
-    zeigt. Der Eintrag darüber im Register lautet: [[keine besonderen
-    Vorkommnisse. |26]]
+    Entwicklung des Geistes und der Physiognomie: Freundschaft mit dem
+    Physikprofessor, Geschichte oder Literatur?, er liest Carlyles Sartor
+    Resartus, Exkurse: englische Frauen aus Poole Keynes oder Dean Close
+    (sie heißen immer Lilly und haben kräftige Schenkel und
+    [[Pferdegesichter]] – er schätzt die Wildheit und setzt sie in eine
+    Kontinuität mit der keltisch-britischen Königin Boudicca), das Gefühl,
+    ein Teilnehmer am [[Great Game zu sein |20]]
 rueckseite:
   titel: Mountains of Sadness
   kurztitel: Mountains of Sadness
@@ -125,18 +122,17 @@ rueckseite:
       zu haben. Sie haben Bambusstöcke geschultert, an denen Bündel mit
       Lebensmitteln für das Xihai Hotel hängen. Es ist das einzige Hotel
       dort oben, wie ich aus dem Panda-Reiseführer weiß, und hat einen
-      Hunger, den niemand sieht.
-    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+      Hunger, der nie gestillt werden kann.
+    # Im Wortlaut des Buchsatzes.
     fortsetzung: >-
-      Sie steigen schneller als ich, mit dreißig Kilo auf der Schulter,
-      und sie bleiben nicht stehen, wenn sie mich überholen. Einer nickt.
-      Die anderen sehen die Stufen an.
+      Für die Träger heißt das: Drei Mal am Tag hinauf und wieder hinunter.
+      Eine [[Sisyphos-Arbeit]]. Die Bambusstöcke biegen sich unter der Last
+      und ich bin froh, dass ich nur einen Rucksack mit einer Flasche Wasser,
+      einem Windbreaker, meinem iPhone, Zigaretten und Magnesiumtabletten
+      dabeihabe. Mehr brauche ich nicht. Schließlich bleibe ich nicht lange.
 
 
-      Oben, vor dem Hotel, laden sie ab, setzen sich auf ihre Stöcke und
-      essen aus mitgebrachten Behältern. Das Hotel verkauft eine Schüssel
-      Nudeln für den Lohn eines halben [[Aufstiegs. |12]]
+      Auf der anderen Seite [[für immer. Je nachdem, wie |26]]
 ---
 
 Platzhalter für die lange Beschreibung.

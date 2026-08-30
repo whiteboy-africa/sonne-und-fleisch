@@ -59,19 +59,16 @@ leseprobe:
     noch eine weitere Geheimzutat enthalten würde, die er mir jedoch um
     nichts in der Welt verraten würde; „Sie, Herr Selters", sagte mir
     dieser unverschämte Mensch, „lieben das Abenteuer, deswegen werde ich
-    Ihnen den Namen nennen.
-  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    Ihnen die letzte Note nicht verraten."
+  # Im Wortlaut des Buchsatzes.
   fortsetzung: >-
-    Er nannte ihn. Er sagte ihn so leise, dass ich zweimal nachfragen
-    musste, und beim zweiten Mal lachte er, als hätte er mich
-    hereingelegt.
-
-
-    Ich habe den Namen aufgeschrieben, sobald ich auf der Straße war, auf
-    die Rückseite einer Quittung, und ich habe ihn seither niemandem
-    gesagt. Nicht aus Treue. Sondern weil er, laut ausgesprochen, sofort
-    [[nach nichts klingt. |20]]
+    Ich ließ mit hochrotem Kopf eine Salve wüster Beschimpfungen auf den
+    alten Save los und hätte ihm wohl mit einigen wohl platzierten Ohrfeigen
+    das süffisante Lächeln aus dem Gesicht geschlagen, wären nicht seine
+    elenden [[Hmong-Schergen]] dazwischengesprungen, um mich Tobenden
+    gewaltsam vor die Tür zu befördern, wo ich fluchend jeder Art Abenteuer
+    und literarischer Recherche abschwor und bald beschlossen hatte, mich in
+    Zukunft auf [[andere Wirkungsbereiche |22]]
 format: Broschur
 verfuegbarkeit: In Vorbereitung
 hoehe: 2.0
@@ -132,18 +129,19 @@ rueckseite:
       aus." Meine Stimme ist heiser. „Aber das war eine Suffaktion. Dass mein
       Leben versaut ist wegen was, hinter dem ich nicht stehe." Marie stellt
       ihre Tasche ab, zieht die Schuhe aus. „Du kennst mich", sage ich. „Wenn
-      mich jetzt alle hassen, weil ich das gesagt habe.
-    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+      mich jetzt alle hassen, weil ich. Keine Ahnung. Gesagt hätte, dass
+      ich Milei gut finde. Okay! Damit kann ich leben! Da könnte ich
+      argumentieren, da könnte ich sagen: Hier ist warum. Aber so?"
+    # Im Wortlaut des Buchsatzes.
     fortsetzung: >-
-      Sie sagt nichts. Sie hängt ihre Jacke auf, geht in die Küche, lässt
-      Wasser laufen. Ich höre, wie sie ein Glas nimmt und wieder
-      hinstellt, ohne getrunken zu haben.
+      Marie legt den Zeigefinger auf meine Lippen. Er ist weich und es macht
+      mir nichts aus, mit dem Reden aufzuhören. „Du musst endlich was posten",
+      sagt sie.
 
 
-      Dann kommt sie zurück, setzt sich mir gegenüber und schaut mich an,
-      wie man jemanden anschaut, den man kennt. „Es hassen dich nicht
-      alle", sagt sie. „Es ist nur so, dass [[dich niemand verteidigt. |26]]
+      „Ich warte noch, was Eddy macht." Marie schnaubt leise. „Eddy ist
+      abgetaucht." „Der wartet nur auf den richtigen Moment." „Und dann?" Sie
+      zieht die Augenbrauen hoch. „Was glaubst du, was [[passiert? |11]]
 ---
 
 Ein Band, zwei Vorderseiten. Vorn „Opium" von C. T. Selters —
