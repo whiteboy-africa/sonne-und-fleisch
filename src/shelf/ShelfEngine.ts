@@ -911,7 +911,23 @@ export class ShelfEngine {
     this.controls.dampingFactor = 0.075;
     this.controls.enablePan = true;
     this.controls.screenSpacePanning = true;
-    this.controls.enableZoom = true;
+    /*
+     * **Die Kamera zoomt nirgends.**
+     *
+     * Im Stapel rechnet die Engine den Abstand selbst (`zielZoom`,
+     * zwischen 0,55 und 1,7) — dort ist `controls` ohnehin abgeschaltet.
+     * In der Betrachtung war `enableZoom` aber an, und OrbitControls hat
+     * das Kneifen an sich genommen und die Kamera zwischen 2,4 und 9
+     * Einheiten hin und her gefahren. Zurueckgesetzt wurde das nie: wer
+     * in der Detailansicht herangezoomt hatte und dann zum Stapel
+     * zurueckging, stand mitten im Stapel und kam kaum wieder heraus.
+     *
+     * Der Zoom in der Betrachtung war auch nie gebaut, nur nicht
+     * abgeschaltet — dort steht der Band in seiner eingerichteten Groesse,
+     * und zum Hineingehen gibt es die Lupe in der Leseprobe. Aus
+     * demselben Grund kreist die Kamera dort nicht (`enableRotate`).
+     */
+    this.controls.enableZoom = false;
     this.controls.minDistance = 2.4;
     this.controls.maxDistance = 9;
     // Die Kamera dreht sich nicht mehr um das Buch — das Buch dreht sich in
