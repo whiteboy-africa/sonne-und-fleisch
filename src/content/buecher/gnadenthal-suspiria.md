@@ -92,10 +92,12 @@ leseprobe:
 rueckseite:
   titel: Qorpus Delicti
   kurztitel: Qorpus Delicti
+  # Kein Werktitel, sondern die Angabe zum Band. Sie stand im
+  # Klappentext und gehoert unter den Titel.
+  untertitel: Gesammelte Schriften 1996–1998
   autor: QRT
   klappentext: >-
-    Gesammelte Schriften 1996–1998. Am Anfang steht ein Leichnam, aber
-    nicht als Rätsel: gefragt wird nicht, wer es war, sondern was ein
+    Am Anfang steht ein Leichnam, aber nicht als Rätsel: gefragt wird nicht, wer es war, sondern was ein
     Körper ist, wenn er niemandem mehr gehört. Dazwischen Listen — was
     gefunden, was gewogen, was nicht bestimmt werden konnte.
   zitat: Der Körper zeigt die Tat nicht. Die Tat macht den Körper sichtbar.

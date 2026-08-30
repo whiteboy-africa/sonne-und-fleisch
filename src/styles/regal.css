@@ -802,6 +802,45 @@ body {
   margin-top: 0.4rem;
 }
 
+/*
+ * **Der Untertitel spricht aus dem Buch**, nicht aus der Bedienung: die
+ * Buchserife, aufrecht, ohne Anfuehrungszeichen, ohne Strich davor, ohne
+ * Linie daneben. Die Tafel ist sonst durchweg Mono — und genau deshalb
+ * liest er sich hier als etwas, das auf dem Titelblatt steht, und nicht
+ * als eine weitere Angabe des Verlags.
+ *
+ * Im Grad zwischen den beiden Nachbarn: groesser als der Klappentext,
+ * kleiner als der Titel.
+ *
+ * Die Gewichte wie beim Autor: `.book-details .…` wiegt 0-2-0 und
+ * schlaegt den Reset der Tafel, der jeden Absatzrand auf null plaettet.
+ * Mit 0-1-0 kaeme der Abstand nie im Bild an — genau der Fehler, der
+ * hier schon einmal stand.
+ */
+.book-details .book-details__untertitel {
+  max-width: 34ch;
+  margin-top: 0.3rem;
+  color: var(--ink-soft);
+  font-family: var(--schrift-buch);
+  font-size: clamp(14px, 1.05vw, 17px);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.34;
+  text-transform: none;
+  text-wrap: balance;
+}
+
+/*
+ * **Kein Abstand darf seinem Nachbarn gleichen.** Ohne Untertitel sind
+ * es zwei Spruenge (Titel→Autor 0,4 rem, Autor→Klappentext 1,6 rem); mit
+ * ihm drei (0,3 / 0,9 / 1,6). Waeren zwei gleich, stuenden die Zeilen
+ * als Block da und man saehe nicht mehr, was zu was gehoert.
+ */
+.book-details.hat-untertitel .book-details__author {
+  margin-top: 0.9rem;
+}
+
 .book-details .book-details__description {
   /* Zwischen Autor und Klappentext viermal so viel Luft wie zwischen
      Titel und Autor: Titel und Name gehoeren zusammen, der Text ist

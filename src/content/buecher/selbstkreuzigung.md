@@ -4,6 +4,11 @@
 # Nummer.
 titel: Corporal Curses
 kurztitel: Corporal Curses
+# Vom Umschlag, in der Zeile unter dem Titel — und ebenso im Entwurf
+# („Corporal Curses / 10.000 Dead Martyrs: A study on sensitivity").
+# Der Umschlag setzt Gedankenstrich und grosse Anfangsbuchstaben; ihm
+# wird gefolgt, er ist das Gedruckte.
+untertitel: 10.000 Dead Martyrs — A Study on Sensitivity
 autor: Marlies van Addak
 # Aus dem Entwurf „Corporal Curses 4.docx". Die Heldin heisst hier
 # durchgehend Helena; im Manuskript steht an sechzehn Stellen noch

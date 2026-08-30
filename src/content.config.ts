@@ -105,15 +105,26 @@ const leseprobe = z
  */
 const untertitelFeld = z
   .string()
-  .refine((wert) => !wert.includes('\n'), {
-    message: 'Der Untertitel ist eine Zeile. Ohne „|" schreiben.',
+  .superRefine((wert, ctx) => {
+    /*
+     * `superRefine` und nicht `refine`: die Funktionsform von `refine`
+     * bringt ihre Nachricht in dieser Zod-Fassung nicht durch, und im Bau
+     * stand dann „Invalid input" — eine Meldung, die weder das Feld noch
+     * die Zahl nennt und mit der niemand etwas anfangen kann.
+     */
+    if (wert.includes('\n')) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Der Untertitel ist eine Zeile. Ohne „|" schreiben.',
+      });
+    }
+    if (wert.length > 60) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Der Untertitel steht unter dem Titel und hat dort zwei Zeilen: höchstens 60 Zeichen, hier ${wert.length}.`,
+      });
+    }
   })
-  .refine(
-    (wert) => wert.length <= 60,
-    (wert) => ({
-      message: `Der Untertitel steht unter dem Titel und hat dort zwei Zeilen: höchstens 60 Zeichen, hier ${wert.length}.`,
-    }),
-  )
   .optional();
 
 // Cover-Dateien unter public/buecher/<slug>/.

@@ -2,8 +2,20 @@
 # Aus den beiden Buchsatz-Dateien gelesen: „Eine mittelmaessige Idee"
 # (5.932 Woerter) und „Mountains of Sadness" (4.843). Klappentexte, Zitate
 # und Leseproben stehen im Wortlaut. Seitenzahlen sind geschaetzt.
-titel: The Life and Times of Robert Duval
+# **Der Titel stand als Unterzeile da.** Hier hiess der Band „The Life
+# and Times of Robert Duval" — das ist im Buchsatz die Zeile *unter* dem
+# Titel; das Buch heisst „Eine mittelmaessige Idee". Der Kommentar oben
+# nennt es seit jeher richtig, das Feld nicht. Aufgefallen ist es erst,
+# als der Untertitel sein eigenes Feld bekam und dieselbe Zeile zweimal
+# untereinander stand.
+#
+# **Zurueck heisst: diese beiden Zeilen tauschen.** Der Kurztitel bleibt
+# „Robert Duval" — so steht der Band im Regal und auf dem Ruecken, und so
+# heisst seine Datei.
+titel: Eine mittelmäßige Idee
 kurztitel: Robert Duval
+# Vom Titelblatt des Buchsatzes, unter dem Titel.
+untertitel: "oder: The Life and Times of Robert Duval"
 autor: Aleksandar Vadim
 klappentext: >-
   Robert Duval, der eigenen Zeit fremd, findet nur in den Büchern kolonialer

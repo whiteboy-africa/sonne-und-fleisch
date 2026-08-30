@@ -100,10 +100,15 @@ reihenfolge: 0
 # Farben aus dem Umschlag: das Olivgrün des Gewitterhimmels, das Gold der
 # Wabe, das Knochenweiß der Schrift.
 rueckseite:
-  # Nach dem Doppelpunkt stehen geschuetzte Leerzeichen (U+00A0): der
-  # Titel bricht nur hinter „Lichas:" um, nicht mitten in der Formel.
-  titel: "Lichas:\u00A0The\u00A0Agony\u00A0and\u00A0the\u00A0Extasy"
+  # **Derselbe Fall wie bei 004.** Hier stand der Untertitel im Titel,
+  # mit einem Doppelpunkt angeklebt und mit geschuetzten Leerzeichen
+  # zusammengehalten, damit die Formel nicht mitten durchbricht — ein
+  # Notbehelf fuer ein Feld, das es damals nicht gab. Im Buchsatz steht
+  # auf dem Titelblatt nur LICHAS.
+  titel: Lichas
   kurztitel: Lichas
+  # Vom Titelblatt, die Zeile darunter.
+  untertitel: The Agony and the Extasy
   autor: Aleksandar Vadim
   klappentext: >-
     Ein Fischersohn aus Tarent strandet bei Korfu, findet die Bienen und

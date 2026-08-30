@@ -116,6 +116,8 @@ leseprobe:
 rueckseite:
   titel: Mathieu Lovats Selbstkreuzigung
   kurztitel: Selbstkreuzigung
+  # Vom Titelblatt des Buchsatzes, unter dem Titel.
+  untertitel: In Venedig im Jahr 1805
   autor: J. H. G. Schlegel
   klappentext: >-
     Venedig, 19. Juli 1805: Ein Schuster nagelt sich an ein Kreuz aus

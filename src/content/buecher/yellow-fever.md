@@ -7,11 +7,13 @@
 # wortgleich, S. 30 bis auf ein eingefuegtes „Das" am Satzanfang.
 titel: Yellow Fever
 kurztitel: Yellow Fever
+# Vom Umschlag. Er stand bisher im Klappentext („Im Untertitel: …") —
+# eine Zeile, die den Untertitel **beschreibt**, statt ihn zu setzen.
+untertitel: A Single Man's Guide to Thailand, Laos and Despair
 autor: C. T. Selters
 klappentext: >-
   Ein österreichischer Schriftsteller fährt mit einem Reisestipendium nach
-  Bangkok, um ein Buch zu beenden, und schreibt stattdessen dieses. Im
-  Untertitel: A Single Man's Guide to Thailand, Laos and Despair.
+  Bangkok, um ein Buch zu beenden, und schreibt stattdessen dieses.
 klammer: >-
   Selters fährt nach Bangkok und kommt mit einem türkischen Schimpfwort zurück. Hinweg und Rückweg in einem Band.
 zitat: >-
