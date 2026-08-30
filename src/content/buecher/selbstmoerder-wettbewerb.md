@@ -54,40 +54,61 @@ seiten_zahl: 80
 # wir nicht, also bleibt es bei der Hausserife; `leseprobe_schrift` waere
 # die Stelle, falls je eine Bleisatz-Naeherung dazukommt.
 leseprobe:
-  seite: 4
+  # **Nicht der Anfang.** Hier standen die Vorrede ueber den Selbstmord
+  # und das Ausschreiben — also die Ankuendigung. Der Klappentext daneben
+  # sagt dasselbe, und das Zitat stammt aus derselben Stelle.
+  #
+  # Jetzt die Vorfuehrung selbst: Nummer Eins verliert die Nerven, und
+  # der Bericht faengt an, mitzuzaehlen.
+  #
+  # GESCHAETZT: die Stelle liegt bei 45 % des Buchsatzes. Der Band hat
+  # rund 80 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
+  # rund 40 fuer diese, und die Stelle um 18.
+  seite: 18
+  # Im Wortlaut des Buchsatzes, Absaetze 41 und 42. Alte Rechtschreibung
+  # („Schuß", „daß") absichtlich stehengelassen — die Vorlage haelt sie,
+  # und das Buch ist von 1927.
   text: >-
-    Daß die Verurteilung des Selbstmordes eine speziell christliche oder
-    europäische Anschauungsweise ist, zeigen die bekannten und durchaus
-    verbürgten Berichte aus anderen Gegenden der Erdkugel, z. B.
-    Japan, wo sogar die Seelen gewisser Selbstmörder eine besondere
-    Verehrung genießen.
-
-
-    Zu welchen Absurditäten jedoch die Nachahmung anderer, auf ihrem Boden
-    zweifellos berechtigter Kulturerscheinungen in unserm unglückseligen
-    „Neuen Erdteil" führt, mag folgende, durchaus ernst zu nehmende
-    Zeitungsnotiz aus einer seiner Hauptstädte beleuchten, die die
-    Spezialitäten des berüchtigten Madrid noch um ein ansehnliches
-    übertrifft.
-
-
-    „In Anbetracht der fünfzig Millionen, die ich über das mir zum Ziel
-    gesetzte Vermögen gewonnen habe, und der Tatsache, daß für die
-    Selbstmörder noch nie etwas Wesentliches getan wurde, beabsichtige
-    ich, den genannten Betrag zum Besten jener vernachlässigten Existenzen
-    auszusetzen; denn was könnte man Besseres tun, als die Tat wenigstens
-    einer Anzahl derselben durch den Schein eines gewissen Ruhmes zu
-    verherrlichen und ihre Angehörigen von verzweifelten Waisen zu
-    glücklichen Leuten zu machen?
-  # Die rechte Seite: das Ausschreiben selbst, bis zum Denkmal fuer den
-  # Sieger. Weiter im Wortlaut des Buchsatzes.
+    Als aber der Zeiger zwei Minuten vor dreiviertel stand, das letzte
+    Gedeck abgeräumt wurde und die beiden Roten sich an die Seiten der
+    rotverhangenen Tafel begaben, da verlor Nummer Eins den Rest seiner
+    Beherrschung: Schlag dreiviertel, noch ehe die sechs Schiedsrichter
+    ihre Plätze eingenommen hatten, sprang er auf, stürzte ins Innere der
+    glitzernden Schranken, riß eine der Pistolen an sich und schoß nach
+    seinem Kopf. Der Schuß ging daneben und traf einen dicken
+    Kommerzienrat neben mir, der sofort tot umsank. Aber in der
+    allgemeinen Aufregung merkte es niemand außer ihm selbst und mir; denn
+    sein schmutziges Blut bespritzte meinen hellen Anzug, und seine
+    ekelhaften Augen glotzten nun nicht mehr lüstern nach der Mitte des
+    Saales, sondern in mein Gesicht. Aber schon donnerte der zweite Schuß
+    durch den Saal, und auch ich starrte, wie die 10000 anderen Augen, nur
+    noch nach der Mitte, ohne vor dem Ende einen Blick abzuwenden: denn
+    dort spielte sich in knapp zwei Stunden eine blitzartige Folge der
+    grauenhaftesten Szenen ab, wie nur eine aufgeregte Phantasie oder eine
+    so weit vorgeschrittene Zivilisation wie die des Jahres 19… sie
+    hervorbringen kann.
+  # Die rechte Seite: Nummer Zwei. Sie bricht ab, wo der Henker den Strick
+  # abschneidet.
   fortsetzung: >-
-    Um jedoch auch dem Publikum gerecht zu werden, verbinde ich die
-    Auswahl des Geeigneten mit einem Wettbewerb von zwölf sich freiwillig
-    meldenden, heute lebenden Selbstmördern um die beste Ausführung
-    der Tat. Dem Sieger wird aus dem Fond dieser fünfzig Millionen ein
-    prächtiges Denkmal gesetzt und der Rest unter die Hinterbliebenen
-    verteilt.
+    Der Mann lag nun mit klaffendem Schädel, dicht an die Schranke
+    gepreßt, auf dem Boden, und verhaltenes Stöhnen seiner Verwandten
+    drang aus einer Ecke des Saales hinüber. Der Arzt verließ seinen
+    gelben Sitz, stellte den Tod fest, trat aus den Schranken heraus und
+    rief Nummer Zwei.
+
+
+    Schon wankte er heran, furchtbar bleich, stierte den zerschmetterten
+    Schädel des Liegenden entsetzt an und griff hastig nach einem der
+    glatten Stricke. Mit einer plötzlich wiedergewonnenen Ruhe knüpfte er
+    ihn an dem aus der Mitte der Kuppel herabhängenden festen Haken auf,
+    indem er auf einen kleinen bereitstehenden Schemel trat, steckte den
+    Kopf durch die Schlinge und stieß nach kurzem Zögern den Schemel fort.
+    Das Geräusch der unter den scheinbar mit übermenschlicher Kraft
+    geführten Zuckungen bebenden Eisenstange in der Kuppel, der Anblick
+    des entsetzlich entstellten Gesichtes und des in häßlichen Kleidern
+    wie ein Lumpen herabhängenden Körpers ließ im Saal jedes Geräusch
+    verstummen. Nachdem der Arzt den Tod festgestellt hatte, schnitt einer
+    der Henker den Strick ab und schob die Leiche mit dem
 cover_bild: /buecher/selbstmoerder-wettbewerb/cover.webp
 # Aus dem Umschlag genommen: der Papierton als Einband, die violette
 # Schreibmaschinentinte als Akzent.
@@ -133,44 +154,54 @@ rueckseite:
   motiv: boom
   # Im Wortlaut von „JUSTINE SEGUNDA – Buchsatz.docx", der Anfang.
   leseprobe:
-    # GESCHAETZT: der Buchsatz hat keine harten Seitenumbrueche.
-    seite: 7
+    # **Nicht der Anfang.** Hier stand die Vorgeschichte — Justine bei den
+    # Dekadenten, der Herzog, die Whisky-Orgel. Genau das, was der
+    # Klappentext daneben schon erzaehlt.
+    #
+    # Jetzt der Karfreitag und das Konzert selbst.
+    #
+    # GESCHAETZT: die Stelle liegt bei 38 % des Buchsatzes. Der Band hat
+    # rund 80 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
+    # rund 40 fuer diese, und die Stelle um 15.
+    seite: 15
+    # Im Wortlaut von „JUSTINE SEGUNDA – Buchsatz.docx", Absaetze 12 und
+    # 13. Der erste laeuft auf der rechten Seite weiter.
     text: >-
-      Die große Komponistin Justine Segunda, des Lebens und des Laufs der
-      Dinge überdrüssig und von der um sich greifenden Überzeugung
-      ergriffen, sie habe alles gesehen und durchschaut, die Männer wie die
-      Kompositionen, entwickelte – wie so mancher unkluge Mann vor ihr –
-      eine Vorliebe für die Abgründe jener dekadenten Schriftsteller,
-      welche die Hauptstädte des späten neunzehnten Jahrhunderts mit ihrer
-      theatralischen Ergebenheit an den Verlust aller Bedeutung
-      heimsuchten.
-
-
-      Kurz gesagt: Statt in Bars zu gehen und arme und bemitleidenswerte
-      Männer zu ficken, verbrachte Justine ihre Nächte nun zu Hause und
-      studierte noch die geringfügigste Einzelheit ihrer Leben und Werke.
-      Bei einem dieser literarischen Streifzüge stieß sie auf die monströse
-      Erfindung des dekadenten Herzogs Floresser, einen Apparat, der
-      ihren Puls beschleunigte und ihren Atem verkürzte und ihr tagelang
-      keinen Schlaf ließ.
-
-
-      Der Wahnsinnige hatte eine höllische Vorrichtung ersonnen, die er die
-      „Whisky-Orgel" nannte und auf der er, mittels vereinzelter Tropfen
-      vergorener, rektifizierter und mazerierter Flüssigkeiten,
-      Geschmackssymphonien auf seiner zerschlissenen Zunge aufführen
-      konnte, welche ihm Zugang zu jenen ersten Empfindungen verschafften,
-      in denen sich die Welt zuerst erschließt – ebenjene Empfindungen, die
-      Justine selbst während ihrer frühen Kompositionen so zärtlich
-      verspürt hatte und die sie nun so verzweifelt zurückzugewinnen
-      suchte.
-    # Die rechte Seite, weiter im Wortlaut: sie will den Herzog
-    # uebertreffen und bricht ab, bevor man erfaehrt, womit.
+      Am Karfreitag erschienen in der ganzen Stadt Plakate, die
+      unverkennbar nach Pumakäfig stanken und das letzte Konzert der
+      großen Justine Segunda verkündeten. Und als am Sonntag ihre letzte
+      Komposition uraufgeführt wurde, trat die sonst zurückhaltende
+      Komponistin selbst hervor, mit nichts bekleidet als einem kleinen
+      Schal aus Shahtoosh, und hielt die einleitende Ansprache, in der sie
+      – nicht durchweg schlüssig – darlegte, das primitive Handwerk der
+      Parfümerie könne Transzendenz allein durch die chemische
+      Komplizenschaft des Gehirns mit dem erreichen, was sie hartnäckig
+      „good storytelling" nannte, und durch die orchestrierte Ausschüttung
+      von Cortisol, Oxytocin, Dopamin, Endorphinen innerhalb ebenjener
+      heiligen Dreigliedrigkeit, welche den Spannungsbogen der
+      Heldenreise, die musikalische Symphonie und die Architektur eines
+      Duftes gleichermaßen beherrsche, auf dass das Gesamtkunstwerk
+      entstehe, als Geschichte zu riechen oder als Ton zu lesen, etc.
+      etc., … doch um es kurz zu machen: Das ohnehin spärliche Publikum,
+      das sich in ihrer Dachkammer versammelt hatte, wurde ungeduldig.
+    # Die rechte Seite: der erste Satz. Sie bricht ab, wo der
+    # Zitronenakkord zum zweiten Mal entzogen wird.
     fortsetzung: >-
-      Da sie sich dem gerupften Herzog von Natur aus überlegen glaubte,
-      machte sie sich sogleich daran, sein Konzept zu verfeinern und Hand
-      an jene wirklichen Saiten zu legen, die unsere Atome schwingen
-      lassen, entschlossen, einen von Menschen noch ungehörten Akkord
-      anzuschlagen
+      Der bescheidenen Reize von Justines Körper überdrüssig – ihres
+      glanzlosen Haars, ihrer schmalen Hüften, ihrer Adlernase –, gingen
+      sie zum Flüstern über, zum Dösen, zum Austausch gedämpfter
+      Bemerkungen, bis die Komponistin von Sinners in the Hands of an
+      Angry God den eröffnenden olfaktorischen Akkord anschlug und die
+      anwesenden Herren auf ihr richtiges Maß zurückgeführt wurden.
+
+
+      Der erste Satz begann. Leicht entzündet bediente Justine die Tasten
+      ihres gargantuesken Apparats, die Hand in einem breiten, festen
+      Griff wie am Schaft einer Schusswaffe, stetig auf und ab bewegt,
+      während ihr Rücken sich langsam streckte und versteifte. Sie spielte
+      eine Variation aus Wasserfrüchten und Mandarine, die jeden Mund im
+      Raum still überfließen ließ – hundert erwartungsvolle
+      Mundöffnungen, gefüllt mit einem warmschaligen Zitronenakkord, nur
+      um ihn wieder zu entziehen, eingeführt und noch einmal
 
 ---

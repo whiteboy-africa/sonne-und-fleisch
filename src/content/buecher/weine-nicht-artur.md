@@ -118,56 +118,66 @@ rueckseite:
   # 1.640 traegt. Dazugekommen sind der Satz vom Honigduft, der beim
   # ersten Setzen uebersprungen worden war, und der Weg weiter bis Hedyle.
   leseprobe:
-    seite: 8
-    # Der Wortlaut bleibt stehen, obwohl ihn niemand mehr setzt: liegt ein
-    # `bild` vor, zeichnet die Seite nicht mehr. Faellt das Bild einmal
-    # weg, ist der Text noch da.
+    # **Nicht der Anfang.** Hier standen Schiffbruch und Bienen — der
+    # Anfang der Geschichte, und derselbe Stoff, den der Klappentext
+    # daneben schon erzaehlt.
+    #
+    # Jetzt Capri: Tryphaena sieht Hedyle zum ersten Mal und begreift,
+    # wo sie steht.
+    #
+    # GESCHAETZT: die Stelle liegt bei 36 % des Buchsatzes. Der Band hat
+    # rund 48 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
+    # rund 24 fuer diese, und die Stelle um 9.
+    seite: 9
+    # Im Wortlaut des Buchsatzes, Absaetze 38 bis 41.
     text: >-
-      Lichas, Unglücklicher, am dritten Tag ist Sturm und es wird euch allen
-      bang, die gleichgültigen Wellen treiben euch aufs Meer, sie bringen
-      Meerwasser an Bord. Du denkst: der Geruch von Fisch soll mich auch in
-      den Tod begleiten. Dann ruft man Neptun an, doch er ist unnachgiebig –
-      dein Schiff wird an den Klippen zerschellen, doch du, Lichas,
-      Glücklicher, du strandest auf einer Insel bei Korfu: es ist Othoni.
-      Und auf Othoni: alle tot außer dir.
+      Doch er ist dir verfallen: ein dummer alter Lichas will dich
+      beeindrucken mit seinen Geschenken und seinen Reisen. Gerade noch so
+      willigst du ein, ihn nach Capri zu begleiten, denn du hast gehört,
+      dort könne man Tiberius kennenlernen, und der alte Tiberius ist
+      bekannt für seinen Geschmack an jungen Frauen. Strahlend siehst du
+      es vor dir: Tryphaena an der Seite des pater patriae, wie ihr über
+      die gewöhnlichen Leute lacht und Pfaueneier esst zum Frühstück.
 
 
-      Und dann: die Biene – es ist dein erstes Mal. Du trinkst gierig die
-      Waben, schluckst die Bienen, wie lange hast du nichts gegessen, das
-      Gelb rinnt durch deinen Hals und heilt die Schmerzen. Es ist Wärme in
-      deinem Körper, die Bienen haben dich gestochen und bespuckt, doch
-      nichts hast du davon gemerkt, so glücklich warst du sie zu trinken.
-      Und dann haben sie verstanden, du hast sie bezwungen.
+      Doch auf Capri alles anders: als du zum ersten Mal Hedyle siehst,
+      älter als du und reifer, mit Haltung und Charakter und aus guter
+      Familie: Sie hat alles, was dir fehlt. Ihre Schönheit komplexer,
+      ihre Züge feiner, und du musst einsehen, wie gewöhnlich du bist und
+      dass sich niemand im Geringsten interessiert für deine Wünsche:
+      Tryphaena, sie wissen, dass du nichts bist als eine Bauerntochter
+      aus Korfu, dass du von einer Schweinefamilie abstammst, an deren
+      Namen man sich nie erinnern wird, und niemand will sich auf der
+      Villa Jovis mit dir unterhalten, wo selbst ein Lichas mehr gilt als
+      du!
 
 
-      Süßer Honigduft, wie du den Fischgeruch überdeckst, das Fischwasser
-      in den Körben und in den Körpern.
-
-
-      Die Bienen, dein Schatz aus ihrer Honigblase und die ältesten Formen
-      menschlichen Handelns: die Zucht und der Verkauf, und du liebst deinen
-      Honig. Du trägst ihn in die Dörfer, trägst ihn an den Straßen und
-      trägst ihn nach Rom, doch niemand will ihn kaufen. Du schläfst auf den
-      Straßen, die Honigwaben deine Pölster und aus Bienenhaar deine Decke:
-      Und dann triffst du Hedyle aus gutem Hause. Ihr liebt euch im
-      Forum Romanum und im Forum Iulium, ihr liebt euch bis ans Ende der Via
-      Latina und Hedyles Verbindungen ermöglichen dir alles – jetzt bist du
-      einer der großen Männer, ganz Rom liebt deine Waben aus Othoni und du
-      gehst mit den feinen Herren.
-    # Die rechte Seite: der Satz laeuft noch ein Stueck und bricht dort ab,
-    # wo Hedyle weiss, wer er wirklich ist.
+      Und kurz hast du dich nach Korfu gesehnt, nach der Ruhe unter deinem
+      Feigenbaum, und dann denkst du wieder an deine Alten und eines ihrer
+      dummen Sprichwörter kommt dir in den Sinn: Circulus aureus in
+      naribus suis mulier pulchra et fatua.
+    # Die rechte Seite: was aus der Wut wird. Sie bricht ab, wo Tryphaena
+    # anfaengt, wissen zu wollen.
     fortsetzung: >-
-      Man hat dem und dem gesehen, und sogar mit Tiberius, und der lebt
-      sich gut mit Lichas.
+      – Eine schöne, aber einfältige Frau ist wie ein goldener Ring an
+      einem Schweinerüssel.
 
 
-      Lichas und Hedyle, die ganze Stadt spricht über eure Liebe: Lichas,
-      der Othone und Hedyle, seine Bienenkönigin. Doch Lichas, sie weiß,
-      dass du ein Bienenlutscher bist und nichts weiter, dass du die
-      Schuhe der feinen Herren mit Bienenwachs geputzt hast und dass du
-      allein warst mit deinen Bienen. Dass du ein besessener
-      Bienenschlucker bist, ein Honigsäufer, dass du unter freiem Himmel
-      geschlafen hast und dass du nichts wärest ohne sie.
+      Dann wirst du wütend auf das alles und dein Gesicht verzerrt sich in
+      der wilden Art deiner Vorfahren: Du hast gekeift und gelogen,
+      geschrien und alle beleidigt, und dabei löst sich etwas in dir, das
+      sich besser nicht gelöst hätte, und es treibt dich zu den Körpern
+      der anwesenden Herren. Und plötzlich war jeder interessiert an dir,
+      und du schreist laut und stöhnst und willst von allen hören, dass
+      Hedyle nichtswürdig sei und dass sie verschwinden soll, und Tiberius
+      hat dabei gelacht und alles instruiert: es wurde eine der
+      ausschweifendsten Nächte auf Capri.
+
+
+      Hedyle war lange verschwunden, und der müde, traurige Lichas, der
+      zurückblieb, hat dir alles verziehen, doch das hat dich kaum noch
+      interessiert: du warst verrückt vor Neugier, herauszufinden, wie die
+      Haut von einem
   akzent_farbe: '#c8912f'
   schrift_farbe: '#e8ddc0'
   motiv: wave

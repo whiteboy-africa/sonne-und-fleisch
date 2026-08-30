@@ -140,61 +140,51 @@ rueckseite:
   schrift_farbe: '#e4d6ae'
   motiv: fracture
   leseprobe:
-    seite: 5
-    # Der Wortlaut bleibt stehen: liegt ein `bild` vor, zeichnet die Seite
-    # nicht mehr. Faellt es einmal weg, ist der Text noch da.
-    # Im Wortlaut von „QUIDAMS SCHWERMUT – Buchsatz.docx". Hier stand eine
-    # Fassung aus dem aelteren Entwurf, in der ein Satz des Buches in zwei
-    # zerlegt und die Fuge umgeschrieben war („dessen grausame Taten …
-    # waren" wurde zu „Seine grausamen Taten waren …").
+    # **Nicht der Anfang.** Hier standen die ersten Absaetze — und in
+    # ihnen woertlich der Satz, der als Zitat schon daneben steht („Das
+    # ewige Mysterium der Praeferenz"). Zweimal dieselbe Zeile auf einer
+    # Seite.
     #
-    # Und sie reicht bis an den Fuss der Seite: 1.775 Zeichen gegen die
-    # rund 1.770, die eine Seite haelt. Vorher waren es 1.093 — ein
-    # Drittel der Seite blieb leer.
+    # Jetzt die Mitte: was nach dem letzten Grossen Aufstand aus dem
+    # Weissen Lotus wurde, und das Verfahren, mit dem er weitermacht.
+    #
+    # GESCHAETZT: die Stelle liegt bei 58 % des Buchsatzes. Der Band hat
+    # rund 144 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
+    # rund 72 fuer diese, und die Stelle um 42.
+    seite: 42
+    # Im Wortlaut des Buchsatzes, Absatz 13. Er laeuft auf der rechten
+    # Seite weiter — deshalb steht er dort ohne Einzug.
     text: >-
-      Die Herrscher des Erdstalls saßen zwischen den Quitten und
-      schwiegen: Es war ein chinesisches Jahrhundert, in jenen alten
-      Tagen, als das Wünschen noch geholfen hat. Ein grausamer General,
-      den man den „Tumor in Menschengestalt" nannte, brach die Stille;
-      ein sensibler Mensch und ein akribischer Sammler von Erinnerungen,
-      dessen grausame Taten über die Folklore der Göktürken bis zu den
-      germanischen Stämmen des Karpatenbeckens vorgedrungen waren, wo sie
-      Stoff wurden für das Epos von demjenigen, der die Tiefe sah, dessen
-      abscheulicher Held „Quidam" genannt wurde – ein Name, der bei den
-      furchtsamen Krimgoten bis heute Unbehagen auslöst, wenn er laut
-      ausgesprochen wird.
-
-
-      „Das Meer, das Feuer und die Frauen", sagt er, „drei Übel …",
-      während er sich in den Armen seiner Geliebten die Pfeife anzündet
-      und seinen Blick über die Wogen des südchinesischen Meeres schweifen
-      lässt. Der sanfte Strom der Erinnerung führt ihn zu den frühen
-      Treffen seiner Kabale und zurück in jene Jahrhunderte, in denen sie
-      unaufhörliche Kriege gegen den Kaiser und die Seinigen geführt
-      hatten, um der trostlosen Welt der Materie durch physische und
-      philosophische Konfrontation ein Ende zu setzen.
-
-
-      Quidam gedachte seiner toten Feinde, die seiner Bruderschaft den
-      spöttischen Namen „White Lotus School" gegeben hatten, und seiner
-      toten Freunde, der berüchtigten Skopzy, über deren
-      kindergleiche, unheimlich verunstaltete „weißen Tauben" die ganze
-      Welt staunte: Er erinnerte sich, wie sie am selben schattigen Platz
-      bei den Quitten gemeinsam einen höhnischen Brief an den König der
-      Tres Daciae verfassten und wie sie bei einer ihrer Reisen über
-      ebenjenes Meer die stolzen mohammedanischen Verehrer von
-      Termagant gequält und gedemütigt hatten, welche ihre Marter
-      tonlos ertrugen;
-    # Die rechte Seite, weiter im Wortlaut des Buchsatzes. Sie bricht ab,
-    # wo der Erdball mit Splittern des Kreuzes uebersaet ist.
+      In den gnostischen Zirkeln der südlichen Provinzen hingegen wussten
+      auch die Türhüter und ihre debilen Gehilfen zu berichten, dass
+      Quidam und sein Konklave bei ihrem Marsch auf die City of Darkness –
+      plötzlich geschlagen von der unendlichen Traurigkeit des Rebellen –
+      der Aufstände und der Morde müde wurden, der Enthauptungen und der
+      Lingchi-Folter, der niedergebrannten Dörfer und der
+      Menschenpyramiden, der weinenden Kinder und der stillen, kollektiven
+      nächtlichen Selbsttötung in den eigenen Reihen; und dass sie auf der
+      Ebene von Zaiton das Kreuz schlugen und sich von ihren Pferden
+      fallen ließen, um sich dort unten zwischen Aas und Kriechtier
+      gemeinsam einem neuen Verfahren zuzuwenden, das die Welt mit ihrem
+      Dualismus unterjochen sollte: In den folgenden Wochen würden sich
+      eine Handvoll Quidams engster Berater in den Untergrund
+      zurückziehen, um sich unter Namen von obskurer und dunkler Bedeutung
+      neu zu formieren – die neuen Gruppierungen hießen etwa Wukong jiao
+      („Bewusstsein für die Leere"), Luodao jiao („Arhat-Weg") und
+      Wenxiang jiao („Derjenige, der den Duft empfindet").
+    # Die rechte Seite: das Verfahren selbst. Sie bricht ab, wo die
+    # Flakons unter die Menschen kommen.
     fortsetzung: >-
-      wie seine Miliz eine Gruppe von Hindu-Brahmanen in der Hitze
-      Varanasis stellte, um sie auf das Samsara-Leidensrad zu
-      flechten, und wie sie an einem anderen, etwas kühleren Tag alle in
-      Andacht versammelt und in kalte Kamelhaardecken gehüllt zum Glimmen
-      von dunklem Harz erschauderten, als sie bei einer Lesung aus den
-      Flugschriften der Heiligen Helena hörten, dass der gesamte Erdball
-      mit Splittern des Kreuzes des Kyrios
+      Von dem Zeitpunkt des Zaitonerlebnisses an verfolgte der Weiße Lotus
+      eine neue Praxis, die die Menschheit mithilfe einer Methode der
+      Nanjing Decadence aus ihrer tierwarmen Fleischhülle befreien sollte:
+      Sie mazerierten Quittenschalen mit der Essenz einer zarten Pflanze,
+      die man damals „Buddhas Hand" nannte, gossen den Ansatz mit dem
+      Grabwasser ihrer Ahnen auf und ließen darin Splitter vom Holz des
+      heiligen Amberbaumes ziehen, bis sich eine dunkelrote Flüssigkeit
+      abseihte, die man in Flakons aus Hetianjade füllte und still unter
+      den
+
 ---
 
 Platzhalter für die lange Beschreibung.
