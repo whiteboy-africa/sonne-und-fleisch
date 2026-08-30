@@ -54,20 +54,7 @@ seiten_zahl: 80
 # wir nicht, also bleibt es bei der Hausserife; `leseprobe_schrift` waere
 # die Stelle, falls je eine Bleisatz-Naeherung dazukommt.
 leseprobe:
-  # Echte Seiten, wie bei Yellow Fever: aus „DER SELBSTMÖRDER-WETTBEWERB –
-  # Buchsatz.docx" gesetzt (`scripts/docx-setzen.swift --kolumne-ab 5`),
-  # gerastert, dann registerhaltig geschwaerzt.
-  #
-  # **Der Umbruch ist TextKits, nicht Words.** Kommt das PDF aus Word,
-  # laufen dieselben drei Schritte darueber.
   seite: 4
-  bild: /buecher/selbstmoerder-wettbewerb/leseprobe-s4.webp
-  geschwaerzt:
-    - /buecher/selbstmoerder-wettbewerb/leseprobe-s5-schwarz.webp
-    - /buecher/selbstmoerder-wettbewerb/leseprobe-s6-schwarz.webp
-    - /buecher/selbstmoerder-wettbewerb/leseprobe-s7-schwarz.webp
-    - /buecher/selbstmoerder-wettbewerb/leseprobe-s8-schwarz.webp
-  schluss: /buecher/selbstmoerder-wettbewerb/leseprobe-s9-stanze.webp
   text: >-
     Daß die Verurteilung des Selbstmordes eine speziell christliche oder
     europäische Anschauungsweise ist, zeigen die bekannten und durchaus
@@ -136,22 +123,36 @@ rueckseite:
   akzent_farbe: '#e00e03'
   schrift_farbe: '#facb9d'
   motiv: boom
-  # Echte Seiten, wie vorn: aus dem Buchsatz gesetzt
-  # (`docx-setzen.swift --kolumne-ab 5`), gerastert, registerhaltig
-  # geschwaerzt.
-  #
-  # Das Fenster ist Seite 5, nicht 4: Seite 4 ist der Kapitelanfang und
-  # traegt nur den Titel und die ersten Zeilen — 248 Zeichen auf einer
-  # Seite, die 1.600 haelt. Eine Probe, die zu vier Fuenfteln leer ist,
-  # sieht nicht nach Entzug aus, sondern nach unfertig.
+  # Im Wortlaut von „JUSTINE SEGUNDA – Buchsatz.docx", der Anfang.
   leseprobe:
-    seite: 5
-    bild: /buecher/selbstmoerder-wettbewerb/leseprobe-justine-s5.webp
-    geschwaerzt:
-      - /buecher/selbstmoerder-wettbewerb/leseprobe-justine-s6-schwarz.webp
-      - /buecher/selbstmoerder-wettbewerb/leseprobe-justine-s7-schwarz.webp
-      - /buecher/selbstmoerder-wettbewerb/leseprobe-justine-s8-schwarz.webp
-      - /buecher/selbstmoerder-wettbewerb/leseprobe-justine-s9-schwarz.webp
-    schluss: /buecher/selbstmoerder-wettbewerb/leseprobe-justine-s10-stanze.webp
+    # GESCHAETZT: der Buchsatz hat keine harten Seitenumbrueche.
+    seite: 7
+    text: >-
+      Die große Komponistin Justine Segunda, des Lebens und des Laufs der
+      Dinge überdrüssig und von der um sich greifenden Überzeugung
+      ergriffen, sie habe alles gesehen und durchschaut, die Männer wie die
+      Kompositionen, entwickelte – wie so mancher unkluge Mann vor ihr –
+      eine Vorliebe für die Abgründe jener dekadenten Schriftsteller,
+      welche die Hauptstädte des späten neunzehnten Jahrhunderts mit ihrer
+      theatralischen Ergebenheit an den [[Verlust aller Bedeutung]]
+      heimsuchten.
+
+
+      Kurz gesagt: Statt in Bars zu gehen und arme und bemitleidenswerte
+      Männer zu ficken, verbrachte Justine ihre Nächte nun zu Hause und
+      studierte noch die geringfügigste Einzelheit ihrer Leben und Werke.
+      Bei einem dieser literarischen Streifzüge stieß sie auf die monströse
+      Erfindung des dekadenten Herzogs [[Floresser]], einen Apparat, der
+      ihren Puls beschleunigte und ihren Atem verkürzte und ihr tagelang
+      keinen Schlaf ließ.
+
+
+      Der Wahnsinnige hatte eine höllische Vorrichtung ersonnen, die er die
+      „Whisky-Orgel" nannte und auf der er, mittels vereinzelter Tropfen
+      vergorener, rektifizierter und mazerierter Flüssigkeiten,
+      Geschmackssymphonien auf seiner zerschlissenen Zunge aufführen
+      konnte, welche ihm Zugang zu jenen ersten Empfindungen verschafften,
+      in denen sich die Welt zuerst erschließt – ebenjene Empfindungen, die
+      Justine selbst [[während ihrer frühen |22]]
 
 ---

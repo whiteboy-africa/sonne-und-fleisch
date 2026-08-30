@@ -111,24 +111,7 @@ rueckseite:
   # 1.640 traegt. Dazugekommen sind der Satz vom Honigduft, der beim
   # ersten Setzen uebersprungen worden war, und der Weg weiter bis Hedyle.
   leseprobe:
-    # Echte Seiten, wie bei Yellow Fever. Gesetzt aus „Lichas –
-    # Buchsatz.docx" mit `scripts/docx-setzen.swift` (5,06 x 7,81 Zoll,
-    # Format und Raender aus dem Dokument, Kolumne aus seinen
-    # Kopfzeilen), gerastert mit `magazin-rendern.swift`, geschwaerzt mit
-    # `seite-schwaerzen.mjs` — die Balken liegen registerhaltig auf dem
-    # Satz, der dasteht, und sind ins Bild gerechnet.
-    #
-    # **Der Umbruch ist TextKits, nicht Words.** Die Seitenzahl stimmt
-    # damit fuer diesen Satz, nicht zwingend fuer den gedruckten Band.
-    # Kommt das PDF aus Word, laufen dieselben drei Schritte darueber.
     seite: 8
-    bild: /buecher/weine-nicht-artur/leseprobe-lichas-s8.webp
-    geschwaerzt:
-      - /buecher/weine-nicht-artur/leseprobe-lichas-s9-schwarz.webp
-      - /buecher/weine-nicht-artur/leseprobe-lichas-s10-schwarz.webp
-      - /buecher/weine-nicht-artur/leseprobe-lichas-s11-schwarz.webp
-      - /buecher/weine-nicht-artur/leseprobe-lichas-s12-schwarz.webp
-    schluss: /buecher/weine-nicht-artur/leseprobe-lichas-s13-stanze.webp
     # Der Wortlaut bleibt stehen, obwohl ihn niemand mehr setzt: liegt ein
     # `bild` vor, zeichnet die Seite nicht mehr. Faellt das Bild einmal
     # weg, ist der Text noch da.

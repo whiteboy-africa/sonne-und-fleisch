@@ -1,4 +1,7 @@
 ---
+# **Der Dateiname ist nur der Schluessel zu den Cover-Ordnern**, nicht
+# mehr der Inhalt: hier steht Tokio Burning und Mathieu Lovats Selbstkreuzigung. Die Adresse eines Bandes ist seine
+# Nummer.
 titel: Tokio Burning
 kurztitel: Tokio Burning
 autor: Christoph Laible
@@ -16,9 +19,7 @@ klappentext: >-
 # bevor ein Text da war. Deine Klammer sagt „gefeuerter Salaryman". Wenn
 # das stimmt, gehoert der Klappentext nachgezogen.
 klammer: >-
-  Ein gefeuerter Salaryman legt Feuer in Tokio, ein gewisser Quidam
-  beschließt zwischen den Quitten einen letzten Aufstand. Zweimal brennt
-  eine Welt, einmal aus Kränkung, einmal aus Lehre.
+  Ein gefeuerter Salaryman legt Feuer in Tokio. Daneben Venedig 1805: ein Schuster nagelt sich ans Kreuz und hängt es aus dem Fenster.
 zitat: >-
   Früher hätten Männer wie ich Kriege gewonnen. Heute gewinnen wir
   Verhandlungsgespräche.
@@ -70,93 +71,72 @@ leseprobe:
     reicht uns die Sicherheitskarten mit beiden Händen, ein Lächeln, eine
     Verbeugung. Wir nehmen die Karten entgegen und passieren die
     Drehkreuze hin zu den Aufzügen. [[Biep, biep. |14]]
+# Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
+# Getauscht — Corporal Curses ist jetzt Seite A.
 rueckseite:
-  titel: The Melancholy of Quidam
-  kurztitel: Melancholy of Quidam
-  autor: Aleksandar Vadim
-  # Aus dem Manuskript „QUIDAMS SCHWERMUT IV.docx" — 8.864 Zeichen,
-  # dreizehn Absaetze, keine offenen Stellen.
+  titel: Mathieu Lovats Selbstkreuzigung
+  kurztitel: Selbstkreuzigung
+  autor: J. H. G. Schlegel
   klappentext: >-
-    Ein General, den man den „Tumor in Menschengestalt" nennt, sitzt
-    zwischen den Quitten und erinnert sich an die Jahrhunderte, die
-    seine Bruderschaft gegen die Welt der Materie geführt hat. Dann
-    beschließt er einen letzten Aufstand.
-  zitat: Das ewige Mysterium der Präferenz; oder das Rätsel des Begehrens.
-  zitat_von: Quidam
-  # Neuer Umschlag, neuer Dateiname — ein Bild nie unter demselben
-  # austauschen, sonst zeigt der Cache weiter das alte. `rueckseite.webp`
-  # bleibt liegen.
+    Venedig, 19. Juli 1805: Ein Schuster nagelt sich an ein Kreuz aus
+    seinem Bettpfosten und hängt es aus dem Fenster. Sein Arzt Ruggieri
+    fragt ihn wochenlang nach dem Grund und bekommt jedes Mal denselben
+    Satz.
+  zitat: Der Stolz der Menschen müsse gezüchtigt werden und am Kreuze endigen.
+  zitat_von: Mathieu Lovat, auf jede Frage dieselbe Antwort
+  cover_bild: /buecher/selbstkreuzigung/cover.webp
+  cover_farbe: '#0d0c0c'
+  akzent_farbe: '#ac8d1d'
+  schrift_farbe: '#c3b189'
+  motiv: network
+  # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
+  # Der Umschlag ist ein Markenbogen: neun Reihen derselben Dornengekroenten
+  # in sieben Farben, ein Feld leer, eine Marke schief darueber, unten rechts
+  # ein schwarzes Loch im Papier. Untertitel auf dem Bild: „10.000 Dead
+  # Martyrs — A Study on Sensitivity", dazu die Zeile „Ein Bildlein nuechtern
+  # mit Andacht zu verschlucken."
   #
-  # Lithographie auf gealtertem Karton: Lotos vor Gruen, Rahmen in Rot und
-  # Gold, unten ein rotes Siegel. Titel auf dem Bild: „QUIDAMS SCHWERMUT",
-  # darunter ALEKSANDAR VADIM.
-  cover_bild: /buecher/tokio-burning/quidams-schwermut.webp
-  # Aus dem neuen Umschlag genommen.
-  cover_farbe: '#22421f'
-  akzent_farbe: '#b5863e'
-  schrift_farbe: '#e4d6ae'
-  motiv: fracture
+  # Zweite Fassung des Bogens (`-markenbogen-2`): dasselbe Bild auf hellem
+  # statt gealtertem Papier, die Marken klarer. Die erste liegt daneben.
+  #
+  # Davor lag hier ein Holzschnitt in Schwarz auf Papierweiss
+  # (`corporal-curses.webp`). Die Datei bleibt liegen — zurueckgestellt wird,
+  # indem man den Pfad unten wieder auf sie zeigen laesst. Ein Bild unter
+  # demselben Namen auszutauschen ginge nicht: der Cache zeigte weiter das
+  # alte.
+  # Was in doppelten Klammern steht, wird beim Bauen
+  # herausgeschnitten und als Balken gedruckt — es steht in keinem HTML.
   leseprobe:
-    # Echte Seiten, wie bei Yellow Fever: aus „QUIDAMS SCHWERMUT –
-    # Buchsatz.docx" gesetzt (`scripts/docx-setzen.swift --kolumne-ab 6`),
-    # gerastert, dann registerhaltig geschwaerzt. Die Balken sind ins Bild
-    # gerechnet; darunter steht nichts mehr.
-    #
-    # **Der Umbruch ist TextKits, nicht Words.** Die Seitenzahl stimmt
-    # fuer diesen Satz. Kommt das PDF aus Word, laufen dieselben drei
-    # Schritte darueber.
-    seite: 5
-    bild: /buecher/tokio-burning/leseprobe-quidam-s5.webp
-    geschwaerzt:
-      - /buecher/tokio-burning/leseprobe-quidam-s6-schwarz.webp
-      - /buecher/tokio-burning/leseprobe-quidam-s7-schwarz.webp
-      - /buecher/tokio-burning/leseprobe-quidam-s8-schwarz.webp
-      - /buecher/tokio-burning/leseprobe-quidam-s9-schwarz.webp
-    schluss: /buecher/tokio-burning/leseprobe-quidam-s10-stanze.webp
-    # Der Wortlaut bleibt stehen: liegt ein `bild` vor, zeichnet die Seite
-    # nicht mehr. Faellt es einmal weg, ist der Text noch da.
-    # Im Wortlaut von „QUIDAMS SCHWERMUT – Buchsatz.docx". Hier stand eine
-    # Fassung aus dem aelteren Entwurf, in der ein Satz des Buches in zwei
-    # zerlegt und die Fuge umgeschrieben war („dessen grausame Taten …
-    # waren" wurde zu „Seine grausamen Taten waren …").
-    #
-    # Und sie reicht bis an den Fuss der Seite: 1.775 Zeichen gegen die
-    # rund 1.770, die eine Seite haelt. Vorher waren es 1.093 — ein
-    # Drittel der Seite blieb leer.
+    # Der Wortlaut aus dem Buchsatz — Ruggieris Brief in Schlegels
+    # Übersetzung, nicht mehr nacherzählt. Geschwärzt wird im Text selbst:
+    # was in [[doppelten Klammern]] steht, wird beim Bauen herausgeschnitten
+    # und als Balken gedruckt; es steht in keinem HTML.
+    seite: 19
     text: >-
-      Die Herrscher des Erdstalls saßen zwischen den Quitten und
-      schwiegen: Es war ein chinesisches Jahrhundert, in jenen alten
-      Tagen, als das Wünschen noch geholfen hat. Ein grausamer General,
-      den man den [[„Tumor in Menschengestalt"]] nannte, brach die Stille;
-      ein sensibler Mensch und ein akribischer Sammler von Erinnerungen,
-      dessen grausame Taten über die Folklore der Göktürken bis zu den
-      germanischen Stämmen des Karpatenbeckens vorgedrungen waren, wo sie
-      Stoff wurden für das Epos von demjenigen, der die Tiefe sah, dessen
-      abscheulicher Held „Quidam" genannt wurde – ein Name, der bei den
-      furchtsamen Krimgoten bis heute Unbehagen auslöst, wenn er laut
-      ausgesprochen wird.
+      Ich halte Wort, mein werter Freund, indem ich Ihnen hier die
+      Kreuzigung beschreibe, welche Mathieu Lovat, Marcs Sohn, 47 Jahre
+      alt, mit dem Beinamen Casale – von seinem Geburtsorte, einem zum
+      Kirchspiele [[Soldo gehörenden Dörfchen im Bezirke von Bellune]] –
+      am Morgen des 19. Juli 1805 an sich selbst vollzogen hat.
 
 
-      „Das Meer, das Feuer und die Frauen", sagt er, „drei Übel …",
-      während er sich in den Armen seiner Geliebten die Pfeife anzündet
-      und seinen Blick über die Wogen des südchinesischen Meeres schweifen
-      lässt. Der sanfte Strom der Erinnerung führt ihn zu den frühen
-      Treffen seiner Kabale und zurück in jene Jahrhunderte, in denen sie
-      unaufhörliche Kriege gegen den Kaiser und die Seinigen geführt
-      hatten, um der trostlosen Welt der Materie durch [[physische und
-      philosophische Konfrontation]] ein Ende zu setzen.
+      Bevor ich mich in eine nähere Schilderung dieser seltsamen,
+      wahnsinnigen Handlung einlasse, ist es nötig, vorläufig Ihnen einige
+      Umstände darzulegen, die Licht über den [[körperlichen und
+      moralischen Zustand]] des hier in Frage stehenden Menschen
+      verbreiten.
 
 
-      Quidam gedachte seiner toten Feinde, die seiner Bruderschaft den
-      spöttischen Namen „White Lotus School" gegeben hatten, und seiner
-      toten Freunde, der berüchtigten [[Skopzy]], über deren
-      kindergleiche, unheimlich verunstaltete „weißen Tauben" die ganze
-      Welt staunte: Er erinnerte sich, wie sie am selben schattigen Platz
-      bei den Quitten gemeinsam einen höhnischen Brief an den König der
-      Tres Daciae verfassten und wie sie bei einer ihrer Reisen über
-      ebenjenes Meer die stolzen mohammedanischen Verehrer von
-      [[Termagant]] gequält und gedemütigt hatten, welche ihre [[Marter
-      tonlos ertrugen; |24]]
+      Von armen, mit den größten Arbeiten des Ackerbaues beschäftigten
+      Eltern erzeugt, in einer, so zu sagen, fast von aller menschlichen
+      Gesellschaft abgeschnittenen Lage, kann man sich vorstellen, was für
+      eine Erziehung er gehabt haben mag. In seiner Einbildung ward es ihm
+      auffallend zu sehen, dass der Pfarrer und sein Vikar die einzigen
+      waren, welche keineswegs das Feld bearbeiteten, und dass sie in
+      ihren Personen alles vereinten, was die kleine Welt, in der er
+      lebte, ihm an [[Macht und Ansehen vorspiegelte. Dies zusammen
+      erweckte, aus Nachahmung, |26]]
+
 ---
 
 Platzhalter für die lange Beschreibung.
