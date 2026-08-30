@@ -3,18 +3,19 @@ import { glob } from 'astro/loaders';
 import { MOTIVE, VERFUEGBARKEITEN } from './shelf/katalog';
 
 /**
- * Die Leseprobe: eine einzige offene Stelle in einem sonst geschwaerzten
- * Block. Jede Seite eines Wendebandes hat ihre eigene.
+ * Die Leseprobe: eine offene Stelle in einem sonst geschwaerzten Block.
+ * Jede Seite eines Wendebandes hat ihre eigene.
  *
- * Geschwaerzt wird **im Text selbst**, nicht ueber eine Liste von
- * Positionen daneben: `[[hier steht der Klartext]]` wird zum Balken. Was
- * zwischen den Klammern steht, verlaesst den Build nicht — es wird beim
- * Uebersetzen herausgeschnitten und kommt nie ins HTML. Nur seine Laenge
- * bleibt uebrig und wird zur Breite des Balkens. Wer einen Balken ohne
- * Klartext will, schreibt `[[|18]]` fuer achtzehn Zeichen Breite.
+ * **Im laufenden Text wird nicht mehr geschwaerzt.** Hier gab es einmal
+ * `[[Klartext]]` — eine Marke, aus der beim Uebersetzen ein Balken wurde,
+ * so breit wie der Klartext lang, und der Klartext selbst verliess den
+ * Build nicht. Im Bild sah das nach Schema aus: immer dieselben kurzen
+ * Balken an denselben Stellen, mitten im Satz. Die Schwaerzungen im Text
+ * kommen jetzt aus der Druckdatei, wo sie hingehoeren.
  *
- * Eine Liste von Positionen waere beim ersten Umschreiben des Satzes
- * verrutscht; im Text kann das nicht passieren.
+ * Geschwaerzt wird nur noch flaechig: die untere Haelfte der rechten
+ * Seite und die ganze Seite danach — dort volle Zeilen
+ * (`shelf/schwaerzung.ts`).
  */
 const leseprobe = z
   .object({

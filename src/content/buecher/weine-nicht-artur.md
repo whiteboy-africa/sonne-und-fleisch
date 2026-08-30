@@ -24,13 +24,8 @@ leseprobe_schrift: "'Times New Roman', Times, serif"
 # steht am Ende der Leseprobe („Weiter nur im Band").
 seiten_zahl: 48
 cover_bild: /buecher/weine-nicht-artur/cover.webp
-# Gekuerzt, als der Band sein wirkliches Format bekam (0,648 statt A5):
-# die schmalere Seite haelt zwei Zeilen weniger, und der Satz lief unten
-# ueber. Der Balken schliesst jetzt frueher.
-#
-# Aus dem Manuskript, im Wortlaut. Was in [[doppelten Klammern]] steht, wird
-# beim Bauen herausgeschnitten und als Balken gedruckt — es steht in keinem
-# HTML. Die Stelle ist die Begegnung am Bahnhof Hetzendorf; der Satz, der
+# Aus dem Manuskript, im Wortlaut. Die Stelle ist die Begegnung am
+# Bahnhof Hetzendorf; der Satz, der
 # dem letzten Balken folgen wuerde, ist der, um den das ganze Buch kreist.
 leseprobe:
   # GESCHAETZT, wie oben: die Stelle liegt bei rund drei Vierteln der ersten
@@ -42,7 +37,7 @@ leseprobe:
     war irgendwie stolz, ja trotzig, als ob er gar nicht hergehöre, oder nur
     widerwillig da wäre, aus einer Verlegenheit heraus, sozusagen. Seine Augen
     waren aber traurig, von großen Augenringen gesäumt und er machte als
-    Ganzes einen elenden Eindruck: [[ärmlich, zerschlissen, abgekämpft]].
+    Ganzes einen elenden Eindruck: ärmlich, zerschlissen, abgekämpft.
 
 
     „Wie heißt Du? Hast Du Dich verlaufen?"
@@ -52,7 +47,7 @@ leseprobe:
 
 
     Er schwieg und senkte seinen Blick. Dann kniete er sich auf den Boden,
-    machte seinen Rucksack auf und holte vorsichtig [[eine Ikone]] heraus. Das
+    machte seinen Rucksack auf und holte vorsichtig eine Ikone heraus. Das
     Licht der Straßenlaterne fiel auf seine kraftlos herabhängenden,
     hellbraunen Strähnen und auf den Heiligenschein von Maria und dem kleinen
     Gottessohn.
@@ -65,7 +60,7 @@ leseprobe:
     ertönte jäh die Durchsage aus den Lautsprechern des Bahnhofs
     Hetzendorf, worauf ein Zug mit gewaltigem Brausen vorbeirauschte. Wenn
     der Junge Deutsch verstanden hätte, so hätte ich zu ihm gesagt:
-    [[es ist ein verwünschtes Weltall]].
+    es ist ein verwünschtes Weltall.
 
 
     Artur schaute mich an, so als wolle er etwas sagen, aber immer wenn er
@@ -81,12 +76,12 @@ leseprobe:
     Nacken und wir begannen den Weg zu meinem Haus. Ich ging geschwind, als
     ob ich vor dem Unstern flöhe und Artur trottete müde meinen Schritten
     hinterher, bewegte manchmal seinen Mund, fast so als würde er mit sich
-    selber sprechen, oder [[beten]].
+    selber sprechen, oder beten.
 
 
     Ich sah wie seine traurigen, braunen Augen verwundert mein Haus und die
     Linden im Garten betrachteten, dann den langen Gang mit Hirschgeweihen,
-    den [[Jagdtrophäen meines Großvaters. |30]]
+    den Jagdtrophäen meines Großvaters.
 cover_farbe: '#2e240e'
 akzent_farbe: '#e5b261'
 schrift_farbe: '#c0b292'
@@ -134,7 +129,7 @@ rueckseite:
       den Tod begleiten. Dann ruft man Neptun an, doch er ist unnachgiebig –
       dein Schiff wird an den Klippen zerschellen, doch du, Lichas,
       Glücklicher, du strandest auf einer Insel bei Korfu: es ist Othoni.
-      Und auf Othoni: [[alle tot außer dir]].
+      Und auf Othoni: alle tot außer dir.
 
 
       Und dann: die Biene – es ist dein erstes Mal. Du trinkst gierig die
@@ -142,11 +137,11 @@ rueckseite:
       Gelb rinnt durch deinen Hals und heilt die Schmerzen. Es ist Wärme in
       deinem Körper, die Bienen haben dich gestochen und bespuckt, doch
       nichts hast du davon gemerkt, so glücklich warst du sie zu trinken.
-      Und dann haben sie verstanden, [[du hast sie bezwungen]].
+      Und dann haben sie verstanden, du hast sie bezwungen.
 
 
       Süßer Honigduft, wie du den Fischgeruch überdeckst, das Fischwasser
-      in den Körben und in den [[Körpern]].
+      in den Körben und in den Körpern.
 
 
       Die Bienen, dein Schatz aus ihrer Honigblase und die ältesten Formen
@@ -154,7 +149,7 @@ rueckseite:
       Honig. Du trägst ihn in die Dörfer, trägst ihn an den Straßen und
       trägst ihn nach Rom, doch niemand will ihn kaufen. Du schläfst auf den
       Straßen, die Honigwaben deine Pölster und aus Bienenhaar deine Decke:
-      Und dann triffst du [[Hedyle aus gutem Hause]]. Ihr liebt euch im
+      Und dann triffst du Hedyle aus gutem Hause. Ihr liebt euch im
       Forum Romanum und im Forum Iulium, ihr liebt euch bis ans Ende der Via
       Latina und Hedyles Verbindungen ermöglichen dir alles – jetzt bist du
       einer der großen Männer, ganz Rom liebt deine Waben aus Othoni und du
@@ -168,11 +163,11 @@ rueckseite:
 
       Lichas und Hedyle, die ganze Stadt spricht über eure Liebe: Lichas,
       der Othone und Hedyle, seine Bienenkönigin. Doch Lichas, sie weiß,
-      dass du ein [[Bienenlutscher]] bist und nichts weiter, dass du die
+      dass du ein Bienenlutscher bist und nichts weiter, dass du die
       Schuhe der feinen Herren mit Bienenwachs geputzt hast und dass du
       allein warst mit deinen Bienen. Dass du ein besessener
       Bienenschlucker bist, ein Honigsäufer, dass du unter freiem Himmel
-      geschlafen hast und dass du [[nichts wärest ohne sie. |24]]
+      geschlafen hast und dass du nichts wärest ohne sie.
   akzent_farbe: '#c8912f'
   schrift_farbe: '#e8ddc0'
   motiv: wave

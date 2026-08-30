@@ -59,15 +59,15 @@ leseprobe:
     Daß die Verurteilung des Selbstmordes eine speziell christliche oder
     europäische Anschauungsweise ist, zeigen die bekannten und durchaus
     verbürgten Berichte aus anderen Gegenden der Erdkugel, z. B.
-    [[Japan]], wo sogar die Seelen gewisser Selbstmörder eine besondere
+    Japan, wo sogar die Seelen gewisser Selbstmörder eine besondere
     Verehrung genießen.
 
 
     Zu welchen Absurditäten jedoch die Nachahmung anderer, auf ihrem Boden
     zweifellos berechtigter Kulturerscheinungen in unserm unglückseligen
     „Neuen Erdteil" führt, mag folgende, durchaus ernst zu nehmende
-    [[Zeitungsnotiz]] aus einer seiner Hauptstädte beleuchten, die die
-    Spezialitäten des berüchtigten [[Madrid]] noch um ein ansehnliches
+    Zeitungsnotiz aus einer seiner Hauptstädte beleuchten, die die
+    Spezialitäten des berüchtigten Madrid noch um ein ansehnliches
     übertrifft.
 
 
@@ -84,10 +84,10 @@ leseprobe:
   fortsetzung: >-
     Um jedoch auch dem Publikum gerecht zu werden, verbinde ich die
     Auswahl des Geeigneten mit einem Wettbewerb von zwölf sich freiwillig
-    meldenden, heute lebenden [[Selbstmördern]] um die beste Ausführung
+    meldenden, heute lebenden Selbstmördern um die beste Ausführung
     der Tat. Dem Sieger wird aus dem Fond dieser fünfzig Millionen ein
-    prächtiges Denkmal gesetzt und der Rest unter die [[Hinterbliebenen
-    verteilt. |26]]
+    prächtiges Denkmal gesetzt und der Rest unter die Hinterbliebenen
+    verteilt.
 cover_bild: /buecher/selbstmoerder-wettbewerb/cover.webp
 # Aus dem Umschlag genommen: der Papierton als Einband, die violette
 # Schreibmaschinentinte als Akzent.
@@ -142,7 +142,7 @@ rueckseite:
       Kompositionen, entwickelte – wie so mancher unkluge Mann vor ihr –
       eine Vorliebe für die Abgründe jener dekadenten Schriftsteller,
       welche die Hauptstädte des späten neunzehnten Jahrhunderts mit ihrer
-      theatralischen Ergebenheit an den [[Verlust aller Bedeutung]]
+      theatralischen Ergebenheit an den Verlust aller Bedeutung
       heimsuchten.
 
 
@@ -150,7 +150,7 @@ rueckseite:
       Männer zu ficken, verbrachte Justine ihre Nächte nun zu Hause und
       studierte noch die geringfügigste Einzelheit ihrer Leben und Werke.
       Bei einem dieser literarischen Streifzüge stieß sie auf die monströse
-      Erfindung des dekadenten Herzogs [[Floresser]], einen Apparat, der
+      Erfindung des dekadenten Herzogs Floresser, einen Apparat, der
       ihren Puls beschleunigte und ihren Atem verkürzte und ihr tagelang
       keinen Schlaf ließ.
 
@@ -169,8 +169,8 @@ rueckseite:
     fortsetzung: >-
       Da sie sich dem gerupften Herzog von Natur aus überlegen glaubte,
       machte sie sich sogleich daran, sein Konzept zu verfeinern und Hand
-      an jene wirklichen Saiten zu legen, die unsere [[Atome schwingen
-      lassen]], entschlossen, einen von Menschen noch [[ungehörten Akkord
-      anzuschlagen |24]]
+      an jene wirklichen Saiten zu legen, die unsere Atome schwingen
+      lassen, entschlossen, einen von Menschen noch ungehörten Akkord
+      anzuschlagen
 
 ---

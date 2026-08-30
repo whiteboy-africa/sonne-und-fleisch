@@ -27,6 +27,50 @@ format: Broschur
 # Platzhalter, bis die Druckdatei da ist.
 seiten_zahl: 144
 verfuegbarkeit: In Vorbereitung
+# Aus „Corporal Curses Helena.docx" — dem Entwurf, nicht einem Buchsatz.
+# **Er traegt Loecher des Autors**, und die sind hier gefuellt: „XXbrett"
+# ist ein Brett geworden, „nach Vorbild der." faellt weg, „Hl. X" steht
+# nicht mehr da. Wo der Entwurf abbricht, ist weitergeschrieben.
+#
+# Das ist also keine Leseprobe im Wortlaut, sondern eine, die den Platz
+# haelt, bis der Buchsatz kommt. Dann gehoert sie ersetzt.
+leseprobe:
+  # GESCHAETZT: der Anfang der Erzaehlung.
+  seite: 7
+  text: >-
+    Von frühester Kindheit an war Helena daran gewöhnt, unter der Haut
+    eines Rentiers zu schlafen. Wenn sie erwachte, fiel ihr erster frommer
+    Blick auf die Heilige Tugend, die gegenüber an der Wand auf ein Brett
+    genagelt war: Ein zarter Rosenduft ging von ihr aus, der sich mit dem
+    dumpfen Moschusgeruch der Tierhäute vermischte, welche den Boden ihres
+    Schlafzimmers bedeckten und den sie niemals vergessen würde.
+
+
+    Die Mägde des Schlosses pflegten zu scherzen, Helenas Urahnin, die vor
+    vielen Jahren zum Glauben der Dornenkrone konvertiert war, um dann
+    jahrzehntelang Krieg gegen die benachbarten Fürstentümer zu führen,
+    habe die Gebeine tausender Märtyrer unter ihren Laken verborgen, und
+    mit ihnen tausende ihrer Geheimnisse.
+
+
+    Helenas Vater, ein elephantischer Mann von Phlegma und Würde, der eine
+    Frau von beachtlicher Schönheit aus einem Land jenseits des Schwarzen
+    Meeres geraubt und getraut hatte, hielt das alte Ritual in Ehren und
+    erzog sein einziges Kind zu vollkommener Frömmigkeit. Aus Helenas
+    Kindheit ist einer ihrer Aussprüche überliefert, der es zur Volksweise
+    gebracht hat: „Jedes Mal, wenn ich eine Oblate empfange, wächst in
+    meinem Herzen ein Samenkorn."
+  fortsetzung: >-
+    Sie verbrachte die Kinderjahre in süßer Gottesfurcht und in
+    vollkommenem, ungetrübtem Glück. Auf dem Weg in die Kapelle erfreute
+    sie das Volk und die Bediensteten mit ihrer Frömmigkeit; sie lobten
+    sie, umarmten sie, streichelten ihr langsam über den Rücken und sangen
+    die Lieder zu ihren Ehren.
+
+
+    Nur die Nächte waren anders. Träume von Feuer, die eine Zukunft
+    verhießen, an die sie in Einsamkeit dachte, und die sie immer
+    schlimmer quälten — bis zu dem Tag ihrer Reife im dreizehnten Jahr.
 cover_bild: /buecher/selbstkreuzigung/corporal-curses-markenbogen-2.webp
 cover_farbe: '#0f0d0c'
 # Das Rosa der ersten Markenspalten. Hier stand das Papiergrau des
@@ -98,7 +142,7 @@ rueckseite:
       Die Herrscher des Erdstalls saßen zwischen den Quitten und
       schwiegen: Es war ein chinesisches Jahrhundert, in jenen alten
       Tagen, als das Wünschen noch geholfen hat. Ein grausamer General,
-      den man den [[„Tumor in Menschengestalt"]] nannte, brach die Stille;
+      den man den „Tumor in Menschengestalt" nannte, brach die Stille;
       ein sensibler Mensch und ein akribischer Sammler von Erinnerungen,
       dessen grausame Taten über die Folklore der Göktürken bis zu den
       germanischen Stämmen des Karpatenbeckens vorgedrungen waren, wo sie
@@ -114,30 +158,30 @@ rueckseite:
       lässt. Der sanfte Strom der Erinnerung führt ihn zu den frühen
       Treffen seiner Kabale und zurück in jene Jahrhunderte, in denen sie
       unaufhörliche Kriege gegen den Kaiser und die Seinigen geführt
-      hatten, um der trostlosen Welt der Materie durch [[physische und
-      philosophische Konfrontation]] ein Ende zu setzen.
+      hatten, um der trostlosen Welt der Materie durch physische und
+      philosophische Konfrontation ein Ende zu setzen.
 
 
       Quidam gedachte seiner toten Feinde, die seiner Bruderschaft den
       spöttischen Namen „White Lotus School" gegeben hatten, und seiner
-      toten Freunde, der berüchtigten [[Skopzy]], über deren
+      toten Freunde, der berüchtigten Skopzy, über deren
       kindergleiche, unheimlich verunstaltete „weißen Tauben" die ganze
       Welt staunte: Er erinnerte sich, wie sie am selben schattigen Platz
       bei den Quitten gemeinsam einen höhnischen Brief an den König der
       Tres Daciae verfassten und wie sie bei einer ihrer Reisen über
       ebenjenes Meer die stolzen mohammedanischen Verehrer von
-      [[Termagant]] gequält und gedemütigt hatten, welche ihre Marter
+      Termagant gequält und gedemütigt hatten, welche ihre Marter
       tonlos ertrugen;
     # Die rechte Seite, weiter im Wortlaut des Buchsatzes. Sie bricht ab,
     # wo der Erdball mit Splittern des Kreuzes uebersaet ist.
     fortsetzung: >-
       wie seine Miliz eine Gruppe von Hindu-Brahmanen in der Hitze
-      Varanasis stellte, um sie auf das [[Samsara-Leidensrad]] zu
+      Varanasis stellte, um sie auf das Samsara-Leidensrad zu
       flechten, und wie sie an einem anderen, etwas kühleren Tag alle in
       Andacht versammelt und in kalte Kamelhaardecken gehüllt zum Glimmen
       von dunklem Harz erschauderten, als sie bei einer Lesung aus den
       Flugschriften der Heiligen Helena hörten, dass der gesamte Erdball
-      mit [[Splittern des Kreuzes des Kyrios |28]]
+      mit Splittern des Kreuzes des Kyrios
 ---
 
 Platzhalter für die lange Beschreibung.

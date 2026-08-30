@@ -22,8 +22,6 @@ hoehe: 2.0
 dicke: 0.078
 reihenfolge: 6
 # Zweite Vorderseite: eine Titelseite in Fraktur, Schwarz auf Papierweiß.
-# Platzhalter-Leseprobe. Was in doppelten Klammern steht, wird beim Bauen
-# herausgeschnitten und als Balken gedruckt — es steht in keinem HTML.
 leseprobe:
   seite: 44
   text: >-
@@ -35,8 +33,8 @@ leseprobe:
 
     In der Höhle oben, sagt man, sei das Buch diktiert worden. Die
     Führerin sagt es vierzehnmal am Tag, mit denselben Pausen an
-    denselben Stellen, und man merkt ihr an, dass sie [[an einer Stelle
-    nicht mehr glaubt, was sie sagt]]. Welche es ist, verrät sie nicht.
+    denselben Stellen, und man merkt ihr an, dass sie an einer Stelle
+    nicht mehr glaubt, was sie sagt. Welche es ist, verrät sie nicht.
 
 
     Salva blieb sitzen, als die Gruppe weiterging. Der Stein war kalt, das
@@ -48,7 +46,7 @@ leseprobe:
     Am Abend im Hafen sprach sie mit einem Mann, der Boote vermietete. Er
     hatte von dem Buch gehört und es nie gelesen, und er hielt das für
     keinen Mangel. Als sie fragte, was die Leute hierher zieht, sagte er
-    [[einen Satz, den sie sich nicht aufzuschreiben traute]] und der doch
+    einen Satz, den sie sich nicht aufzuschreiben traute und der doch
     das ganze Kapitel trägt.
 
 
@@ -65,7 +63,7 @@ leseprobe:
 
     Es gibt keinen Punkt, an dem man sich entscheidet, das zu glauben. Es
     gibt nur den Punkt, an dem einem auffällt, dass man aufgehört hat, es
-    [[nicht zu glauben. |18]]
+    nicht zu glauben.
 rueckseite:
   titel: Superlucens Caligo
   kurztitel: Superlucens Caligo
@@ -88,8 +86,8 @@ rueckseite:
 
       Das Verfahren geht so: man sagt, was es ist, dann sagt man, was es
       nicht ist, und dann sagt man, dass auch das Nichtsagen zu viel war.
-      Wer dreimal durchgegangen ist, steht [[vor demselben Satz wie am
-      Anfang]], aber er steht anders davor.
+      Wer dreimal durchgegangen ist, steht vor demselben Satz wie am
+      Anfang, aber er steht anders davor.
 
 
       Die Übersetzung folgt der Wiener Handschrift, nicht der gedruckten
@@ -100,8 +98,8 @@ rueckseite:
 
       An drei Stellen fehlt der Text. Wir haben nicht ergänzt. Was dort
       stand, lässt sich aus dem Umliegenden erschließen, und genau das
-      wollten wir nicht: eine Rekonstruktion sähe aus wie [[eine Auskunft,
-      die niemand gegeben hat]].
+      wollten wir nicht: eine Rekonstruktion sähe aus wie eine Auskunft,
+      die niemand gegeben hat.
 
 
       Der letzte Abschnitt ist der kürzeste und hat die meisten Anmerkungen.
@@ -117,7 +115,7 @@ rueckseite:
 
       Wer den Band von hinten liest, bekommt eine zweite, vollständigere
       Schrift, die von der ersten nur behauptet, es habe sie
-      [[gegeben. |10]]
+      gegeben.
 ---
 
 Platzhalter für die lange Beschreibung.

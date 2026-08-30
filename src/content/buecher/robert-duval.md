@@ -31,8 +31,6 @@ reihenfolge: 3
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Aus dem Manuskript, im Wortlaut. Der Text ist als Exposee gesetzt —
 # Kapitelzeilen und Gedankenstriche gehoeren zur Form, nicht zur Kuerzung.
-# Was in doppelten Klammern steht, wird beim Bauen herausgeschnitten und
-# als Balken gedruckt — es steht in keinem HTML.
 leseprobe:
   # GESCHAETZT: das erste Kapitel.
   seite: 5
@@ -43,13 +41,13 @@ leseprobe:
     von der Erdenschwere. Beschreibung seiner Fremdheit vom Rest der Welt —
     Beschreibung seiner Familie: Vater Aloïs weiß einen mit
     Wildleberpasteten gedeckten Tisch mehr zu schätzen als
-    [[ein gutes Buch]]. (Die Eltern heißen durch einen bemerkenswerten
+    ein gutes Buch. (Die Eltern heißen durch einen bemerkenswerten
     Zufall Aloïs und Aloïse — er nennt sie He-Aloïs und She-Aloïs).
     Beschreibung von Roberts idiosynkratischen Studien in öffentlichen
     Bibliotheken — Exkurs Rudyard Kipling und das British Raj — Exkurs
     Literatur: Romane von Paul Scott und deren Verfilmungen, The Jewel in
     the Crown — er ist von BBC-Dokumentationen fasziniert, später besonders
-    von denen über [[englische Privatschulen]] — wünscht sich selbst eine
+    von denen über englische Privatschulen — wünscht sich selbst eine
     solche zu besuchen — Familie ist überrascht von der Veränderung im
     jungen Mann, jetzt fünfzehnjährig zeigt er einen bisher ungesehenen
     Tatendrang in Bezug auf den Aufenthalt in einem britischen boarding
@@ -71,9 +69,9 @@ leseprobe:
     Physikprofessor, Geschichte oder Literatur?, er liest Carlyles Sartor
     Resartus, Exkurse: englische Frauen aus Poole Keynes oder Dean Close
     (sie heißen immer Lilly und haben kräftige Schenkel und
-    [[Pferdegesichter]] – er schätzt die Wildheit und setzt sie in eine
+    Pferdegesichter – er schätzt die Wildheit und setzt sie in eine
     Kontinuität mit der keltisch-britischen Königin Boudicca), das Gefühl,
-    ein Teilnehmer am [[Great Game zu sein |20]]
+    ein Teilnehmer am Great Game zu sein
 rueckseite:
   titel: Mountains of Sadness
   kurztitel: Mountains of Sadness
@@ -104,12 +102,12 @@ rueckseite:
       adäquat gekleidet und die sehen so oder so schrecklich aus. Einer der
       Gründe, warum ich mich von Shanghai aufgemacht habe und jetzt die
       tausenden Stufen auf den Mount Huangshan erklimme. Ein weiterer Grund
-      ist, dass James Cameron hier [[Avatar]] gedreht hat. Ich mochte den
+      ist, dass James Cameron hier Avatar gedreht hat. Ich mochte den
       Film sehr. Mir gefiel der Gedanke, ein anderer werden zu können.
       Schließlich schlüpft der querschnittgelähmte Protagonist in den
       Körper eines dieser anmutigen blauhäutigen Außerirdischen. Fortan
       lebt er mit ihnen auf ihrem Heimatplaneten. Dabei hat mich vor allem
-      [[die Entschlossenheit des Protagonisten]] beeindruckt, das
+      die Entschlossenheit des Protagonisten beeindruckt, das
       durchzuziehen. No second thoughts.
 
 
@@ -126,13 +124,13 @@ rueckseite:
     # Im Wortlaut des Buchsatzes.
     fortsetzung: >-
       Für die Träger heißt das: Drei Mal am Tag hinauf und wieder hinunter.
-      Eine [[Sisyphos-Arbeit]]. Die Bambusstöcke biegen sich unter der Last
+      Eine Sisyphos-Arbeit. Die Bambusstöcke biegen sich unter der Last
       und ich bin froh, dass ich nur einen Rucksack mit einer Flasche Wasser,
       einem Windbreaker, meinem iPhone, Zigaretten und Magnesiumtabletten
       dabeihabe. Mehr brauche ich nicht. Schließlich bleibe ich nicht lange.
 
 
-      Auf der anderen Seite [[für immer. Je nachdem, wie |26]]
+      Auf der anderen Seite für immer. Je nachdem, wie
 ---
 
 Platzhalter für die lange Beschreibung.

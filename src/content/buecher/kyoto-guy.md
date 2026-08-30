@@ -41,7 +41,7 @@ leseprobe:
     ziehen, hatten wir uns auf den Preis von umgerechnet 1200 Dollar für
     sein letztes Werk geeinigt und uns die Hand darauf gegeben, als Sava
     wie nebenbei einstreute, dass es sich bei Oh Unknown tatsächlich um
-    keinen Roman, sondern um [[eine „transzendente Parfumkreation"]]
+    keinen Roman, sondern um eine „transzendente Parfumkreation"
     handle, die die Essenz aller seiner „profunden Teeerfahrungen der
     letzten Jahrzehnte" beinhalten sollte; ich war perplex angesichts des
     ungeheuerlichen Ausmaßes der Nutzlosigkeit meiner Reise und der
@@ -65,10 +65,10 @@ leseprobe:
     Ich ließ mit hochrotem Kopf eine Salve wüster Beschimpfungen auf den
     alten Save los und hätte ihm wohl mit einigen wohl platzierten Ohrfeigen
     das süffisante Lächeln aus dem Gesicht geschlagen, wären nicht seine
-    elenden [[Hmong-Schergen]] dazwischengesprungen, um mich Tobenden
+    elenden Hmong-Schergen dazwischengesprungen, um mich Tobenden
     gewaltsam vor die Tür zu befördern, wo ich fluchend jeder Art Abenteuer
     und literarischer Recherche abschwor und bald beschlossen hatte, mich in
-    Zukunft auf [[andere Wirkungsbereiche |22]]
+    Zukunft auf andere Wirkungsbereiche
 format: Broschur
 verfuegbarkeit: In Vorbereitung
 hoehe: 2.0
@@ -110,15 +110,15 @@ rueckseite:
       warte darauf, dass Eddy endlich abnimmt. Oder wenigstens Marie kommt.
       Mein Instagram-Postfach explodiert. Und dann gibt es diese
       Wordpress-Seite ohne Impressum. Mit meiner Adresse. Mit der Adresse
-      meiner Eltern. Ein Artikel ist mit [[Völkischer Waffennarr]] betitelt.
+      meiner Eltern. Ein Artikel ist mit Völkischer Waffennarr betitelt.
       Dazu ein Foto, das der Betreiber von meiner Instagram-Seite gerippt hat:
-      ich im Trachtenjanker, [[eine goldene Pistole in der Hand]]. Das war eine
+      ich im Trachtenjanker, eine goldene Pistole in der Hand. Das war eine
       Spielzeugpistole! Ein Dekoobjekt. Aufgenommen in der Wohnung von Jürgen
       und Michael, zwei Jahre her, nach der Wiesn. Ich laufe im Wohnzimmer
       auf und ab, setze mich, stehe wieder auf, setze mich. Ich könnte mir
       die Haare abrasieren und mir einen Schnauzer wachsen lassen, denke ich.
       Ein Glatzentattoo stechen. Eine Japanerin heiraten, die sich nicht an
-      dem Video stört. [[Die Japaner nehmen einem die Vergangenheit nicht]].
+      dem Video stört. Die Japaner nehmen einem die Vergangenheit nicht.
 
 
       15.09.2025
@@ -141,7 +141,7 @@ rueckseite:
 
       „Ich warte noch, was Eddy macht." Marie schnaubt leise. „Eddy ist
       abgetaucht." „Der wartet nur auf den richtigen Moment." „Und dann?" Sie
-      zieht die Augenbrauen hoch. „Was glaubst du, was [[passiert? |11]]
+      zieht die Augenbrauen hoch. „Was glaubst du, was passiert?
 ---
 
 Ein Band, zwei Vorderseiten. Vorn „Opium" von C. T. Selters —

@@ -42,15 +42,15 @@ leseprobe:
     des heiligen Franz von Assisi in Turin die Messe zu lesen; während er
     die priesterlichen Gewänder anlegte, hörte er den Lärm eines Streits
     und wandte den Kopf; der Sakristan schüttelte einen jungen Burschen wie
-    einen Pflaumenbaum und beschimpfte ihn als [[Bettler und Nichtsnutz]].
+    einen Pflaumenbaum und beschimpfte ihn als Bettler und Nichtsnutz.
     Und da der Bursche verdutzt sich nicht rührte, stieß er ihn grob
     hinaus.
 
 
     – Nun, sagte er, hab keine Angst, wie heißt du? – Barthélemy Garelli. –
     Woher bist du? – Aus Asti. – Hast du Eltern? – Sie sind tot. – Dein
-    Alter? – 16 Jahre. – Kannst du lesen und schreiben? – [[Ich kann
-    nichts]]. – Kannst du wenigstens deine Gebete? – Ich kann nichts.
+    Alter? – 16 Jahre. – Kannst du lesen und schreiben? – Ich kann
+    nichts. – Kannst du wenigstens deine Gebete? – Ich kann nichts.
 
 
     Und in eben diesem Augenblick, da Dom Bosco ihn zum Anfang das
@@ -62,7 +62,7 @@ leseprobe:
 
 
     Der Schüler brachte seinem Meister andere zu; bald wimmelte es von
-    ihnen; ihre Zahl überstieg rasch [[hundert]]. Dom Bosco versammelte sie
+    ihnen; ihre Zahl überstieg rasch hundert. Dom Bosco versammelte sie
     abends in der Sakristei der Kirche, und tagsüber ging er sie in ihren
     Werkstätten besuchen oder suchte Arbeit für die, welche keine hatten.
     Das Werk lief ohne allzu große Hindernisse, als er, da seine
@@ -70,7 +70,7 @@ leseprobe:
     musste. Sein Beichtvater Dom Cafasso, ein heiligmäßiger Mann, der ihn
     liebte, ließ ihn daraufhin zum Direktor des kleinen Hospizes der
     heiligen Philomena ernennen, und er wurde bei dieser Gelegenheit einem
-    Priester französischer Herkunft namens [[Borel]] beigeordnet, der ein
+    Priester französischer Herkunft namens Borel beigeordnet, der ein
     von der Marquise von Barolo gestiftetes Mädchenasyl verwaltete.
   # Im Wortlaut des Buchsatzes.
   fortsetzung: >-
@@ -82,7 +82,7 @@ leseprobe:
 
 
     Der Abbé Borel, der Dom Bosco der zuverlässigste Freund war, half ihm
-    nach Kräften, aber die Lage wurde [[unhaltbar. |11]]
+    nach Kräften, aber die Lage wurde unhaltbar.
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 rueckseite:
   titel: La Chine hermétique
@@ -120,7 +120,7 @@ rueckseite:
       wird mit dem Leben bezahlt." So versteht man, welch üble Sache die
       Person am Hals hat, um derentwillen jemand sich den Tod gibt.
       Manchmal rächt sich ein abgewiesener Bettler an Ihnen, indem er sich
-      vor Ihrer Tür [[die Kehle durchschneidet]]; das sind die
+      vor Ihrer Tür die Kehle durchschneidet; das sind die
       glücklichsten Fälle.
 
 
@@ -128,8 +128,8 @@ rueckseite:
       gewünschten Früchte trägt. Er entscheidet sich nicht nur für diese
       oder jene Art des Selbstmords, sondern schiebt sich außerdem in die
       Weste oder in den Stiefel eine Art Anklageschrift, in der er die
-      Beweggründe darlegt und der Justiz [[die Person anzeigt, die der
-      Anlass seines Todes ist]].
+      Beweggründe darlegt und der Justiz die Person anzeigt, die der
+      Anlass seines Todes ist.
 
 
       Hier aber der höchste Grad der Verfeinerung in der Vorbedachtheit
@@ -146,11 +146,11 @@ rueckseite:
       und ihre Sprache gründlich kennt.
 
 
-      Eine von einem [[Wucherer]] gehetzte Frau schluckt eines schönen Tages
+      Eine von einem Wucherer gehetzte Frau schluckt eines schönen Tages
       Opium in ausreichender Menge und begibt sich in sein Büro, um dort zu
       sterben. Aber unser Mann, der erraten hatte, worum es ging, ließ die
-      Türen schließen und schlug diese Frau mit Hilfe seiner [[Diener tot;
-      |14]]
+      Türen schließen und schlug diese Frau mit Hilfe seiner Diener tot;
+
 ---
 
 Ein Band, zwei Vorderseiten. Vorn „Biographische Skizze über Dom Bosco"

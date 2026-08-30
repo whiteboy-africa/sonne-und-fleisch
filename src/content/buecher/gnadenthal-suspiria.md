@@ -23,8 +23,6 @@ dicke: 0.078
 reihenfolge: 9
 # Zweite Vorderseite: ein Zeitschriftenumschlag in Rosa und Schwarz,
 # Farben von dort genommen.
-# Platzhalter-Leseprobe. Was in doppelten Klammern steht, wird beim Bauen
-# herausgeschnitten und als Balken gedruckt — es steht in keinem HTML.
 leseprobe:
   seite: 57
   text: >-
@@ -37,7 +35,7 @@ leseprobe:
     Der Bruder, von dem hier die Rede ist, kam aus dem Norden und sprach
     die Sprache schlecht. Man gab ihm die Zelle am Ende der Reihe und
     ließ ihn drei Jahre in Ruhe. Was er in diesen drei Jahren tat, wissen
-    wir aus [[zwei Zeilen einer fremden Handschrift]], und die widersprechen
+    wir aus zwei Zeilen einer fremden Handschrift, und die widersprechen
     einander.
 
 
@@ -50,8 +48,8 @@ leseprobe:
 
     Gnadenthal hat davon nur die Form übernommen, nicht den Inhalt. Man
     baute die Zellen in derselben Reihe, man richtete die Stunden nach
-    derselben Ordnung, und man nannte es [[bei einem Namen, der ihm nicht
-    zustand]]. Das ist keine Anklage; es ist eine Beschreibung.
+    derselben Ordnung, und man nannte es bei einem Namen, der ihm nicht
+    zustand. Das ist keine Anklage; es ist eine Beschreibung.
 
 
     Was blieb, ist das Weinen selbst, losgelöst von dem, wofür es einmal
@@ -68,7 +66,7 @@ leseprobe:
     Niemand hat je vermerkt, wofür die Summe stand. Sie wurde bezahlt,
     weil sie im Vorjahr bezahlt worden war, und sie stand da, bis das Haus
     aufgelöst wurde. In der Schlussabrechnung führt sie der Kommissar
-    unter den [[Posten ohne Gegenstand. |24]]
+    unter den Posten ohne Gegenstand.
 rueckseite:
   titel: Qorpus Delicti
   kurztitel: Qorpus Delicti
@@ -91,8 +89,8 @@ rueckseite:
 
 
       Am Anfang steht ein Leichnam, aber nicht als Rätsel. Er ist da,
-      vollständig, und niemand fragt, wer es war; gefragt wird, [[was ein
-      Körper ist, wenn er niemandem mehr gehört]]. Die Antwort wird über
+      vollständig, und niemand fragt, wer es war; gefragt wird, was ein
+      Körper ist, wenn er niemandem mehr gehört. Die Antwort wird über
       dreihundert Seiten nicht gegeben, und das ist die Arbeit.
 
 
@@ -104,8 +102,8 @@ rueckseite:
 
       Dazwischen stehen Listen. Was gefunden wurde, was gewogen wurde, was
       man nicht bestimmen konnte. Der Ton dieser Listen ist derselbe wie der
-      des übrigen Textes, und wer sie überspringt, [[verliert genau die
-      Stelle, um die es geht]].
+      des übrigen Textes, und wer sie überspringt, verliert genau die
+      Stelle, um die es geht.
 
 
       Zum Schluss löst sich nichts auf. Die letzte Seite wiederholt die
@@ -120,7 +118,7 @@ rueckseite:
 
       Man kann das für einen Kunstgriff halten. Wer den Band aber zweimal
       gelesen hat, weiß, dass es kein Griff ist, sondern eine Auskunft
-      darüber, wie der Text [[entstanden ist. |16]]
+      darüber, wie der Text entstanden ist.
 ---
 
 Platzhalter für die lange Beschreibung.

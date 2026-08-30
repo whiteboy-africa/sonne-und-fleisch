@@ -26,8 +26,6 @@ motiv: branches
 hoehe: 2.0
 dicke: 0.078
 reihenfolge: 2
-# Was in doppelten Klammern steht, wird beim Bauen herausgeschnitten und
-# als Balken gedruckt — es steht in keinem HTML.
 leseprobe:
   # GESCHAETZT: der Text setzt sofort ein. Aus dem Umbruch nachtragen.
   seite: 9
@@ -42,8 +40,8 @@ leseprobe:
 
     Dann knallte die Metalltüre zum Hof auf und das grelle Bellen von Hund
     Dolly biss sich in mein Bewusstsein. Ich schreckte hoch. Ich sah das
-    kleine, karamellbraune Viech, wie es knurrte und keifte, sah wie [[die
-    kackfarbene Kotpumpe mit dem Dackelkörper und dem Biegelkopf]] an der
+    kleine, karamellbraune Viech, wie es knurrte und keifte, sah wie die
+    kackfarbene Kotpumpe mit dem Dackelkörper und dem Biegelkopf an der
     Leine riss. Lydia, die Besitzerin, die junge Grundschullehrerin,
     wusste nicht, wie umgehen mit der Situation.
 
@@ -61,11 +59,11 @@ leseprobe:
     uns eigentlich ganz gut, haben uns auch schon gegenseitig besucht,
     geredet, getrunken, tausend mal auf der Straße oder im Supermarkt
     getroffen, aber sie schaute immer noch so ängstlich, als lägen dort
-    [[Freddy Krüger und Chucky]] die Mörderpuppe in ihrem Garten.
+    Freddy Krüger und Chucky die Mörderpuppe in ihrem Garten.
 
 
     Sie nahm sogar den kleinen, geretteten, rumänischen Straßenhund Dolly
-    auf den Arm, als würden wir ihn gleich in [[tausend Stücke reißen |22]]
+    auf den Arm, als würden wir ihn gleich in tausend Stücke reißen
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 rueckseite:
   titel: The Rise of Damascus Goat
@@ -89,7 +87,7 @@ rueckseite:
 
       Angefangen hat es mit einer Rechnung. Vierzehn Tiere gingen ein, elf
       kamen an, und die Differenz wurde nicht als Verlust gebucht, sondern
-      als [[Umwidmung]]. Das Wort steht in keinem Wörterbuch dieses Faches,
+      als Umwidmung. Das Wort steht in keinem Wörterbuch dieses Faches,
       und trotzdem hat es sich gehalten.
 
 
@@ -101,8 +99,8 @@ rueckseite:
 
       Man muss sich das ohne Geheimnis vorstellen. Es gab keine Verschwörung
       und keinen Plan; es gab eine Ordnung, die funktionierte, und Leute, die
-      darin ihre Arbeit taten. Genau das macht es [[schwerer zu ertragen als
-      ein Verbrechen]].
+      darin ihre Arbeit taten. Genau das macht es schwerer zu ertragen als
+      ein Verbrechen.
 
 
       Als die Prüfer kamen, fanden sie alles in Ordnung, und das war die
@@ -118,7 +116,7 @@ rueckseite:
 
 
       Wer den Bericht liest, erfährt, dass es gebrannt hat. Wer das Tier
-      gekannt hat, erfährt [[etwas anderes. |16]]
+      gekannt hat, erfährt etwas anderes.
 ---
 
 Platzhalter für die lange Beschreibung.

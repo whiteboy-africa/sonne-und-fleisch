@@ -55,7 +55,7 @@ leseprobe:
 
     Die Japaner haben diese Folklore arrangiert, um eine bestimmte Wirkung
     bei ihren Gästen zu erzielen, denke ich. Sie wollen, dass sie sich
-    willkommen fühlen, sie einlullen und [[weich machen]]. Ich betrachte
+    willkommen fühlen, sie einlullen und weich machen. Ich betrachte
     das Ganze intensiv, achte darauf, ob es etwas in mir auslöst. Aber da
     ist nichts.
 
@@ -78,9 +78,9 @@ leseprobe:
     Japanern zu tun haben.
 
 
-    Der Film erzählt von der [[Einheit 731]] und den Gräueltaten, die sie
-    Ende des Zweiten Weltkriegs an chinesischen [[Kriegsgefangenen verübt
-    hat. |24]]
+    Der Film erzählt von der Einheit 731 und den Gräueltaten, die sie
+    Ende des Zweiten Weltkriegs an chinesischen Kriegsgefangenen verübt
+    hat.
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Getauscht — Corporal Curses ist jetzt Seite A.
 rueckseite:
@@ -114,26 +114,22 @@ rueckseite:
   # indem man den Pfad unten wieder auf sie zeigen laesst. Ein Bild unter
   # demselben Namen auszutauschen ginge nicht: der Cache zeigte weiter das
   # alte.
-  # Was in doppelten Klammern steht, wird beim Bauen
-  # herausgeschnitten und als Balken gedruckt — es steht in keinem HTML.
   leseprobe:
     # Der Wortlaut aus dem Buchsatz — Ruggieris Brief in Schlegels
-    # Übersetzung, nicht mehr nacherzählt. Geschwärzt wird im Text selbst:
-    # was in [[doppelten Klammern]] steht, wird beim Bauen herausgeschnitten
-    # und als Balken gedruckt; es steht in keinem HTML.
+    # Übersetzung, nicht mehr nacherzählt.
     seite: 19
     text: >-
       Ich halte Wort, mein werter Freund, indem ich Ihnen hier die
       Kreuzigung beschreibe, welche Mathieu Lovat, Marcs Sohn, 47 Jahre
       alt, mit dem Beinamen Casale – von seinem Geburtsorte, einem zum
-      Kirchspiele [[Soldo gehörenden Dörfchen im Bezirke von Bellune]] –
+      Kirchspiele Soldo gehörenden Dörfchen im Bezirke von Bellune –
       am Morgen des 19. Juli 1805 an sich selbst vollzogen hat.
 
 
       Bevor ich mich in eine nähere Schilderung dieser seltsamen,
       wahnsinnigen Handlung einlasse, ist es nötig, vorläufig Ihnen einige
-      Umstände darzulegen, die Licht über den [[körperlichen und
-      moralischen Zustand]] des hier in Frage stehenden Menschen
+      Umstände darzulegen, die Licht über den körperlichen und
+      moralischen Zustand des hier in Frage stehenden Menschen
       verbreiten.
 
 
@@ -144,7 +140,7 @@ rueckseite:
       auffallend zu sehen, dass der Pfarrer und sein Vikar die einzigen
       waren, welche keineswegs das Feld bearbeiteten, und dass sie in
       ihren Personen alles vereinten, was die kleine Welt, in der er
-      lebte, ihm an [[Macht und Ansehen vorspiegelte. Dies zusammen
+      lebte, ihm an Macht und Ansehen vorspiegelte. Dies zusammen
       erweckte, aus Nachahmung, in ihm den Gedanken, Priester werden zu
       wollen.
     # Im Wortlaut des Buchsatzes.
@@ -152,13 +148,13 @@ rueckseite:
       In dieser Absicht unterwarf er sich dem Unterrichte des Vikars, von
       welchem er lesen und ein wenig schreiben lernte. Allein die Not seiner
       Familie, die sie außer Stand setzte, ihm ein Erbteil auszusetzen, zwang
-      ihn, ganz und gar aufs Studieren [[Verzicht zu tun]], und er entschloss
+      ihn, ganz und gar aufs Studieren Verzicht zu tun, und er entschloss
       sich, das Schumacherhandwerk zu erlernen.
 
 
       Die Verleugnung seines eigenen Willens in der Wahl eines Standes, der
-      die Geschicke des Lebens bestimmt, hat stets auch den [[stärksten Geist
-      empört |20]]
+      die Geschicke des Lebens bestimmt, hat stets auch den stärksten Geist
+      empört
 ---
 
 Platzhalter für die lange Beschreibung.
