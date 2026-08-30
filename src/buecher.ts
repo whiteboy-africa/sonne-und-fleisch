@@ -179,8 +179,10 @@ function leseprobeLesen(
   geschwaerzt?: string[],
   schluss?: string,
   fortsetzung?: string,
+  halb?: string,
 ): BookExcerpt {
   const seiten = {
+    ...(halb ? { halfImage: halb } : {}),
     ...(geschwaerzt?.length ? { blackImages: geschwaerzt } : {}),
     ...(schluss ? { closingImage: schluss } : {}),
   };
@@ -311,6 +313,7 @@ export function alsKatalogBuch(
             d.leseprobe.geschwaerzt,
             d.leseprobe.schluss,
             d.leseprobe.fortsetzung,
+            d.leseprobe.halb,
           ),
         }
       : {}),
@@ -350,6 +353,7 @@ export function alsKatalogBuch(
                     d.rueckseite.leseprobe.geschwaerzt,
                     d.rueckseite.leseprobe.schluss,
                     d.rueckseite.leseprobe.fortsetzung,
+                    d.rueckseite.leseprobe.halb,
                   ),
                 }
               : {}),

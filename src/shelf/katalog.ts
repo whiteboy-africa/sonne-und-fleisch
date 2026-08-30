@@ -68,6 +68,8 @@ export type BookExcerpt = {
    * **gedruckten** Schwaerzungen.
    */
   image?: string;
+  /** Die halbe Seite als echtes Bild: oben Satz, unten Balken. */
+  halfImage?: string;
   /** Die geschwaerzten Folgeseiten als echte Seiten, der Reihe nach. */
   blackImages?: string[];
   /**

@@ -47,12 +47,14 @@ leseprobe:
   # genügt es, hier die Nummern zu tauschen.
   seite: 11
   bild: /buecher/yellow-fever/leseprobe-s11.webp
+  # Die rechte Seite der ersten Doppelseite: obere Haelfte Satz, darunter
+  # Balken — ausgespielt mit `--kopf 0.55` aus derselben Druckdatei.
+  halb: /buecher/yellow-fever/leseprobe-s12-halb.webp
   # Die Folgeseiten, ebenfalls echt — schon beim Ausspielen geschwaerzt.
+  # Nur noch eine: die Folge hat zwei Doppelseiten. Die uebrigen bleiben
+  # liegen, geloescht wird in `public/` nicht.
   geschwaerzt:
-    - /buecher/yellow-fever/leseprobe-s12-schwarz.webp
     - /buecher/yellow-fever/leseprobe-s13-schwarz.webp
-    - /buecher/yellow-fever/leseprobe-s14-schwarz.webp
-    - /buecher/yellow-fever/leseprobe-s15-schwarz.webp
   # Die Schlussseite, ebenfalls echt — mit ausgesparter Zone für den
   # Stempel (`--stanze 0.40 0.66` beim Ausspielen).
   schluss: /buecher/yellow-fever/leseprobe-s16-stanze.webp
@@ -74,10 +76,13 @@ rueckseite:
   leseprobe:
     seite: 37
     bild: /buecher/yellow-fever/leseprobe-goetveren-s37.webp
+    halb: /buecher/yellow-fever/leseprobe-goetveren-s38-halb.webp
     geschwaerzt:
-      - /buecher/yellow-fever/leseprobe-goetveren-s38-schwarz.webp
       - /buecher/yellow-fever/leseprobe-goetveren-s39-schwarz.webp
-      - /buecher/yellow-fever/leseprobe-goetveren-s40-schwarz.webp
+    # Die Schlussseite mit der Stanze fuer den Stempel — sie fehlte, und
+    # die letzte Doppelseite war darum nachgebaut, mitten zwischen echten
+    # Scans.
+    schluss: /buecher/yellow-fever/leseprobe-goetveren-s36-stanze.webp
   cover_farbe: '#c9b98a'
   akzent_farbe: '#c8352a'
   schrift_farbe: '#22303c'

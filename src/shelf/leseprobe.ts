@@ -159,14 +159,19 @@ function seitenFolge(probe: BookExcerpt): Seitenart[] {
   // Die rechte Seite der ersten Doppelseite: oben laeuft der Satz weiter,
   // unten faengt die Schwaerzung an. Ohne `continuation` ist sie eine
   // gewoehnliche geschwaerzte Seite.
-  const anschluss = probe.continuation?.length
-    ? ({ art: 'halb', nummer: probe.page + 1, probe } as const)
-    : ({ art: 'schwarz', nummer: probe.page + 1 } as const);
-  folge.push(
-    probe.blackImages?.[0] && anschluss.art === 'schwarz'
-      ? { ...anschluss, bild: probe.blackImages[0] }
-      : anschluss,
-  );
+  if (probe.halfImage) {
+    // Die echte halbe Seite: oben Satz, unten Balken, beides im Bild.
+    folge.push({ art: 'halb', nummer: probe.page + 1, probe, bild: probe.halfImage });
+  } else if (probe.continuation?.length) {
+    folge.push({ art: 'halb', nummer: probe.page + 1, probe });
+  } else {
+    const echt = probe.blackImages?.[0];
+    folge.push({
+      art: 'schwarz',
+      nummer: probe.page + 1,
+      ...(echt ? { bild: echt } : {}),
+    });
+  }
   for (let i = 1; i <= schwarzeSeiten; i += 1) {
     // Liegt die echte Seite geschwaerzt vor, wird sie gezeigt; sonst
     // zeichnet die Seite ihre Balken selbst.
@@ -379,6 +384,19 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     rechts: boolean,
   ) {
     const blatt = document.createElement('article');
+
+    // Die echte halbe Seite bringt alles mit: Kolumne, Satz, Balken.
+    if (seite.bild) {
+      blatt.className = 'blatt blatt--halb blatt--bild';
+      const bild = document.createElement('img');
+      bild.className = 'blatt__bild';
+      bild.src = seite.bild;
+      bild.alt = '';
+      bild.decoding = 'async';
+      blatt.append(bild);
+      return blatt;
+    }
+
     blatt.className = 'blatt blatt--halb';
     blatt.append(kolumne(seite.nummer, rechts));
 

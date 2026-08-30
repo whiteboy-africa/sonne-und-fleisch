@@ -54,6 +54,17 @@ const leseprobe = z
      * Reihenfolge, in der sie kommen. Wo keine mehr da ist, zeichnet die
      * Seite ihre Balken selbst.
      */
+    /**
+     * Die **halbe Seite** als echtes Bild: oben laeuft der Satz weiter,
+     * unten faengt die Schwaerzung an. Ausgespielt mit
+     * `node scripts/seite-schwaerzen.mjs … --kopf 0.55` — der Anteil sagt,
+     * wie viel oben stehenbleibt.
+     *
+     * Das Gegenstueck zu `fortsetzung`: bei gesetztem Text entscheidet
+     * der Redakteur, wo abgebrochen wird, bei einer echten Seite die
+     * Zahl im Aufruf.
+     */
+    halb: z.string().optional(),
     geschwaerzt: z.array(z.string()).optional(),
     /**
      * Die **Schlussseite** als echte Seite — geschwaerzt, aber mit einer
