@@ -4,11 +4,15 @@ titel: Gnadenthal — Suspiria Ex Scetis
 kurztitel: Suspiria Ex Scetis
 autor: J. von Ohrid
 klappentext: >-
-  Platzhalter: zwei bis vier Sätze zur ersten Geschichte.
+  Die Seufzer der Väter von Sketis, bei denen das Weinen ein Handwerk war
+  und nicht eine Stimmung. Daneben die Rechnungsbücher von Gnadenthal, das
+  ihre Ordnung übernahm und ihren Namen dazu: zwölf Gulden im Jahr, vier
+  Jahrzehnte lang, für einen Posten ohne Gegenstand.
 klammer: >-
   Wüstenväter-Seufzer aus Sketis neben einem Leichnam, der zu senden beginnt. Das älteste und das neueste Gebet im selben Rücken.
-zitat: Platzhalter für einen Satz aus dem Buch.
-zitat_von: Verlagsnotiz
+zitat: >-
+  Ein Bruder fragte, worüber man weine. Der Altvater sagte: nicht worüber.
+zitat_von: Aus den Seufzern
 format: Broschur
 # Platzhalter, bis die Druckdatei da ist.
 seiten_zahl: 232
@@ -24,101 +28,138 @@ reihenfolge: 9
 # Zweite Vorderseite: ein Zeitschriftenumschlag in Rosa und Schwarz,
 # Farben von dort genommen.
 leseprobe:
-  seite: 57
+  # ERZEUGT, nicht aus einem Manuskript — das Buch ist noch nicht
+  # geschrieben. **Sie soll aus dem Buch sprechen, nicht ueber es.** Hier
+  # stand ein Text im Nachwortton („Von den Vaetern in der Wueste heisst
+  # es …"), also ein Referat statt einer Seite.
+  #
+  # Ersetzen, sobald der Buchsatz da ist.
+  seite: 88
   text: >-
-    Von den Vätern in der Wüste heißt es, sie hätten das Weinen gelernt wie
-    andere ein Handwerk. Es war nicht Trauer, was sie übten, und es war
-    auch nicht Reue. Es war eine Tätigkeit, und sie hatten Regeln dafür,
-    die aufzuschreiben ihnen zu gefährlich schien.
+    Ein Bruder kam zu Altvater Poimen und sagte: Ich habe drei Jahre lang
+    geweint und weiß nicht, ob es etwas genützt hat.
 
 
-    Der Bruder, von dem hier die Rede ist, kam aus dem Norden und sprach
-    die Sprache schlecht. Man gab ihm die Zelle am Ende der Reihe und
-    ließ ihn drei Jahre in Ruhe. Was er in diesen drei Jahren tat, wissen
-    wir aus zwei Zeilen einer fremden Handschrift, und die widersprechen
-    einander.
+    Der Altvater sagte: Wenn du weißt, ob es genützt hat, hast du nicht
+    geweint, sondern gerechnet.
 
 
-    Im vierten Jahr ging er zum Ältesten und stellte seine Frage. Der
-    Älteste antwortete nicht mit einem Wort, sondern hielt ihm die
-    geöffnete Hand hin, und der Bruder ging zurück und schwieg weitere
-    zwei Jahre. Diese Geste ist mehrfach überliefert und jedes Mal anders
-    gedeutet.
+    Ein anderer Bruder fragte denselben Altvater: Worüber soll ich weinen?
+    Und der Altvater sagte: nicht worüber. Der Bruder ging fort und
+    verstand es nicht, und weil er es nicht verstand, kam er wieder, und
+    weil er wiederkam, hatte er angefangen.
 
 
-    Gnadenthal hat davon nur die Form übernommen, nicht den Inhalt. Man
-    baute die Zellen in derselben Reihe, man richtete die Stunden nach
-    derselben Ordnung, und man nannte es bei einem Namen, der ihm nicht
-    zustand. Das ist keine Anklage; es ist eine Beschreibung.
+    Von Altvater Sisoes wird erzählt, er habe einen Jungen bei sich
+    gehabt, der nachts weinte, ohne dass ihm etwas fehlte. Die Brüder
+    wollten ihn wegschicken, weil sie meinten, er störe. Sisoes sagte:
+    Lasst ihn; er kann es schon, und wir üben noch.
 
 
-    Was blieb, ist das Weinen selbst, losgelöst von dem, wofür es einmal
-    gestanden hatte. In den Akten des Hauses erscheint es als Position,
-    zwischen dem Verbrauch an Kerzen und der Ausgabe für Salz.
-  # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-  # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+    Ein junger Mönch bat um eine Regel, die er aufschreiben könne. Der
+    Altvater sagte: Schreib auf, was du morgen wieder tun wirst.
+
+
+    Altvater Arsenios wurde gefragt, warum er das Fenster verhängt habe.
+    Er sagte: Damit ich nicht sehe, was ich sonst beschreiben müsste.
+
+
+    Ein Bruder, der viel gelesen hatte, kam und wollte über die Schrift
+    sprechen. Der Altvater hörte ihm zu und sagte nichts. Als der Bruder
+    gegangen war, sagte er zu einem anderen: Er hat gut geredet, und ich
+    habe ihm nicht geantwortet, weil er sonst noch besser geredet hätte.
+
+
+    Und wieder ein anderer sagte: Ich habe in Sketis vierzig Jahre
+    gelebt, und das Einzige, was ich gelernt habe, ist, morgens
+    aufzustehen, bevor mir einfällt, warum.
+  # Die rechte Seite: derselbe Vorgang, wie ihn Gnadenthal spaeter
+  # verbucht. Sie bricht ab beim Posten ohne Gegenstand.
   fortsetzung: >-
-    Zwölf Gulden im Jahr, gleichbleibend über vier Jahrzehnte, in
-    derselben Handschrift fortgeschrieben, auch als die Hand längst eine
-    andere war.
+    In Gnadenthal übernahm man die Reihe der Zellen, die Ordnung der
+    Stunden und den Namen dazu. Was man nicht übernehmen konnte, war
+    das, wofür die Ordnung dagewesen war; man übernahm sie trotzdem, weil
+    sie sich bewährt hatte.
 
 
-    Niemand hat je vermerkt, wofür die Summe stand. Sie wurde bezahlt,
-    weil sie im Vorjahr bezahlt worden war, und sie stand da, bis das Haus
-    aufgelöst wurde. In der Schlussabrechnung führt sie der Kommissar
-    unter den Posten ohne Gegenstand.
+    Im Hauptbuch steht das Weinen als Position, zwischen dem Verbrauch an
+    Kerzen und der Ausgabe für Salz. Zwölf Gulden im Jahr, gleichbleibend
+    über vier Jahrzehnte, in derselben Handschrift fortgeschrieben, auch
+    als die Hand längst eine andere war. Niemand hat je vermerkt, wofür
+    die Summe stand. Sie wurde bezahlt, weil sie im Vorjahr bezahlt worden
+    war, und sie stand da, bis das Haus aufgelöst wurde. In der
+    Schlussabrechnung führt sie der Kommissar unter den
 rueckseite:
   titel: Qorpus Delicti
   kurztitel: Qorpus Delicti
   autor: QRT
   klappentext: >-
-    Platzhalter: die Einführung in die zweite Geschichte des Bandes,
-    gesammelte Schriften 1996–1998.
+    Gesammelte Schriften 1996–1998. Am Anfang steht ein Leichnam, aber
+    nicht als Rätsel: gefragt wird nicht, wer es war, sondern was ein
+    Körper ist, wenn er niemandem mehr gehört. Dazwischen Listen — was
+    gefunden, was gewogen, was nicht bestimmt werden konnte.
+  zitat: Der Körper zeigt die Tat nicht. Die Tat macht den Körper sichtbar.
+  zitat_von: QRT
   cover_bild: /buecher/gnadenthal-suspiria/qorpus-delicti.webp
   cover_farbe: '#232627'
   akzent_farbe: '#e0839a'
   schrift_farbe: '#d1c39f'
   motiv: schematic
   leseprobe:
-    seite: 12
+    # ERZEUGT, nicht aus einem Manuskript. **Sie soll aus dem Buch
+    # sprechen, nicht ueber es.** Hier stand eine Besprechung („QRT
+    # schreibt gegen den eigenen Satz an, und man sieht es jeder Seite
+    # an") — das ist ein Urteil ueber den Band, kein Satz aus ihm.
+    #
+    # Ersetzen, sobald der Buchsatz da ist.
+    seite: 104
     text: >-
-      QRT schreibt gegen den eigenen Satz an, und man sieht es jeder Seite
-      an. Der Text nimmt zurück, was er zwei Zeilen vorher behauptet hat,
-      nicht aus Unsicherheit, sondern weil das Behaupten selbst zur Debatte
-      steht.
+      Die Formel meint das Ding, an dem sich die Tat zeigt. Man nimmt sie
+      beim Wort und hat schon verloren: das Ding zeigt gar nichts, es
+      liegt da. Gezeigt wird erst, wenn jemand hinsieht, und hingesehen
+      wird erst, wenn etwas passiert ist. Also macht nicht der Körper die
+      Tat sichtbar, sondern die Tat den Körper.
 
 
-      Am Anfang steht ein Leichnam, aber nicht als Rätsel. Er ist da,
-      vollständig, und niemand fragt, wer es war; gefragt wird, was ein
-      Körper ist, wenn er niemandem mehr gehört. Die Antwort wird über
-      dreihundert Seiten nicht gegeben, und das ist die Arbeit.
+      Vorher war er nichts, das man hätte sehen müssen. Er ging über die
+      Straße, er stand in der Schlange, er war statistisch erfasst und
+      insofern vorhanden, aber niemand hatte einen Grund, ihn zu
+      betrachten. Der Grund kommt von außen und nachträglich, und er
+      kommt nie von ihm selbst.
 
 
-      Die juristische Formel, die dem Buch den Titel gibt, meint das Ding,
-      an dem sich die Tat zeigt. QRT nimmt sie beim Wort und dreht sie um:
-      nicht der Körper zeigt die Tat, sondern die Tat macht den Körper erst
-      sichtbar. Vorher war er nichts, das man hätte sehen müssen.
+      Daraus folgt etwas Unangenehmes für alle, die glauben, sie hätten
+      einen Körper. Sie haben keinen. Sie haben eine Anwartschaft auf
+      einen, einlösbar in dem Moment, in dem ihnen etwas zustößt, und bis
+      dahin bewegt sich etwas durch die Stadt, das man am ehesten als
+      Adresse beschreibt.
 
 
-      Dazwischen stehen Listen. Was gefunden wurde, was gewogen wurde, was
-      man nicht bestimmen konnte. Der Ton dieser Listen ist derselbe wie der
-      des übrigen Textes, und wer sie überspringt, verliert genau die
-      Stelle, um die es geht.
+      Das ist keine Klage. Es ist die Beschreibung eines Vorteils. Solange
+      dich niemand ansieht, kannst du dich bewegen; sobald du sichtbar
+      wirst, wirst du gemessen, und was gemessen wird, wird beschrieben,
+      und was beschrieben ist, gehört dem Beschreiber.
 
 
-      Zum Schluss löst sich nichts auf. Die letzte Seite wiederholt die
-      erste, mit einer Änderung, die man beim ersten Lesen nicht bemerkt und
-      beim zweiten nicht mehr los wird, weil sie alles davor umschreibt.
-    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+      Die Kunst der neunziger Jahre hat daraus einen Kult gemacht und
+      dabei den einfachen Teil übersehen: dass Sichtbarkeit nichts ist,
+      was man erwirbt, sondern etwas, das einem zustößt, und dass man
+      sie sich nicht aussucht — so wenig wie der auf dem Tisch.
+    # Die rechte Seite: die Listen. Sie bricht in einer davon ab.
     fortsetzung: >-
-      Es ist ein einziges Wort, und es steht an einer Stelle, an der beim
-      ersten Mal ein anderes stand. Wer es findet, liest von vorn.
+      Ich habe die Protokolle gelesen, weil ich wissen wollte, wie die
+      Sprache aussieht, die das leistet. Sie ist unauffällig. Sie besteht
+      aus Substantiven und Maßen und aus einem einzigen Verb, das immer
+      wieder vorkommt: vorgefunden.
 
 
-      Man kann das für einen Kunstgriff halten. Wer den Band aber zweimal
-      gelesen hat, weiß, dass es kein Griff ist, sondern eine Auskunft
-      darüber, wie der Text entstanden ist.
+      Vorgefunden wurden: ein Hemd, Baumwolle, hellblau, Gr. 40, an drei
+      Stellen durchtrennt. Ein Schlüsselbund mit vier Schlüsseln, davon
+      einer ohne Zuordnung. Achtzig Mark in Scheinen, zwei Mark vierzig in
+      Münzen. Ein Fahrschein, entwertet, Zone A, ohne Datum. Ein Zettel
+      mit einer Telefonnummer, sechsstellig, unvollständig, Bleistift,
+      Handschrift nicht
+
 ---
 
 Platzhalter für die lange Beschreibung.

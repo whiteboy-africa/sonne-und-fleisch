@@ -94,53 +94,78 @@ rueckseite:
   kurztitel: Damascus Goat
   autor: A. Dwoku
   klappentext: >-
-    Platzhalter: die Einführung in die zweite Geschichte des Bandes.
+    Ein Zollschreiber in einem Ausfuhrhafen führt Buch über Tiere, die
+    zwischen Verladung und Ankunft verschwinden. Die Differenz wird nicht
+    als Verlust gebucht, sondern umgewidmet. Nach elf Jahren weiß er,
+    wie viele Ziegen ein Mensch ist.
+  zitat: Der Hafen zählt keine Tiere. Der Hafen zählt Vorgänge.
+  zitat_von: Herr Ibraimi
   cover_bild: /buecher/dolly/rueckseite.webp
   cover_farbe: '#2e2d16'
   akzent_farbe: '#d68f00'
   schrift_farbe: '#8a978b'
   motiv: branches
   leseprobe:
-    seite: 9
+    # ERZEUGT, nicht aus einem Manuskript — das Buch ist noch nicht
+    # geschrieben. **Sie soll aus dem Buch sprechen, nicht ueber es.**
+    # Hier stand ein Text im Nachwortton („Die Ziege von Damaskus,
+    # schreibt Dwoku, sei kein Tier, sondern eine Verwaltungseinheit"):
+    # dritte Person, Urteil ueber den Band, kein Satz aus ihm. Eine Probe
+    # ist eine Seite, keine Besprechung.
+    #
+    # Ersetzen, sobald der Buchsatz da ist.
+    seite: 63
     text: >-
-      Die Ziege von Damaskus, schreibt Dwoku, sei kein Tier, sondern eine
-      Verwaltungseinheit. Wer das für einen Scherz hält, hat die ersten
-      fünfzig Seiten nicht gelesen, und wer die ersten fünfzig Seiten
-      gelesen hat, hält es für zu wenig gesagt.
+      Im dritten Sommer bekam ich den Schlüssel zum hinteren Schuppen, und
+      seitdem schlief ich schlecht.
 
 
-      Angefangen hat es mit einer Rechnung. Vierzehn Tiere gingen ein, elf
-      kamen an, und die Differenz wurde nicht als Verlust gebucht, sondern
-      als Umwidmung. Das Wort steht in keinem Wörterbuch dieses Faches,
-      und trotzdem hat es sich gehalten.
+      Der Schuppen war für die Tiere, deren Papiere nicht mehr stimmten.
+      Nicht für die kranken — kranke gingen durch, dafür gab es eine
+      Spalte. Papiere stimmen nicht, wenn jemand vergessen hat, sie zu
+      ändern, und wer sie ändern durfte, war im Sommer selten da. Die
+      Tiere standen also hinten, fraßen, tranken, wurden fett und kamen
+      in keinem Buch des Hafens vor.
 
 
-      Der Händler, dessen Namen wir nicht nennen, führte drei Bücher: eines
-      für sich, eines für die Behörde und ein drittes, von dem niemand
-      wusste, dass es ihm gehörte. Im dritten stehen keine Zahlen, sondern
-      Namen, und hinter jedem Namen ein Zeichen, das er nie erklärt hat.
+      Herr Ibraimi zeigte mir am ersten Abend, wie man zählt. Er ging die
+      Reihe entlang und legte jedem Tier kurz die Hand auf den Rücken, so
+      wie man einem Kind über den Kopf streicht, und bei jeder Hand sagte
+      er eine Zahl. Am Ende der Reihe sagte er eine andere Zahl, und die
+      schrieb ich auf.
 
 
-      Man muss sich das ohne Geheimnis vorstellen. Es gab keine Verschwörung
-      und keinen Plan; es gab eine Ordnung, die funktionierte, und Leute, die
-      darin ihre Arbeit taten. Genau das macht es schwerer zu ertragen als
-      ein Verbrechen.
+      „Und die erste?", fragte ich.
 
 
-      Als die Prüfer kamen, fanden sie alles in Ordnung, und das war die
-      Wahrheit. Sie fuhren wieder ab, und drei Wochen später brannte der
-      Stall, und der Bericht darüber besteht aus einem Satz, in dem das
-      Wort Ziege nicht vorkommt.
-    # ERZEUGT, nicht aus dem Manuskript. Ersetzen, sobald der Buchsatz da
-    # ist — sie steht hier, damit die rechte Seite nicht leer bleibt.
+      „Die erste ist für mich", sagte er. „Die zweite ist für den Hafen.
+      Sie werden sehen, es ist immer dieselbe Differenz."
+
+
+      Es war immer dieselbe Differenz. Elf Jahre lang, jeden Monat, in
+      einer Handschrift, die mit den Jahren meine wurde. Man lernt das
+      nicht an einem Tag. Man lernt es, indem man einmal fragt, eine
+      Antwort bekommt, die keine ist, und danach nicht mehr fragt, weil
+      das Nichtfragen bequemer ist und niemandem auffällt.
+
+
+      Im vierten Sommer merkte ich, dass ich die Tiere nicht mehr ansah.
+      Ich ging die Reihe entlang wie er, legte die Hand auf und sagte die
+      Zahl, und was unter der Hand war, war warm und war eine Ziffer.
+    # Die rechte Seite: der Winter, in dem die Differenz nicht stimmte.
     fortsetzung: >-
-      Ich habe den Satz abgeschrieben und trage ihn seither bei mir. Er
-      ist in der Sprache der Ämter verfasst, die nichts behauptet und
-      alles zulässt: ein Datum, ein Sachschaden, kein Urheber.
+      Einmal, in einem Winter, stimmte sie nicht. Es fehlten zwei mehr als
+      sonst, und ich stand mit dem Blatt vor ihm und wusste nicht, ob der
+      Fehler meiner war oder seiner.
 
 
-      Wer den Bericht liest, erfährt, dass es gebrannt hat. Wer das Tier
-      gekannt hat, erfährt etwas anderes.
+      Herr Ibraimi sah das Blatt länger an als nötig. Dann fragte er mich,
+      ob ich in den elf Jahren je etwas vermisst hätte, und ich verstand
+      die Frage falsch und sagte nein. Er nickte, als hätte ich richtig
+      geantwortet. Dann nahm er einen Bleistift, änderte eine einzige
+      Ziffer und gab mir das Blatt zurück, und ich trug es hinüber, und
+      drüben nahm es jemand entgegen, ohne
+
 ---
 
 Platzhalter für die lange Beschreibung.

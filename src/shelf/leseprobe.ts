@@ -971,8 +971,18 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
        * solange die Schale noch `hidden` ist — dort ist jedes Mass null,
        * und der Beschnitt der Balken lief ins Leere. Also noch einmal,
        * sobald die Doppelseite im Fluss steht.
+       *
+       * **Und danach noch zweimal.** Auch im Fluss steht das Mass noch
+       * nicht fest: die Buchschrift kann in diesem Augenblick erst
+       * geladen werden, und mit ihr aendert sich die Zeilenhoehe. Der
+       * unterste Balken ragte dann um eine viertel Zeile in den Fusssteg,
+       * ein schwarzer Strich weiter draussen als alles andere auf der
+       * Seite. Kuerzen ist folgenlos, wenn nichts zu kuerzen ist — also
+       * lieber dreimal messen als einmal danebenliegen.
        */
       zeilenKuerzen();
+      requestAnimationFrame(() => zeilenKuerzen());
+      document.fonts?.ready.then(() => zeilenKuerzen());
       // Die Doppelseite legt sich zuerst genau auf die, die in der Szene
       // aufgeschlagen daliegt — gemessen, nicht gerechnet —, und faehrt von
       // dort in ihre eigene Lage. Meist ist das ein Weg von wenigen Pixeln;
