@@ -52,8 +52,8 @@ hoehe: 2.0
 dicke: 0.078
 reihenfolge: 7
 rueckseite:
-  titel: The Melancholy of Quidam
-  kurztitel: Melancholy of Quidam
+  titel: Quidams Schwermut
+  kurztitel: Quidams Schwermut
   autor: Aleksandar Vadim
   # Aus dem Manuskript „QUIDAMS SCHWERMUT IV.docx" — 8.864 Zeichen,
   # dreizehn Absaetze, keine offenen Stellen.

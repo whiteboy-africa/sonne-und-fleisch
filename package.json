@@ -15,6 +15,7 @@
     "postinstall": "node scripts/cms-kopieren.mjs",
     "astro": "astro",
     "pruefen:platzhalter": "node scripts/platzhalter-pruefen.mjs",
+    "pruefen:inhalt": "node scripts/inhalt-pruefen.mjs",
     "cover:normalisieren": "node scripts/cover-normalisieren.mjs"
   },
   "dependencies": {

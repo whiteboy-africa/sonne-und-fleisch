@@ -542,9 +542,28 @@ export function regalStarten(wurzel: HTMLElement) {
         // einzelner Anstoss verpufft, solange der Band noch im Stapel
         // liegt: das Regal holt ihn erst heraus. Also so lange nachfassen,
         // bis er wirklich offen ist.
-        const gewuenscht = Number(
-          new URLSearchParams(window.location.search).get('band'),
-        );
+        const wunsch = new URLSearchParams(window.location.search).get('band');
+
+        /*
+         * **Die offene Stelle hat einen Namen, keine Zahl.** Ihre Nummer
+         * ergibt sich aus der Position und wandert mit jedem echten Band
+         * weiter — heute 012, morgen 013. Eine Adresse, die darauf zeigt,
+         * ist schon beim naechsten Buch falsch.
+         *
+         * Schlimmer noch: `?band=012` traefe sie gar nicht. Die Zahl
+         * indiziert den Katalog roh, und dort liegen hinter den elf
+         * Baenden erst das Blatt, dann das Heft und dann der Rohling —
+         * 012 oeffnete das Blatt.
+         */
+        if (wunsch === 'vakant') {
+          const blind = katalog.findIndex((b) => b.blind);
+          if (blind >= 0) {
+            window.setTimeout(() => engine?.blindOeffnen(blind), 0);
+          }
+          return;
+        }
+
+        const gewuenscht = Number(wunsch);
         if (
           Number.isInteger(gewuenscht) &&
           gewuenscht >= 1 &&

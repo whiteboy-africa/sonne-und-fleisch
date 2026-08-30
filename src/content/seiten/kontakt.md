@@ -32,4 +32,4 @@ Postadresse oben verwenden.
 Die offene Stelle der Reihe steht im Stapel: der letzte Band, unbedruckt.
 Dort steht, was wir suchen, und dorthin schickt man den Text.
 
-[Zum vakanten Band](/programm/blindband)
+[Zum vakanten Band](/?band=vakant)
