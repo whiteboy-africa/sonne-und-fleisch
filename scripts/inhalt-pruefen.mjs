@@ -72,8 +72,25 @@ for (const b of buecher) {
     const abs = m[2].split(/\n\s*\n/).map((x) => sicht(x.replace(/\s+/g, ' ').trim())).filter(Boolean);
     const n = abs.reduce((s, x) => s + x.length, 0);
     const seite = i === 0 ? 'A' : 'B';
-    if (n < 1450) melde('Leseprobe zu kurz', `${b.name} ${seite}`, `${n} Zeichen (voll ist rund 1.650)`);
-    if (n > 1850) melde('Leseprobe zu lang', `${b.name} ${seite}`, `${n} Zeichen`);
+    /*
+     * **Nur zaehlen, nicht urteilen.** Hier stand eine Schwelle — unter
+     * 1.450 Zeichen „zu kurz" —, und sie war falsch: nachgemessen im Bild
+     * fuellen Dolly, Dom Bosco und Patmos ihre Seite auf 100 %, obwohl
+     * sie nur 1.038 bis 1.273 Zeichen tragen.
+     *
+     * Wie viele Zeichen eine Seite haelt, haengt an drei Dingen, die je
+     * Band verschieden sind: am Format (`breite_verhaeltnis` macht die
+     * Spalte schmaler), an der Schrift (`leseprobe_schrift` — Times
+     * setzt enger als die Hausserife, das sind neun Zeichen je Zeile
+     * Unterschied) und an der Zahl der Absaetze. Eine Zahl fuer alle gibt
+     * es darum nicht.
+     *
+     * Gemessen wird im Bild: Band aufschlagen und
+     * `document.querySelector('.blatt__satz')` nach `scrollHeight` gegen
+     * `clientHeight` fragen. 100 % ist voll, darueber faellt der Rest
+     * unter den Beschnitt.
+     */
+    melde('Leseprobe, Umfang', `${b.name} ${seite}`, `${n} Zeichen`);
   }
 }
 

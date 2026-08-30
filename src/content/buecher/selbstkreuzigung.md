@@ -50,6 +50,11 @@ motiv: gather
 # Zeile in den Angaben steht nicht da. Kommt der Text, kommt sie.
 hoehe: 2.0
 dicke: 0.078
+# Das wirkliche Druckformat, aus „QUIDAMS SCHWERMUT – Buchsatz.docx":
+# 7286 x 11246 Twips, also 5,06 x 7,81 Zoll. Es kam beim Seitentausch
+# zunaechst in der falschen Datei zu liegen — das Mass gehoert dem Band,
+# und Quidam liegt jetzt hier.
+breite_verhaeltnis: 0.648
 reihenfolge: 7
 rueckseite:
   titel: Quidams Schwermut

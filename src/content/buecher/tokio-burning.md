@@ -35,9 +35,6 @@ schrift_farbe: '#d67016'
 motiv: boom
 hoehe: 2.0
 dicke: 0.078
-# Das wirkliche Druckformat aus dem Buchsatz: 5,06 x 7,81 Zoll. Ohne die
-# Angabe stuende die echte Seite in einem A5-Rahmen.
-breite_verhaeltnis: 0.648
 reihenfolge: 8
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 # Aus dem Manuskript, im Wortlaut: der Gang in die Empfangshalle.
