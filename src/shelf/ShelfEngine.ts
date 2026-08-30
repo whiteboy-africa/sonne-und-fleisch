@@ -230,6 +230,14 @@ const introAzimuth = 0.15;
  * niemand sieht sie.
  */
 const introHalten = 2.0;
+
+/**
+ * Wie lange ein Wenden dauert. Dieselbe Groessenordnung wie ein Zug im
+ * Stapel (`browsePhaseDuration`, 0,12 bis 0,28 s) — nur traegt der
+ * Schwung eine ganze Drehung mehr und bekommt entsprechend mehr Zeit.
+ */
+const wendeDauerFlach = 0.4;
+const wendeDauerSchwung = 0.72;
 /** Wie traege das Sinken danach ist. Klein heisst langsam. */
 const introTempo = 0.45;
 
@@ -2659,12 +2667,26 @@ export class ShelfEngine {
      * klein, und traege Finger sind schlimmer als ein schneller
      * Umschlag.
      */
-    const wendetGerade =
-      Math.abs(this.zielYaw - this.inspectYaw) > 0.05 ||
-      Math.abs(this.zielPitch - this.inspectPitch) > 0.05;
-    const drehTempo = this.reducedMotion ? 24 : wendetGerade ? 6.5 : 11;
-    this.inspectYaw = damp(this.inspectYaw, this.zielYaw, drehTempo, delta);
-    this.inspectPitch = damp(this.inspectPitch, this.zielPitch, drehTempo, delta);
+    // Wer die Hand anlegt, hat Vorrang: der Zug bricht ab, und von da an
+    // laeuft die Drehung wieder der Hand hinterher.
+    if (this.pointerDown) this.wendeLaeuft = false;
+    if (this.wendeLaeuft) {
+      this.wendeZeit += delta;
+      const t = clamp(this.wendeZeit / this.wendeDauer, 0, 1);
+      const s = t * t * (3 - 2 * t);
+      this.inspectYaw = this.wendeVonYaw + (this.zielYaw - this.wendeVonYaw) * s;
+      this.inspectPitch =
+        this.wendeVonPitch + (this.zielPitch - this.wendeVonPitch) * s;
+      if (t >= 1) {
+        this.wendeLaeuft = false;
+        this.inspectYaw = this.zielYaw;
+        this.inspectPitch = this.zielPitch;
+      }
+    } else {
+      const drehTempo = this.reducedMotion ? 24 : 11;
+      this.inspectYaw = damp(this.inspectYaw, this.zielYaw, drehTempo, delta);
+      this.inspectPitch = damp(this.inspectPitch, this.zielPitch, drehTempo, delta);
+    }
 
     // Waehrend eines Seitwaertswechsels stehen zwei Baende nebeneinander:
     // der bisherige faehrt hinaus, der naechste kommt herein.
@@ -3740,6 +3762,32 @@ export class ShelfEngine {
    */
   private wendeBand: number | null = null;
 
+  /*
+   * **Das Wenden laeuft auf Zeit, nicht auf Daempfung.**
+   *
+   * Vorher lag es auf `damp()` wie alles andere in der Betrachtung. Eine
+   * Daempfung legt in jedem Bild denselben Anteil des Rests zurueck: sie
+   * kommt nie wirklich an, sie naehert sich nur. Nachgemessen am Schwung
+   * (5,64 Rad um die Hochachse): die halbe Drehung war nach 133 ms
+   * herum, das letzte Zehntel brauchte noch einmal 350 ms. Man sah einen
+   * Band losschiessen und dann zum Stillstand kriechen — im Stapel faellt
+   * das nicht auf, weil der Band klein und weit weg ist, in der
+   * Betrachtung steht er gross vor einem und man sieht nur das Kriechen.
+   *
+   * Der Stapel macht es laengst richtig (`book-motion.ts`): feste Dauern
+   * je Zug und `smoothstep` darueber — eine Bewegung, die anfaengt,
+   * traegt und **landet**. Dasselbe hier.
+   *
+   * Das Ziehen mit der Hand bleibt bei der Daempfung: dort ist der Rest
+   * immer klein, und traege Finger sind schlimmer als ein schneller
+   * Umschlag.
+   */
+  private wendeLaeuft = false;
+  private wendeZeit = 0;
+  private wendeDauer = 0;
+  private wendeVonYaw = 0;
+  private wendeVonPitch = 0;
+
   private wendeSchritt(bandIndex: number | null) {
     if (bandIndex !== this.wendeBand) {
       this.wendeBand = bandIndex;
@@ -3768,6 +3816,20 @@ export class ShelfEngine {
     const schritt = this.wendeSchritt(this.selectedIndex);
     this.zielPitch += schritt.quer;
     this.zielYaw += schritt.hoch;
+    // Von dort, wo der Band gerade steht — nicht vom letzten Ziel. Wer
+    // schnell zweimal drueckt, soll die zweite Drehung dort anfangen
+    // sehen, wo die erste steht.
+    this.wendeVonYaw = this.inspectYaw;
+    this.wendeVonPitch = this.inspectPitch;
+    this.wendeZeit = 0;
+    // Der Schwung traegt eine ganze Drehung mehr und darf laenger
+    // dauern; sonst waere er bloss schneller, nicht groesser.
+    this.wendeDauer = this.reducedMotion
+      ? 0
+      : schritt.hoch !== 0
+        ? wendeDauerSchwung
+        : wendeDauerFlach;
+    this.wendeLaeuft = this.wendeDauer > 0;
   }
 
   /**
