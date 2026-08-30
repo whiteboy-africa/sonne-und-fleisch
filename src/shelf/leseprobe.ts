@@ -666,10 +666,19 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
     spanne.querySelectorAll<HTMLElement>('.balken-block').forEach((block) => {
       const satz = block.closest<HTMLElement>('.blatt__satz');
       if (!satz) return;
-      const unten = satz.getBoundingClientRect().bottom;
+      /*
+       * **Gemessen wird am Satzspiegel, nicht am Rahmen.** Hier stand die
+       * Unterkante des Elements — und die liegt unter dem Fusssteg. Ein
+       * Balken durfte damit bis an den Papierrand laufen, waehrend der
+       * Text eine Zeile darueber aufhoert: unten stand ein schwarzer
+       * Strich weiter draussen als alles andere auf der Seite. Der Fuss
+       * gehoert dem Papier, auch auf der geschwaerzten Haelfte.
+       */
+      const rand = satz.getBoundingClientRect();
+      const unten = rand.bottom - parseFloat(getComputedStyle(satz).paddingBottom);
       Array.from(block.children).forEach((kind) => {
         const zeile = kind as HTMLElement;
-        if (zeile.getBoundingClientRect().bottom > unten) zeile.remove();
+        if (zeile.getBoundingClientRect().bottom > unten + 0.5) zeile.remove();
       });
     });
 

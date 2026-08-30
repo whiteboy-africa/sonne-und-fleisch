@@ -65,10 +65,16 @@ leseprobe:
   # rund 80 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
   # rund 40 fuer diese, und die Stelle um 18.
   seite: 18
-  # Im Wortlaut des Buchsatzes, Absaetze 41 und 42. Alte Rechtschreibung
+  # Im Wortlaut des Buchsatzes, Absaetze 40 bis 42. Alte Rechtschreibung
   # („Schuß", „daß") absichtlich stehengelassen — die Vorlage haelt sie,
   # und das Buch ist von 1927.
   text: >-
+    Als aber das Essen aufgetragen wurde, setzte eine gewisse Entspannung
+    ein, die sich jedoch in dem Maße, in dem der große rote Uhrzeiger dem
+    viertel vor zwölf sich näherte, in eine beängstigende Spannung
+    verwandelte.
+
+
     Als aber der Zeiger zwei Minuten vor dreiviertel stand, das letzte
     Gedeck abgeräumt wurde und die beiden Roten sich an die Seiten der
     rotverhangenen Tafel begaben, da verlor Nummer Eins den Rest seiner
@@ -104,11 +110,9 @@ leseprobe:
     indem er auf einen kleinen bereitstehenden Schemel trat, steckte den
     Kopf durch die Schlinge und stieß nach kurzem Zögern den Schemel fort.
     Das Geräusch der unter den scheinbar mit übermenschlicher Kraft
-    geführten Zuckungen bebenden Eisenstange in der Kuppel, der Anblick
-    des entsetzlich entstellten Gesichtes und des in häßlichen Kleidern
-    wie ein Lumpen herabhängenden Körpers ließ im Saal jedes Geräusch
-    verstummen. Nachdem der Arzt den Tod festgestellt hatte, schnitt einer
-    der Henker den Strick ab und schob die Leiche mit dem
+    geführten Zuckungen bebenden Eisenstange in der Kuppel und der Anblick
+    des in häßlichen Kleidern wie ein Lumpen herabhängenden Körpers ließ
+    im Saal jedes Geräusch
 cover_bild: /buecher/selbstmoerder-wettbewerb/cover.webp
 # Aus dem Umschlag genommen: der Papierton als Einband, die violette
 # Schreibmaschinentinte als Akzent.
@@ -183,16 +187,18 @@ rueckseite:
       Duftes gleichermaßen beherrsche, auf dass das Gesamtkunstwerk
       entstehe, als Geschichte zu riechen oder als Ton zu lesen, etc.
       etc., … doch um es kurz zu machen: Das ohnehin spärliche Publikum,
-      das sich in ihrer Dachkammer versammelt hatte, wurde ungeduldig.
+      das sich in ihrer Dachkammer versammelt hatte – hauptsächlich
+      Journalisten und mehrere Herren ohne festen Wohnsitz, stolz versorgt
+      mit Radonwasser in Fin-de-Siècle-Gläsern –, wurde ungeduldig. Der
+      bescheidenen Reize von Justines Körper überdrüssig – ihres
+      glanzlosen Haars, ihrer schmalen Hüften, ihrer Adlernase –, gingen
+      sie zum Flüstern über und zum Austausch gedämpfter Bemerkungen.
     # Die rechte Seite: der erste Satz. Sie bricht ab, wo der
     # Zitronenakkord zum zweiten Mal entzogen wird.
     fortsetzung: >-
-      Der bescheidenen Reize von Justines Körper überdrüssig – ihres
-      glanzlosen Haars, ihrer schmalen Hüften, ihrer Adlernase –, gingen
-      sie zum Flüstern über, zum Dösen, zum Austausch gedämpfter
-      Bemerkungen, bis die Komponistin von Sinners in the Hands of an
-      Angry God den eröffnenden olfaktorischen Akkord anschlug und die
-      anwesenden Herren auf ihr richtiges Maß zurückgeführt wurden.
+      Bis die Komponistin von Sinners in the Hands of an Angry God den
+      eröffnenden olfaktorischen Akkord anschlug und die anwesenden Herren
+      auf ihr richtiges Maß zurückgeführt wurden.
 
 
       Der erste Satz begann. Leicht entzündet bediente Justine die Tasten

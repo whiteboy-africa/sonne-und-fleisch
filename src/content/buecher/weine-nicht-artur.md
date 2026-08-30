@@ -66,12 +66,15 @@ leseprobe:
     Artur schaute mich an, so als wolle er etwas sagen, aber immer wenn er
     sich anschickte den Mund zu öffnen, pressten sich seine Lippen wieder
     zusammen und seine Blicke irrten durch das Dunkel der Winternacht.
+  # Im Wortlaut des Buchsatzes. Der letzte Absatz der linken Seite laeuft
+  # hier weiter — deshalb steht er ohne Einzug.
+  fortsetzung: >-
     Zuerst hatte ich vor, mich abzuwenden und zu gehen, aber dann schaute
     ich Artur abermals an, schloss meine Augen und wähnte wieder müde das
     Licht des Sternenhimmels zu sehen, die Ewigkeit und glaubte alle
     Geheimnisse des Alls gelöst.
-  # Im Wortlaut des Buchsatzes.
-  fortsetzung: >-
+
+
     „Komm Bursche", sagte ich zu ihm, tat meine Handfläche auf seinen
     Nacken und wir begannen den Weg zu meinem Haus. Ich ging geschwind, als
     ob ich vor dem Unstern flöhe und Artur trottete müde meinen Schritten
@@ -129,8 +132,14 @@ rueckseite:
     # rund 48 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
     # rund 24 fuer diese, und die Stelle um 9.
     seite: 9
-    # Im Wortlaut des Buchsatzes, Absaetze 38 bis 41.
+    # Im Wortlaut des Buchsatzes, Absaetze 37 bis 41.
     text: >-
+      Jetzt ist dir der Honig gewöhnlich geworden und du betreibst deine
+      Pflege mit teuren Ölgewächsen: Nur selten gewährst du Lichas noch
+      eine Audienz, und selbst dann gibst du ihm das Gefühl, er sei der
+      gewöhnlichste Mensch im gesamten Römischen Reich.
+
+
       Doch er ist dir verfallen: ein dummer alter Lichas will dich
       beeindrucken mit seinen Geschenken und seinen Reisen. Gerade noch so
       willigst du ein, ihn nach Capri zu begleiten, denn du hast gehört,

@@ -152,9 +152,18 @@ rueckseite:
     # rund 144 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
     # rund 72 fuer diese, und die Stelle um 42.
     seite: 42
-    # Im Wortlaut des Buchsatzes, Absatz 13. Er laeuft auf der rechten
-    # Seite weiter — deshalb steht er dort ohne Einzug.
+    # Im Wortlaut des Buchsatzes, Absaetze 12 und 13. Der zweite laeuft auf
+    # der rechten Seite weiter — deshalb steht er dort ohne Einzug.
     text: >-
+      Aus dieser sogenannten „Forschungstradition" ging schließlich ein
+      jahrzehntelanger Strom trockener und mit Fußnoten verminter
+      Untersuchungen hervor, der letztlich kluge Köpfe wie Alfred Döblin
+      oder Martin Buber jeglicher akademischen Selbstachtung berauben
+      würde – allesamt elend daran scheiternd, zu begreifen, was mit dem
+      Weißen Lotus nach dem Großen Aufstand geschah und wie sie aufgehört
+      hatten zu existieren.
+
+
       In den gnostischen Zirkeln der südlichen Provinzen hingegen wussten
       auch die Türhüter und ihre debilen Gehilfen zu berichten, dass
       Quidam und sein Konklave bei ihrem Marsch auf die City of Darkness –
@@ -169,12 +178,15 @@ rueckseite:
       Dualismus unterjochen sollte: In den folgenden Wochen würden sich
       eine Handvoll Quidams engster Berater in den Untergrund
       zurückziehen, um sich unter Namen von obskurer und dunkler Bedeutung
-      neu zu formieren – die neuen Gruppierungen hießen etwa Wukong jiao
-      („Bewusstsein für die Leere"), Luodao jiao („Arhat-Weg") und
-      Wenxiang jiao („Derjenige, der den Duft empfindet").
-    # Die rechte Seite: das Verfahren selbst. Sie bricht ab, wo die
+      neu zu formieren.
+    # Die rechte Seite: die Namen und das Verfahren. Sie bricht ab, wo die
     # Flakons unter die Menschen kommen.
     fortsetzung: >-
+      Die neuen Gruppierungen hießen etwa Wukong jiao („Bewusstsein für
+      die Leere"), Luodao jiao („Arhat-Weg") und Wenxiang jiao
+      („Derjenige, der den Duft empfindet").
+
+
       Von dem Zeitpunkt des Zaitonerlebnisses an verfolgte der Weiße Lotus
       eine neue Praxis, die die Menschheit mithilfe einer Methode der
       Nanjing Decadence aus ihrer tierwarmen Fleischhülle befreien sollte:

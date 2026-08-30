@@ -44,13 +44,11 @@ leseprobe:
     keinen Roman, sondern um eine „transzendente Parfumkreation"
     handle, die die Essenz aller seiner „profunden Teeerfahrungen der
     letzten Jahrzehnte" beinhalten sollte; ich war perplex angesichts des
-    ungeheuerlichen Ausmaßes der Nutzlosigkeit meiner Reise und der
-    grausamen 72 Stunden von Zhongdian; doch nach all den Strapazen war
+    ungeheuerlichen Ausmaßes der Nutzlosigkeit meiner Reise; doch nach
+    all den Strapazen war
     ich in keiner Stimmung mehr zu verhandeln, also nahm ich das Parfum
     dankend in Empfang und sprühte mir damit in einer Kreuzbewegung unter
-    die Achseln und über die verschwitzte Knopfleiste meines Hemdes; ein
-    nicht unangenehmer Geruch breitete sich aus, der mich für einige
-    Augenblicke lang besänftigen konnte.
+    die Achseln und über die verschwitzte Knopfleiste meines Hemdes.
 
 
     Die Stimmung kippte schließlich, als Sava mein Geld in Empfang

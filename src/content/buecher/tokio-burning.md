@@ -155,9 +155,15 @@ rueckseite:
     # rund 40 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
     # rund 20 fuer diese, und die Stelle um 8.
     seite: 8
-    # Im Wortlaut des Buchsatzes, Absaetze 36 bis 38. Der letzte laeuft auf
+    # Im Wortlaut des Buchsatzes, Absaetze 35 bis 38. Der letzte laeuft auf
     # der rechten Seite weiter.
     text: >-
+      Er band es einerseits an den untersten Teil des senkrechten
+      Kreuzstammes fest und andererseits an die beiden Enden der
+      Querhölzer, welche die Arme des Kreuzes bildeten, sodass dieses Netz
+      einem kegelförmig umgekehrten Beutel glich.
+
+
       Nachdem diese grausamen Vorbereitungen beendigt waren, krönte sich
       Mathieu Lovat mit Dornen, von denen drei oder vier durch die die
       Stirn bedeckende Haut drangen. Mit einem weißen, mit Fäden an seinen

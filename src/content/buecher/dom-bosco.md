@@ -116,12 +116,23 @@ rueckseite:
     # dem Umbruch nachtragen.
     seite: 61
     text: >-
+      Das Motiv des Selbstmords aus Rache oder Groll ist bisweilen
+      ernsthaft. Häufig aber ist seine Nichtigkeit derart, dass unser
+      abendländischer Verstand nicht begreifen kann, wie eine in unseren
+      Augen belanglose Ursache einen solchen Entschluss herbeiführen kann.
+      Der Chinese ist ein rachsüchtiges Wesen. Er ist zugleich ein
+      Impulsiver, der der ersten Regung von Zorn oder Missmut leicht
+      nachgibt. Vorbedachte Rache und unüberlegte Aufwallung führen aus
+      demselben Grund zum Selbstmord: aus Genugtuung der Eigenliebe bei
+      dem Gedanken, man werde seinem Nächsten schaden können.
+
+
       Ein chinesisches Sprichwort, das Gesetzeskraft hat, sagt: „Das Leben
       wird mit dem Leben bezahlt." So versteht man, welch üble Sache die
       Person am Hals hat, um derentwillen jemand sich den Tod gibt.
       Manchmal rächt sich ein abgewiesener Bettler an Ihnen, indem er sich
-      vor Ihrer Tür die Kehle durchschneidet; das sind die
-      glücklichsten Fälle.
+      vor Ihrer Tür die Kehle durchschneidet; das sind die glücklichsten
+      Fälle.
 
 
       Wer sich rächen will, trifft alle Vorkehrungen, damit sein Tod die

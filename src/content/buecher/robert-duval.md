@@ -43,9 +43,17 @@ leseprobe:
   # rund 48 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
   # rund 24 fuer diese, und die Stelle um 18.
   seite: 18
-  # Im Wortlaut des Manuskripts, Absaetze 32 und 33. Der letzte laeuft auf
+  # Im Wortlaut des Manuskripts, Absaetze 31 bis 33. Der letzte laeuft auf
   # der rechten Seite weiter.
   text: >-
+    Ihr kam zugute, dass sie neben ihrer künstlerischen Ausbildung in
+    Belgrad auch eine wirtschaftliche absolviert hatte, sodass ihr
+    mithilfe einiger
+    einflussreicher Klienten der Eintritt in die Geschäftswelt gelang und
+    sie noch im selben Jahr bei Boston Consulting begann: „Tlön, Uqbar –
+    Jovana geht zu BCG", kommentierte das ihr ehemaliger Partner.
+
+
     Als Jo und Robert gemeinsam austraten und sich auf dem Rooftop eine
     Mevius Menthol teilten, zeigte sie auf die Hochhäuser, die high rise
     buildings der Banken und Berater, die sie umgaben, und erklärte ihm im
@@ -113,10 +121,20 @@ rueckseite:
     # rund 48 Seiten, ein Wendeband teilt sie auf zwei Geschichten — also
     # rund 24 fuer diese, und die Stelle um 11.
     seite: 11
-    # Im Wortlaut des Manuskripts, Absaetze 12 bis 14. Die chinesischen
+    # Im Wortlaut des Manuskripts, Absaetze 11 bis 14. Die chinesischen
     # Zeilen gehoeren zum Satz und bleiben stehen — das Gespraech laeuft
     # ueber den Uebersetzer, und ohne beide Haelften waere es keines.
     text: >-
+      Der Raum ist zweckmäßig. Stockbetten. Eine Deckenlampe, die flackert
+      und gelbes Licht abgibt. Ein moosgrüner Teppichboden, der bis ins
+      Bad verlegt wurde, wo ein Klo und direkt darüber ein Spiegel an der
+      Wand angebracht sind. Eine Duschkabine. Der Supply-Träger deutet auf
+      eines der Stockbetten und weist mir die untere Matratze zu. Ich
+      werfe meinen Rucksack darauf, während er die Leiter erklimmt und
+      oben in einem Beutel kramt. Er steigt wieder zu mir herab, und eine
+      Flasche schimmert in seiner Hand.
+
+
       Wir haben uns auf die Treppen vor dem Hotel gesetzt und die
       Landschaft liegt im letzten Glühen des Sonnenuntergangs. Der
       Reisschnaps ist scharf. Ich huste, sage: „Shit." Der Supply-Träger
