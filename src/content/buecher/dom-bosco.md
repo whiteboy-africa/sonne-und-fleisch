@@ -59,16 +59,30 @@ leseprobe:
     kaum begonnene Kreuzzeichen segnete das ganze Weltall, warf nach allen
     Seiten eine Aussaat von Barmherzigkeit und Hingabe, die nach und nach
     aufgehen sollte.
-  # Im Wortlaut des Buchsatzes.
-  fortsetzung: >-
+
+
     Der Schüler brachte seinem Meister andere zu; bald wimmelte es von
     ihnen; ihre Zahl überstieg rasch [[hundert]]. Dom Bosco versammelte sie
     abends in der Sakristei der Kirche, und tagsüber ging er sie in ihren
     Werkstätten besuchen oder suchte Arbeit für die, welche keine hatten.
+    Das Werk lief ohne allzu große Hindernisse, als er, da seine
+    Studienzeit zu Ende war, das Institut Sankt Franziskus verlassen
+    musste. Sein Beichtvater Dom Cafasso, ein heiligmäßiger Mann, der ihn
+    liebte, ließ ihn daraufhin zum Direktor des kleinen Hospizes der
+    heiligen Philomena ernennen, und er wurde bei dieser Gelegenheit einem
+    Priester französischer Herkunft namens [[Borel]] beigeordnet, der ein
+    von der Marquise von Barolo gestiftetes Mädchenasyl verwaltete.
+  # Im Wortlaut des Buchsatzes.
+  fortsetzung: >-
+    Seine Kammer lag in diesem Asyl. Er brachte seine Kinder dorthin, doch
+    sie reichte nicht aus, sie zu fassen; ihre Zahl wuchs unaufhörlich,
+    sie kamen über alle Pfade, sie langten über alle Straßen an. Zu mehr
+    als dreihundert quollen sie in die Korridore, ins Treppenhaus,
+    ergossen sich in den Hof.
 
 
-    Das Werk lief ohne allzu große Hindernisse, als er, da seine Studienzeit
-    zu Ende war, das [[Institut Sankt Franziskus |24]]
+    Der Abbé Borel, der Dom Bosco der zuverlässigste Freund war, half ihm
+    nach Kräften, aber die Lage wurde [[unhaltbar. |11]]
 # Wendeband: auf der Rückseite die zweite Geschichte, kopfüber gedruckt.
 rueckseite:
   titel: La Chine hermétique
