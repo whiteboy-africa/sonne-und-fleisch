@@ -601,6 +601,19 @@
 }
 
 /*
+ * Der Balken, der die abgebrochene Zeile schliesst. Seine Breite kommt
+ * aus der Messung (`anschlussSetzen`), nicht von hier — nur der
+ * Anfangswert steht da, damit vor der ersten Messung kein Balken
+ * aufblitzt. Kein negativer Rand wie bei den uebrigen: er sitzt hinter
+ * einem Wort, nicht in einem Satz, und soll dort nicht hineinragen.
+ */
+.balken--anschluss {
+  width: 0;
+  margin: 0;
+  transform: translateY(0.08em);
+}
+
+/*
  * Eine ganz geschwaerzte Seite. Nicht ein Balken pro Zeile — das ergab ein
  * schwarzes Rechteck —, sondern zwei bis vier mit Wortabstaenden dazwischen,
  * in Absaetzen mit Einzug und kurzer Schlusszeile. Man soll sehen, dass hier

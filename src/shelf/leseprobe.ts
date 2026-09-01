@@ -410,6 +410,25 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
       stuecke.forEach((stueck, stelle) =>
         stueckAnhaengen(absatz, stueck, seite.nummer * 31 + index * 7 + stelle),
       );
+      /*
+       * **Der Anschlussbalken.**
+       *
+       * Der Satz bricht mitten im Wort ab, und danach stand: nichts. Kein
+       * Punkt, keine Schwaerzung — bloss der Rest der Zeile leer, und die
+       * Balken fingen eine Zeile tiefer an. Das liest sich als
+       * Absatzende, nicht als Abbruch; man sucht den Punkt, der fehlt.
+       *
+       * Hier kommt deshalb ein Balken **in dieselbe Zeile**, gleich hinter
+       * das letzte Wort, und laeuft bis an den Rand. Die Schwaerzung
+       * setzt damit dort an, wo der Satz aufhoert. Die Breite steht erst
+       * nach dem Umbruch fest — `anschlussSetzen()` misst sie.
+       */
+      if (letzter) {
+        const anschluss = document.createElement('span');
+        anschluss.className = 'balken balken--anschluss';
+        anschluss.setAttribute('aria-hidden', 'true');
+        absatz.append(anschluss);
+      }
       satz.append(absatz);
     });
     satz.append(balkenBlock(seite.nummer, balkenZeilen));
@@ -655,7 +674,38 @@ export function leseprobeAnhaengen(wurzel: HTMLElement, haken: LeseprobeHaken) {
    * Zeilen, dann wird der Rest in einem Zug entfernt. Zeile fuer Zeile
    * wegzunehmen und jedesmal nachzumessen kostete ein Bild.
    */
+  /**
+   * Misst, wie viel von der letzten Zeile nach dem Abbruch noch frei ist,
+   * und macht den Anschlussbalken so breit.
+   *
+   * Gemessen wird am eigenen Ort: der Balken steht als letztes im Absatz;
+   * setzt man ihn auf Breite null, liegt seine linke Kante genau dort, wo
+   * der Satz aufhoert. Der Abstand zum rechten Rand des Satzspiegels ist
+   * die gesuchte Breite.
+   *
+   * **Unter zwei Zeichen wird nichts gesetzt.** Bricht der Satz kurz vor
+   * dem Rand ab, waere der Balken ein Strich und saehe nach Fleck aus;
+   * dann faengt die Schwaerzung wie bisher in der naechsten Zeile an.
+   */
+  function anschlussSetzen() {
+    spanne
+      .querySelectorAll<HTMLElement>('.balken--anschluss')
+      .forEach((balken) => {
+        const absatz = balken.parentElement;
+        if (!absatz) return;
+        balken.style.width = '0px';
+        const eigen = balken.getBoundingClientRect();
+        const rand = absatz.getBoundingClientRect();
+        const schrift = parseFloat(getComputedStyle(absatz).fontSize) || 16;
+        // Ein Wortabstand bleibt zwischen Satz und Balken stehen.
+        const luecke = schrift * 0.26;
+        const frei = rand.right - eigen.left - luecke;
+        balken.style.width = frei >= schrift * 2 ? `${frei}px` : '0px';
+      });
+  }
+
   function zeilenKuerzen() {
+    anschlussSetzen();
     /*
      * Auf der halben Seite haengen die Balken unter dem Satz, und wo der
      * Satz aufhoert, steht nicht vorher fest. Gemessen wird darum am
