@@ -1088,6 +1088,19 @@
 }
 
 /*
+ * Die Beratungszeile steht unten, gleich ueber der Adresse — sie gehoert
+ * zu ihr, nicht in den Vorspann. Voller Ton, kein Kleingedrucktes: sie
+ * ist ein Angebot, keine Fussnote.
+ *
+ * Der Rhythmus bleibt: 26 (Liste → Kleingedrucktes), 34 (→ Beratung),
+ * 18 (→ Adresse). Keine zwei nebeneinander gleich.
+ */
+.inserate__beratung {
+  margin: 34px 0 0;
+  font-size: 13px;
+}
+
+/*
  * Unter 768: der Preis geht in seine eigene Zeile unter den Namen und
  * bleibt rechtsbuendig. Ein zweispaltiges Raster mit `max-content` waere
  * dort entweder gequetscht oder umgebrochen.
@@ -1113,7 +1126,7 @@
  * in diesem Abschnitt steht sie sonst nirgends.
  */
 .inserate__post {
-  margin: 44px 0 0;
+  margin: 18px 0 0;
   font-size: 13px;
 }
 

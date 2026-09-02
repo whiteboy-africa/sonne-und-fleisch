@@ -38,7 +38,7 @@ Wir lesen unverlangte Manuskripte. Ein Text muss einen halben Band füllen.
 
 <h2 class="inserate__titel">Inserate</h2>
 
-<p class="inserate__vorspann">Die Reihe ist eine gute Gelegenheit, Ihr Produkt, Ihre Firma oder sich selbst als subkulturaffin und den Künsten zugetan zu präsentieren. Wir beraten Sie gerne individuell.</p>
+<p class="inserate__vorspann">Die Reihe ist eine gute Gelegenheit, Ihr Produkt, Ihre Firma als subkulturaffin und sich selbst als Mäzen der Künste zu präsentieren.</p>
 
 <dl class="inserate__liste">
 <dt>Erwähnung in den Credits</dt>
@@ -53,9 +53,12 @@ Wir lesen unverlangte Manuskripte. Ein Text muss einen halben Band füllen.
 
 <p class="inserate__kleingedrucktes">Alle Preise ca. und ohne Gewähr.</p>
 
-<!-- Dieselbe Adresse wie beim vakanten Band, also die aus
-     verlag-config.ts. Die vier Adressen auf sonne-und-fleisch.de in den
-     uebrigen Markdown-Seiten sind Platzhalter und gehoeren nachgezogen. -->
-<p class="inserate__post"><a href="mailto:salve@sonneundfleisch.com?subject=Inserat">Inserate: salve@sonneundfleisch.com</a></p>
+<p class="inserate__beratung">Wir beraten Sie gerne individuell.</p>
+
+<!-- **Eigene Adresse fuer die Inserate**, nicht die des vakanten Bandes:
+     dort kommen Manuskripte an, hier Werbekunden, und die zwei sollen
+     nicht in demselben Postfach landen. Der Name ist der Witz, den der
+     Verlag hier ohnehin macht — die Inseratenaffaere. Neu anzulegen. -->
+<p class="inserate__post"><a href="mailto:inseratenaffaere@sonneundfleisch.com?subject=Inserat">inseratenaffaere@sonneundfleisch.com</a></p>
 
 </section>
