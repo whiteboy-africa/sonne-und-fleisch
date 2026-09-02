@@ -32,12 +32,14 @@ const ziel = 'public/marke';
  * ihre Mitte und nimmt so viel Gaumen mit, dass die Zaehne den Rand noch
  * andeuten.
  *
- * **300 und nicht 260, weil das Icon rund ist.** Ein Kreis nimmt an der
- * Oberkante der Schrift nur noch `sqrt(r² - dy²)` an halber Breite her;
- * bei 260 blieben dort 244 Punkte fuer 240 Punkte Schrift, und das S und
- * das H stiessen an den Rand. Bei 300 sind es 286.
+ * **Der Kreis liegt um die Schrift, nicht um den Mund.** Der Schriftblock
+ * misst 220 zu 125 Punkte; der kleinste Kreis, der ihn fasst, hat den
+ * Radius seiner halben Diagonale, `sqrt(110² + 62,5²)` = 126,5. Bei 270
+ * Kante bleiben also gut acht Punkte Luft — eng, und genau so gemeint:
+ * die Schrift soll den Kreis fuellen. Vom Gaumen bleibt der Rand, vom
+ * Mund nichts.
  */
-const iconAusschnitt = { left: 115, top: 28, width: 300, height: 300 };
+const iconAusschnitt = { left: 130, top: 42, width: 270, height: 270 };
 
 /** Was Dienste beim Teilen erwarten: 1200x630, also 1,905:1. */
 const teileBreite = 1200;
