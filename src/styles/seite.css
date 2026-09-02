@@ -1002,3 +1002,128 @@
     display: none;
   }
 }
+
+/* -------------------------------------------------------------- Inserate */
+
+/*
+ * **Der Trenner ist der der Angabentabelle**, nicht ein neuer: dieselbe
+ * Haarlinie, dieselbe Staerke. Er trennt den Abschnitt vom Kontaktblock
+ * darueber — mehr Linien gibt es hier nicht. Innen keine, denn eine
+ * Preisliste mit Linien je Zeile ist ein Formular.
+ */
+.inserate {
+  margin-top: 3.4rem;
+  padding-top: 2.6rem;
+  border-top: 1px solid var(--hairline);
+}
+
+/*
+ * `.fliesstext h2` bringt `margin-top: 2.3em` mit — hier steht die
+ * Ueberschrift aber schon unter einem Trenner, der den Abstand macht.
+ *
+ * **Mit dem Gewicht von `.fliesstext h2`**, sonst kommt es nicht an:
+ * `.inserate__titel` allein wiegt 0-1-0 und verliert gegen 0-1-1. Der
+ * Rand blieb dann stehen, und zwischen Haarlinie und Wort klafften
+ * hundertzwanzig Punkte.
+ */
+.fliesstext .inserate__titel {
+  margin-top: 0;
+}
+
+/*
+ * **Der Rhythmus, und keine zwei Spruenge nebeneinander gleich.**
+ *
+ *   Ueberschrift → Vorspann        14
+ *   Vorspann     → erste Zeile     34
+ *   Zeile        → Zeile           20
+ *   letzte Zeile → Kleingedrucktes 26
+ *   Kleingedr.   → Mailto-Zeile    44   (steht noch aus)
+ *
+ * Dieselbe Regel wie im Fussblock der Bandseite: sonst liest sich der
+ * Abschnitt als ein Block statt als Ueberschrift, Text, Liste, Fussnote.
+ */
+.inserate__vorspann {
+  margin: 14px 0 0;
+  max-width: 52ch;
+}
+
+/*
+ * Zwei Spalten in **einem** Raster, nicht ein Raster je Zeile: nur so hat
+ * die Preisspalte fuer alle Zeilen dieselbe Breite, und die Preise stehen
+ * auf einer Kante. `max-content` nimmt sich der breiteste Preis, die
+ * Namensspalte den Rest.
+ */
+.inserate__liste {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  column-gap: 2.4rem;
+  row-gap: 20px;
+  max-width: 620px;
+  margin: 34px 0 0;
+  font-size: 13px;
+}
+
+.inserate__liste dt {
+  margin: 0;
+  /* Die Klammer bleibt in derselben Zeile wie der Name, solange die
+     Breite reicht, und laeuft sonst als Fortsetzung weiter — kein
+     eigener Beschreibungsabsatz. */
+  text-wrap: pretty;
+}
+
+.inserate__liste dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.inserate__klammer {
+  color: var(--ink-soft);
+}
+
+.inserate__kleingedrucktes {
+  margin: 26px 0 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+/*
+ * Unter 768: der Preis geht in seine eigene Zeile unter den Namen und
+ * bleibt rechtsbuendig. Ein zweispaltiges Raster mit `max-content` waere
+ * dort entweder gequetscht oder umgebrochen.
+ */
+@media (max-width: 767px) {
+  .inserate__liste {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 6px;
+  }
+
+  .inserate__liste dd {
+    margin-bottom: 14px;
+  }
+
+  .inserate__liste dd:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+/*
+ * Die Zeile darunter: Mono wie die uebrige Bedienung, kein Rahmen, kein
+ * Pfeil, kein Zeichen davor. Die Giftfarbe kommt erst unter dem Zeiger —
+ * in diesem Abschnitt steht sie sonst nirgends.
+ */
+.inserate__post {
+  margin: 44px 0 0;
+  font-size: 13px;
+}
+
+.inserate__post a {
+  color: var(--ink);
+  text-decoration: none;
+  border: 0;
+}
+
+.inserate__post a:hover,
+.inserate__post a:focus-visible {
+  color: var(--accent);
+}
