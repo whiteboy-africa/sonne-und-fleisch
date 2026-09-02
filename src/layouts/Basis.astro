@@ -57,6 +57,13 @@ const seitenTitel = titel
   : siteConfig.title;
 const seitenBeschreibung = beschreibung ?? siteConfig.description;
 const kanonisch = new URL(Astro.url.pathname, Astro.site).href;
+
+/*
+ * **Das Bild, das beim Teilen erscheint.** Absolut, nicht relativ: wer
+ * einen Link in WhatsApp oder Signal einwirft, holt das Bild von aussen,
+ * und ein Pfad ohne Herkunft fuehrt dort nirgendwohin.
+ */
+const teilebild = new URL('/marke/teilen.jpg', Astro.site).href;
 ---
 
 <!doctype html>
@@ -84,9 +91,36 @@ const kanonisch = new URL(Astro.url.pathname, Astro.site).href;
     <meta property="og:description" content={seitenBeschreibung} />
     <meta property="og:url" content={kanonisch} />
     <meta property="og:locale" content="de_DE" />
+    <meta property="og:image" content={teilebild} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Ein geöffneter Mund, auf den Gaumen projiziert: SONNE + FLEISCH"
+    />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={teilebild} />
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {
+      /*
+       * **Kein SVG mehr.** `favicon.svg` (die gezeichnete Sonne) liegt
+       * noch unter `public/`, ist aber nicht mehr verlinkt: sobald ein
+       * Browser ein SVG-Icon angeboten bekommt, nimmt er das und nie das
+       * PNG daneben. Das Zeichen des Verlags ist jetzt das Foto.
+       *
+       * Der enge Ausschnitt ist Absicht — siehe `scripts/marke-bauen.mjs`.
+       * Der ganze Mund bei 32 Punkten waere ein rosa Fleck.
+       */
+    }
+    <link rel="icon" href="/marke/icon-32.png" sizes="32x32" type="image/png" />
+    <link
+      rel="icon"
+      href="/marke/icon-192.png"
+      sizes="192x192"
+      type="image/png"
+    />
+    <link rel="apple-touch-icon" href="/marke/icon-180.png" />
     {siteConfig.suchmaschinen && <link rel="sitemap" href="/sitemap-index.xml" />}
   </head>
   <body data-regalseite={regal ? 'ja' : undefined}>
