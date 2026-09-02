@@ -1007,14 +1007,17 @@
 
 /*
  * **Der Trenner ist der der Angabentabelle**, nicht ein neuer: dieselbe
- * Haarlinie, dieselbe Staerke. Er trennt den Abschnitt vom Kontaktblock
- * darueber — mehr Linien gibt es hier nicht. Innen keine, denn eine
- * Preisliste mit Linien je Zeile ist ein Formular.
+ * Haarlinie, dieselbe Staerke. Innen keine, denn eine Preisliste mit
+ * Linien je Zeile ist ein Formular.
+ *
+ * **Er liegt jetzt unten**, nicht oben: der Abschnitt steht als erstes
+ * auf der Seite, und darueber trennt schon die Linie des Seitenkopfs.
+ * Zwei Haarlinien uebereinander waeren ein Kasten.
  */
 .inserate {
-  margin-top: 3.4rem;
-  padding-top: 2.6rem;
-  border-top: 1px solid var(--hairline);
+  margin: 0 0 3.4rem;
+  padding-bottom: 2.6rem;
+  border-bottom: 1px solid var(--hairline);
 }
 
 /*
